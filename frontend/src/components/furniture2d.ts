@@ -88,6 +88,22 @@ export function furnitureSymbol(type: string, w: number, d: number): Part[] | ty
         line(0, -d * 0.16, 0, d * 0.22, "fp3d-sym-strong"),
         circle(0, d * 0.22, Math.min(w, d) * 0.045, "fp3d-sym-fill"),
       ];
+    case "air_purifier":
+      return [rect(-w / 2, -d / 2, w / 2, d / 2), circle(0, d * 0.28, Math.min(w, d) * 0.1, "fp3d-sym-fill")];
+    case "smart_speaker":
+      return [circle(0, 0, Math.min(w, d) * 0.46, "fp3d-sym-fill"), circle(0, 0, Math.min(w, d) * 0.3)];
+    case "security_camera":
+      return [rect(-w * 0.28, -d / 2, w * 0.28, -d * 0.36, "fp3d-sym-fill"), rect(-w * 0.38, -d * 0.28, w * 0.38, d * 0.36), circle(0, d * 0.34, Math.min(w, d) * 0.12, "fp3d-sym-strong")];
+    case "smart_lock":
+      return [rect(-w / 2, -d / 2, w / 2, d / 2, "fp3d-sym-fill"), line(-w * 0.15, d * 0.18, w * 0.48, d * 0.18, "fp3d-sym-strong")];
+    case "smart_curtain": {
+      const out: Part[] = [line(-w / 2, -d * 0.32, w / 2, -d * 0.32, "fp3d-sym-strong")];
+      for (let i = 0; i <= 10; i++) {
+        const x = -w / 2 + (w * i) / 10;
+        if (Math.abs(x) > w * 0.1) out.push(line(x, -d * 0.18, x, d * (i % 2 ? 0.34 : 0.12)));
+      }
+      return out;
+    }
     case "kitchen_corner":
       return [rect(-w / 2, -d / 2, w / 2, -d * 0.05), rect(-w / 2, -d * 0.05, -w * 0.05, d / 2), line(-w * 0.05, -d * 0.05, w / 2, -d * 0.05)];
     case "vanity":

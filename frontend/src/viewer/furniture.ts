@@ -1164,6 +1164,65 @@ function waterPurifier(b: Builder, w: number, d: number, h: number): void {
   b.lyingCyl("x", faucetX + w * 0.055, stemZ, cabinetH + pipe * 1.6, cabinetH + pipe * 2.5, w * 0.15, pipe * 0.9, C.dark, silver, 8);
 }
 
+function airPurifier(b: Builder, w: number, d: number, h: number): void {
+  b.pad(-w / 2, w / 2, 0, h, -d / 2, d / 2, C.white, C.whiteTop, Math.min(0.04, w * 0.1), EDGE_FURN);
+  const front = d / 2 + 0.006;
+  b.cyl(0, d / 2, w * 0.095, h * 0.69, h * 0.705, C.dark, C.dark, 18, EDGE_GLOW);
+  for (let i = 0; i < 7; i++) {
+    const y = h * (0.16 + i * 0.055);
+    b.seg(-w * 0.34, y, front, w * 0.34, y, front, EDGE_FAINT);
+  }
+  for (let i = -3; i <= 3; i++) b.seg(i * w * 0.085, h + 0.003, -d * 0.27, i * w * 0.085, h + 0.003, d * 0.22, EDGE_FAINT);
+}
+
+function smartSpeaker(b: Builder, w: number, d: number, h: number): void {
+  const r = Math.min(w, d) * 0.46;
+  b.cyl(0, 0, r, h * 0.06, h * 0.9, C.dark, C.fabricTop, 18, EDGE_FURN);
+  b.cyl(0, 0, r * 0.94, h * 0.9, h, C.dark, C.dark, 18, EDGE_GLOW);
+  b.cyl(0, 0, r * 0.72, h, h + 0.006, C.dark, C.dark, 18, EDGE_FAINT);
+  for (const x of [-w * 0.12, w * 0.12]) b.cyl(x, 0, w * 0.014, h + 0.007, h + 0.01, C.white, C.white, 8);
+}
+
+function securityCamera(b: Builder, w: number, d: number, h: number): void {
+  const y0 = 1.85;
+  b.box(-w * 0.28, w * 0.28, y0, y0 + h * 0.7, -d / 2, -d / 2 + d * 0.12, C.white, C.whiteTop, EDGE_FURN);
+  b.box(-w * 0.08, w * 0.08, y0 + h * 0.3, y0 + h * 0.45, -d / 2 + d * 0.1, 0, C.metal, C.metal, EDGE_FAINT);
+  b.lyingCyl("z", 0, d * 0.16, y0 + h * 0.17, y0 + h * 0.78, d * 0.58, h * 0.58, C.white, C.whiteTop, 14, EDGE_FURN);
+  b.lyingCyl("z", 0, d * 0.47, y0 + h * 0.28, y0 + h * 0.67, d * 0.08, h * 0.38, C.dark, C.dark, 16, EDGE_GLOW);
+  b.lyingCyl("z", 0, d * 0.515, y0 + h * 0.38, y0 + h * 0.57, d * 0.025, h * 0.18, C.accent, C.dark, 14);
+}
+
+function smartLock(b: Builder, w: number, d: number, h: number): void {
+  const y0 = 0.95;
+  const front = d / 2;
+  b.pad(-w / 2, w / 2, y0, y0 + h, -d / 2, front, C.dark, C.metal, Math.min(0.018, w * 0.12), EDGE_FURN);
+  for (let row = 0; row < 3; row++) for (let col = 0; col < 3; col++) {
+    const x = (col - 1) * w * 0.22;
+    const y = y0 + h * (0.7 - row * 0.105);
+    b.seg(x - w * 0.025, y, front + 0.005, x + w * 0.025, y, front + 0.005, EDGE_GLOW);
+  }
+  b.cyl(0, front, w * 0.12, y0 + h * 0.22, y0 + h * 0.235, C.accent, C.dark, 14, EDGE_GLOW);
+  b.lyingCyl("x", w * 0.22, front + d * 0.12, y0 + h * 0.31, y0 + h * 0.4, w * 0.75, h * 0.085, C.metal, C.metal, 10, EDGE_FURN);
+}
+
+function smartCurtain(b: Builder, w: number, d: number, h: number): void {
+  const trackY = h * 0.96;
+  b.lyingCyl("x", 0, -d * 0.18, trackY, h, w, d * 0.16, C.metal, C.metal, 10, EDGE_FURN);
+  b.box(-w * 0.06, w * 0.06, trackY - h * 0.055, trackY + h * 0.015, -d * 0.28, d * 0.02, C.dark, C.dark, EDGE_GLOW);
+  const gap = w * 0.12;
+  const folds = 6;
+  for (const side of [-1, 1]) {
+    const x0 = side < 0 ? -w / 2 : gap;
+    const x1 = side < 0 ? -gap : w / 2;
+    const step = (x1 - x0) / folds;
+    for (let i = 0; i < folds; i++) {
+      const a = x0 + i * step;
+      const z = i % 2 ? d * 0.12 : -d * 0.04;
+      b.box(a, a + step * 0.82, h * 0.04, trackY, z - d * 0.18, z + d * 0.18, C.fabric, C.fabricTop, i === 0 || i === folds - 1 ? EDGE_FURN : null);
+    }
+  }
+}
+
 function kitchenCorner(b: Builder, w: number, d: number, h: number): void {
   const arm = Math.max(0.42, Math.min(w, d) * 0.46);
   b.box(-w / 2, w / 2, 0, h - 0.04, -d / 2, -d / 2 + arm, C.body, C.bodyTop, EDGE_FURN);
@@ -1440,6 +1499,10 @@ function builtInScreen(f: Furniture, w: number, d: number, h: number, floor?: Fl
   if (f.type === "range_hood") return { x0: -w * 0.4, x1: w * 0.4, y0: 0.005, y1: h * 0.06, z: d / 2 + 0.003 };
   if (f.type === "microwave") return { x0: -w * 0.4, x1: w * 0.18, y0: h * 0.17, y1: h * 0.82, z: d / 2 + 0.008 };
   if (f.type === "water_purifier") return { x0: -w * 0.28, x1: w * 0.28, y0: h * 0.8 * 0.56, y1: h * 0.8 * 0.64, z: d / 2 + 0.016 };
+  if (f.type === "air_purifier") return { x0: -w * 0.11, x1: w * 0.11, y0: h * 0.66, y1: h * 0.74, z: d / 2 + 0.008 };
+  if (f.type === "smart_speaker") return { x0: -w * 0.42, x1: w * 0.42, y0: h * 0.9, y1: h + 0.008, z: d * 0.05 };
+  if (f.type === "security_camera") return { x0: -w * 0.12, x1: w * 0.12, y0: 1.85 + h * 0.37, y1: 1.85 + h * 0.58, z: d * 0.53 };
+  if (f.type === "smart_lock") return { x0: -w * 0.36, x1: w * 0.36, y0: 0.95 + h * 0.43, y1: 0.95 + h * 0.78, z: d / 2 + 0.006 };
   if (f.type === "washer" || f.type === "dryer") {
     const cy = (h - 0.14) / 2 + 0.04;
     const r = Math.min(w * 0.36, (h - 0.2) * 0.42) * 0.8;
@@ -1564,6 +1627,21 @@ function buildFurniture(buf: GeoBuffer, lines: LineBuffer, shadow: GeoBuffer, f:
     case "water_purifier":
       waterPurifier(b, w, d, h);
       break;
+    case "air_purifier":
+      airPurifier(b, w, d, h);
+      break;
+    case "smart_speaker":
+      smartSpeaker(b, w, d, h);
+      break;
+    case "security_camera":
+      securityCamera(b, w, d, h);
+      return;
+    case "smart_lock":
+      smartLock(b, w, d, h);
+      return;
+    case "smart_curtain":
+      smartCurtain(b, w, d, h);
+      return;
     case "kitchen_corner":
       kitchenCorner(b, w, d, h);
       break;

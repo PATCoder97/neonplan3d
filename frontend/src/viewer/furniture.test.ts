@@ -201,6 +201,24 @@ test("the upright water purifier has a cabinet, top faucet and front status mark
   assert.ok(status.y0 > 0 && status.y1 < h * 0.8 && status.z > d / 2, "status mark stays on the glass cabinet front");
 });
 
+test("smart-home furniture builds recognisable finite geometry at its declared mount", () => {
+  const floor = newFloor("eg", "EG", 0);
+  for (const type of ["air_purifier", "smart_speaker", "security_camera", "smart_lock", "smart_curtain"] as const) {
+    const [w, d, h] = FURNITURE_SIZE[type];
+    const item = { id: type, type, x: 0, z: 0, w, d, h, rotation: 0, variant: null } as Furniture;
+    const base = mountBase(floor, item);
+    const buf = new GeoBuffer();
+    const lines = new LineBuffer();
+    pushFurniture(buf, lines, new GeoBuffer(), item, base);
+    const ys = buf.p.filter((_, i) => i % 3 === 1);
+    assert.ok(buf.count > 20 && lines.p.length > 0, `${type}: detailed solid and outline geometry`);
+    assert.ok(buf.p.every(Number.isFinite) && lines.p.every(Number.isFinite), `${type}: finite geometry`);
+    assert.ok(Math.min(...ys) >= base - 1e-6 && Math.max(...ys) <= base + h + 0.02, `${type}: stays inside its mounted height`);
+  }
+  assert.equal(mountBase(floor, { type: "security_camera", x: 0, z: 0, h: FURNITURE_SIZE.security_camera[2] }), 1.85);
+  assert.equal(mountBase(floor, { type: "smart_lock", x: 0, z: 0, h: FURNITURE_SIZE.smart_lock[2] }), 0.95);
+});
+
 test("ceiling and floor fans have separate finite rotors for live animation", () => {
   for (const type of ["fan_ceiling", "fan_floor"] as const) {
     const [w, d, h] = FURNITURE_SIZE[type];

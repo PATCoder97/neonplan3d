@@ -1553,6 +1553,14 @@ export class Fp3dView3d extends LitElement {
           screens.set(f.id, { color: [0.2, 0.78, 1], level: 0.85, plain: true });
         } else if (["range_hood", "microwave", "water_purifier"].includes(f.type) && running) {
           screens.set(f.id, { color: f.type === "microwave" ? [1, 0.58, 0.2] : [0.2, 0.78, 1], level: 0.8, plain: true });
+        } else if (f.type === "air_purifier" && running) {
+          screens.set(f.id, { color: [0.2, 0.9, 0.72], level: 0.85, plain: true });
+        } else if (f.type === "smart_speaker" && st && ["playing", "on", "paused"].includes(st.state)) {
+          screens.set(f.id, { color: appColor(st) ?? [0.22, 0.88, 1], level: st.state === "playing" ? 1 : 0.55, ring: true, plain: true });
+        } else if (f.type === "security_camera" && st && !["off", "idle", "unavailable", "unknown"].includes(st.state)) {
+          screens.set(f.id, { color: [0.25, 0.82, 1], level: 0.75, plain: true });
+        } else if (f.type === "smart_lock" && st) {
+          screens.set(f.id, { color: st.state === "locked" ? [0.25, 0.9, 0.55] : [1, 0.45, 0.2], level: 0.8, plain: true });
         } else if ((f.type === "washer" || f.type === "dryer" || f.type === "dishwasher") && running) {
           screens.set(f.id, { color: [0.3, 0.85, 1], level: 0.8 });
         }

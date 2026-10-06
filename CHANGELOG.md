@@ -4,6 +4,13 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.18.7
+
+### Added
+
+- Added security cameras, smart speakers, air purifiers, smart door locks and smart curtains with dedicated 2D symbols and detailed 3D models.
+- Linked the new smart-home furniture to matching camera, media player, fan, lock and cover entities, with live status accents and preview examples.
+
 ## 1.18.6
 
 ### Changed

@@ -6092,6 +6092,16 @@ export class Fp3dEditor extends LitElement {
         : media
           ? // a media player, or the smart plug an older TV is switched with
             /^(media_player|switch|input_boolean|light)\./.test(id)
+          : f.type === "security_camera"
+            ? id.startsWith("camera.")
+            : f.type === "smart_lock"
+              ? id.startsWith("lock.")
+              : f.type === "smart_curtain"
+                ? id.startsWith("cover.")
+                : f.type === "smart_speaker"
+                  ? id.startsWith("media_player.")
+                  : f.type === "air_purifier"
+                    ? /^(fan|switch)\./.test(id)
           : f.type === "radiator" || f.type === "air_conditioner"
             ? id.startsWith("climate.")
             : f.type === "robot_vacuum"

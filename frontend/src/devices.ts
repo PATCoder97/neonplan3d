@@ -692,6 +692,11 @@ const FURNITURE_NAMES: Record<string, RegExp> = {
   range_hood: /(dunstabzug|range ?hood|extractor|hút mùi|hut mui)/i,
   microwave: /(mikrowelle|microwave|lò vi sóng|lo vi song)/i,
   water_purifier: /(wasserfilter|water ?purifier|water ?dispenser|lọc nước|loc nuoc|cây nước|cay nuoc)/i,
+  air_purifier: /(luftreiniger|air ?purifier|air ?cleaner|máy lọc không khí|may loc khong khi)/i,
+  smart_speaker: /(smart ?speaker|lautsprecher|speaker|echo|alexa|homepod|google (home|nest)|loa thông minh|loa thong minh)/i,
+  security_camera: /(security ?camera|surveillance|überwachung|camera|kamera|cctv|cam an ninh)/i,
+  smart_lock: /(smart ?lock|türschloss|door ?lock|khóa cửa|khoa cua)/i,
+  smart_curtain: /(curtain|blind|shade|vorhang|rollladen|rèm|rem)/i,
 };
 const MEDIA_FURNITURE = new Set(["tv_board", "tv_wall"]);
 
@@ -809,6 +814,10 @@ export function furnitureEntities(hass: HomeAssistant, floors: readonly Floor[])
         } else if (f.type === "radiator" || f.type === "air_conditioner") {
           const climates = free.filter((id) => kindOf(id) === "climate");
           entity = climates.find((id) => pattern.test(name(id))) ?? climates[0] ?? null;
+        } else if (["air_purifier", "smart_speaker", "security_camera", "smart_lock", "smart_curtain"].includes(f.type)) {
+          const expected = { air_purifier: "fan", smart_speaker: "media", security_camera: "camera", smart_lock: "lock", smart_curtain: "cover" }[f.type];
+          const candidates = free.filter((id) => kindOf(id) === expected);
+          entity = candidates.find((id) => pattern.test(name(id))) ?? candidates[0] ?? null;
         } else if (f.type === "water_pump") {
           // Outdoor furniture has no room/area; a distinct pump name can still be found globally.
           const candidates = room ? free : Object.keys(hass.states ?? {}).filter((id) => !used.has(id));

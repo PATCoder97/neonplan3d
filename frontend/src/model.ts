@@ -779,6 +779,11 @@ export const FURNITURE_TYPES = [
   "range_hood",
   "microwave",
   "water_purifier",
+  "air_purifier",
+  "smart_speaker",
+  "security_camera",
+  "smart_lock",
+  "smart_curtain",
   "kitchen_corner",
   "vanity",
   "crib",
@@ -849,13 +854,13 @@ export const FURNITURE_TYPES = [
 /** Furniture library sections (the editor lists them in this order). */
 export const FURNITURE_GROUPS: Record<string, FurnitureType[]> = {
   lights: ["lamp_ceiling", "lamp_downlight", "lamp_spot", "lamp_panel", "lamp_pendant", "lamp_floor", "lamp_uplight", "lamp_table", "lamp_wall", "led_strip", "lamp_bollard", "lamp_garden"],
-  living: ["sofa", "sofa_l", "sofa_bed", "armchair", "stool", "coffee_table", "tv_board", "tv_wall", "sideboard", "shelf", "room_divider", "altar", "altar_wall", "plant", "rug"],
+  living: ["sofa", "sofa_l", "sofa_bed", "armchair", "stool", "coffee_table", "tv_board", "tv_wall", "smart_speaker", "smart_curtain", "sideboard", "shelf", "room_divider", "altar", "altar_wall", "plant", "rug"],
   dining: ["table", "table_round", "chair", "bench", "corner_bench", "bar_stool"],
   kitchen: ["kitchen", "kitchen_corner", "kitchen_wall", "kitchen_tall", "island", "worktop", "sink", "stove", "range_hood", "microwave", "water_purifier", "dishwasher", "fridge"],
   sleeping: ["bed", "bed_single", "bed_double", "bunk_bed", "crib", "nightstand", "wardrobe", "dresser", "vanity"],
   bath: ["bathtub", "shower", "shower_screen", "wc", "washbasin", "water_heater", "washer", "dryer", "drying_rack"],
-  climate: ["air_conditioner", "radiator", "fan_ceiling", "fan_floor"],
-  outdoor: ["water_pump", "hammock", "stone_table_set", "planter_large", "water_tank", "gate", "fence"],
+  climate: ["air_conditioner", "air_purifier", "radiator", "fan_ceiling", "fan_floor"],
+  outdoor: ["security_camera", "smart_lock", "water_pump", "hammock", "stone_table_set", "planter_large", "water_tank", "gate", "fence"],
   work: ["desk", "worktop", "office_chair", "tall_cabinet", "coat_rack", "shoe_cabinet", "shoe_bench", "stairs", "stairs_landing", "robot_vacuum"],
   vehicles: ["motorbike", "parking"],
 };
@@ -962,6 +967,10 @@ export function builtinBase(f: Pick<Furniture, "type" | "h"> & { variant?: strin
       return 1.0;
     case "meter":
       return 0.4;
+    case "security_camera":
+      return 1.85;
+    case "smart_lock":
+      return 0.95;
     default:
       return 0;
   }
@@ -987,6 +996,11 @@ export const ELECTRIC_FURNITURE = new Set<string>([
   "range_hood",
   "microwave",
   "water_purifier",
+  "air_purifier",
+  "smart_speaker",
+  "security_camera",
+  "smart_lock",
+  "smart_curtain",
   "robot_vacuum",
   "inverter",
   "home_battery",
@@ -1069,6 +1083,11 @@ export const FURNITURE_SIZE: Record<FurnitureType, [number, number, number]> = {
   range_hood: [0.75, 0.5, 0.5],
   microwave: [0.5, 0.4, 0.3],
   water_purifier: [0.42, 0.38, 1.2],
+  air_purifier: [0.32, 0.32, 0.65],
+  smart_speaker: [0.14, 0.14, 0.19],
+  security_camera: [0.2, 0.24, 0.22],
+  smart_lock: [0.1, 0.08, 0.32],
+  smart_curtain: [2.0, 0.16, 2.2],
   kitchen_corner: [1.25, 1.25, 0.92],
   vanity: [1.0, 0.45, 1.55],
   crib: [0.75, 1.25, 0.95],
