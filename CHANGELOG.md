@@ -4,6 +4,14 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.17.2
+
+### Changed
+
+- Replaced the wide editor toolbar with compact grouped menus that keep the active tool visible and leave the action buttons on one row.
+- Changed undo, redo, fit, split 3D, floor-plan lock and project configuration into compact icon actions with accessible labels and hints.
+- Added a phone toolbar with the current tool and essential actions, plus a large bottom-sheet tool picker for touch use.
+
 ## 1.17.1
 
 ### Changed

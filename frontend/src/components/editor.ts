@@ -4162,6 +4162,18 @@ export class Fp3dEditor extends LitElement {
     this._sideOpen = tool !== "select";
     if (tool === "furniture") this._furnPane = "library";
     if (tool === "settings") this.selectItem("room", null);
+    this.closeToolMenus();
+  }
+
+  private closeToolMenus(except?: HTMLDetailsElement): void {
+    for (const menu of this.renderRoot.querySelectorAll<HTMLDetailsElement>(".fp3d-tool-menu[open], .fp3d-mobile-tools[open]")) {
+      if (menu !== except) menu.open = false;
+    }
+  }
+
+  private onToolMenuToggle(e: Event): void {
+    const menu = e.currentTarget as HTMLDetailsElement;
+    if (menu.open) this.closeToolMenus(menu);
   }
 
   protected render(): TemplateResult {
@@ -4172,10 +4184,21 @@ export class Fp3dEditor extends LitElement {
       <div class="fp3d-editor ${this.narrow ? "fp3d-narrow" : ""}">
         <div class="fp3d-main">
           <div class="fp3d-toolbar">
+            <button
+              class="fp3d-toolbar-button fp3d-desktop-tool"
+              aria-pressed=${this._tool === "select"}
+              ?disabled=${!floor}
+              @click=${() => this.chooseTool("select")}
+            >
+              ${this.t("tool_select")}
+            </button>
             ${EDITOR_TOOL_GROUPS.map(
-              (group) => html`<div class="fp3d-tool-group">
-                <span>${this.t(`tool_group_${group.key}` as I18nKey)}</span>
-                <div class="fp3d-seg" role="group" aria-label=${this.t(`tool_group_${group.key}` as I18nKey)}>
+              (group) => {
+                const selected = group.tools.includes(this._tool);
+                const label = selected ? this.t(`tool_${this._tool}` as I18nKey) : this.t(`tool_group_${group.key}` as I18nKey);
+                return html`<details class="fp3d-tool-menu fp3d-desktop-tool" @toggle=${this.onToolMenuToggle}>
+                  <summary class=${selected ? "fp3d-active" : ""} aria-current=${selected ? "true" : nothing}>${label}<span aria-hidden="true">▾</span></summary>
+                  <div class="fp3d-tool-popover" role="group" aria-label=${this.t(`tool_group_${group.key}` as I18nKey)}>
                   ${group.tools.map(
                     (tool) => html`<button
                       aria-pressed=${this._tool === tool}
@@ -4185,24 +4208,59 @@ export class Fp3dEditor extends LitElement {
                       ${this.t(`tool_${tool}` as I18nKey)}
                     </button>`,
                   )}
-                </div>
-              </div>`,
+                  </div>
+                </details>`;
+              },
             )}
-            <div class="fp3d-tool-group fp3d-tool-actions">
-              <span>${this.t("tool_group_actions")}</span>
-              <div class="fp3d-seg">
-                <button ?disabled=${!this._canUndo} @click=${() => this.undo()} title="Ctrl+Z">${this.t("undo")}</button>
-                <button ?disabled=${!this._canRedo} @click=${() => this.redo()} title="Ctrl+Y">${this.t("redo")}</button>
-                <button @click=${() => this.fit()}>${this.t("fit")}</button>
-                <button aria-pressed=${this._split} title=${this.t("split_3d_hint")} @click=${() => this.toggleSplit()}>${this.t("split_3d")}</button>
-                ${this.isAdmin
-                  ? html`<button aria-pressed=${!!this._doc.settings.lock_plan} title=${this.t("lock_plan_hint")} @click=${() => this.toggleLockPlan()}>
-                      ${this._doc.settings.lock_plan ? `🔓 ${this.t("plan_unlock")}` : `🔒 ${this.t("plan_lock")}`}
-                    </button>`
-                  : nothing}
+            <details class="fp3d-mobile-tools" @toggle=${this.onToolMenuToggle}>
+              <summary class="fp3d-toolbar-button fp3d-active">${this.t(`tool_${this._tool}` as I18nKey)}<span aria-hidden="true">▾</span></summary>
+              <div class="fp3d-mobile-sheet">
+                <div class="fp3d-mobile-sheet-handle" aria-hidden="true"></div>
+                <button aria-pressed=${this._tool === "select"} ?disabled=${!floor} @click=${() => this.chooseTool("select")}>${this.t("tool_select")}</button>
+                ${EDITOR_TOOL_GROUPS.map(
+                  (group) => html`<section>
+                    <h3>${this.t(`tool_group_${group.key}` as I18nKey)}</h3>
+                    <div>
+                      ${group.tools.map(
+                        (tool) => html`<button
+                          aria-pressed=${this._tool === tool}
+                          ?disabled=${(!floor && tool !== "settings") || (!this.isAdmin && tool !== "select")}
+                          @click=${() => this.chooseTool(tool)}
+                        >
+                          ${this.t(`tool_${tool}` as I18nKey)}
+                        </button>`,
+                      )}
+                    </div>
+                  </section>`,
+                )}
               </div>
+            </details>
+            <div class="fp3d-toolbar-actions" role="group" aria-label=${this.t("tool_group_actions")}>
+              <button class="fp3d-icon-button" ?disabled=${!this._canUndo} @click=${() => this.undo()} title=${`${this.t("undo")} · Ctrl+Z`} aria-label=${this.t("undo")}>↶</button>
+              <button class="fp3d-icon-button" ?disabled=${!this._canRedo} @click=${() => this.redo()} title=${`${this.t("redo")} · Ctrl+Y`} aria-label=${this.t("redo")}>↷</button>
+              <button class="fp3d-icon-button fp3d-desktop-action" @click=${() => this.fit()} title=${this.t("fit")} aria-label=${this.t("fit")}>⛶</button>
+              <button class="fp3d-icon-button" aria-pressed=${this._split} title=${this.t("split_3d_hint")} aria-label=${this.t("split_3d")} @click=${() => this.toggleSplit()}>
+                <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="3.5" width="19" height="17" rx="2.5"></rect><path d="M12 4v16"></path></svg>
+              </button>
+              ${this.isAdmin
+                ? html`<button
+                    class="fp3d-icon-button fp3d-desktop-action"
+                    aria-pressed=${!!this._doc.settings.lock_plan}
+                    title=${this._doc.settings.lock_plan ? this.t("plan_unlock") : this.t("lock_plan_hint")}
+                    aria-label=${this._doc.settings.lock_plan ? this.t("plan_unlock") : this.t("plan_lock")}
+                    @click=${() => this.toggleLockPlan()}
+                  >${this._doc.settings.lock_plan ? "🔓" : "🔒"}</button>`
+                : nothing}
+              <button
+                class="fp3d-icon-button fp3d-settings-button"
+                aria-pressed=${this._tool === "settings"}
+                ?disabled=${!this.isAdmin}
+                title=${this.t("project_settings")}
+                aria-label=${this.t("project_settings")}
+                @click=${() => this.chooseTool("settings")}
+              >⚙</button>
             </div>
-            ${walls?.warnings.length ? html`<span class="fp3d-warn">${this.t("overlap_warning")}</span>` : nothing}
+            ${walls?.warnings.length ? html`<span class="fp3d-warn" title=${this.t("overlap_warning")} aria-label=${this.t("overlap_warning")}>⚠</span>` : nothing}
           </div>
           <div class="fp3d-stage-pair ${this._split ? "fp3d-split" : ""}" style=${this._split && !this.narrow ? `--fp3d-split:${Math.round(this._splitRatio * 100)}%` : ""}>
           <div class="fp3d-canvas-wrap">
@@ -7160,25 +7218,134 @@ export class Fp3dEditor extends LitElement {
       }
       .fp3d-toolbar {
         display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-        align-items: flex-end;
-        padding: 10px 12px;
+        flex-wrap: nowrap;
+        gap: 6px;
+        align-items: center;
+        min-width: 0;
+        padding: 8px 12px;
+        border-bottom: 1px solid var(--fp3d-line);
+        background: var(--fp3d-bg2);
       }
-      .fp3d-tool-group {
+      .fp3d-toolbar-button,
+      .fp3d-tool-menu > summary,
+      .fp3d-icon-button {
+        box-sizing: border-box;
+        min-height: 36px;
+        border: 1px solid var(--fp3d-line);
+        border-radius: 10px;
+        background: var(--fp3d-chrome);
+        color: var(--fp3d-text);
+        font: inherit;
+        font-weight: 600;
+        cursor: pointer;
+      }
+      .fp3d-toolbar-button,
+      .fp3d-tool-menu > summary {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        padding: 7px 11px;
+        white-space: nowrap;
+      }
+      .fp3d-toolbar-button:hover,
+      .fp3d-tool-menu > summary:hover,
+      .fp3d-icon-button:hover {
+        border-color: var(--fp3d-accent);
+      }
+      .fp3d-toolbar-button[aria-pressed="true"],
+      .fp3d-toolbar-button.fp3d-active,
+      .fp3d-tool-menu > summary.fp3d-active,
+      .fp3d-icon-button[aria-pressed="true"] {
+        border-color: transparent;
+        background: var(--fp3d-accent);
+        color: var(--fp3d-accent-text);
+      }
+      .fp3d-toolbar-button:disabled,
+      .fp3d-icon-button:disabled {
+        opacity: 0.4;
+        cursor: default;
+      }
+      .fp3d-tool-menu {
+        position: relative;
+        min-width: 0;
+      }
+      .fp3d-tool-menu > summary {
+        list-style: none;
+      }
+      .fp3d-tool-menu > summary::-webkit-details-marker,
+      .fp3d-mobile-tools > summary::-webkit-details-marker {
+        display: none;
+      }
+      .fp3d-tool-menu[open] > summary {
+        border-color: var(--fp3d-accent);
+      }
+      .fp3d-tool-popover {
+        position: absolute;
+        z-index: 12;
+        top: calc(100% + 7px);
+        left: 0;
         display: grid;
-        gap: 3px;
+        min-width: max-content;
+        padding: 6px;
+        border: 1px solid var(--fp3d-line);
+        border-radius: 12px;
+        background: var(--fp3d-chrome-solid);
+        box-shadow: var(--fp3d-shadow);
       }
-      .fp3d-tool-group > span {
-        padding-left: 6px;
-        color: var(--fp3d-muted);
-        font-size: 9.5px;
+      .fp3d-tool-popover button,
+      .fp3d-mobile-sheet button {
+        min-height: 38px;
+        padding: 8px 12px;
+        border: 0;
+        border-radius: 8px;
+        background: transparent;
+        color: var(--fp3d-text);
+        font: inherit;
+        text-align: left;
+        cursor: pointer;
+      }
+      .fp3d-tool-popover button:hover,
+      .fp3d-mobile-sheet button:hover {
+        background: rgba(55, 224, 255, 0.09);
+      }
+      .fp3d-tool-popover button[aria-pressed="true"],
+      .fp3d-mobile-sheet button[aria-pressed="true"] {
+        background: var(--fp3d-accent);
+        color: var(--fp3d-accent-text);
         font-weight: 700;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
       }
-      .fp3d-tool-actions {
+      .fp3d-tool-popover button:disabled,
+      .fp3d-mobile-sheet button:disabled {
+        opacity: 0.4;
+        cursor: default;
+      }
+      .fp3d-toolbar-actions {
+        display: flex;
+        flex: none;
+        gap: 4px;
         margin-left: auto;
+      }
+      .fp3d-icon-button {
+        display: inline-grid;
+        width: 36px;
+        padding: 0;
+        place-items: center;
+        font-size: 20px;
+        line-height: 1;
+      }
+      .fp3d-icon-button svg {
+        width: 20px;
+        height: 20px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 1.8;
+      }
+      .fp3d-settings-button {
+        margin-left: 3px;
+      }
+      .fp3d-mobile-tools {
+        display: none;
       }
       .fp3d-side-tabs {
         position: sticky;
@@ -7200,19 +7367,84 @@ export class Fp3dEditor extends LitElement {
         color: var(--fp3d-accent);
       }
       .fp3d-narrow .fp3d-toolbar {
-        flex-wrap: nowrap;
-        align-items: flex-start;
-        overflow-x: auto;
+        padding: 7px 8px;
       }
-      .fp3d-narrow .fp3d-tool-group {
-        flex: none;
+      .fp3d-narrow .fp3d-desktop-tool,
+      .fp3d-narrow .fp3d-desktop-action {
+        display: none;
       }
-      .fp3d-narrow .fp3d-tool-actions {
-        margin-left: 0;
+      .fp3d-narrow .fp3d-mobile-tools {
+        display: block;
+        min-width: 0;
+      }
+      .fp3d-narrow .fp3d-mobile-tools > summary {
+        max-width: min(42vw, 190px);
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .fp3d-mobile-tools[open]::before {
+        position: fixed;
+        z-index: 30;
+        inset: 0;
+        content: "";
+        background: rgba(2, 6, 13, 0.66);
+        backdrop-filter: blur(2px);
+      }
+      .fp3d-mobile-sheet {
+        position: fixed;
+        z-index: 31;
+        right: 8px;
+        bottom: 8px;
+        left: 8px;
+        display: grid;
+        max-height: min(76vh, 620px);
+        gap: 8px;
+        overflow-y: auto;
+        padding: 8px 14px max(16px, env(safe-area-inset-bottom));
+        border: 1px solid var(--fp3d-line);
+        border-radius: 20px 20px 14px 14px;
+        background: var(--fp3d-chrome-solid);
+        box-shadow: 0 -16px 50px rgba(0, 0, 0, 0.62);
+        overscroll-behavior: contain;
+      }
+      .fp3d-mobile-sheet-handle {
+        width: 44px;
+        height: 4px;
+        margin: 1px auto 5px;
+        border-radius: 999px;
+        background: var(--fp3d-muted);
+        opacity: 0.65;
+      }
+      .fp3d-mobile-sheet > button,
+      .fp3d-mobile-sheet section > div {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 7px;
+      }
+      .fp3d-mobile-sheet > button {
+        display: block;
+        width: 100%;
+        min-height: 46px;
+        text-align: center;
+      }
+      .fp3d-mobile-sheet section {
+        display: grid;
+        gap: 5px;
+      }
+      .fp3d-mobile-sheet h3 {
+        margin: 3px 4px 0;
+        color: var(--fp3d-muted);
+        font-size: 11px;
+        letter-spacing: 0.04em;
+      }
+      .fp3d-mobile-sheet section button {
+        min-height: 46px;
+        text-align: center;
       }
       .fp3d-warn {
+        flex: none;
         color: var(--fp3d-warm);
-        font-size: 12.5px;
+        font-size: 18px;
       }
       .fp3d-picture-group {
         display: grid;
