@@ -70,8 +70,8 @@ const BINARY_CLASSES = new Set(["door", "window", "opening", "garage_door", "mot
 /** Order in lists and panels. */
 export const KIND_ORDER: DeviceKind[] = ["light", "cover", "climate", "media", "switch", "fan", "lock", "binary", "sensor", "camera", "scene", "script"];
 
-/** Kinds that can be toggled with a tap in 3D. */
-export const TOGGLE_KINDS = new Set<DeviceKind>(["light", "switch", "fan"]);
+/** Kinds that can be toggled with a tap in 3D. Fans open their Home Assistant details like climate devices, so speed and presets stay one tap away. */
+export const TOGGLE_KINDS = new Set<DeviceKind>(["light", "switch"]);
 
 export function domainOf(entityId: string): string {
   return entityId.slice(0, entityId.indexOf("."));

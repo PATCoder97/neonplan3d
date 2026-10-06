@@ -4,6 +4,12 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.18.8
+
+### Changed
+
+- A single tap on a fan now opens its Home Assistant details like an air conditioner, keeping speed, mode and preset controls directly accessible instead of toggling it immediately.
+
 ## 1.18.7
 
 ### Added
