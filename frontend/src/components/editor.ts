@@ -3241,18 +3241,6 @@ export class Fp3dEditor extends LitElement {
     </section>`;
   }
 
-  /** Where to report a problem and where to propose an idea. */
-  private renderHelpLinks() {
-    return html`<section class="fp3d-help">
-      <h3>${this.t("help_title")}</h3>
-      <p class="fp3d-sub">${this.t("help_hint")}</p>
-      <div class="fp3d-actions">
-        <a class="fp3d-btn" href="https://github.com/PATCoder97/neonplan3d/issues/new/choose" target="_blank" rel="noopener">🐞 ${this.t("help_issue")}</a>
-        <a class="fp3d-btn" href="https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas" target="_blank" rel="noopener">💡 ${this.t("help_idea")}</a>
-      </div>
-    </section>`;
-  }
-
   /** The Pro add-on: active (with the manual), or what it brings and where to get it. */
   private renderProCard() {
     const lang = this.hass?.language;
@@ -5205,7 +5193,6 @@ export class Fp3dEditor extends LitElement {
             : floor
               ? this.renderRoomList(floor)
               : nothing}
-      ${admin ? nothing : this.renderHelpLinks()}
     `;
   }
 
@@ -5238,7 +5225,7 @@ export class Fp3dEditor extends LitElement {
         <p class="fp3d-sub">${this.t("project_settings_hint")}</p>
       </section>
       ${this.renderSettings()} ${floor ? this.renderBackgroundForm(floor) : nothing} ${this.renderStartView()} ${this.renderFavorites()}
-      ${SHOW_PRESENCE ? this.renderPresenceSettings() : nothing} ${this.renderBackup()} ${this.renderHelpLinks()}
+      ${SHOW_PRESENCE ? this.renderPresenceSettings() : nothing} ${this.renderBackup()}
     `;
   }
 
@@ -7273,12 +7260,18 @@ export class Fp3dEditor extends LitElement {
       .fp3d-tool-menu > summary {
         list-style: none;
       }
+      .fp3d-tool-menu > summary > span {
+        transition: transform 120ms ease-out;
+      }
       .fp3d-tool-menu > summary::-webkit-details-marker,
       .fp3d-mobile-tools > summary::-webkit-details-marker {
         display: none;
       }
       .fp3d-tool-menu[open] > summary {
         border-color: var(--fp3d-accent);
+      }
+      .fp3d-tool-menu[open] > summary > span {
+        transform: rotate(180deg);
       }
       .fp3d-tool-popover {
         position: absolute;
@@ -7292,6 +7285,16 @@ export class Fp3dEditor extends LitElement {
         border-radius: 12px;
         background: var(--fp3d-chrome-solid);
         box-shadow: var(--fp3d-shadow);
+        transform: translate3d(0, 0, 0);
+        transform-origin: top left;
+        will-change: transform, opacity;
+        animation: fp3d-tool-menu-in 120ms cubic-bezier(0.2, 0.8, 0.2, 1);
+      }
+      @keyframes fp3d-tool-menu-in {
+        from {
+          opacity: 0;
+          transform: translate3d(0, -5px, 0) scale(0.985);
+        }
       }
       .fp3d-tool-popover button,
       .fp3d-mobile-sheet button {
@@ -7440,6 +7443,14 @@ export class Fp3dEditor extends LitElement {
       .fp3d-mobile-sheet section button {
         min-height: 46px;
         text-align: center;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .fp3d-tool-menu > summary > span {
+          transition: none;
+        }
+        .fp3d-tool-popover {
+          animation: none;
+        }
       }
       .fp3d-warn {
         flex: none;

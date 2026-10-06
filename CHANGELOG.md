@@ -4,6 +4,13 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.17.3
+
+### Changed
+
+- Smoothed the grouped tool menus with a short GPU-friendly opening transition and rotating disclosure arrow.
+- Removed the public help and feedback links from the editor configuration and the unused Extensions interface for this personal fork.
+
 ## 1.17.2
 
 ### Changed
