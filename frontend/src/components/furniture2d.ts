@@ -146,6 +146,15 @@ export function furnitureSymbol(type: string, w: number, d: number): Part[] | ty
       }
       return out;
     }
+    case "water_pump":
+      // motor at the back, round pump housing and inlet/outlet pipes at the front
+      return [
+        rect(-w * 0.42, -d * 0.42, w * 0.42, d * 0.42),
+        rect(-w * 0.25, -d * 0.38, w * 0.25, d * 0.05, "fp3d-sym-fill"),
+        circle(0, d * 0.15, Math.min(w, d) * 0.27, "fp3d-sym-strong"),
+        line(0, d * 0.15, 0, d / 2),
+        line(w * 0.18, d * 0.15, w * 0.42, d * 0.15),
+      ];
     case "lamp_panel":
       return [rect(-w / 2 + 0.03, -d / 2 + 0.03, w / 2 - 0.03, d / 2 - 0.03, "fp3d-sym-fill")];
     case "lamp_uplight":

@@ -4,6 +4,12 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.15.0
+
+### New
+
+- **Outdoor water pump:** a compact domestic pump with motor, pump housing, suction and delivery pipes, 2D plan symbol and a live status light. It follows lawn and terrace heights, links to a Home Assistant switch or fan, and can discover a clearly named pump entity even outside a room.
+
 ## 1.14.0
 
 ### New

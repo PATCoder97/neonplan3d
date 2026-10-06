@@ -684,6 +684,7 @@ const FURNITURE_NAMES: Record<string, RegExp> = {
   sink: /(spülmaschine|geschirrspül|dishwasher)/i,
   radiator: /(heiz|radiator|thermostat|climate|hk|trv)/i,
   air_conditioner: /(klima|air ?condition|aircon|airco|split|điều hòa|dieu hoa|máy lạnh|may lanh)/i,
+  water_pump: /(wasserpumpe|gartenpumpe|brunnenpumpe|water ?pump|garden ?pump|well ?pump|pool ?pump|irrigation|máy bơm|may bom|bơm nước|bom nuoc|bơm giếng|bom gieng|bơm tưới|bom tuoi)/i,
 };
 const MEDIA_FURNITURE = new Set(["tv_board", "tv_wall"]);
 
@@ -801,6 +802,11 @@ export function furnitureEntities(hass: HomeAssistant, floors: readonly Floor[])
         } else if (f.type === "radiator" || f.type === "air_conditioner") {
           const climates = free.filter((id) => kindOf(id) === "climate");
           entity = climates.find((id) => pattern.test(name(id))) ?? climates[0] ?? null;
+        } else if (f.type === "water_pump") {
+          // Outdoor furniture has no room/area; a distinct pump name can still be found globally.
+          const candidates = room ? free : Object.keys(hass.states ?? {}).filter((id) => !used.has(id));
+          const matches = candidates.filter((id) => ["switch", "fan"].includes(kindOf(id) ?? "") && pattern.test(name(id)));
+          entity = room ? (matches[0] ?? null) : matches.length === 1 ? matches[0] : null;
         } else if (isMediaFurniture(f.type)) {
           const media = free.filter((id) => kindOf(id) === "media");
           // a TV takes the TV (or any player of the room); a monitor or a smart speaker model only one whose name fits

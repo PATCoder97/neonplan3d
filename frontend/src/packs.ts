@@ -2,7 +2,7 @@
 // furniture has the type "pack:<pack id>:<item id>". Every bundle (main, editor, 3D) keeps its own
 // registry, filled with setPacks() from the packs the backend returns.
 
-import { builtinBase, ELECTRIC_FURNITURE, FURNITURE_SIZE, surfaceHeight, WALL_LAMP_Y, type Floor, type Furniture } from "./model.ts";
+import { builtinBase, ELECTRIC_FURNITURE, FURNITURE_SIZE, outdoorGround, pointInPolygon, surfaceHeight, WALL_LAMP_Y, type Floor, type Furniture } from "./model.ts";
 import type { LampModel } from "./viewer/viewer3d.ts";
 
 export interface PackPart {
@@ -155,6 +155,8 @@ export function mountBase(floor: Floor, f: Pick<Furniture, "type" | "x" | "z" | 
   // wall lights at the usual height, LED strips just under the ceiling
   if (f.type === "lamp_wall") return WALL_LAMP_Y;
   if (f.type === "led_strip") return Math.max(0, floor.height - 0.04 - Math.max(0.02, f.h));
+  // An outdoor pump follows the lawn/terrace below it; inside a room it stays on that floor.
+  if (f.type === "water_pump" && !floor.rooms.some((r) => r.points.length >= 3 && pointInPolygon([f.x, f.z], r.points))) return outdoorGround(floor, f.x, f.z);
   switch (item?.mount) {
     case "surface":
       return surfaceHeight(floor, f.x, f.z);

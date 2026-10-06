@@ -109,6 +109,25 @@ test("a split air conditioner hangs high on the wall and exposes its outlet as t
   assert.ok(outlet.y0 >= 1.9 && outlet.y1 < 2.2 && outlet.x0 < 0 && outlet.x1 > 0);
 });
 
+test("an outdoor water pump sits on the terrace with its shadow and live status window", () => {
+  const pump = { id: "pump", type: "water_pump", x: 2, z: 1, w: 0.55, d: 0.4, h: 0.45, rotation: 0, variant: null } as Furniture;
+  const floor = newFloor("eg", "EG", 0);
+  floor.outdoor = [{ id: "yard", type: "terrace", points: [[0, 0], [4, 0], [4, 3], [0, 3]] }];
+  const base = mountBase(floor, pump);
+  const buf = new GeoBuffer();
+  const lines = new LineBuffer();
+  const shadow = new GeoBuffer();
+  pushFurniture(buf, lines, shadow, pump, base);
+  const ys = buf.p.filter((_, i) => i % 3 === 1);
+  const shadowYs = shadow.p.filter((_, i) => i % 3 === 1);
+  assert.ok(buf.count > 100 && lines.p.length > 0, "motor, pump chamber and pipes are drawn");
+  assert.ok(buf.p.every(Number.isFinite) && lines.p.every(Number.isFinite));
+  assert.ok(Math.abs(Math.min(...ys) - base) < 1e-6, "the pump rests on the terrace");
+  assert.ok(shadowYs.length > 0 && Math.abs(Math.min(...shadowYs) - (base + 0.003)) < 1e-6, "the contact shadow follows the terrace");
+  const status = screenRect(pump, floor)!;
+  assert.ok(status.y0 > base && status.y1 < base + pump.h && status.x0 < 0 && status.x1 > 0);
+});
+
 /** Signed volume of a closed-ish mesh: positive when its triangles face outwards. */
 function orientation(buf: GeoBuffer): number {
   let v = 0;
@@ -121,7 +140,7 @@ function orientation(buf: GeoBuffer): number {
 
 test("a mirrored item keeps its faces pointing outwards (#159)", () => {
   setPacks([PACK]);
-  for (const type of ["sofa", "bed", "fridge", "pack:t.cars:wedge"]) {
+  for (const type of ["sofa", "bed", "fridge", "water_pump", "pack:t.cars:wedge"]) {
     const vol = (mirror: boolean) => {
       const buf = new GeoBuffer();
       const f: Furniture = { id: "f", type, x: 0, z: 0, rotation: 30, w: 2, d: 1, h: 1, variant: null, entity: null, power: null, mirror };

@@ -1547,6 +1547,8 @@ export class Fp3dView3d extends LitElement {
             const heating = action === "heating" || action === "heat";
             screens.set(f.id, { color: heating ? [1, 0.5, 0.18] : [0.28, 0.8, 1], level: action === "cooling" || heating ? 0.85 : 0.55 });
           }
+        } else if (f.type === "water_pump" && running) {
+          screens.set(f.id, { color: [0.2, 0.78, 1], level: 0.85, plain: true });
         } else if ((f.type === "washer" || f.type === "dryer" || f.type === "dishwasher") && running) {
           screens.set(f.id, { color: [0.3, 0.85, 1], level: 0.8 });
         }

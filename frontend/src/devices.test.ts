@@ -604,3 +604,20 @@ test("a wall air conditioner automatically takes the room's climate entity", () 
   const links = furnitureEntities(hass, [{ ...newFloor("eg", "Tầng trệt", 0), rooms: [room], furniture: [ac] }]);
   assert.equal(links.get("ac")?.entity, "climate.dieu_hoa_phong_khach");
 });
+
+test("an outdoor water pump can find a clearly named switch without a room", () => {
+  const st = (entity_id: string, state: string, attributes: Record<string, unknown> = {}) => ({ entity_id, state, attributes });
+  const hass = {
+    language: "vi",
+    states: {
+      "switch.may_bom_gieng": st("switch.may_bom_gieng", "off", { friendly_name: "Máy bơm giếng" }),
+      "switch.den_san": st("switch.den_san", "off", { friendly_name: "Đèn sân" }),
+    },
+    entities: {},
+    devices: {},
+    areas: {},
+  } as unknown as HomeAssistant;
+  const pump = { id: "pump", type: "water_pump", x: 6, z: 3, w: 0.55, d: 0.4, h: 0.45, rotation: 0, variant: null };
+  const links = furnitureEntities(hass, [{ ...newFloor("eg", "Tầng trệt", 0), furniture: [pump] }]);
+  assert.equal(links.get("pump")?.entity, "switch.may_bom_gieng");
+});

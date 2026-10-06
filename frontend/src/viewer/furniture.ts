@@ -799,6 +799,37 @@ function airConditioner(b: Builder, w: number, d: number, h: number): void {
   b.seg(w * 0.37, y0 + h * 0.67, front + 0.006, w * 0.4, y0 + h * 0.67, front + 0.006, EDGE_GLOW);
 }
 
+/** Compact domestic outdoor water pump: motor, volute housing, inlet and top outlet on a base plate. */
+function waterPump(b: Builder, w: number, d: number, h: number): void {
+  const base = Math.min(0.045, h * 0.12);
+  const motorDia = Math.min(w * 0.42, h * 0.48);
+  const motorY0 = base + h * 0.13;
+  const motorY1 = motorY0 + motorDia;
+  // rubber feet and a weatherproof base plate
+  for (const x of [-w * 0.32, w * 0.32]) b.box(x - w * 0.055, x + w * 0.055, 0, base, -d * 0.34, d * 0.3, C.dark);
+  b.box(-w * 0.43, w * 0.43, base, base + h * 0.06, -d * 0.4, d * 0.36, C.metal, C.metal, EDGE_FURN);
+  // electric motor, rear fan cover and cooling ribs
+  b.lyingCyl("z", 0, -d * 0.13, motorY0, motorY1, d * 0.46, motorDia, C.body, C.bodyTop, 14, EDGE_FURN);
+  b.lyingCyl("z", 0, -d * 0.39, motorY0 + motorDia * 0.08, motorY1 - motorDia * 0.08, d * 0.1, motorDia * 0.84, C.dark, C.metal, 12, EDGE_FAINT);
+  for (let i = -2; i <= 2; i++) {
+    const z = -d * 0.23 + i * d * 0.055;
+    b.box(-motorDia * 0.54, motorDia * 0.54, motorY0 + motorDia * 0.43, motorY0 + motorDia * 0.57, z - d * 0.012, z + d * 0.012, C.metal, C.metal);
+  }
+  // round pump chamber at the front and the suction pipe facing forwards
+  const headDia = Math.min(w * 0.55, h * 0.65);
+  const headY0 = base + h * 0.08;
+  b.lyingCyl("z", 0, d * 0.17, headY0, headY0 + headDia, d * 0.22, headDia, C.accent, C.bodyTop, 16, EDGE_FURN);
+  b.lyingCyl("z", 0, d * 0.39, headY0 + headDia * 0.34, headY0 + headDia * 0.66, d * 0.22, headDia * 0.32, C.metal, C.dark, 12, EDGE_GLOW);
+  // delivery outlet on top, with a short collar
+  const outletX = w * 0.16;
+  const outletZ = d * 0.13;
+  const outletR = Math.min(w, d) * 0.075;
+  b.cyl(outletX, outletZ, outletR * 1.35, headY0 + headDia * 0.72, headY0 + headDia * 0.82, C.accent, C.accent, 12, EDGE_FURN);
+  b.cyl(outletX, outletZ, outletR, headY0 + headDia * 0.82, h, C.metal, C.metal, 12, EDGE_GLOW);
+  // small live status window on the front of the pump head
+  b.box(-w * 0.11, w * 0.11, headY0 + headDia * 0.58, headY0 + headDia * 0.72, d * 0.285, d * 0.3, C.dark, C.dark, EDGE_GLOW);
+}
+
 /** A ring of glowing line on a front face (z = front), for dials and fans. */
 function ring(b: Builder, cx: number, cy: number, r: number, z: number, n = 20): void {
   for (let i = 0; i < n; i++) {
@@ -955,6 +986,7 @@ function builtInScreen(f: Furniture, w: number, d: number, h: number, floor?: Fl
   // glowing fronts of appliances that run and of a radiator that heats
   if (f.type === "radiator") return { x0: -w / 2 + 0.02, x1: w / 2 - 0.02, y0: RADIATOR_Y + 0.02, y1: RADIATOR_Y + h - 0.02, z: d / 2 + 0.004 };
   if (f.type === "air_conditioner") return { x0: -w * 0.43, x1: w * 0.43, y0: AIR_CONDITIONER_Y + h * 0.08, y1: AIR_CONDITIONER_Y + h * 0.27, z: d / 2 + 0.008 };
+  if (f.type === "water_pump") return { x0: -w * 0.1, x1: w * 0.1, y0: h * 0.56, y1: h * 0.65, z: d * 0.3 + 0.004 };
   if (f.type === "washer" || f.type === "dryer") {
     const cy = (h - 0.14) / 2 + 0.04;
     const r = Math.min(w * 0.36, (h - 0.2) * 0.42) * 0.8;
@@ -1020,9 +1052,11 @@ function pushUpright(buf: GeoBuffer, lines: LineBuffer, shadow: GeoBuffer, f: Fu
   if (packItem(f.type) || Math.abs(lift) < 0.001) return buildFurniture(buf, lines, shadow, f, base);
   const p0 = buf.p.length;
   const l0 = lines.p.length;
+  const s0 = shadow.p.length;
   buildFurniture(buf, lines, base < 0.05 ? shadow : new GeoBuffer(), f, 0);
   for (let i = p0 + 1; i < buf.p.length; i += 3) buf.p[i] += lift;
   for (let i = l0 + 1; i < lines.p.length; i += 3) lines.p[i] += lift;
+  for (let i = s0 + 1; i < shadow.p.length; i += 3) shadow.p[i] += lift;
 }
 
 function buildFurniture(buf: GeoBuffer, lines: LineBuffer, shadow: GeoBuffer, f: Furniture, base: number): void {
@@ -1191,6 +1225,9 @@ function buildFurniture(buf: GeoBuffer, lines: LineBuffer, shadow: GeoBuffer, f:
     case "air_conditioner":
       airConditioner(b, w, d, h);
       return; // mounted high on the wall, no shadow on the floor
+    case "water_pump":
+      waterPump(b, w, d, h);
+      break;
     case "inverter":
       inverter(b, w, d, h, f.variant ?? null);
       return;

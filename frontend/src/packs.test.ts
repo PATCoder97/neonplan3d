@@ -26,6 +26,16 @@ test("pack furniture resolves by type, with size, name and power link", () => {
   assert.deepEqual(furnitureSize(type), [0.6, 0.6, 0.8]);
   assert.equal(isElectric(type), false);
   assert.equal(isElectric("air_conditioner"), true);
+  assert.equal(isElectric("water_pump"), true);
+});
+
+test("an outdoor water pump follows the ground or terrace and stays at floor level indoors", () => {
+  const floor = newFloor("eg", "EG", 0);
+  floor.outdoor = [{ id: "yard", type: "terrace", points: [[0, 0], [4, 0], [4, 3], [0, 3]] }];
+  floor.rooms = [{ id: "shed", name: "Shed", area_id: null, points: [[5, 0], [7, 0], [7, 2], [5, 2]], floor_material: "concrete" }];
+  assert.ok(Math.abs(mountBase(floor, { type: "water_pump", x: 2, z: 1, h: 0.45 }) - -0.08) < 1e-9);
+  assert.equal(mountBase(floor, { type: "water_pump", x: 6, z: 1, h: 0.45 }), 0);
+  assert.equal(mountBase(floor, { type: "water_pump", x: 2, z: 1, h: 0.45, mount_y: 0.2 }), 0.2);
 });
 
 test("pack items stand on the floor, on furniture, on a wall or hang from the ceiling", () => {
