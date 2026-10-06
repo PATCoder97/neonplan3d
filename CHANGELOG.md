@@ -4,6 +4,13 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.17.6
+
+### Fixed
+
+- Corrected editor pointer coordinates after the split-view SVG icon was added, so zoom stays under the cursor and drawing, dragging and context actions line up with the floor plan again.
+- Added regression tests for plan/screen coordinate conversion, cursor-centred zoom and zoom limits.
+
 ## 1.17.5
 
 ### Changed

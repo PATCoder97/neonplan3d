@@ -103,6 +103,7 @@ import type { WallMode } from "../viewer/viewer3d.ts";
 import { furnitureName } from "../furniture-names.ts";
 import { furnitureSize, isElectric, mountBase, packItem, packItemName, packType, setPacks, type FurniturePack } from "../packs.ts";
 import { EDITOR_TOOL_GROUPS, resolvedFurniturePane, type EditorTool, type FurniturePane } from "../editor-navigation.ts";
+import { planToScreen, screenToPlan, zoomPlanAt } from "../editor-view.ts";
 
 /** Items that can be fixed against moving. */
 type FixKind = "room" | "opening" | "furniture" | "device" | "wall" | "outdoor";
@@ -807,17 +808,17 @@ export class Fp3dEditor extends LitElement {
   // ------------------------------------------------------------------ view transform
 
   private toScreen(p: Vec2): [number, number] {
-    const { scale, ox, oy } = this._view;
-    return [p[0] * scale + ox, p[1] * scale + oy];
+    return planToScreen(this._view, p[0], p[1]);
   }
 
   private toWorld(sx: number, sy: number): Vec2 {
-    const { scale, ox, oy } = this._view;
-    return [(sx - ox) / scale, (sy - oy) / scale];
+    return screenToPlan(this._view, sx, sy);
   }
 
   private localPoint(e: PointerEvent | WheelEvent): [number, number] {
-    const rect = (this.renderRoot.querySelector("svg") as SVGSVGElement).getBoundingClientRect();
+    const current = e.currentTarget as SVGSVGElement | null;
+    const plan = current?.classList.contains("fp3d-plan") ? current : (this.renderRoot.querySelector("svg.fp3d-plan") as SVGSVGElement);
+    const rect = plan.getBoundingClientRect();
     return [e.clientX - rect.left, e.clientY - rect.top];
   }
 
@@ -842,10 +843,7 @@ export class Fp3dEditor extends LitElement {
   }
 
   private zoomAt(factor: number, sx: number, sy: number): void {
-    const { scale, ox, oy } = this._view;
-    const next = Math.max(8, Math.min(600, scale * factor));
-    const k = next / scale;
-    this._view = { scale: next, ox: sx - (sx - ox) * k, oy: sy - (sy - oy) * k };
+    this._view = zoomPlanAt(this._view, factor, sx, sy);
   }
 
   // ------------------------------------------------------------------ snapping
