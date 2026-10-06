@@ -736,6 +736,20 @@ export function resizeFurniture(f: Furniture, corner: [1 | -1, 1 | -1], p: Vec2,
   return { x: r(ax + sx * (w / 2) * c - sz * (d / 2) * s), z: r(az + sx * (w / 2) * s + sz * (d / 2) * c), w: r(w), d: r(d) };
 }
 
+/** One of a furniture item's corners in plan coordinates. */
+export function furnitureCorner(f: Pick<Furniture, "x" | "z" | "rotation" | "w" | "d">, corner: [1 | -1, 1 | -1]): Vec2 {
+  const a = (f.rotation * Math.PI) / 180;
+  const c = Math.cos(a);
+  const s = Math.sin(a);
+  const [sx, sz] = corner;
+  return [f.x + sx * (f.w / 2) * c - sz * (f.d / 2) * s, f.z + sx * (f.w / 2) * s + sz * (f.d / 2) * c];
+}
+
+/** Rotation whose local front (+z) points from the furniture centre towards `p`. */
+export function furnitureRotationAt(f: Pick<Furniture, "x" | "z">, p: Vec2): number {
+  return (Math.atan2(-(p[0] - f.x), p[1] - f.z) * 180) / Math.PI;
+}
+
 export const FURNITURE_TYPES = [
   "lamp_ceiling",
   "lamp_downlight",

@@ -4,6 +4,13 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.18.4
+
+### Fixed
+
+- Kept the exact grab point under the pointer while resizing furniture, preventing corners from jumping when a drag starts inside the larger touch target.
+- Made furniture rotation use the resized item's new centre and preserve the initial pointer offset, so resize-then-rotate gestures stay aligned without an angle jump.
+
 ## 1.18.3
 
 ### Fixed

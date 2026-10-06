@@ -91,6 +91,8 @@ import {
   WINDOW_STYLES,
   openingStyle,
   isFrontDoor,
+  furnitureCorner,
+  furnitureRotationAt,
   type OpeningStyle,
   type ScreenPicture,
 } from "../model.ts";
@@ -116,9 +118,9 @@ type Drag =
   | { kind: "device"; entityId: string; start: Vec2; startScreen: [number, number]; base: Building; moved: boolean }
   | { kind: "opening"; id: string; startScreen: [number, number]; base: Building; moved: boolean }
   | { kind: "furniture"; id: string; start: Vec2; startScreen: [number, number]; base: Building; moved: boolean }
-  | { kind: "rotate"; id: string; base: Building; moved: boolean }
+  | { kind: "rotate"; id: string; angleOffset: number; base: Building; moved: boolean }
   | { kind: "aim"; entityId: string; base: Building; moved: boolean }
-  | { kind: "resize"; id: string; corner: [1 | -1, 1 | -1]; base: Building; moved: boolean }
+  | { kind: "resize"; id: string; corner: [1 | -1, 1 | -1]; grabOffset: Vec2; base: Building; moved: boolean }
   | { kind: "room"; roomId: string; start: Vec2; startScreen: [number, number]; base: Building; moved: boolean }
   | { kind: "rect"; start: Vec2; end: Vec2; outdoor?: boolean; hole?: boolean; roof?: boolean }
   | { kind: "roofmove"; id: string; start: Vec2; startScreen: [number, number]; base: Building; moved: boolean }
@@ -1187,12 +1189,19 @@ export class Fp3dEditor extends LitElement {
     const resizeEl = target.closest("[data-resize]");
     if (resizeEl && this.isAdmin) {
       const [id, sx, sz] = resizeEl.getAttribute("data-resize")!.split(":");
-      this.drag = { kind: "resize", id, corner: [sx === "1" ? 1 : -1, sz === "1" ? 1 : -1], base: this._doc, moved: false };
+      const corner: [1 | -1, 1 | -1] = [sx === "1" ? 1 : -1, sz === "1" ? 1 : -1];
+      const f = this.floor.furniture.find((item) => item.id === id);
+      if (!f) return;
+      const handle = furnitureCorner(f, corner);
+      this.drag = { kind: "resize", id, corner, grabOffset: [world[0] - handle[0], world[1] - handle[1]], base: this._doc, moved: false };
       return;
     }
     const rotateEl = target.closest("[data-rotate]");
     if (rotateEl && this.isAdmin) {
-      this.drag = { kind: "rotate", id: rotateEl.getAttribute("data-rotate")!, base: this._doc, moved: false };
+      const id = rotateEl.getAttribute("data-rotate")!;
+      const f = this.floor.furniture.find((item) => item.id === id);
+      if (!f) return;
+      this.drag = { kind: "rotate", id, angleOffset: f.rotation - furnitureRotationAt(f, world), base: this._doc, moved: false };
       return;
     }
     const aimEl = target.closest("[data-aim]");
@@ -1634,7 +1643,11 @@ export class Fp3dEditor extends LitElement {
         drag.moved = true;
         const f = drag.base.floors.find((x) => x.id === this._floorId)?.furniture.find((x) => x.id === drag.id);
         if (!f) return;
-        const size = resizeFurniture(f, drag.corner, world, e.altKey ? 0.01 : this._doc.settings.grid);
+        // Keep the exact point grabbed inside the generously sized touch handle under the pointer.
+        // Otherwise the corner jumps to the pointer on the first move, which is especially visible
+        // when the resized item is rotated afterwards around its newly moved centre.
+        const handle: Vec2 = [world[0] - drag.grabOffset[0], world[1] - drag.grabOffset[1]];
+        const size = resizeFurniture(f, drag.corner, handle, e.altKey ? 0.01 : this._doc.settings.grid);
         this.change((_, floor) => Object.assign(floor.furniture.find((q) => q.id === drag.id)!, size), drag.base, false);
         break;
       }
@@ -1642,8 +1655,8 @@ export class Fp3dEditor extends LitElement {
         drag.moved = true;
         const f = drag.base.floors.find((x) => x.id === this._floorId)?.furniture.find((x) => x.id === drag.id);
         if (!f) return;
-        // the handle sits in front of the item: turn the front towards the pointer
-        let a = (Math.atan2(-(world[0] - f.x), world[1] - f.z) * 180) / Math.PI;
+        // Preserve where inside the large touch handle the gesture began, avoiding an angle jump.
+        let a = furnitureRotationAt(f, world) + drag.angleOffset;
         const step = e.altKey ? 1 : 15;
         a = ((Math.round(a / step) * step) % 360 + 360) % 360;
         this.change((_, floor) => Object.assign(floor.furniture.find((q) => q.id === drag.id)!, { rotation: a }), drag.base, false);
@@ -4735,7 +4748,7 @@ export class Fp3dEditor extends LitElement {
       </g>
       ${sel && this.isAdmin && !f.locked
         ? ([[-1, -1], [1, -1], [1, 1], [-1, 1]] as const).map(([sx, sz]) => {
-            const [x, y] = this.toScreen([f.x + (sx * f.w * Math.cos(a)) / 2 - (sz * f.d * Math.sin(a)) / 2, f.z + (sx * f.w * Math.sin(a)) / 2 + (sz * f.d * Math.cos(a)) / 2]);
+            const [x, y] = this.toScreen(furnitureCorner(f, [sx, sz]));
             return svg`<g class="fp3d-resize" data-resize=${`${f.id}:${sx}:${sz}`}>
               <circle cx=${x} cy=${y} r="14" class="fp3d-hit" />
               <rect x=${x - 5} y=${y - 5} width="10" height="10" rx="2" />

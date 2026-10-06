@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { emptyBuilding, floorElevation, newFloor, openingPreset, openingStyle, normalizeBuilding, outdoorDrop, outdoorGround, resizeFurniture, roomTiles, sidelightLayout, spotGrid, surfaceHeight, type Furniture } from "./model.ts";
+import { emptyBuilding, floorElevation, furnitureCorner, furnitureRotationAt, newFloor, openingPreset, openingStyle, normalizeBuilding, outdoorDrop, outdoorGround, resizeFurniture, roomTiles, sidelightLayout, spotGrid, surfaceHeight, type Furniture } from "./model.ts";
 
 test("a sidelight sits opposite the hinge, on the hinge side when asked, and keeps the leaf at least half a metre", () => {
   const none = {};
@@ -110,6 +110,22 @@ test("resizing drags one corner while the opposite corner stays", () => {
   assert.equal(turned.d, 1);
   // never smaller than 10 cm
   assert.equal(resizeFurniture(f, [1, 1], [0, 0], 0.05).w, 0.1);
+});
+
+test("a resized furniture item rotates accurately around its new centre", () => {
+  const f: Furniture = { id: "f", type: "table", x: 1, z: 1, rotation: 30, w: 1, d: 0.8, h: 0.75, variant: null };
+  const fixed = furnitureCorner(f, [-1, -1]);
+  const resized = { ...f, ...resizeFurniture(f, [1, 1], [2.4, 2.1], 0.05) };
+
+  // Resizing moves the centre, but leaves the opposite corner exactly where it started.
+  const after = furnitureCorner(resized, [-1, -1]);
+  assert.ok(Math.hypot(after[0] - fixed[0], after[1] - fixed[1]) < 0.001);
+
+  // The rotation calculation uses that new centre and agrees with the visible front direction.
+  const a = 75;
+  const r = (a * Math.PI) / 180;
+  const pointer: [number, number] = [resized.x - Math.sin(r) * 2, resized.z + Math.cos(r) * 2];
+  assert.ok(Math.abs(furnitureRotationAt(resized, pointer) - a) < 1e-9);
 });
 
 test("floors from Home Assistant levels are stacked by level", () => {
