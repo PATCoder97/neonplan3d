@@ -102,11 +102,12 @@ import { load3d } from "../load3d.ts";
 import type { WallMode } from "../viewer/viewer3d.ts";
 import { furnitureName } from "../furniture-names.ts";
 import { furnitureSize, isElectric, mountBase, packItem, packItemName, packType, setPacks, type FurniturePack } from "../packs.ts";
+import { EDITOR_TOOL_GROUPS, resolvedFurniturePane, type EditorTool, type FurniturePane } from "../editor-navigation.ts";
 
 /** Items that can be fixed against moving. */
 type FixKind = "room" | "opening" | "furniture" | "device" | "wall" | "outdoor";
 
-type Tool = "select" | "rect" | "polygon" | "measure" | "opening" | "furniture" | "outdoor" | "hole" | "wall" | "roof" | "energy";
+type Tool = EditorTool;
 
 type Drag =
   | { kind: "pan"; last: [number, number] }
@@ -184,6 +185,7 @@ export class Fp3dEditor extends LitElement {
     _energyNote: { state: true },
     _cableId: { state: true },
     _furnQuery: { state: true },
+    _furnPane: { state: true },
     _libOpen: { state: true },
     _expanded: { state: true },
     _notice: { state: true },
@@ -257,6 +259,8 @@ export class Fp3dEditor extends LitElement {
   private cableCache: { doc: Building; segs: FlowSegment[] } | null = null;
   /** Furniture library: the search text, and which sections are open (built-in groups and packs). */
   private declare _furnQuery: string;
+  /** Furniture tool: browse the library, or edit the selected item without mixing both long panels. */
+  private declare _furnPane: FurniturePane;
   private declare _libOpen: Set<string>;
   /** Devices whose further entities are unfolded in the device list. */
   private declare _expanded: Set<string>;
@@ -333,6 +337,7 @@ export class Fp3dEditor extends LitElement {
     this._energyNote = null;
     this._cableId = null;
     this._furnQuery = "";
+    this._furnPane = "library";
     this._libOpen = new Set(["group:lights", "group:living"]);
     try {
       const saved = localStorage.getItem("neonplan3d.library");
@@ -1152,6 +1157,10 @@ export class Fp3dEditor extends LitElement {
       } else this.drag = { kind: "pan", last: local };
       return;
     }
+    if (this._tool === "settings") {
+      this.drag = { kind: "pan", last: local };
+      return;
+    }
     if (this._tool === "rect" || this._tool === "outdoor" || this._tool === "hole") {
       const start = this.snap(world, undefined, e.altKey);
       this.drag = { kind: "rect", start, end: start, outdoor: this._tool === "outdoor", hole: this._tool === "hole" };
@@ -1303,7 +1312,7 @@ export class Fp3dEditor extends LitElement {
     const world = this.toWorld(...local);
     const drag = this.drag;
     if (!drag) {
-      if (this._tool !== "select" && this._tool !== "furniture" && this.floor) this._cursor = this.snap(world, undefined, e.altKey);
+      if (this._tool !== "select" && this._tool !== "furniture" && this._tool !== "settings" && this.floor) this._cursor = this.snap(world, undefined, e.altKey);
       return;
     }
     switch (drag.kind) {
@@ -3627,6 +3636,7 @@ export class Fp3dEditor extends LitElement {
     this._openingId = kind === "opening" ? id : null;
     this._furnitureId = kind === "furniture" ? id : null;
     this._deviceId = kind === "device" ? id : null;
+    if (kind === "furniture" && id && this._tool === "furniture") this._furnPane = "properties";
     if (kind === "device" && id) {
       const pl = this.floor?.placements.find((x) => x.entity_id === id);
       this._roomId = (pl && this.roomAt([pl.x, pl.z])) ?? this._roomId;
@@ -4144,6 +4154,16 @@ export class Fp3dEditor extends LitElement {
 
   // ------------------------------------------------------------------ rendering
 
+  private chooseTool(tool: Tool): void {
+    this._tool = tool;
+    this._draft = [];
+    this._cursor = null;
+    this._preview = null;
+    this._sideOpen = tool !== "select";
+    if (tool === "furniture") this._furnPane = "library";
+    if (tool === "settings") this.selectItem("room", null);
+  }
+
   protected render(): TemplateResult {
     const floor = this.floor;
     const walls = floor ? generateWalls(floor.rooms, { exterior: this._doc.settings.wall_exterior, interior: this._doc.settings.wall_interior }, floor.walls ?? []) : null;
@@ -4152,33 +4172,35 @@ export class Fp3dEditor extends LitElement {
       <div class="fp3d-editor ${this.narrow ? "fp3d-narrow" : ""}">
         <div class="fp3d-main">
           <div class="fp3d-toolbar">
-            <div class="fp3d-seg" role="group" aria-label=${this.t("tool_select")}>
-              ${(["select", "rect", "polygon", "wall", "opening", "furniture", "outdoor", "hole", "roof", "energy"] as Tool[]).map(
-                (tool) => html`<button
-                  aria-pressed=${this._tool === tool}
-                  ?disabled=${!floor || (!this.isAdmin && tool !== "select")}
-                  @click=${() => {
-                    this._tool = tool;
-                    this._draft = [];
-                    this._cursor = null;
-                    // a tool needs the sidebar (library, presets): open it beside the 3D pane
-                    this._sideOpen = tool !== "select";
-                  }}
-                >
-                  ${this.t(`tool_${tool}` as I18nKey)}
-                </button>`,
-              )}
-            </div>
-            <div class="fp3d-seg">
-              <button ?disabled=${!this._canUndo} @click=${() => this.undo()} title="Ctrl+Z">${this.t("undo")}</button>
-              <button ?disabled=${!this._canRedo} @click=${() => this.redo()} title="Ctrl+Y">${this.t("redo")}</button>
-              <button @click=${() => this.fit()}>${this.t("fit")}</button>
-              <button aria-pressed=${this._split} title=${this.t("split_3d_hint")} @click=${() => this.toggleSplit()}>${this.t("split_3d")}</button>
-              ${this.isAdmin
-                ? html`<button aria-pressed=${!!this._doc.settings.lock_plan} title=${this.t("lock_plan_hint")} @click=${() => this.toggleLockPlan()}>
-                    ${this._doc.settings.lock_plan ? `🔓 ${this.t("plan_unlock")}` : `🔒 ${this.t("plan_lock")}`}
-                  </button>`
-                : nothing}
+            ${EDITOR_TOOL_GROUPS.map(
+              (group) => html`<div class="fp3d-tool-group">
+                <span>${this.t(`tool_group_${group.key}` as I18nKey)}</span>
+                <div class="fp3d-seg" role="group" aria-label=${this.t(`tool_group_${group.key}` as I18nKey)}>
+                  ${group.tools.map(
+                    (tool) => html`<button
+                      aria-pressed=${this._tool === tool}
+                      ?disabled=${(!floor && tool !== "settings") || (!this.isAdmin && tool !== "select")}
+                      @click=${() => this.chooseTool(tool)}
+                    >
+                      ${this.t(`tool_${tool}` as I18nKey)}
+                    </button>`,
+                  )}
+                </div>
+              </div>`,
+            )}
+            <div class="fp3d-tool-group fp3d-tool-actions">
+              <span>${this.t("tool_group_actions")}</span>
+              <div class="fp3d-seg">
+                <button ?disabled=${!this._canUndo} @click=${() => this.undo()} title="Ctrl+Z">${this.t("undo")}</button>
+                <button ?disabled=${!this._canRedo} @click=${() => this.redo()} title="Ctrl+Y">${this.t("redo")}</button>
+                <button @click=${() => this.fit()}>${this.t("fit")}</button>
+                <button aria-pressed=${this._split} title=${this.t("split_3d_hint")} @click=${() => this.toggleSplit()}>${this.t("split_3d")}</button>
+                ${this.isAdmin
+                  ? html`<button aria-pressed=${!!this._doc.settings.lock_plan} title=${this.t("lock_plan_hint")} @click=${() => this.toggleLockPlan()}>
+                      ${this._doc.settings.lock_plan ? `🔓 ${this.t("plan_unlock")}` : `🔒 ${this.t("plan_lock")}`}
+                    </button>`
+                  : nothing}
+              </div>
             </div>
             ${walls?.warnings.length ? html`<span class="fp3d-warn">${this.t("overlap_warning")}</span>` : nothing}
           </div>
@@ -4952,10 +4974,11 @@ export class Fp3dEditor extends LitElement {
       return html`<aside class="fp3d-side fp3d-side-strip">
         <button class="fp3d-strip-btn" title=${this.t("side_open")} @click=${() => (this._sideOpen = true)}>☰</button>
         ${this._furnitureId || this._deviceId || this._openingId
-          ? html`<button class="fp3d-strip-btn fp3d-strip-hot" title=${this.t("side_details")} @click=${() => (this._sideOpen = true)}>⚙</button>`
+          ? html`<button class="fp3d-strip-btn fp3d-strip-hot" title=${this.t("side_details")} @click=${() => (this._sideOpen = true)}>✎</button>`
           : nothing}
-        <button class="fp3d-strip-btn" title=${this.t("tool_furniture")} @click=${() => ((this._tool = "furniture"), (this._draft = []), (this._sideOpen = true))}>🛋</button>
-        <button class="fp3d-strip-btn" title=${this.t("tool_opening")} @click=${() => ((this._tool = "opening"), (this._draft = []), (this._sideOpen = true))}>🚪</button>
+        <button class="fp3d-strip-btn" title=${this.t("tool_furniture")} @click=${() => this.chooseTool("furniture")}>🛋</button>
+        <button class="fp3d-strip-btn" title=${this.t("tool_opening")} @click=${() => this.chooseTool("opening")}>🚪</button>
+        ${this.isAdmin ? html`<button class="fp3d-strip-btn" title=${this.t("tool_settings")} @click=${() => this.chooseTool("settings")}>⚙</button>` : nothing}
       </aside>`;
     }
     // open over the 3D pane, so the pane keeps its size
@@ -4983,9 +5006,10 @@ export class Fp3dEditor extends LitElement {
     const areas = Object.values(this.hass?.areas ?? {}).sort((a, b) => a.name.localeCompare(b.name));
     if (this._tool === "roof") return this.renderRoofPanel();
     if (this._tool === "energy") return this.renderEnergyPanel();
-    // furnishing: the library and the selected item come first
+    if (this._tool === "settings" && admin) return this.renderProjectPanel(floor);
+    // Furnishing has two deliberate steps: choose an item, then edit it.
     if (this._tool === "furniture" && floor && admin) {
-      return html`${this.furnitureItem ? this.renderFurnitureForm(this.furnitureItem) : nothing} ${this.renderFurnitureLibrary()}`;
+      return this.renderFurniturePanel();
     }
     // a selected item shows only its own form, with a way back to the floor and room
     const item =
@@ -5123,11 +5147,40 @@ export class Fp3dEditor extends LitElement {
             : floor
               ? this.renderRoomList(floor)
               : nothing}
-      ${admin ? this.renderStartView() : nothing} ${admin ? this.renderFavorites() : nothing}
-      ${this.renderHelpLinks()}
-      ${admin && SHOW_PRESENCE ? this.renderPresenceSettings() : nothing}
-      ${floor && admin ? this.renderBackgroundForm(floor) : nothing} ${admin ? this.renderSettings() : nothing}
-      ${admin ? this.renderBackup() : nothing}
+      ${admin ? nothing : this.renderHelpLinks()}
+    `;
+  }
+
+  private renderFurniturePanel() {
+    const item = this.furnitureItem;
+    const pane = resolvedFurniturePane(this._furnPane, !!item);
+    return html`
+      <div class="fp3d-side-tabs fp3d-seg" role="tablist" aria-label=${this.t("furniture")}>
+        <button role="tab" aria-selected=${pane === "library"} aria-pressed=${pane === "library"} @click=${() => (this._furnPane = "library")}>
+          ${this.t("furniture_library")}
+        </button>
+        <button
+          role="tab"
+          aria-selected=${pane === "properties"}
+          aria-pressed=${pane === "properties"}
+          ?disabled=${!item}
+          @click=${() => (this._furnPane = "properties")}
+        >
+          ${this.t("furniture_properties")}
+        </button>
+      </div>
+      ${pane === "properties" && item ? this.renderFurnitureForm(item) : this.renderFurnitureLibrary()}
+    `;
+  }
+
+  private renderProjectPanel(floor: Floor | undefined) {
+    return html`
+      <section class="fp3d-project-intro">
+        <h3>${this.t("project_settings")}</h3>
+        <p class="fp3d-sub">${this.t("project_settings_hint")}</p>
+      </section>
+      ${this.renderSettings()} ${floor ? this.renderBackgroundForm(floor) : nothing} ${this.renderStartView()} ${this.renderFavorites()}
+      ${SHOW_PRESENCE ? this.renderPresenceSettings() : nothing} ${this.renderBackup()} ${this.renderHelpLinks()}
     `;
   }
 
@@ -7109,8 +7162,53 @@ export class Fp3dEditor extends LitElement {
         display: flex;
         flex-wrap: wrap;
         gap: 8px;
-        align-items: center;
+        align-items: flex-end;
         padding: 10px 12px;
+      }
+      .fp3d-tool-group {
+        display: grid;
+        gap: 3px;
+      }
+      .fp3d-tool-group > span {
+        padding-left: 6px;
+        color: var(--fp3d-muted);
+        font-size: 9.5px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+      .fp3d-tool-actions {
+        margin-left: auto;
+      }
+      .fp3d-side-tabs {
+        position: sticky;
+        top: -12px;
+        z-index: 4;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        padding: 6px 0 10px;
+        background: var(--fp3d-chrome-solid);
+      }
+      .fp3d-side-tabs button {
+        justify-content: center;
+      }
+      .fp3d-project-intro {
+        padding-bottom: 10px;
+        border-bottom: 1px solid var(--fp3d-line);
+      }
+      .fp3d-project-intro h3 {
+        color: var(--fp3d-accent);
+      }
+      .fp3d-narrow .fp3d-toolbar {
+        flex-wrap: nowrap;
+        align-items: flex-start;
+        overflow-x: auto;
+      }
+      .fp3d-narrow .fp3d-tool-group {
+        flex: none;
+      }
+      .fp3d-narrow .fp3d-tool-actions {
+        margin-left: 0;
       }
       .fp3d-warn {
         color: var(--fp3d-warm);

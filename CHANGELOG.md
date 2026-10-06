@@ -4,6 +4,14 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.17.1
+
+### Changed
+
+- Grouped the editor toolbar by floor-plan, furnishing, building, project and action workflows, with a horizontally scrollable layout on narrow screens.
+- Split furniture editing into Library and Properties tabs, and moved project-wide settings, backgrounds, start view, favourites, presence, backups and help into a dedicated Configuration panel.
+- Added complete Vietnamese labels for the new navigation and configuration interface.
+
 ## 1.17.0
 
 ### Changed
