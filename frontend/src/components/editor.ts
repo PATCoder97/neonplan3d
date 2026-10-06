@@ -7255,6 +7255,8 @@ export class Fp3dEditor extends LitElement {
       }
       .fp3d-tool-menu {
         position: relative;
+        flex: 0 0 auto;
+        block-size: 36px;
         min-width: 0;
       }
       .fp3d-tool-menu > summary {

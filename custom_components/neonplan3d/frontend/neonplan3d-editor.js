@@ -2025,6 +2025,8 @@ var Et=globalThis,At=Et.ShadowRoot&&(Et.ShadyCSS===void 0||Et.ShadyCSS.nativeSha
       }
       .fp3d-tool-menu {
         position: relative;
+        flex: 0 0 auto;
+        block-size: 36px;
         min-width: 0;
       }
       .fp3d-tool-menu > summary {

@@ -4,6 +4,12 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.17.4
+
+### Fixed
+
+- Kept desktop tool menus at the same height while open, preventing the editor toolbar and plan from jumping by a few pixels.
+
 ## 1.17.3
 
 ### Changed
