@@ -124,6 +124,11 @@
   "state_idle": "Sẵn sàng",
   "state_locked": "Đã khóa",
   "state_unlocked": "Đã mở khóa",
+  "lock_plan": "🔒 Mặt bằng",
+  "lock_plan_hint": "Khóa mặt bằng để tránh vô tình di chuyển phòng, tường, cửa, cửa sổ và khu vực ngoài trời. Nội thất và thiết bị vẫn có thể di chuyển.",
+  "plan_locked": "Mặt bằng đã khóa",
+  "plan_lock": "Khóa mặt bằng",
+  "plan_unlock": "Mở khóa mặt bằng",
   "state_detected": "Đã phát hiện",
   "state_clear": "Bình thường",
   "state_unavailable": "Không khả dụng",
@@ -236,6 +241,8 @@
   "ext_pro": "Tính năng tích hợp",
   "ext_active": "đang hoạt động",
   "manual_more": "Tìm hiểu thêm",
+  "ext_teaser_title": "Gói nội thất tùy chọn",
+  "ext_teaser_text": "Các tính năng tích hợp đã được bật. Mở Tiện ích mở rộng để cài thêm nội thất nếu cần.",
   "ext_open": "Mở tiện ích mở rộng",
   "close": "Đóng"
 }

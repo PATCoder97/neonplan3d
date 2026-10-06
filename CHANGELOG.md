@@ -4,6 +4,13 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.16.1
+
+### Fixed
+
+- Reworded the furniture-library teaser so it only points to optional furniture packs and no longer suggests that the bundled add-ons still need unlocking.
+- Made the floor-plan lock action explicit and added its missing Vietnamese labels and explanation.
+
 ## 1.16.0
 
 ### Changed
