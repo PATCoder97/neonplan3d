@@ -2465,7 +2465,7 @@ declare const __FP3D_LANG_HASH__: string;
  * load texts they do not need) and are fetched once when Home Assistant runs in that language. Missing
  * keys fall back to English.
  */
-export const EXTRA_LANGUAGES = ["fr", "es", "nl", "it", "hu"] as const;
+export const EXTRA_LANGUAGES = ["fr", "es", "nl", "it", "hu", "vi"] as const;
 const extra = new Map<string, Record<string, string>>();
 const pending = new Map<string, Promise<void>>();
 
