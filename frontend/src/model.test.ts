@@ -1,6 +1,14 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { emptyBuilding, floorElevation, furnitureCorner, furnitureRotationAt, newFloor, openingPreset, openingStyle, normalizeBuilding, outdoorDrop, outdoorGround, resizeFurniture, roomTiles, sidelightLayout, spotGrid, surfaceHeight, type Furniture } from "./model.ts";
+import { emptyBuilding, floorElevation, FURNITURE_GROUPS, furnitureCorner, furnitureRotationAt, newFloor, openingPreset, openingStyle, normalizeBuilding, outdoorDrop, outdoorGround, resizeFurniture, roomTiles, sidelightLayout, spotGrid, surfaceHeight, type Furniture } from "./model.ts";
+
+test("furniture is grouped by function instead of a regional collection", () => {
+  assert.equal(FURNITURE_GROUPS.vietnam, undefined);
+  assert.ok(FURNITURE_GROUPS.living.includes("altar") && FURNITURE_GROUPS.living.includes("altar_wall"));
+  assert.ok(FURNITURE_GROUPS.climate.includes("fan_ceiling") && FURNITURE_GROUPS.climate.includes("fan_floor"));
+  assert.ok(FURNITURE_GROUPS.bath.includes("water_heater") && FURNITURE_GROUPS.bath.includes("drying_rack"));
+  assert.ok(FURNITURE_GROUPS.vehicles.includes("motorbike"));
+});
 
 test("a sidelight sits opposite the hinge, on the hinge side when asked, and keeps the leaf at least half a metre", () => {
   const none = {};

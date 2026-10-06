@@ -45,6 +45,31 @@ test("a U-shaped stair builds two flights and a half-height landing", () => {
   assert.ok(Math.abs(Math.min(...ys)) < 1e-6, "starts on the lower floor");
   assert.ok(Math.abs(Math.max(...ys) - 2.8) < 1e-6, "reaches the upper floor");
   assert.ok(ys.some((y) => Math.abs(y - 1.4) < 1e-6), "landing is at half-height");
+
+  // Both sloping rails meet the landing rails at shared endpoints: the inner pair closes the
+  // stairwell gap and the outer pair runs around the back without floating breaks.
+  const near = (a: number, b: number) => Math.abs(a - b) < 1e-6;
+  const hasSegment = (a: [number, number, number], b: [number, number, number]) => {
+    for (let i = 0; i < lines.p.length; i += 6) {
+      const p = lines.p.slice(i, i + 3);
+      const q = lines.p.slice(i + 3, i + 6);
+      const same = (u: number[], v: number[]) => u.every((n, j) => near(n, v[j]));
+      if ((same(p, a) && same(q, b)) || (same(p, b) && same(q, a))) return true;
+    }
+    return false;
+  };
+  const gap = Math.min(0.16, stair.w * 0.12);
+  const flightW = (stair.w - gap) / 2;
+  const landingD = Math.min(stair.d * 0.34, Math.max(stair.d * 0.22, flightW));
+  const front = -stair.d / 2 + landingD;
+  const back = -stair.d / 2 + 0.03;
+  const railY = stair.h / 2 + Math.min(0.9, Math.max(0.55, stair.h * 0.32));
+  const lowerOuter = -stair.w / 2 + 0.03;
+  const lowerInner = -gap / 2 - 0.03;
+  const upperInner = gap / 2 + 0.03;
+  const upperOuter = stair.w / 2 - 0.03;
+  assert.ok(hasSegment([lowerInner, railY, front], [upperInner, railY, front]), "inner landing rail is continuous");
+  assert.ok(hasSegment([lowerOuter, railY, back], [upperOuter, railY, back]), "outer landing rail is continuous");
 });
 
 test("loft and lying cylinder parts build finite geometry with their outlines", () => {

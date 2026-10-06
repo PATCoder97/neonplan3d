@@ -848,17 +848,16 @@ export const FURNITURE_TYPES = [
 
 /** Furniture library sections (the editor lists them in this order). */
 export const FURNITURE_GROUPS: Record<string, FurnitureType[]> = {
-  vietnam: ["altar", "altar_wall", "shoe_cabinet", "shoe_bench", "motorbike", "fan_ceiling", "fan_floor", "water_heater", "drying_rack"],
   lights: ["lamp_ceiling", "lamp_downlight", "lamp_spot", "lamp_panel", "lamp_pendant", "lamp_floor", "lamp_uplight", "lamp_table", "lamp_wall", "led_strip", "lamp_bollard", "lamp_garden"],
-  living: ["sofa", "sofa_l", "sofa_bed", "armchair", "stool", "coffee_table", "tv_board", "tv_wall", "sideboard", "shelf", "room_divider", "plant", "rug"],
+  living: ["sofa", "sofa_l", "sofa_bed", "armchair", "stool", "coffee_table", "tv_board", "tv_wall", "sideboard", "shelf", "room_divider", "altar", "altar_wall", "plant", "rug"],
   dining: ["table", "table_round", "chair", "bench", "corner_bench", "bar_stool"],
   kitchen: ["kitchen", "kitchen_corner", "kitchen_wall", "kitchen_tall", "island", "worktop", "sink", "stove", "range_hood", "microwave", "water_purifier", "dishwasher", "fridge"],
   sleeping: ["bed", "bed_single", "bed_double", "bunk_bed", "crib", "nightstand", "wardrobe", "dresser", "vanity"],
-  bath: ["bathtub", "shower", "shower_screen", "wc", "washbasin", "washer", "dryer"],
-  climate: ["air_conditioner", "radiator"],
+  bath: ["bathtub", "shower", "shower_screen", "wc", "washbasin", "water_heater", "washer", "dryer", "drying_rack"],
+  climate: ["air_conditioner", "radiator", "fan_ceiling", "fan_floor"],
   outdoor: ["water_pump", "hammock", "stone_table_set", "planter_large", "water_tank", "gate", "fence"],
-  work: ["desk", "worktop", "office_chair", "tall_cabinet", "coat_rack", "stairs", "stairs_landing", "robot_vacuum"],
-  vehicles: ["parking"],
+  work: ["desk", "worktop", "office_chair", "tall_cabinet", "coat_rack", "shoe_cabinet", "shoe_bench", "stairs", "stairs_landing", "robot_vacuum"],
+  vehicles: ["motorbike", "parking"],
 };
 
 /** Energy devices: placed and set up in the Energy tool (stored like furniture, not in the library). */

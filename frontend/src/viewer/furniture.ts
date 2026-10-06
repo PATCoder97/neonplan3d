@@ -534,7 +534,7 @@ function stairs(b: Builder, w: number, d: number, h: number): void {
   }
 }
 
-/** Vietnamese-style half-turn stair: two parallel flights joined by a landing at the back. */
+/** Half-turn stair: two parallel flights joined by a landing at the back. */
 function stairsLanding(b: Builder, w: number, d: number, h: number): void {
   const steps = Math.max(6, Math.round(h / 0.18));
   const lowerSteps = Math.floor(steps / 2);
@@ -576,9 +576,12 @@ function stairsLanding(b: Builder, w: number, d: number, h: number): void {
   }
 
   const rail = Math.min(0.9, Math.max(0.55, h * 0.32));
+  const lowerRails = [left0 + 0.03, left1 - 0.03] as const;
+  const upperRails = [right0 + 0.03, right1 - 0.03] as const;
   // Rails on both sides make the central stairwell and the outer edges easy to read in 3D.
-  for (const x of [left0 + 0.03, left1 - 0.03]) {
-    b.seg(x, rise + rail, d / 2 - lowerRun / 2, x, landingY + rail, landingFront + lowerRun / 2, EDGE_GLOW);
+  for (const x of lowerRails) {
+    // Meet the landing at its edge instead of stopping halfway across the last tread.
+    b.seg(x, rise + rail, d / 2 - lowerRun / 2, x, landingY + rail, landingFront, EDGE_GLOW);
     for (let i = 0; i < lowerSteps; i += 3) {
       const z = d / 2 - lowerRun * (i + 0.5);
       const y = rise * (i + 1);
@@ -586,18 +589,37 @@ function stairsLanding(b: Builder, w: number, d: number, h: number): void {
     }
   }
   const railSteps = Math.max(1, upperSteps - 3);
-  for (const x of [right0 + 0.03, right1 - 0.03]) {
-    b.seg(x, landingY + rise + rail, landingFront + upperRun / 2, x, landingY + rise * railSteps + rail, landingFront + upperRun * (railSteps - 0.5), EDGE_GLOW);
+  for (const x of upperRails) {
+    // Start at landing height so the rail rises smoothly from the horizontal landing guard.
+    b.seg(x, landingY + rail, landingFront, x, landingY + rise * railSteps + rail, landingFront + upperRun * (railSteps - 0.5), EDGE_GLOW);
     for (let i = 0; i < railSteps; i += 3) {
       const z = landingFront + upperRun * (i + 0.5);
       const y = landingY + rise * (i + 1);
       b.seg(x, y, z, x, y + rail, z, EDGE_FAINT);
     }
   }
-  // Guard the small central opening at the edge of the landing.
-  b.seg(left1, landingY, landingFront, left1, landingY + rail, landingFront, EDGE_FAINT);
-  b.seg(right0, landingY, landingFront, right0, landingY + rail, landingFront, EDGE_FAINT);
-  b.seg(left1, landingY + rail, landingFront, right0, landingY + rail, landingFront, EDGE_GLOW);
+
+  // The inner rails join across the central opening. The outer rails continue around the back of
+  // the landing, making both handrail runs one uninterrupted path through the half-turn.
+  const lowerOuter = lowerRails[0];
+  const lowerInner = lowerRails[1];
+  const upperInner = upperRails[0];
+  const upperOuter = upperRails[1];
+  const landingBack = -d / 2 + 0.03;
+  b.seg(lowerInner, landingY + rail, landingFront, upperInner, landingY + rail, landingFront, EDGE_GLOW);
+  b.seg(lowerOuter, landingY + rail, landingFront, lowerOuter, landingY + rail, landingBack, EDGE_GLOW);
+  b.seg(lowerOuter, landingY + rail, landingBack, upperOuter, landingY + rail, landingBack, EDGE_GLOW);
+  b.seg(upperOuter, landingY + rail, landingBack, upperOuter, landingY + rail, landingFront, EDGE_GLOW);
+  for (const [x, z] of [
+    [lowerInner, landingFront],
+    [upperInner, landingFront],
+    [lowerOuter, landingFront],
+    [lowerOuter, landingBack],
+    [upperOuter, landingBack],
+    [upperOuter, landingFront],
+  ] as const) {
+    b.seg(x, landingY, z, x, landingY + rail, z, EDGE_FAINT);
+  }
 }
 
 function sideboard(b: Builder, w: number, d: number, h: number): void {

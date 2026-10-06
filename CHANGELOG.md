@@ -4,6 +4,16 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.18.5
+
+### Fixed
+
+- Joined both flights of the U-shaped stair cleanly to the landing, with a continuous inner guard and an outer handrail running around the landing.
+
+### Changed
+
+- Removed the regional furniture-library section and distributed its items into their functional living, climate, bath, work and vehicle sections.
+
 ## 1.18.4
 
 ### Fixed
@@ -122,7 +132,7 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 
 ### New
 
-- **Vietnamese U-shaped staircase with a landing:** two parallel flights turn 180° at a half-height landing, include guard rails, use a clear two-flight plan symbol and automatically open the floor above.
+- **U-shaped staircase with a landing:** two parallel flights turn 180° at a half-height landing, include guard rails, use a clear two-flight plan symbol and automatically open the floor above.
 
 ## 1.12.1
 
