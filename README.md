@@ -23,12 +23,13 @@
 
 Also included: parking spots with vehicles that appear while a car is home, a heatmap for temperature, humidity and CO₂, sunlight through the windows from `sun.sun`, three looks (*Neon*, *Blueprint*, *Day*), a search, restore points, and a full backup of plan, pictures and packs.
 
-### Free, packs and Pro add-ons
+### Free features and optional packs
 
-The integration and everything above are free and open source (MIT). Optional third-party extras from the original author are sold at [mastershort.de](https://mastershort.de/en/neonplan3d/?lang=en) and install from the **Extensions** tab:
+The integration and everything above are free and open source (MIT). In this fork, the six add-ons whose implementation is bundled with the frontend — Camera cockpit, Weather outside, Live screens, Energy Pro, Sound & Cinema and Car Pro — are enabled by default. They do not require a feature pack.
+
+Optional third-party content from the original author is sold at [mastershort.de](https://mastershort.de/en/neonplan3d/?lang=en) and installs from the **Extensions** tab:
 
 - **Furniture packs** – rooms (living, kitchen, bedroom, bath), areas (kids, office, garden, garage, fitness, smart home), vehicles, stairs & railings.
-- **Pro add-ons** – *Camera cockpit* (look through a camera, motion trail), *Weather outside* (rain, snow, clouds, lightning, sun and moon), *Live screens* (app colours and artwork on TVs, pictures by rules, camera live pictures on screens).
 
 Bought packs are signed for your installation and update by themselves once a day. Everything installed keeps working without the shop.
 
@@ -115,8 +116,8 @@ npm run screenshot  # renders preview/index.html (invented demo data) with a loc
 
 ## Licence
 
-MIT – see [LICENSE](LICENSE). The original copyright notice is preserved as required by the licence. Furniture packs and Pro add-ons sold by the original author are not part of this repository.
+MIT – see [LICENSE](LICENSE). The original copyright notice is preserved as required by the licence. Furniture, images and other content distributed separately in paid packs are not part of this repository.
 
 ## Fork and upstream
 
-This fork is maintained for PATCoder97's own Home Assistant customisations. The original project and its paid packs remain owned and operated by Mastershort. Upstream changes can be followed at [Mastershort/neonplan3d](https://github.com/Mastershort/neonplan3d).
+This fork is maintained for PATCoder97's own Home Assistant customisations. The original project and separately distributed paid pack content remain owned and operated by Mastershort. Upstream changes can be followed at [Mastershort/neonplan3d](https://github.com/Mastershort/neonplan3d).

@@ -2,14 +2,15 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { hasFeature, manualUrl, shopUrl, unlockedFeatures } from "./features.ts";
 
-test("features come from installed packs that list them; unknown names are ignored", () => {
-  assert.deepEqual([...unlockedFeatures([])], []);
-  const packs = [{ features: ["weather", "time_travel"] }, { features: undefined }, { features: ["camera_cockpit"] }];
-  assert.deepEqual([...unlockedFeatures(packs)].sort(), ["camera_cockpit", "weather"]);
+test("bundled features are enabled by default; packs can add hidden known features", () => {
+  assert.deepEqual([...unlockedFeatures([])].sort(), ["auto_pro", "camera_cockpit", "energy_pro", "screens", "sound", "weather"]);
+  const packs = [{ features: ["fridge_smart", "time_travel"] }, { features: undefined }];
+  assert.deepEqual([...unlockedFeatures(packs)].sort(), ["auto_pro", "camera_cockpit", "energy_pro", "fridge_smart", "screens", "sound", "weather"]);
   assert.equal(hasFeature("screens", [{ features: ["screens"] }]), true);
-  assert.equal(hasFeature("screens", [{ features: ["screens"] }]), true);
-  assert.equal(hasFeature("weather", [{ features: ["weather"] }]), true);
-  assert.equal(hasFeature("camera_cockpit", [{ features: ["weather"] }]), false);
+  assert.equal(hasFeature("weather", []), true);
+  assert.equal(hasFeature("camera_cockpit", []), true);
+  assert.equal(hasFeature("fridge_smart", []), false);
+  assert.equal(hasFeature("fridge_smart", [{ features: ["fridge_smart"] }]), true);
 });
 
 test("manual and shop links follow the language and point Pro add-ons at their section", () => {

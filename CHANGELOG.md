@@ -4,6 +4,13 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.16.0
+
+### Changed
+
+- **Bundled add-ons enabled:** Camera cockpit, Weather outside, Live screens, Energy Pro, Sound & Cinema and Car Pro are available by default in this fork without a feature pack. Optional signed furniture and asset packs remain supported separately.
+- Updated the Extensions page, card hints, manuals and Vietnamese translations to describe the fork's bundled features accurately.
+
 ## 1.15.0
 
 ### New

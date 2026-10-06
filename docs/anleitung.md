@@ -551,7 +551,7 @@ Ein Tipp auf die Kamera oder auf ihren Sichtkegel öffnet das Standbild, das sic
 
 ## 6. Pro-Erweiterungen
 
-Pro-Erweiterungen sind kostenpflichtige Zusatzfunktionen, einzeln im Shop erhältlich. Ohne Erweiterung zeigen die Schalter ein 🔒, und ein Hinweis führt zum Shop. Wie du sie installierst, steht in [Kapitel 7](#7-erweiterungen-shop-und-möbel-packs).
+Dieser Fork aktiviert alle sechs im Frontend enthaltenen Zusatzfunktionen standardmäßig; ein Feature-Pack ist dafür nicht erforderlich. Optionale Möbel- und Asset-Packs bleiben getrennt und werden wie in [Kapitel 7](#7-erweiterungen-shop-und-möbel-packs) beschrieben installiert.
 
 ![Gesperrte Pro-Funktion](images/view-pro-locked.jpg)
 
@@ -728,7 +728,7 @@ Danach:
 
 ### 7.2 Pro-Erweiterungen
 
-Die mittlere Kachelreihe zeigt die drei Pro-Erweiterungen. Aktive tragen ein ✓, gesperrte ein 🔒 und den Link „Im Shop ansehen“.
+Die mittlere Kachelreihe zeigt die sechs enthaltenen Zusatzfunktionen. In diesem Fork tragen sie ein ✓ und sind ohne Feature-Pack aktiv.
 
 ### 7.3 Möbel-Packs
 

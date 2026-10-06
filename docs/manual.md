@@ -549,7 +549,7 @@ A tap on the camera or on its wedge opens the snapshot, which refreshes every fe
 
 ## 6. Pro add-ons
 
-Pro add-ons are paid extra features, sold singly in the shop. Without an add-on, the switches show a 🔒 and a hint leads to the shop. How to install them is in [chapter 7](#7-extensions-shop-and-furniture-packs).
+This fork enables all six add-on features bundled with the frontend by default; no feature pack is required. Optional furniture and asset packs remain separate and are installed as described in [chapter 7](#7-extensions-shop-and-furniture-packs).
 
 ![A locked Pro feature](images/view-pro-locked.jpg)
 
@@ -726,7 +726,7 @@ After that:
 
 ### 7.2 Pro add-ons
 
-The middle row of tiles shows the three Pro add-ons. Active ones carry a ✓, locked ones a 🔒 and the link "See in the shop".
+The middle row shows the six bundled add-ons. In this fork they carry a ✓ and are active without a feature pack.
 
 ### 7.3 Furniture packs
 
