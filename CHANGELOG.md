@@ -4,6 +4,16 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.18.3
+
+### Fixed
+
+- Reworked the standing fan with a shallower connected guard, rear motor and three swept blades centred correctly inside the cage.
+
+### Changed
+
+- Added interactive mock ceiling and standing fans plus two neon lights to the local preview home.
+
 ## 1.18.2
 
 ### Changed

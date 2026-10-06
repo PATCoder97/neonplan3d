@@ -930,15 +930,25 @@ function floorFan(b: Builder, w: number, d: number, h: number): void {
   for (const x of [-w * 0.07, 0, w * 0.07]) b.cyl(x, d * 0.12, w * 0.018, h * 0.14, h * 0.155, C.accent, C.accent, 8, EDGE_GLOW);
   const cy = h * 0.78;
   const r = Math.min(w, h * 0.42) * 0.46;
-  b.lyingCyl("z", 0, 0, cy - r * 0.25, cy + r * 0.25, d * 0.28, r * 0.25, C.body, C.bodyTop, 14, EDGE_FURN);
-  // Front and rear cage rings with radial cage wires; the blades are a separate live rotor.
-  for (let i = 0; i < 12; i++) {
-    const a = (i / 12) * Math.PI * 2;
-    b.seg(Math.cos(a) * r * 0.18, cy + Math.sin(a) * r * 0.18, d * 0.15, Math.cos(a) * r, cy + Math.sin(a) * r, d * 0.15, EDGE_FAINT);
+  const cageZ = d * 0.075;
+  // A short neck and rear motor make the head read as a domestic pedestal fan, not two floating rings.
+  b.box(-w * 0.085, w * 0.085, h * 0.58, cy - r * 0.18, -d * 0.1, d * 0.015, C.body, C.bodyTop, EDGE_FURN);
+  b.lyingCyl("z", 0, -d * 0.11, cy - r * 0.3, cy + r * 0.3, d * 0.24, r * 0.6, C.body, C.bodyTop, 16, EDGE_FURN);
+  // Shallow front and rear guards, joined at four points, keep the cage visually thin.
+  for (const z of [-cageZ, cageZ]) {
+    for (let i = 0; i < 16; i++) {
+      const a = (i / 16) * Math.PI * 2;
+      b.seg(Math.cos(a) * r * 0.18, cy + Math.sin(a) * r * 0.18, z, Math.cos(a) * r, cy + Math.sin(a) * r, z, EDGE_FAINT);
+    }
+    ring(b, 0, cy, r, z, 32);
+    ring(b, 0, cy, r * 0.86, z, 32);
+    ring(b, 0, cy, r * 0.18, z, 18);
   }
-  ring(b, 0, cy, r, d * 0.15, 28);
-  ring(b, 0, cy, r * 0.86, d * 0.155, 28);
-  ring(b, 0, cy, r, -d * 0.15, 28);
+  for (const a of [0, Math.PI / 2, Math.PI, (Math.PI * 3) / 2]) {
+    const x = Math.cos(a) * r;
+    const y = cy + Math.sin(a) * r;
+    b.seg(x, y, -cageZ, x, y, cageZ, EDGE_FURN);
+  }
 }
 
 /** Moving blades of a built-in fan, centred on its rotation axis for the viewer to spin as one group. */
@@ -955,20 +965,20 @@ export function pushFanRotor(buf: GeoBuffer, lines: LineBuffer, type: "fan_ceili
   }
 
   const r = Math.min(w, h * 0.42) * 0.46;
-  const z0 = -Math.max(0.008, d * 0.018);
+  const z0 = -Math.max(0.006, d * 0.012);
   const z1 = -z0;
   const front = new Color(C.bodyTop);
   const side = new Color(C.body);
   const P = (radius: number, angle: number): [number, number] => [Math.cos(angle) * radius, Math.sin(angle) * radius];
-  for (let i = 0; i < 5; i++) {
-    const a = (i / 5) * Math.PI * 2;
-    const poly = [P(r * 0.14, a - 0.08), P(r * 0.7, a + 0.12), P(r * 0.84, a + 0.48), P(r * 0.24, a + 0.42)];
+  for (let i = 0; i < 3; i++) {
+    const a = (i / 3) * Math.PI * 2;
+    const poly = [P(r * 0.14, a - 0.12), P(r * 0.46, a - 0.34), P(r * 0.84, a - 0.16), P(r * 0.72, a + 0.22), P(r * 0.24, a + 0.34)];
     const V = (p: [number, number], z: number) => [p[0], p[1], z];
-    // Front, back and four thin sides make each blade visible from either side of the cage.
-    buf.tri(V(poly[0], z1), V(poly[1], z1), V(poly[2], z1), front);
-    buf.tri(V(poly[0], z1), V(poly[2], z1), V(poly[3], z1), front);
-    buf.tri(V(poly[0], z0), V(poly[2], z0), V(poly[1], z0), side);
-    buf.tri(V(poly[0], z0), V(poly[3], z0), V(poly[2], z0), side);
+    // Three broad swept blades are closer to a common household fan than the old star shape.
+    for (let j = 1; j < poly.length - 1; j++) {
+      buf.tri(V(poly[0], z1), V(poly[j], z1), V(poly[j + 1], z1), front);
+      buf.tri(V(poly[0], z0), V(poly[j + 1], z0), V(poly[j], z0), side);
+    }
     for (let j = 0; j < poly.length; j++) {
       const k = (j + 1) % poly.length;
       buf.tri(V(poly[j], z0), V(poly[k], z1), V(poly[k], z0), side);
@@ -977,7 +987,7 @@ export function pushFanRotor(buf: GeoBuffer, lines: LineBuffer, type: "fan_ceili
     }
   }
   const b = new Builder(buf, lines, (x, z) => [x, z]);
-  b.lyingCyl("z", 0, 0, -r * 0.13, r * 0.13, d * 0.12, r * 0.26, C.body, C.bodyTop, 14, EDGE_GLOW);
+  b.lyingCyl("z", 0, 0, -r * 0.14, r * 0.14, d * 0.1, r * 0.28, C.body, C.bodyTop, 14, EDGE_GLOW);
 }
 
 /** Horizontal wall-mounted storage water heater with pipes and status lamp. */

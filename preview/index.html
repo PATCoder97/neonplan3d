@@ -107,11 +107,13 @@
             };
             if (service === "toggle") setOn(st.state !== "on");
             else if (service === "turn_off") setOn(false);
-            else if (service === "turn_on" && domain === "light") {
+            else if (service === "turn_on") {
               setOn(true);
-              if (data.brightness_pct !== undefined) a.brightness = Math.round((data.brightness_pct / 100) * 255);
-              if (data.color_temp_kelvin !== undefined) Object.assign(a, { color_temp_kelvin: data.color_temp_kelvin, color_mode: "color_temp" });
-              if (data.rgb_color) Object.assign(a, { rgb_color: data.rgb_color, color_mode: "hs" });
+              if (domain === "light") {
+                if (data.brightness_pct !== undefined) a.brightness = Math.round((data.brightness_pct / 100) * 255);
+                if (data.color_temp_kelvin !== undefined) Object.assign(a, { color_temp_kelvin: data.color_temp_kelvin, color_mode: "color_temp" });
+                if (data.rgb_color) Object.assign(a, { rgb_color: data.rgb_color, color_mode: "hs" });
+              }
             } else if (service === "open_cover") {
               next.state = "open";
               a.current_position = 100;

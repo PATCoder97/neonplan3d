@@ -48,7 +48,7 @@ export function furniturePreview(item: PreviewItem, size = 180, packs?: Furnitur
       const l0 = lines.p.length;
       pushFanRotor(buf, lines, item.type, item.w, item.d, item.h);
       const y = item.type === "fan_ceiling" ? item.h * 0.18 : item.h * 0.78;
-      const z = item.type === "fan_ceiling" ? 0 : item.d * 0.15;
+      const z = 0;
       for (let i = p0 + 1; i < buf.p.length; i += 3) buf.p[i] += y;
       for (let i = p0 + 2; i < buf.p.length; i += 3) buf.p[i] += z;
       for (let i = l0 + 1; i < lines.p.length; i += 3) lines.p[i] += y;

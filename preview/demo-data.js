@@ -133,6 +133,10 @@ const DEVICES = [
   light("pool", "Pool Spot", null, true, { brightness: 200, color_mode: "hs", rgb_color: [40, 200, 255] }),
   light("haustuer", "Haustür Außenlicht", "flur", true, { brightness: 200 }),
   light("led_band", "LED Band", "wohnzimmer", true, { brightness: 160, color_mode: "hs", rgb_color: [120, 90, 255], effect: "colorloop", effect_list: ["colorloop", "none"] }),
+  light("den_neon_phong_khach", "Đèn neon phòng khách", "wohnzimmer", true, { brightness: 190, color_mode: "hs", rgb_color: [35, 220, 255] }),
+  light("den_ngu_gia_lap", "Đèn ngủ giả lập", "schlafzimmer", false),
+  entity("fan.quat_tran_phong_khach", "wohnzimmer", "on", { friendly_name: "Quạt trần phòng khách", percentage: 65, percentage_step: 25, supported_features: 1 }),
+  entity("fan.quat_dung_phong_ngu", "schlafzimmer", "on", { friendly_name: "Quạt đứng phòng ngủ", percentage: 40, percentage_step: 20, supported_features: 1 }),
   entity("cover.wohnzimmer", "wohnzimmer", "open", { friendly_name: "Wohnzimmer Rollladen", current_position: 70, supported_features: 15 }),
   entity("cover.kueche", "kueche", "open", { friendly_name: "Rollladen Küche", current_position: 40, supported_features: 15 }),
   entity("climate.wohnzimmer", "wohnzimmer", "heat", {
@@ -376,6 +380,10 @@ DEMO_BUILDING.floors[0].furniture = [
   { ...item("lamp_wall", 8.9, 9.5, 0.22, 0.12, 0.2), entity: "light.haustuer" },
   { ...item("lamp_ceiling", 7.0, 2.1, 0.45, 0.45, 0.08), entity: "light.kueche_links" },
   { ...item("lamp_ceiling", 9.0, 2.1, 0.45, 0.45, 0.08), entity: "light.kueche_rechts" },
+  { ...item("fan_ceiling", 3.8, 2.5, 1.4, 1.4, 0.32), entity: "fan.quat_tran_phong_khach" },
+  { ...item("lamp_floor", 5.25, 1.15, 0.42, 0.42, 1.55), entity: "light.den_neon_phong_khach" },
+  { ...item("fan_floor", 3.75, 5.35, 0.45, 0.45, 1.25, 225), entity: "fan.quat_dung_phong_ngu" },
+  { ...item("lamp_table", 1.1, 7.78, 0.24, 0.24, 0.42, 180), entity: "light.den_ngu_gia_lap", mount_y: 0.5 },
   ...[
     [5.0, 5.4],
     [6.2, 5.4],

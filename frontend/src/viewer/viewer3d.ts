@@ -1769,7 +1769,7 @@ export class FloorplanViewer {
         const a = f.rotation * DEG;
         holder.position.set(f.x, mountBase(floor, f), f.z);
         holder.rotation.y = -a;
-        rotor.position.set(0, f.type === "fan_ceiling" ? f.h * 0.18 : f.h * 0.78, f.type === "fan_ceiling" ? 0 : f.d * 0.15);
+        rotor.position.set(0, f.type === "fan_ceiling" ? f.h * 0.18 : f.h * 0.78, 0);
         holder.add(rotor);
         group.add(holder);
         const active = this.devices.some((d) => d.furnitureId === f.id && d.active);
