@@ -1,11 +1,11 @@
 name: Release
 
-# On a published GitHub release: check that the tag matches the manifest version, pack the integration
-# as neonplan3d.zip (HACS installs this file because hacs.json sets zip_release) and attach it. The
-# asset's download count is the number of HACS installs and updates of that version.
+# On a version tag: check that the tag matches the manifest version, pack the integration as
+# neonplan3d.zip (HACS installs this file because hacs.json sets zip_release), then create the GitHub
+# release and attach the archive. Its download count is the number of HACS installs and updates.
 on:
-  release:
-    types: [published]
+  push:
+    tags: ["v*"]
 
 permissions:
   contents: write
@@ -30,7 +30,15 @@ jobs:
           zip -q -X ../../neonplan3d.zip -@ < /tmp/files
           cd ../..
           unzip -l neonplan3d.zip | tail -1
-      - name: Attach to the release
+      - name: Create the release and attach the archive
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release upload "$GITHUB_REF_NAME" neonplan3d.zip --clobber
+        run: |
+          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            gh release upload "$GITHUB_REF_NAME" neonplan3d.zip --clobber
+          else
+            gh release create "$GITHUB_REF_NAME" neonplan3d.zip \
+              --verify-tag \
+              --generate-notes \
+              --title "NeonPlan 3D $GITHUB_REF_NAME"
+          fi
