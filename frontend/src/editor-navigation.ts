@@ -1,11 +1,11 @@
 /** Stable editor navigation: tools are grouped by the job the user is doing. */
 export type EditorTool = "select" | "rect" | "polygon" | "measure" | "opening" | "furniture" | "outdoor" | "hole" | "wall" | "roof" | "energy" | "settings";
 
-export const EDITOR_TOOL_GROUPS: readonly { key: "room" | "walls" | "layout" | "building"; tools: readonly EditorTool[] }[] = [
+export const EDITOR_TOOL_GROUPS: readonly { key: "room" | "structure" | "layout" | "energy"; tools: readonly EditorTool[] }[] = [
   { key: "room", tools: ["rect", "polygon"] },
-  { key: "walls", tools: ["wall", "opening"] },
+  { key: "structure", tools: ["wall", "opening", "hole", "roof"] },
   { key: "layout", tools: ["furniture", "outdoor"] },
-  { key: "building", tools: ["hole", "roof", "energy"] },
+  { key: "energy", tools: ["energy"] },
 ];
 
 export type FurniturePane = "library" | "properties";

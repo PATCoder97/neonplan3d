@@ -7,9 +7,9 @@ test("editor tools follow the user workflow and occur only once", () => {
     EDITOR_TOOL_GROUPS.map((group) => [group.key, ...group.tools]),
     [
       ["room", "rect", "polygon"],
-      ["walls", "wall", "opening"],
+      ["structure", "wall", "opening", "hole", "roof"],
       ["layout", "furniture", "outdoor"],
-      ["building", "hole", "roof", "energy"],
+      ["energy", "energy"],
     ],
   );
   const tools = EDITOR_TOOL_GROUPS.flatMap((group) => group.tools);

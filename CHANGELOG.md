@@ -4,6 +4,13 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.17.5
+
+### Changed
+
+- Regrouped editor tools into Rooms, Structure and Layout so floor openings and roofs sit with the other structural tools.
+- Made Energy a direct toolbar action instead of a one-item dropdown.
+
 ## 1.17.4
 
 ### Fixed

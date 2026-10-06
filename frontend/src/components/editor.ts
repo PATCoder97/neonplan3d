@@ -4184,6 +4184,17 @@ export class Fp3dEditor extends LitElement {
               (group) => {
                 const selected = group.tools.includes(this._tool);
                 const label = selected ? this.t(`tool_${this._tool}` as I18nKey) : this.t(`tool_group_${group.key}` as I18nKey);
+                if (group.tools.length === 1) {
+                  const tool = group.tools[0];
+                  return html`<button
+                    class="fp3d-toolbar-button fp3d-desktop-tool"
+                    aria-pressed=${this._tool === tool}
+                    ?disabled=${(!floor && tool !== "settings") || (!this.isAdmin && tool !== "select")}
+                    @click=${() => this.chooseTool(tool)}
+                  >
+                    ${label}
+                  </button>`;
+                }
                 return html`<details class="fp3d-tool-menu fp3d-desktop-tool" @toggle=${this.onToolMenuToggle}>
                   <summary class=${selected ? "fp3d-active" : ""} aria-current=${selected ? "true" : nothing}>${label}<span aria-hidden="true">▾</span></summary>
                   <div class="fp3d-tool-popover" role="group" aria-label=${this.t(`tool_group_${group.key}` as I18nKey)}>
