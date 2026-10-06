@@ -4,7 +4,7 @@
 
 NeonPlan 3D draws your home right inside Home Assistant and shows it as a 3D model in a neon look. Lights glow in their colours, blinds move, windows tilt, doors swing open, cameras look into the room and the TV shows what is playing. Everything runs locally in Home Assistant, without a cloud or external programs, and it is built for wall tablets.
 
-This manual describes every feature of the current version. What changed in which version is in the [changelog](../CHANGELOG.md) and on the [releases page](https://github.com/Mastershort/neonplan3d/releases). The pictures come from the demo with invented data. The app follows the language of your Home Assistant user (profile → language); the labels below are the English ones. German and English are built in; French, Spanish, Dutch, Italian and Hungarian are fetched when needed, so the bundles stay small for wall tablets. A text missing in a language shows in English.
+This manual describes every feature of the current version. What changed in which version is in the [changelog](../CHANGELOG.md) and on the [releases page](https://github.com/PATCoder97/neonplan3d/releases). The pictures come from the demo with invented data. The app follows the language of your Home Assistant user (profile → language); the labels below are the English ones. German and English are built in; French, Spanish, Dutch, Italian, Hungarian and Vietnamese are fetched when needed, so the bundles stay small for wall tablets. A text missing in a language shows in English.
 
 ![The house in the 3D view](images/view-house.jpg)
 
@@ -37,13 +37,13 @@ This manual describes every feature of the current version. What changed in whic
 
 ### With HACS
 
-[![Open your Home Assistant instance and open the NeonPlan 3D repository inside HACS.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=Mastershort&repository=neonplan3d&category=integration)
+[![Open your Home Assistant instance and open the NeonPlan 3D repository inside HACS.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=PATCoder97&repository=neonplan3d&category=integration)
 
 The button opens NeonPlan 3D straight in the HACS of your installation. By hand:
 
 1. Open **HACS** in Home Assistant.
 2. Choose **⋮ → Custom repositories** at the top right.
-3. Enter `https://github.com/Mastershort/neonplan3d`, type **Integration**, and add it.
+3. Enter `https://github.com/PATCoder97/neonplan3d`, type **Integration**, and add it.
 4. Search for **NeonPlan 3D**, install it and restart Home Assistant.
 5. **Settings → Devices & services → Add integration → NeonPlan 3D**, or straight with this button:
 
@@ -868,7 +868,7 @@ Home Assistant's own backup includes NeonPlan 3D completely as well.
 
 ## 12. FAQ and troubleshooting
 
-**Help and feedback:** report a bug as an [issue on GitHub](https://github.com/Mastershort/neonplan3d/issues/new/choose) and an idea as a [discussion](https://github.com/Mastershort/neonplan3d/discussions/categories/ideas). Nothing gets lost, everyone sees the state, and you are credited in the release notes once it is built. The two buttons for it are also at the bottom of the editor's sidebar and on the Extensions page.
+**Help and feedback:** report a bug as an [issue on GitHub](https://github.com/PATCoder97/neonplan3d/issues/new/choose) and an idea as a [discussion](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas). Nothing gets lost, everyone sees the state, and you are credited in the release notes once it is built. The two buttons for it are also at the bottom of the editor's sidebar and on the Extensions page.
 
 **Can I use helpers instead of real sensors?**
 Yes. Wherever NeonPlan expects a number (power, charge, range, position …), `input_number` and `number` helpers can be picked too, and wherever it expects on/off (contact, presence …), `input_boolean` as well. For power the helper needs the unit W or kW.
@@ -916,4 +916,4 @@ That is intended: the big one is the **house balance** (Solar & Energy), the sma
 Installed packs and Pro add-ons keep working. Updates arrive as soon as the shop answers again.
 
 **Where do I report bugs?**
-In the issue tracker on GitHub: https://github.com/Mastershort/neonplan3d/issues
+In the issue tracker on GitHub: https://github.com/PATCoder97/neonplan3d/issues

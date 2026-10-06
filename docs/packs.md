@@ -32,9 +32,9 @@ dessen öffentlicher Schlüssel zusätzlich in `PACK_PUBLIC_KEYS` eingetragen un
 {
   "format": "fp3dpack",
   "version": 1,
-  "id": "mastershort.kueche",
+  "id": "patcoder97.kueche",
   "name": "Küchen-Pack",
-  "publisher": "Mastershort",
+  "publisher": "PATCoder97",
   "description": "optional",
   "items": [
     {
@@ -163,4 +163,3 @@ Beim Speichern eines Produkts leert `ms-np-license.php` die zwischengespeicherte
 Pack-Angaben, damit der Katalog nach dem Veröffentlichen sofort die richtigen URLs liefert.
 
 Signieren von Hand: `python tools/fp3dpack.py sign PACK.json --key … --licensee "Name" --instance <Kennung>`.
-

@@ -245,11 +245,11 @@
         const link = (href, text) => `<a href="${href}" target="_blank" rel="noopener" style="color:#00e5ff;font-weight:600;text-decoration:none">${text}</a>`;
         // the install button stands out; GitHub, the manual and the language as plain links
         const install = (text) =>
-          `<a href="https://github.com/Mastershort/neonplan3d#installation" target="_blank" rel="noopener" style="background:#00e5ff;color:#06101c;font-weight:700;text-decoration:none;padding:5px 12px;border-radius:999px">${text}</a>`;
-        const github = link("https://github.com/Mastershort/neonplan3d", "★ GitHub");
+          `<a href="https://github.com/PATCoder97/neonplan3d#installation" target="_blank" rel="noopener" style="background:#00e5ff;color:#06101c;font-weight:700;text-decoration:none;padding:5px 12px;border-radius:999px">${text}</a>`;
+        const github = link("https://github.com/PATCoder97/neonplan3d", "★ GitHub");
         bar.innerHTML = de
-          ? `<span>${narrow ? "Demo" : "Demo mit erfundenen Daten – probier alles aus"}</span>${install(narrow ? "Installieren" : "Jetzt installieren")}${github}${narrow ? "" : link("https://mastershort.de/neonplan3d/anleitung/?lang=de", "Anleitung")}${link("?site&lang=en", narrow ? "EN" : "English")}`
-          : `<span>${narrow ? "Demo" : "Demo with invented data – try everything"}</span>${install(narrow ? "Install" : "Install now")}${github}${narrow ? "" : link("https://mastershort.de/en/neonplan3d/manual/?lang=en", "Manual")}${link("?site&lang=de", narrow ? "DE" : "Deutsch")}`;
+          ? `<span>${narrow ? "Demo" : "Demo mit erfundenen Daten – probier alles aus"}</span>${install(narrow ? "Installieren" : "Jetzt installieren")}${github}${narrow ? "" : link("https://github.com/PATCoder97/neonplan3d/blob/main/docs/anleitung.md", "Anleitung")}${link("?site&lang=en", narrow ? "EN" : "English")}`
+          : `<span>${narrow ? "Demo" : "Demo with invented data – try everything"}</span>${install(narrow ? "Install" : "Install now")}${github}${narrow ? "" : link("https://github.com/PATCoder97/neonplan3d/blob/main/docs/manual.md", "Manual")}${link("?site&lang=de", narrow ? "DE" : "Deutsch")}`;
         const close = document.createElement("button");
         close.textContent = "×";
         close.setAttribute("aria-label", de ? "Schließen" : "Close");

@@ -1,14 +1,14 @@
 {
   "domain": "neonplan3d",
   "name": "NeonPlan 3D",
-  "codeowners": ["@Mastershort"],
+  "codeowners": ["@PATCoder97"],
   "config_flow": true,
   "dependencies": ["frontend", "http", "panel_custom", "websocket_api"],
-  "documentation": "https://mastershort.de/en/neonplan3d/manual/",
+  "documentation": "https://github.com/PATCoder97/neonplan3d/blob/main/docs/manual.md",
   "integration_type": "service",
   "iot_class": "calculated",
-  "issue_tracker": "https://github.com/mastershort/neonplan3d/issues",
+  "issue_tracker": "https://github.com/PATCoder97/neonplan3d/issues",
   "requirements": [],
   "single_config_entry": true,
-  "version": "1.12.0"
+  "version": "1.12.1"
 }

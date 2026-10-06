@@ -1,8 +1,16 @@
 # Changelog
 
 All notable changes to NeonPlan 3D. The full notes in German and English are on the
-[releases page](https://github.com/Mastershort/neonplan3d/releases). Ideas and votes:
-[Discussions → Ideas](https://github.com/Mastershort/neonplan3d/discussions/categories/ideas).
+[releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
+[Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
+
+## 1.12.1
+
+### Changed
+
+- Added Vietnamese to the editor and Home Assistant integration.
+- Transferred the fork's repository links, documentation, support channels and code ownership to PATCoder97.
+- Kept the original author's optional shop and signed pack compatibility explicitly separated as third-party services.
 
 ## 1.12.0
 

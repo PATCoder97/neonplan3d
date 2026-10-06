@@ -5,8 +5,8 @@ body:
   - type: markdown
     attributes:
       value: |
-        Tip: ideas in [Discussions → Ideas](https://github.com/Mastershort/neonplan3d/discussions/categories/ideas) can be voted on 👍, the most wanted ones come first.
-        Tipp: Ideen unter [Discussions → Ideas](https://github.com/Mastershort/neonplan3d/discussions/categories/ideas) können alle mit 👍 bewerten, die beliebtesten kommen zuerst.
+        Tip: ideas in [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas) can be voted on 👍, the most wanted ones come first.
+        Tipp: Ideen unter [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas) können alle mit 👍 bewerten, die beliebtesten kommen zuerst.
   - type: textarea
     id: problem
     attributes:

@@ -1,9 +1,9 @@
-"""How often the Mastershort integrations were installed or updated through HACS: the download counts
+"""How often the PATCoder97 integrations were installed or updated through HACS: the download counts
 of the release zip of every GitHub release (HACS downloads exactly this file, see zip_release in
 hacs.json).
 
-    python tools/downloads.py                       (all repos below; needs the GitHub CLI "gh")
-    python tools/downloads.py cyd-studio            (one repo)
+    python tools/downloads.py                       (this repo; needs the GitHub CLI "gh")
+    python tools/downloads.py neonplan3d             (explicit repo)
 
 Each install and each update counts once; the sum over all releases is therefore "installs + updates",
 the newest release's count roughly the installations that are up to date.
@@ -15,8 +15,8 @@ import json
 import subprocess
 import sys
 
-OWNER = "Mastershort"
-REPOS = ["neonplan3d", "cyd-studio", "zigbee-health"]
+OWNER = "PATCoder97"
+REPOS = ["neonplan3d"]
 
 
 def report(repo: str) -> int:

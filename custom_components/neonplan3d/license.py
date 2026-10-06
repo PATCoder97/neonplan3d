@@ -81,7 +81,7 @@ async def _user_agent_of(hass: HomeAssistant) -> str:
             version = (await async_get_integration(hass, DOMAIN)).version
         except Exception:
             version = None
-        _user_agent = f"NeonPlan3D/{version or 'dev'} (Home Assistant; +https://github.com/Mastershort/neonplan3d)"
+        _user_agent = f"NeonPlan3D/{version or 'dev'} (Home Assistant; +https://github.com/PATCoder97/neonplan3d)"
     return _user_agent
 
 

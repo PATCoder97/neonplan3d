@@ -4,7 +4,7 @@
 
 NeonPlan 3D zeichnet dein Zuhause direkt in Home Assistant und zeigt es als 3D-Modell im Neon-Look. Lichter leuchten in ihrer Farbe, Rollläden fahren, Fenster kippen, Türen schwingen auf, Kameras schauen in den Raum und der Fernseher zeigt, was läuft. Alles läuft lokal in Home Assistant, ohne Cloud und ohne externe Programme, und ist für Wandtablets gebaut.
 
-Diese Anleitung beschreibt alle Funktionen der aktuellen Version. Was sich in welcher Version geändert hat, steht im [Changelog](../CHANGELOG.md) und auf der [Release-Seite](https://github.com/Mastershort/neonplan3d/releases). Die Bilder stammen aus der Demo mit erfundenen Daten.
+Diese Anleitung beschreibt alle Funktionen der aktuellen Version. Was sich in welcher Version geändert hat, steht im [Changelog](../CHANGELOG.md) und auf der [Release-Seite](https://github.com/PATCoder97/neonplan3d/releases). Die Bilder stammen aus der Demo mit erfundenen Daten.
 
 ![Das Haus in der 3D-Ansicht](images/view-house.jpg)
 
@@ -37,13 +37,13 @@ Diese Anleitung beschreibt alle Funktionen der aktuellen Version. Was sich in we
 
 ### Über HACS
 
-[![NeonPlan 3D in HACS öffnen](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=Mastershort&repository=neonplan3d&category=integration)
+[![NeonPlan 3D in HACS öffnen](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=PATCoder97&repository=neonplan3d&category=integration)
 
 Der Knopf öffnet NeonPlan 3D direkt in HACS deiner Installation. Von Hand geht es so:
 
 1. In Home Assistant **HACS** öffnen.
 2. Oben rechts **⋮ → Benutzerdefinierte Repositories** wählen.
-3. `https://github.com/Mastershort/neonplan3d` eintragen, Typ **Integration**, hinzufügen.
+3. `https://github.com/PATCoder97/neonplan3d` eintragen, Typ **Integration**, hinzufügen.
 4. **NeonPlan 3D** suchen, installieren und Home Assistant neu starten.
 5. **Einstellungen → Geräte & Dienste → Integration hinzufügen → NeonPlan 3D**, oder direkt über diesen Knopf:
 
@@ -870,7 +870,7 @@ Das normale Backup von Home Assistant sichert NeonPlan 3D ebenfalls vollständig
 
 ## 12. Häufige Fragen und Fehlerbehebung
 
-**Hilfe und Rückmeldung:** Einen Fehler meldest du am besten als [Issue auf GitHub](https://github.com/Mastershort/neonplan3d/issues/new/choose), eine Idee als [Diskussion](https://github.com/Mastershort/neonplan3d/discussions/categories/ideas). So geht nichts verloren, alle sehen den Stand, und du wirst in den Release-Notizen genannt, wenn es umgesetzt ist. Die beiden Knöpfe dafür stehen auch im Editor unten in der Seitenleiste und auf der Seite Erweiterungen.
+**Hilfe und Rückmeldung:** Einen Fehler meldest du am besten als [Issue auf GitHub](https://github.com/PATCoder97/neonplan3d/issues/new/choose), eine Idee als [Diskussion](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas). So geht nichts verloren, alle sehen den Stand, und du wirst in den Release-Notizen genannt, wenn es umgesetzt ist. Die beiden Knöpfe dafür stehen auch im Editor unten in der Seitenleiste und auf der Seite Erweiterungen.
 
 **Kann ich Helfer statt echter Sensoren nehmen?**
 Ja. Überall, wo NeonPlan einen Zahlenwert erwartet (Leistung, Ladestand, Reichweite, Position …), stehen auch `input_number`- und `number`-Helfer zur Wahl, und wo ein Ein/Aus erwartet wird (Kontakt, Anwesenheit …), auch `input_boolean`. Für Leistung braucht der Helfer die Einheit W oder kW.
@@ -918,4 +918,4 @@ Das ist gewollt: Das große ist die **Hausbilanz** (Solar & Energie), das kleine
 Installierte Packs und Pro-Erweiterungen funktionieren weiter. Updates kommen, sobald der Shop wieder antwortet.
 
 **Wo melde ich Fehler?**
-Im Issue-Tracker auf GitHub: https://github.com/Mastershort/neonplan3d/issues
+Im Issue-Tracker auf GitHub: https://github.com/PATCoder97/neonplan3d/issues

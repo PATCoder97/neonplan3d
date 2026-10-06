@@ -1,12 +1,8 @@
-# Watches the shop's licence API the way the integration talks to it. A well-formed unknown key must
-# come back as WordPress' own JSON 404 – anything else (the host's 429 page, a WordPress error, a timeout)
-# fails the run, and GitHub mails the maintainer. Found the hard way: the host once turned away every
-# request carrying Home Assistant's default User-Agent, and nobody could activate for days.
+# Optional manual probe for the original author's third-party shop. It is intentionally not scheduled
+# in this fork, so PATCoder97's Actions do not monitor a service they do not operate.
 name: Shop check
 
 on:
-  schedule:
-    - cron: "17 * * * *"
   workflow_dispatch:
 
 jobs:
@@ -17,7 +13,7 @@ jobs:
       - name: Catalog and pack endpoints answer like WordPress
         run: |
           set -u
-          ua="NeonPlan3D/check (Home Assistant; +https://github.com/Mastershort/neonplan3d)"
+          ua="NeonPlan3D/check (Home Assistant; +https://github.com/PATCoder97/neonplan3d)"
           ok=1
           for path in catalog pack; do
             body=$(curl -sS --max-time 30 -o /tmp/body -w "%{http_code}" -X POST \

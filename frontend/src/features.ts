@@ -37,14 +37,14 @@ const MANUAL_FEATURE: Record<string, { de: string; en: string }> = {
   extensions: { de: "erweiterungen-shop-moebel-packs/", en: "extensions-shop-furniture-packs/" },
 };
 
-/** The online manual in the user's language, optionally at a Pro add-on's section or the extensions chapter. */
+/** The manual maintained in this fork, optionally at a Pro add-on's section or the extensions chapter. */
 export function manualUrl(lang: string | undefined, topic?: Feature | "extensions"): string {
   const de = isGerman(lang);
-  const base = de ? "https://mastershort.de/neonplan3d/anleitung/" : "https://mastershort.de/en/neonplan3d/manual/";
+  const base = `https://github.com/PATCoder97/neonplan3d/blob/main/docs/${de ? "anleitung.md" : "manual.md"}`;
   const target = topic ? MANUAL_FEATURE[topic] : undefined;
   const path = target ? (de ? target.de : target.en) : "";
-  const [page, anchor] = path.split("#");
-  return `${base}${page}?lang=${de ? "de" : "en"}${anchor ? `#${anchor}` : ""}`;
+  const [, anchor] = path.split("#");
+  return `${base}${anchor ? `#${anchor}` : ""}`;
 }
 
 export function unlockedFeatures(packs: readonly { features?: string[] }[] = getPacks()): Set<Feature> {
