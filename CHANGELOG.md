@@ -4,6 +4,13 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.17.0
+
+### Changed
+
+- Expanded the room-temperature heatmap to 15–40 °C for homes in Vietnam, with colour stops at 15, 23, 30 and 40 °C.
+- Removed the Extensions tab, furniture teaser and unused Extensions frontend bundle from this private fork while retaining installed furniture packs and backup compatibility.
+
 ## 1.16.1
 
 ### Fixed

@@ -6435,12 +6435,7 @@ export class Fp3dEditor extends LitElement {
           q,
         ),
       )}
-    </section>
-    <div class="fp3d-ext-teaser">
-      <b>${this.t("ext_teaser_title")}</b>
-      <span class="fp3d-sub">${this.t("ext_teaser_text")}</span>
-      <button class="fp3d-btn fp3d-primary" @click=${() => this.dispatchEvent(new CustomEvent("open-extensions", { bubbles: true, composed: true }))}>${this.t("ext_open")}</button>
-    </div>`;
+    </section>`;
   }
 
   private libraryButton(type: string, label: string) {
@@ -8087,15 +8082,6 @@ export class Fp3dEditor extends LitElement {
         color: #37e0ff;
         vertical-align: -2px;
       }
-      .fp3d-ext-teaser {
-        display: grid;
-        gap: 6px;
-        margin: 12px 0;
-        padding: 12px;
-        border: 1px solid var(--fp3d-accent);
-        border-radius: 12px;
-        background: linear-gradient(135deg, rgba(55, 224, 255, 0.08), rgba(91, 124, 255, 0.08));
-      }
       .fp3d-pin {
         border: 0;
         background: none;
@@ -8500,9 +8486,6 @@ export class Fp3dEditor extends LitElement {
 }
 
 if (!customElements.get("fp3d-editor")) customElements.define("fp3d-editor", Fp3dEditor);
-
-// the extensions page is part of this bundle: the panel loads it the same way as the editor
-import "./extensions.ts";
 
 /** Distance of a plan point from a segment. */
 function distToSegment(p: Vec2, a: Vec2, b: Vec2): number {

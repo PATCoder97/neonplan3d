@@ -1,14 +1,16 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { fromCelsius, tempUnit, toCelsius } from "./devices.ts";
-import { heatColor, roomValues } from "./heatmap.ts";
+import { HEAT_SCALES, heatColor, roomValues } from "./heatmap.ts";
 import { emptyBuilding, newFloor } from "./model.ts";
 import type { HomeAssistant } from "./types.ts";
 
 test("heat colours: cold is blue, warm is red, values in between are mixed", () => {
+  assert.equal(HEAT_SCALES.temperature.stops[0][0], 15);
+  assert.equal(HEAT_SCALES.temperature.stops.at(-1)?.[0], 40);
   assert.deepEqual(heatColor("temperature", 10), [0.24, 0.48, 1]);
-  assert.deepEqual(heatColor("temperature", 30), [1, 0.32, 0.2]);
-  const mid = heatColor("temperature", 21.75);
+  assert.deepEqual(heatColor("temperature", 40), [1, 0.32, 0.2]);
+  const mid = heatColor("temperature", 26.5);
   assert.ok(mid[0] > 0.2 && mid[0] < 1 && mid[1] > 0.75);
 });
 

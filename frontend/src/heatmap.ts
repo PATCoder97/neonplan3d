@@ -17,10 +17,10 @@ export const HEAT_SCALES: Record<HeatColorMode, { deviceClass: string; unit: str
     deviceClass: "temperature",
     unit: "°C",
     stops: [
-      [17, [0.24, 0.48, 1]],
-      [20.5, [0.2, 0.9, 0.7]],
-      [23, [1, 0.75, 0.25]],
-      [25.5, [1, 0.32, 0.2]],
+      [15, [0.24, 0.48, 1]],
+      [23, [0.2, 0.9, 0.7]],
+      [30, [1, 0.75, 0.25]],
+      [40, [1, 0.32, 0.2]],
     ],
   },
   humidity: {

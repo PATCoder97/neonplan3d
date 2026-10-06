@@ -18,10 +18,9 @@ import { confirmEntities, defaultHeight, entityName, kindOf } from "./devices.ts
 import { canLift, type LampMount } from "./model.ts";
 import { mountBase } from "./packs.ts";
 import { hasFeature } from "./features.ts";
-import { getLicense, unseenOffers, unseenUpdates } from "./api.ts";
 import type { FloorStack, Quality, WallMode } from "./viewer/viewer3d.ts";
 
-type Mode = "view" | "editor" | "extensions";
+type Mode = "view" | "editor";
 
 /** View preferences belong to the device (a wall tablet wants other settings than a desktop). */
 const prefs = {
@@ -48,7 +47,6 @@ export class Floorplan3dPanel extends LitElement {
     route: { attribute: false },
     panel: { attribute: false },
     _mode: { state: true },
-    _newOffers: { state: true },
     _editorReady: { state: true },
     _floorId: { state: true },
     _roomId: { state: true },
@@ -79,9 +77,6 @@ export class Floorplan3dPanel extends LitElement {
   declare route: unknown;
   declare panel: unknown;
   private declare _mode: Mode;
-  /** Shop offers not seen yet (a dot on the extensions tab). */
-  private declare _newOffers: number;
-  private offersChecked = false;
   /** The editor bundle is loaded (it is fetched the first time the editor opens). */
   private declare _editorReady: boolean;
   private declare _floorId: string | null;
@@ -122,7 +117,6 @@ export class Floorplan3dPanel extends LitElement {
     super();
     this.narrow = false;
     this._mode = "view";
-    this._newOffers = 0;
     this._editorReady = !!customElements.get("fp3d-editor");
     this._floorId = null;
     this._roomId = null;
@@ -406,15 +400,6 @@ export class Floorplan3dPanel extends LitElement {
     window.addEventListener("keydown", this.onKey);
   }
 
-  /** Once per page: are there shop offers the admin has not seen yet? (Only with a shop key.) */
-  private checkOffers(): void {
-    if (this.offersChecked || !this.hass?.user?.is_admin) return;
-    this.offersChecked = true;
-    getLicense(this.hass)
-      .then((lic) => (this._newOffers = lic.active ? unseenOffers(lic.offers ?? []).length + unseenUpdates(lic.updates ?? []).length : 0))
-      .catch(() => undefined);
-  }
-
   disconnectedCallback(): void {
     super.disconnectedCallback();
     window.removeEventListener("keydown", this.onKey);
@@ -422,7 +407,6 @@ export class Floorplan3dPanel extends LitElement {
 
   protected render() {
     if (this.hass && !languageReady(this.hass.language)) return nothing;
-    this.checkOffers();
     const b = this.data.building;
     const saveState = this.data.saveState;
     return html`
@@ -434,9 +418,6 @@ export class Floorplan3dPanel extends LitElement {
             ? html`<div class="fp3d-seg" role="tablist">
                 <button role="tab" aria-pressed=${this._mode === "view"} @click=${() => this.setMode("view")}>${this.t("view")}</button>
                 <button role="tab" aria-pressed=${this._mode === "editor"} @click=${() => this.setMode("editor")}>${this.t("editor")}</button>
-                <button role="tab" class="fp3d-tab-ext" aria-pressed=${this._mode === "extensions"} @click=${() => this.setMode("extensions")} title=${this._newOffers ? this.t("offers_dot") : ""}>
-                  ✦ ${this.t("ext_tab")}${this._newOffers ? html`<span class="fp3d-dot" aria-label=${this.t("offers_dot")}></span>` : nothing}
-                </button>
               </div>`
             : nothing}
           <span class="fp3d-grow"></span>
@@ -534,9 +515,7 @@ export class Floorplan3dPanel extends LitElement {
         ${b
           ? this._mode === "editor" && this.isAdmin
             ? this.renderEditor(b)
-            : this._mode === "extensions" && this.isAdmin
-              ? this.renderExtensions()
-              : this.renderView(b)
+            : this.renderView(b)
           : nothing}
       </div>
     `;
@@ -573,24 +552,6 @@ export class Floorplan3dPanel extends LitElement {
     return notices.length ? html`<div class="fp3d-notices">${notices}</div>` : nothing;
   }
 
-  /** The extensions page (shop connection, Pro add-ons, packs); it comes with the editor bundle. */
-  private renderExtensions() {
-    if (!this._editorReady) {
-      loadEditor().then(
-        () => (this._editorReady = true),
-        (err: unknown) => (this.data.error = String(err)),
-      );
-      return html`<div class="fp3d-empty"><p>${this.t("loading")}</p></div>`;
-    }
-    return html`<fp3d-extensions
-      class="fp3d-body"
-      .hass=${this.hass}
-      .packs=${this.data.packs}
-      @packs-changed=${() => void this.data.reloadPacks()}
-      @offers-seen=${() => (this._newOffers = 0)}
-    ></fp3d-extensions>`;
-  }
-
   private renderEditor(b: Building) {
     if (!this._editorReady) {
       loadEditor().then(
@@ -606,7 +567,6 @@ export class Floorplan3dPanel extends LitElement {
       .narrow=${this.narrow}
       .packs=${this.data.packs}
       @packs-changed=${() => void this.data.reloadPacks()}
-      @open-extensions=${() => this.setMode("extensions")}
       @building-changed=${(e: CustomEvent<{ building: Building }>) => this.data.edit(e.detail.building)}
     ></fp3d-editor>`;
   }
@@ -719,7 +679,6 @@ export class Floorplan3dPanel extends LitElement {
           .quality=${this._quality}
           ?showStats=${this._stats}
           @room-tap=${this.onRoomTap}
-          @open-extensions=${() => this.setMode("extensions")}
           @floor-tap=${(e: CustomEvent<{ floorId: string | null }>) => {
             this._floorId = e.detail.floorId;
             this._roomId = null;
@@ -854,16 +813,6 @@ export class Floorplan3dPanel extends LitElement {
     tokens,
     controls,
     css`
-      .fp3d-dot {
-        display: inline-block;
-        width: 8px;
-        height: 8px;
-        margin-left: 6px;
-        border-radius: 50%;
-        background: #ffb547;
-        box-shadow: 0 0 8px #ffb547;
-        vertical-align: middle;
-      }
       :host {
         display: block;
         /* HA gives the custom panel's parent no explicit height, so 100% collapses. */
