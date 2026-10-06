@@ -162,6 +162,7 @@ const DEVICES = [
   entity("media_player.kueche_lautsprecher", "kueche", "playing", { friendly_name: "Küche Lautsprecher", device_class: "speaker", media_title: "Blue Train", media_artist: "John Coltrane", volume_level: 0.45, entity_picture: COVER, group_members: ["media_player.kueche_lautsprecher", "media_player.bad_lautsprecher"] }),
   entity("media_player.bad_lautsprecher", "bad", "playing", { friendly_name: "Bad Lautsprecher", device_class: "speaker", media_title: "Blue Train", media_artist: "John Coltrane", volume_level: 0.3, entity_picture: COVER, group_members: ["media_player.kueche_lautsprecher", "media_player.bad_lautsprecher"] }),
   entity("switch.kaffeemaschine", "kueche", "on", { friendly_name: "Kaffeemaschine" }),
+  entity("switch.may_loc_nuoc_demo", "kueche", "on", { friendly_name: "Máy lọc nước" }),
   entity("camera.wohnzimmer", "wohnzimmer", "idle", { friendly_name: "Wohnzimmer Kamera", entity_picture: CAMERA_STILL }),
   entity("sensor.wohnzimmer_temperatur", "wohnzimmer", "21.4", { friendly_name: "Wohnzimmer Temperatur", device_class: "temperature", unit_of_measurement: "°C" }),
   entity("sensor.kueche_temperatur", "kueche", "23.4", { friendly_name: "Küche Temperatur", device_class: "temperature", unit_of_measurement: "°C" }),
@@ -361,6 +362,8 @@ DEMO_BUILDING.floors[0].furniture = [
   item("kitchen", 9.65, 0.31, 0.6, 0.62, 0.92),
   item("kitchen_wall", 7.25, 0.18, 1.2, 0.35, 0.7),
   item("kitchen_wall", 8.9, 0.18, 0.9, 0.35, 0.7),
+  // Upright glass-front RO purifier with its small top faucet, placed clear of the kitchen door.
+  { ...item("water_purifier", 9.78, 1.25, 0.42, 0.38, 1.2, 90), entity: "switch.may_loc_nuoc_demo" },
   item("corner_bench", 7.1, 3.55, 2.0, 1.6, 0.9, 270),
   item("table", 8.0, 2.9, 1.3, 0.85, 0.75),
   { ...item("lamp_pendant", 8.0, 2.9, 0.3, 0.3, 0.95), entity: "light.esstisch", variant: "globe" },

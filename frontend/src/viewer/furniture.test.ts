@@ -186,6 +186,21 @@ test("Vietnamese home furniture builds finite dedicated geometry at the correct 
   assert.equal(mountBase(floor, { type: "microwave", x: 1, z: 1, h: 0.3 }), 0.91);
 });
 
+test("the upright water purifier has a cabinet, top faucet and front status mark", () => {
+  const floor = newFloor("eg", "EG", 0);
+  const [w, d, h] = FURNITURE_SIZE.water_purifier;
+  const purifier = { id: "p", type: "water_purifier", x: 0, z: 0, w, d, h, rotation: 0, variant: null } as Furniture;
+  const buf = new GeoBuffer();
+  const lines = new LineBuffer();
+  pushFurniture(buf, lines, new GeoBuffer(), purifier);
+  const solidY = buf.p.filter((_, i) => i % 3 === 1);
+  const faucet = Array.from({ length: buf.p.length / 3 }, (_, i) => buf.p.slice(i * 3, i * 3 + 3)).filter((p) => p[1] > h * 0.82);
+  assert.ok(Math.max(...solidY) > h * 0.96, "solid faucet rises above the cabinet");
+  assert.ok(Math.min(...faucet.map((p) => p[2])) < 0 && Math.max(...faucet.map((p) => p[2])) > d * 0.06, "short gooseneck reaches forward to its outlet");
+  const status = screenRect(purifier, floor)!;
+  assert.ok(status.y0 > 0 && status.y1 < h * 0.8 && status.z > d / 2, "status mark stays on the glass cabinet front");
+});
+
 test("ceiling and floor fans have separate finite rotors for live animation", () => {
   for (const type of ["fan_ceiling", "fan_floor"] as const) {
     const [w, d, h] = FURNITURE_SIZE[type];

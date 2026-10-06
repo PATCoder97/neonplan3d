@@ -1068,7 +1068,7 @@ export const FURNITURE_SIZE: Record<FurnitureType, [number, number, number]> = {
   room_divider: [1.6, 0.3, 2.1],
   range_hood: [0.75, 0.5, 0.5],
   microwave: [0.5, 0.4, 0.3],
-  water_purifier: [0.32, 0.36, 1.05],
+  water_purifier: [0.42, 0.38, 1.2],
   kitchen_corner: [1.25, 1.25, 0.92],
   vanity: [1.0, 0.45, 1.55],
   crib: [0.75, 1.25, 0.95],

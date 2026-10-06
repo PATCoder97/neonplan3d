@@ -126,6 +126,48 @@ class Builder {
     if (edges) for (let i = 0; i < n; i++) this.line(poly[i], poly[(i + 1) % n], y1, y1, edges);
   }
 
+  /** Polygonal tube following a path in the local y/z plane; useful for curved taps and pipes. */
+  tubeYZ(x: number, path: [y: number, z: number][], r: number, side: number, n = 8, edges: Color | null = null): void {
+    if (path.length < 2 || r < 1e-4) return;
+    const rings = path.map(([y, z], i) => {
+      const prev = path[Math.max(0, i - 1)];
+      const next = path[Math.min(path.length - 1, i + 1)];
+      const dy = next[0] - prev[0];
+      const dz = next[1] - prev[1];
+      const len = Math.hypot(dy, dz) || 1;
+      // One ring axis is local x; the other is perpendicular to the path in the y/z plane.
+      return Array.from({ length: n }, (_, j) => {
+        const a = (j / n) * Math.PI * 2;
+        const lx = x + Math.cos(a) * r;
+        const ly = y - (dz / len) * Math.sin(a) * r;
+        const lz = z + (dy / len) * Math.sin(a) * r;
+        const p = this.tf(lx, lz);
+        return [p[0], ly, p[1]];
+      });
+    });
+    const p0 = this.buf.p.length;
+    const color = new Color(side);
+    for (let i = 0; i < rings.length - 1; i++) {
+      for (let j = 0; j < n; j++) {
+        const k = (j + 1) % n;
+        this.buf.tri(rings[i][j], rings[i + 1][j], rings[i + 1][k], color);
+        this.buf.tri(rings[i][j], rings[i + 1][k], rings[i][k], color);
+      }
+    }
+    const cap = (i: number, reverse: boolean) => {
+      const p = this.tf(x, path[i][1]);
+      const centre = [p[0], path[i][0], p[1]];
+      for (let j = 0; j < n; j++) {
+        const k = (j + 1) % n;
+        this.buf.tri(centre, rings[i][reverse ? k : j], rings[i][reverse ? j : k], color);
+      }
+    };
+    cap(0, true);
+    cap(path.length - 1, false);
+    if (this.mirrored) flipWinding(this.buf, p0);
+    if (edges) for (let i = 0; i < path.length - 1; i++) this.seg(x, path[i][0], path[i][1], x, path[i + 1][0], path[i + 1][1], edges);
+  }
+
   /** Line between two local points at heights ya and yb. */
   seg(xa: number, ya: number, za: number, xb: number, yb: number, zb: number, color: Color = EDGE_FURN): void {
     this.line(this.tf(xa, za), this.tf(xb, zb), ya, yb, color);
@@ -1080,13 +1122,46 @@ function microwave(b: Builder, w: number, d: number, h: number): void {
 }
 
 function waterPurifier(b: Builder, w: number, d: number, h: number): void {
-  b.box(-w / 2, w / 2, 0, h, -d / 2, d / 2, C.white, C.whiteTop, EDGE_FURN);
-  b.box(-w * 0.34, w * 0.34, h * 0.44, h * 0.72, d / 2, d / 2 + 0.008, C.dark, C.dark, EDGE_GLOW);
-  for (const x of [-w * 0.14, w * 0.14]) {
-    b.cyl(x, d / 2 + 0.015, w * 0.035, h * 0.55, h * 0.68, x < 0 ? C.accent : C.fabricTop, x < 0 ? C.accent : C.fabricTop, 8);
-    b.box(x - w * 0.025, x + w * 0.025, h * 0.46, h * 0.56, d / 2, d / 2 + 0.04, C.metal);
+  // Upright RO cabinet with a glass front and a single small faucet on its top, common in domestic
+  // Sunhouse-style purifiers. `h` includes the faucet; the cabinet itself is roughly one metre high.
+  const cabinetH = h * 0.8;
+  const front = d / 2;
+  b.box(-w * 0.46, w * 0.46, 0.025, cabinetH, -d / 2, front, C.white, C.whiteTop, EDGE_FURN);
+  b.box(-w * 0.48, w * 0.48, 0, 0.035, -d * 0.44, d * 0.44, C.dark, C.dark);
+  // Bright glass-front door, split subtly into service and branding panels.
+  b.box(-w * 0.42, w * 0.42, 0.055, cabinetH - 0.035, front, front + 0.012, C.white, C.whiteTop, EDGE_FURN);
+  b.seg(-w * 0.4, cabinetH * 0.28, front + 0.014, w * 0.4, cabinetH * 0.28, front + 0.014, EDGE_FAINT);
+  b.seg(-w * 0.28, cabinetH * 0.58, front + 0.015, w * 0.28, cabinetH * 0.58, front + 0.015, EDGE_GLOW);
+  b.seg(-w * 0.2, cabinetH * 0.62, front + 0.015, w * 0.2, cabinetH * 0.62, front + 0.015, EDGE_FAINT);
+  // Bright glass top and a subtle circular drip area directly under the outlet.
+  b.box(-w / 2, w / 2, cabinetH - 0.025, cabinetH, -d / 2, d / 2, C.white, C.whiteTop, EDGE_FURN);
+
+  // A solid gooseneck faucet. Its curved tube is deliberately larger than a line outline so the
+  // water outlet stays obvious in the normal isometric demo view.
+  const pipe = Math.min(0.012, w * 0.03);
+  const faucetX = w * 0.1;
+  const stemZ = -d * 0.16;
+  const tipZ = d * 0.08;
+  const silver = 0x6684ad;
+  b.cyl(faucetX, stemZ, pipe * 1.55, cabinetH, cabinetH + pipe * 1.8, silver, silver, 12, EDGE_FURN);
+  b.cyl(faucetX, tipZ, w * 0.16, cabinetH, cabinetH + 0.01, C.whiteTop, C.whiteTop, 18, EDGE_FAINT);
+  b.seg(faucetX - w * 0.1, cabinetH + 0.012, tipZ, faucetX + w * 0.1, cabinetH + 0.012, tipZ, EDGE_FAINT);
+  b.seg(faucetX, cabinetH + 0.012, tipZ - d * 0.11, faucetX, cabinetH + 0.012, tipZ + d * 0.11, EDGE_FAINT);
+  const archY = h * 0.925;
+  const archRise = h * 0.055;
+  const centreZ = (stemZ + tipZ) / 2;
+  const radiusZ = (tipZ - stemZ) / 2;
+  const path: [number, number][] = [[cabinetH + pipe, stemZ], [archY, stemZ]];
+  for (let i = 1; i <= 8; i++) {
+    const a = Math.PI - (Math.PI * i) / 8;
+    path.push([archY + Math.sin(a) * archRise, centreZ + Math.cos(a) * radiusZ]);
   }
-  b.seg(-w * 0.32, h * 0.12, d / 2 + 0.006, w * 0.32, h * 0.12, d / 2 + 0.006, EDGE_FAINT);
+  // The free outlet ends well above the top instead of closing into a handle-like loop.
+  path.push([h * 0.89, tipZ]);
+  b.tubeYZ(faucetX, path, pipe, silver, 10);
+  b.cyl(faucetX, tipZ, pipe * 1.25, h * 0.89 - pipe, h * 0.905, C.dark, silver, 10, EDGE_FAINT);
+  // Short solid lever beside the faucet base.
+  b.lyingCyl("x", faucetX + w * 0.055, stemZ, cabinetH + pipe * 1.6, cabinetH + pipe * 2.5, w * 0.15, pipe * 0.9, C.dark, silver, 8);
 }
 
 function kitchenCorner(b: Builder, w: number, d: number, h: number): void {
@@ -1364,7 +1439,7 @@ function builtInScreen(f: Furniture, w: number, d: number, h: number, floor?: Fl
   }
   if (f.type === "range_hood") return { x0: -w * 0.4, x1: w * 0.4, y0: 0.005, y1: h * 0.06, z: d / 2 + 0.003 };
   if (f.type === "microwave") return { x0: -w * 0.4, x1: w * 0.18, y0: h * 0.17, y1: h * 0.82, z: d / 2 + 0.008 };
-  if (f.type === "water_purifier") return { x0: -w * 0.34, x1: w * 0.34, y0: h * 0.44, y1: h * 0.72, z: d / 2 + 0.01 };
+  if (f.type === "water_purifier") return { x0: -w * 0.28, x1: w * 0.28, y0: h * 0.8 * 0.56, y1: h * 0.8 * 0.64, z: d / 2 + 0.016 };
   if (f.type === "washer" || f.type === "dryer") {
     const cy = (h - 0.14) / 2 + 0.04;
     const r = Math.min(w * 0.36, (h - 0.2) * 0.42) * 0.8;

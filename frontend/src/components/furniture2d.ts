@@ -82,7 +82,12 @@ export function furnitureSymbol(type: string, w: number, d: number): Part[] | ty
     case "microwave":
       return [rect(-w / 2, -d / 2, w / 2, d / 2), rect(-w * 0.38, -d * 0.05, w * 0.2, d / 2, "fp3d-sym-fill"), circle(w * 0.34, d * 0.22, Math.min(w, d) * 0.06)];
     case "water_purifier":
-      return [rect(-w / 2, -d / 2, w / 2, d / 2), circle(0, d * 0.18, Math.min(w, d) * 0.12, "fp3d-sym-fill")];
+      return [
+        rect(-w / 2, -d / 2, w / 2, d / 2),
+        circle(0, -d * 0.16, Math.min(w, d) * 0.065),
+        line(0, -d * 0.16, 0, d * 0.22, "fp3d-sym-strong"),
+        circle(0, d * 0.22, Math.min(w, d) * 0.045, "fp3d-sym-fill"),
+      ];
     case "kitchen_corner":
       return [rect(-w / 2, -d / 2, w / 2, -d * 0.05), rect(-w / 2, -d * 0.05, -w * 0.05, d / 2), line(-w * 0.05, -d * 0.05, w / 2, -d * 0.05)];
     case "vanity":
