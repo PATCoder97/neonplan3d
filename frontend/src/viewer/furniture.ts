@@ -830,6 +830,251 @@ function waterPump(b: Builder, w: number, d: number, h: number): void {
   b.box(-w * 0.11, w * 0.11, headY0 + headDia * 0.58, headY0 + headDia * 0.72, d * 0.285, d * 0.3, C.dark, C.dark, EDGE_GLOW);
 }
 
+/** Vietnamese standing altar with a carved-looking front, incense bowl and raised canopy. */
+function altar(b: Builder, w: number, d: number, h: number): void {
+  const top = h * 0.68;
+  const leg = Math.min(0.09, w * 0.08);
+  for (const x of [-w / 2 + leg, w / 2 - leg]) b.box(x - leg / 2, x + leg / 2, 0, top, -d / 2 + leg, d / 2 - leg, C.wood, C.woodTop, EDGE_FURN);
+  b.box(-w / 2, w / 2, top - 0.08, top, -d / 2, d / 2, C.wood, C.woodTop, EDGE_FURN);
+  b.box(-w * 0.43, w * 0.43, h * 0.16, top - 0.1, d / 2 - 0.07, d / 2, C.wood, C.woodTop, EDGE_FURN);
+  for (const x of [-w * 0.27, 0, w * 0.27]) b.seg(x, h * 0.22, d / 2 + 0.003, x, top - 0.16, d / 2 + 0.003, EDGE_FAINT);
+  b.cyl(0, d * 0.03, Math.min(w, d) * 0.09, top, top + h * 0.08, C.accent, C.woodTop, 12, EDGE_GLOW);
+  b.box(-w * 0.46, w * 0.46, h * 0.88, h * 0.93, -d * 0.42, d * 0.36, C.wood, C.woodTop, EDGE_FURN);
+  for (const x of [-w * 0.4, w * 0.4]) b.box(x - leg / 2, x + leg / 2, top, h * 0.93, -d * 0.36, -d * 0.26, C.wood, C.woodTop, EDGE_FURN);
+  b.loft([-w / 2, w / 2, -d / 2, d * 0.42], [-w * 0.42, w * 0.42, -d * 0.42, d * 0.31], h * 0.93, h, C.wood, C.woodTop, EDGE_FURN);
+}
+
+/** Compact altar shelf mounted on a wall, with a back panel and incense bowl. */
+function wallAltar(b: Builder, w: number, d: number, h: number): void {
+  b.box(-w / 2, w / 2, 0, h * 0.14, -d / 2, d / 2, C.wood, C.woodTop, EDGE_FURN);
+  b.box(-w * 0.43, w * 0.43, h * 0.14, h, -d / 2, -d / 2 + Math.min(0.05, d * 0.18), C.wood, C.woodTop, EDGE_FURN);
+  b.loft([-w / 2, w / 2, -d / 2, d / 2], [-w * 0.42, w * 0.42, -d * 0.42, d * 0.36], h * 0.86, h, C.wood, C.woodTop, EDGE_FURN);
+  b.cyl(0, d * 0.08, Math.min(w, d) * 0.09, h * 0.14, h * 0.28, C.accent, C.woodTop, 12, EDGE_GLOW);
+}
+
+function shoeCabinet(b: Builder, w: number, d: number, h: number): void {
+  cabinet(b, w, d, h - 0.025, Math.max(2, Math.round(w / 0.45)), h * 0.55, true);
+  for (const y of [h * 0.32, h * 0.63]) b.seg(-w / 2 + 0.03, y, d / 2 + 0.003, w / 2 - 0.03, y, d / 2 + 0.003, EDGE_FAINT);
+  b.box(-w / 2, w / 2, h - 0.025, h, -d / 2, d / 2, C.woodTop, C.woodTop, EDGE_GLOW);
+}
+
+/** Small step-through motorbike, facing +z. */
+function motorbike(b: Builder, w: number, d: number, h: number): void {
+  const wheel = Math.min(w * 0.58, d * 0.22, h * 0.42);
+  const axle = w * 0.66;
+  const frontZ = d * 0.34;
+  const rearZ = -d * 0.34;
+  for (const z of [rearZ, frontZ]) {
+    b.lyingCyl("x", 0, z, 0, wheel, axle, wheel, C.dark, C.metal, 14, EDGE_FURN);
+    b.lyingCyl("x", 0, z, wheel * 0.16, wheel * 0.84, axle + 0.012, wheel * 0.46, C.metal, C.metal, 12, EDGE_FAINT);
+  }
+  b.loft([-w * 0.3, w * 0.3, rearZ, d * 0.12], [-w * 0.2, w * 0.2, -d * 0.18, d * 0.06], wheel * 0.45, h * 0.58, C.body, C.bodyTop, EDGE_FURN);
+  b.pad(-w * 0.3, w * 0.3, h * 0.52, h * 0.62, -d * 0.25, d * 0.05, C.dark, C.fabricTop, 0.025, EDGE_FURN);
+  b.seg(-w * 0.18, h * 0.48, d * 0.02, -w * 0.08, h * 0.86, frontZ, EDGE_FURN);
+  b.seg(w * 0.18, h * 0.48, d * 0.02, w * 0.08, h * 0.86, frontZ, EDGE_FURN);
+  b.seg(-w * 0.36, h * 0.9, frontZ, w * 0.36, h * 0.9, frontZ, EDGE_GLOW);
+  b.box(-w * 0.23, w * 0.23, h * 0.72, h * 0.98, frontZ - d * 0.07, frontZ + d * 0.07, C.body, C.bodyTop, EDGE_FURN);
+  b.cyl(0, frontZ + d * 0.075, Math.min(w, d) * 0.07, h * 0.82, h * 0.94, C.white, C.accent, 10, EDGE_GLOW);
+}
+
+function ceilingFan(b: Builder, w: number, d: number, h: number): void {
+  const y = h * 0.2;
+  b.cyl(0, 0, Math.min(w, d) * 0.11, y, h * 0.72, C.body, C.bodyTop, 14, EDGE_FURN);
+  b.cyl(0, 0, Math.min(w, d) * 0.025, h * 0.7, h, C.metal, C.metal, 8);
+  const bladeW = Math.min(w, d) * 0.1;
+  b.box(-w / 2, w / 2, y, y + h * 0.08, -bladeW / 2, bladeW / 2, C.wood, C.woodTop, EDGE_FURN);
+  b.rotated(0, 0, 90).box(-d / 2, d / 2, y, y + h * 0.08, -bladeW / 2, bladeW / 2, C.wood, C.woodTop, EDGE_FURN);
+}
+
+function floorFan(b: Builder, w: number, d: number, h: number): void {
+  b.cyl(0, 0, Math.min(w, d) * 0.42, 0, h * 0.045, C.metal, C.metal, 14, EDGE_FURN);
+  b.cyl(0, 0, Math.min(w, d) * 0.055, h * 0.04, h * 0.62, C.metal, C.metal, 8);
+  const cy = h * 0.78;
+  const r = Math.min(w, h * 0.42) * 0.46;
+  b.lyingCyl("z", 0, 0, cy - r, cy + r, d * 0.22, r * 0.22, C.body, C.bodyTop, 12, EDGE_FURN);
+  for (let i = 0; i < 3; i++) {
+    const a = (i / 3) * Math.PI * 2;
+    b.seg(0, cy, d * 0.13, Math.cos(a) * r * 0.78, cy + Math.sin(a) * r * 0.78, d * 0.13, EDGE_FURN);
+  }
+  ring(b, 0, cy, r, d * 0.14, 24);
+}
+
+/** Horizontal wall-mounted storage water heater with pipes and status lamp. */
+function waterHeater(b: Builder, w: number, d: number, h: number): void {
+  const dia = Math.min(d * 0.88, h * 0.92);
+  const y0 = (h - dia) / 2;
+  b.lyingCyl("x", 0, 0, y0, y0 + dia, w * 0.9, dia, C.white, C.whiteTop, 18, EDGE_FURN);
+  for (const x of [-w * 0.28, w * 0.28]) b.box(x - 0.025, x + 0.025, 0, y0 + dia * 0.25, d * 0.15, d * 0.24, C.metal, C.metal);
+  b.seg(w * 0.27, y0 + dia * 0.55, d * 0.46, w * 0.38, y0 + dia * 0.55, d * 0.46, EDGE_GLOW);
+}
+
+function dryingRack(b: Builder, w: number, d: number, h: number): void {
+  const t = Math.min(0.035, w * 0.025);
+  const x = w / 2 - t;
+  for (const sx of [-1, 1]) {
+    b.box(sx * x - t, sx * x + t, 0, h, -d / 2, -d / 2 + t * 2, C.metal, C.metal, EDGE_FURN);
+    b.box(sx * x - t, sx * x + t, 0, h, d / 2 - t * 2, d / 2, C.metal, C.metal, EDGE_FURN);
+  }
+  for (let i = 0; i < 7; i++) {
+    const z = -d / 2 + t + ((d - 2 * t) * i) / 6;
+    b.box(-w / 2 + t, w / 2 - t, h - t * 2, h, z - t / 2, z + t / 2, C.metal, C.metal, EDGE_FAINT);
+  }
+  b.seg(-w / 2, 0.05, -d / 2, w / 2, h - 0.05, -d / 2, EDGE_FAINT);
+  b.seg(w / 2, 0.05, -d / 2, -w / 2, h - 0.05, -d / 2, EDGE_FAINT);
+}
+
+function shoeBench(b: Builder, w: number, d: number, h: number): void {
+  b.box(-w / 2, w / 2, 0, h * 0.62, -d / 2, d / 2, C.wood, C.woodTop, EDGE_FURN);
+  const n = Math.max(2, Math.round(w / 0.35));
+  for (let i = 1; i < n; i++) b.seg(-w / 2 + (w * i) / n, 0.04, d / 2 + 0.003, -w / 2 + (w * i) / n, h * 0.58, d / 2 + 0.003, EDGE_FAINT);
+  b.pad(-w / 2, w / 2, h * 0.62, h, -d / 2, d / 2, C.cushion, C.fabricTop, 0.025, EDGE_FURN);
+}
+
+function roomDivider(b: Builder, w: number, d: number, h: number): void {
+  const frame = Math.min(0.05, w * 0.035);
+  b.box(-w / 2, w / 2, 0, frame, -d / 2, d / 2, C.wood, C.woodTop, EDGE_FURN);
+  b.box(-w / 2, w / 2, h - frame, h, -d / 2, d / 2, C.wood, C.woodTop, EDGE_FURN);
+  const n = Math.max(5, Math.round(w / 0.22));
+  for (let i = 0; i < n; i++) {
+    const x = -w / 2 + (w * (i + 0.5)) / n;
+    b.box(x - frame / 2, x + frame / 2, frame, h - frame, -d / 2, d / 2, i % 2 ? C.wood : C.body, C.woodTop, EDGE_FAINT);
+  }
+}
+
+function rangeHood(b: Builder, w: number, d: number, h: number): void {
+  b.box(-w * 0.16, w * 0.16, h * 0.42, h, -d / 2, -d * 0.18, C.metal, C.metal, EDGE_FURN);
+  b.loft([-w / 2, w / 2, -d / 2, d / 2], [-w * 0.18, w * 0.18, -d / 2, -d * 0.1], 0, h * 0.48, C.metal, C.whiteTop, EDGE_FURN);
+  b.box(-w * 0.4, w * 0.4, 0, h * 0.06, d * 0.18, d / 2, C.dark, C.dark, EDGE_GLOW);
+}
+
+function microwave(b: Builder, w: number, d: number, h: number): void {
+  b.box(-w / 2, w / 2, 0, h, -d / 2, d / 2, C.body, C.bodyTop, EDGE_FURN);
+  b.box(-w * 0.4, w * 0.18, h * 0.17, h * 0.82, d / 2, d / 2 + 0.006, C.dark, C.glass, EDGE_GLOW);
+  b.cyl(w * 0.34, d / 2 + 0.008, Math.min(w, h) * 0.055, h * 0.58, h * 0.69, C.accent, C.accent, 10, EDGE_GLOW);
+  b.seg(w * 0.28, h * 0.34, d / 2 + 0.009, w * 0.4, h * 0.34, d / 2 + 0.009, EDGE_FAINT);
+}
+
+function waterPurifier(b: Builder, w: number, d: number, h: number): void {
+  b.box(-w / 2, w / 2, 0, h, -d / 2, d / 2, C.white, C.whiteTop, EDGE_FURN);
+  b.box(-w * 0.34, w * 0.34, h * 0.44, h * 0.72, d / 2, d / 2 + 0.008, C.dark, C.dark, EDGE_GLOW);
+  for (const x of [-w * 0.14, w * 0.14]) {
+    b.cyl(x, d / 2 + 0.015, w * 0.035, h * 0.55, h * 0.68, x < 0 ? C.accent : 0xc75b4d, x < 0 ? C.accent : 0xc75b4d, 8);
+    b.box(x - w * 0.025, x + w * 0.025, h * 0.46, h * 0.56, d / 2, d / 2 + 0.04, C.metal);
+  }
+  b.seg(-w * 0.32, h * 0.12, d / 2 + 0.006, w * 0.32, h * 0.12, d / 2 + 0.006, EDGE_FAINT);
+}
+
+function kitchenCorner(b: Builder, w: number, d: number, h: number): void {
+  const arm = Math.max(0.42, Math.min(w, d) * 0.46);
+  b.box(-w / 2, w / 2, 0, h - 0.04, -d / 2, -d / 2 + arm, C.body, C.bodyTop, EDGE_FURN);
+  b.box(-w / 2, -w / 2 + arm, 0, h - 0.04, -d / 2 + arm, d / 2, C.body, C.bodyTop, EDGE_FURN);
+  b.box(-w / 2, w / 2, h - 0.04, h, -d / 2, -d / 2 + arm, C.whiteTop, C.whiteTop, EDGE_GLOW);
+  b.box(-w / 2, -w / 2 + arm, h - 0.04, h, -d / 2 + arm, d / 2, C.whiteTop, C.whiteTop, EDGE_GLOW);
+  b.seg(-w / 2 + arm, 0.08, -d / 2 + arm, -w / 2 + arm, h - 0.08, -d / 2 + arm, EDGE_FAINT);
+}
+
+function vanity(b: Builder, w: number, d: number, h: number): void {
+  const tableH = Math.min(0.76, h * 0.52);
+  b.box(-w / 2, w / 2, tableH - 0.06, tableH, -d / 2, d / 2, C.wood, C.woodTop, EDGE_FURN);
+  for (const x of [-w / 2 + 0.05, w / 2 - 0.05]) b.box(x - 0.025, x + 0.025, 0, tableH - 0.06, -d / 2 + 0.04, d / 2 - 0.04, C.wood);
+  b.box(-w * 0.32, w * 0.32, tableH + 0.12, h, -d / 2, -d / 2 + 0.025, C.glass, C.glass, EDGE_GLOW);
+  b.box(-w * 0.2, w * 0.2, tableH - 0.01, tableH + 0.09, -d * 0.1, d * 0.18, C.body, C.bodyTop, EDGE_FURN);
+}
+
+function crib(b: Builder, w: number, d: number, h: number): void {
+  const rail = Math.min(0.045, w * 0.06);
+  b.box(-w / 2, w / 2, h * 0.24, h * 0.32, -d / 2, d / 2, C.wood, C.woodTop, EDGE_FURN);
+  b.pad(-w / 2 + rail, w / 2 - rail, h * 0.32, h * 0.42, -d / 2 + rail, d / 2 - rail, C.white, C.whiteTop, 0.025);
+  for (const z of [-d / 2, d / 2]) {
+    for (let i = 0; i < 7; i++) {
+      const x = -w / 2 + rail + ((w - 2 * rail) * i) / 6;
+      b.box(x - rail / 2, x + rail / 2, h * 0.3, h, z - rail / 2, z + rail / 2, C.wood, C.woodTop, EDGE_FAINT);
+    }
+    b.box(-w / 2, w / 2, h - rail, h, z - rail, z + rail, C.wood, C.woodTop, EDGE_FURN);
+  }
+  for (const x of [-w / 2, w / 2]) b.box(x - rail, x + rail, 0, h, -d / 2, d / 2, C.wood, C.woodTop, EDGE_FURN);
+}
+
+function cornerSofa(b: Builder, w: number, d: number, h: number): void {
+  const depth = Math.min(0.9, d * 0.53);
+  const chaise = Math.min(0.9, w * 0.38);
+  const seat = h * 0.52;
+  b.pad(-w / 2, w / 2, 0.08, seat, -d / 2, -d / 2 + depth, C.fabric, C.fabricTop, 0.04, EDGE_FURN);
+  b.pad(-w / 2, -w / 2 + chaise, 0.08, seat, -d / 2 + depth, d / 2, C.fabric, C.fabricTop, 0.04, EDGE_FURN);
+  b.box(-w / 2, w / 2, seat, h, -d / 2, -d / 2 + Math.min(0.2, depth * 0.25), C.fabric, C.fabricTop, EDGE_FURN);
+  b.box(-w / 2, -w / 2 + Math.min(0.2, chaise * 0.25), seat, h, -d / 2 + depth, d / 2, C.fabric, C.fabricTop, EDGE_FURN);
+  b.seg(-w / 2 + chaise, seat + 0.01, -d / 2 + depth * 0.1, -w / 2 + chaise, seat + 0.01, -d / 2 + depth * 0.9, EDGE_FAINT);
+}
+
+function sofaBed(b: Builder, w: number, d: number, h: number): void {
+  const seat = h * 0.5;
+  b.pad(-w / 2, w / 2, 0.08, seat, -d / 2 + d * 0.12, d / 2, C.fabric, C.fabricTop, 0.04, EDGE_FURN);
+  b.pad(-w / 2 + 0.05, w / 2 - 0.05, seat, seat + 0.1, -d / 2 + d * 0.3, d / 2 - 0.04, C.cushion, C.fabricTop, 0.03, EDGE_FAINT);
+  b.loft([-w / 2, w / 2, -d / 2, -d / 2 + d * 0.22], [-w / 2 + 0.03, w / 2 - 0.03, -d / 2, -d / 2 + d * 0.1], seat, h, C.fabric, C.fabricTop, EDGE_FURN);
+  b.seg(0, seat + 0.105, -d * 0.05, 0, seat + 0.105, d / 2 - 0.06, EDGE_FAINT);
+}
+
+function showerScreen(b: Builder, w: number, d: number, h: number): void {
+  const t = Math.min(0.025, Math.max(0.01, d * 0.35));
+  b.box(-w / 2, w / 2, 0, 0.025, -t, t, C.metal, C.metal, EDGE_GLOW);
+  for (const x of [-w / 2, 0, w / 2]) b.box(x - t, x + t, 0, h, -t, t, C.metal, C.metal, EDGE_GLOW);
+  b.seg(-w / 2, h, 0, w / 2, h, 0, EDGE_GLOW);
+  b.seg(w * 0.32, h * 0.42, t + 0.003, w * 0.32, h * 0.62, t + 0.003, EDGE_FURN);
+}
+
+function hammock(b: Builder, w: number, d: number, h: number): void {
+  const post = Math.min(0.07, w * 0.035);
+  for (const x of [-w / 2 + post, w / 2 - post]) {
+    b.box(x - post / 2, x + post / 2, 0, h, -post, post, C.metal, C.metal, EDGE_FURN);
+    b.box(x - d * 0.25, x + d * 0.25, 0, post, -d * 0.36, d * 0.36, C.metal, C.metal, EDGE_FURN);
+  }
+  const x0 = -w / 2 + post;
+  const x1 = w / 2 - post;
+  b.loft([x0, -w * 0.14, -d * 0.34, d * 0.34], [x0 + 0.08, -w * 0.14, -d * 0.3, d * 0.3], h * 0.36, h * 0.42, C.fabric, C.fabricTop, EDGE_FAINT);
+  b.loft([-w * 0.14, w * 0.14, -d * 0.34, d * 0.34], [-w * 0.13, w * 0.13, -d * 0.3, d * 0.3], h * 0.25, h * 0.31, C.fabric, C.fabricTop, EDGE_FAINT);
+  b.loft([w * 0.14, x1, -d * 0.34, d * 0.34], [w * 0.14, x1 - 0.08, -d * 0.3, d * 0.3], h * 0.36, h * 0.42, C.fabric, C.fabricTop, EDGE_FAINT);
+  b.seg(x0, h * 0.8, 0, -w * 0.14, h * 0.42, 0, EDGE_FURN);
+  b.seg(w * 0.14, h * 0.42, 0, x1, h * 0.8, 0, EDGE_FURN);
+}
+
+function stoneTableSet(b: Builder, w: number, d: number, h: number): void {
+  const r = Math.min(w, d);
+  b.cyl(0, 0, r * 0.08, 0, h - 0.07, C.metal, C.metal, 12);
+  b.cyl(0, 0, r * 0.22, h - 0.07, h, C.body, C.bodyTop, 16, EDGE_FURN);
+  for (const [x, z] of [[0, -0.38], [0.38, 0], [0, 0.38], [-0.38, 0]] as [number, number][]) {
+    b.cyl(x * w, z * d, r * 0.065, 0, h * 0.52, C.metal, C.metal, 10);
+    b.cyl(x * w, z * d, r * 0.105, h * 0.52, h * 0.61, C.body, C.bodyTop, 12, EDGE_FAINT);
+  }
+}
+
+function waterTank(b: Builder, w: number, d: number, h: number): void {
+  const r = Math.min(w, d) * 0.46;
+  b.cyl(0, 0, r * 0.84, 0, h * 0.08, C.metal, C.metal, 12, EDGE_FURN);
+  b.cyl(0, 0, r, h * 0.08, h * 0.92, C.metal, C.whiteTop, 20, EDGE_FURN);
+  for (const y of [h * 0.28, h * 0.5, h * 0.72]) {
+    for (let i = 0; i < 24; i++) {
+      const a0 = (i / 24) * Math.PI * 2;
+      const a1 = ((i + 1) / 24) * Math.PI * 2;
+      b.seg(Math.cos(a0) * r, y, Math.sin(a0) * r, Math.cos(a1) * r, y, Math.sin(a1) * r, EDGE_FAINT);
+    }
+  }
+  b.cyl(0, 0, r * 0.18, h * 0.92, h, C.dark, C.bodyTop, 12, EDGE_FAINT);
+}
+
+function gateOrFence(b: Builder, w: number, d: number, h: number, gate: boolean): void {
+  const post = Math.min(0.12, w * 0.05);
+  for (const x of [-w / 2 + post / 2, w / 2 - post / 2]) b.box(x - post / 2, x + post / 2, 0, h, -d / 2, d / 2, C.body, C.bodyTop, EDGE_FURN);
+  const panels = gate ? 2 : Math.max(3, Math.round(w / 0.4));
+  const inner = w - 2 * post;
+  for (let i = 0; i < panels; i++) {
+    const x0 = -inner / 2 + (inner * i) / panels + post * 0.25;
+    const x1 = -inner / 2 + (inner * (i + 1)) / panels - post * 0.25;
+    b.box(x0, x1, h * 0.08, h * 0.92, -d * 0.18, d * 0.18, gate ? C.metal : C.wood, gate ? C.metal : C.woodTop, EDGE_FAINT);
+    if (gate) b.seg(i === 0 ? x1 : x0, h * 0.46, d * 0.2, i === 0 ? x1 - 0.08 : x0 + 0.08, h * 0.46, d * 0.2, EDGE_GLOW);
+  }
+  if (!gate) for (const y of [h * 0.22, h * 0.76]) b.box(-inner / 2, inner / 2, y - 0.025, y + 0.025, -d / 2, d / 2, C.wood, C.woodTop, EDGE_FURN);
+}
+
 /** A ring of glowing line on a front face (z = front), for dials and fans. */
 function ring(b: Builder, cx: number, cy: number, r: number, z: number, n = 20): void {
   for (let i = 0; i < n; i++) {
@@ -987,6 +1232,10 @@ function builtInScreen(f: Furniture, w: number, d: number, h: number, floor?: Fl
   if (f.type === "radiator") return { x0: -w / 2 + 0.02, x1: w / 2 - 0.02, y0: RADIATOR_Y + 0.02, y1: RADIATOR_Y + h - 0.02, z: d / 2 + 0.004 };
   if (f.type === "air_conditioner") return { x0: -w * 0.43, x1: w * 0.43, y0: AIR_CONDITIONER_Y + h * 0.08, y1: AIR_CONDITIONER_Y + h * 0.27, z: d / 2 + 0.008 };
   if (f.type === "water_pump") return { x0: -w * 0.1, x1: w * 0.1, y0: h * 0.56, y1: h * 0.65, z: d * 0.3 + 0.004 };
+  if (f.type === "water_heater") return { x0: w * 0.27, x1: w * 0.38, y0: h * 0.47, y1: h * 0.58, z: d * 0.46 + 0.003 };
+  if (f.type === "range_hood") return { x0: -w * 0.4, x1: w * 0.4, y0: 0.005, y1: h * 0.06, z: d / 2 + 0.003 };
+  if (f.type === "microwave") return { x0: -w * 0.4, x1: w * 0.18, y0: h * 0.17, y1: h * 0.82, z: d / 2 + 0.008 };
+  if (f.type === "water_purifier") return { x0: -w * 0.34, x1: w * 0.34, y0: h * 0.44, y1: h * 0.72, z: d / 2 + 0.01 };
   if (f.type === "washer" || f.type === "dryer") {
     const cy = (h - 0.14) / 2 + 0.04;
     const r = Math.min(w * 0.36, (h - 0.2) * 0.42) * 0.8;
@@ -1071,6 +1320,86 @@ function buildFurniture(buf: GeoBuffer, lines: LineBuffer, shadow: GeoBuffer, f:
   const d = Math.max(0.05, f.d);
   const h = Math.max(0.005, f.h);
   switch (f.type) {
+    case "altar":
+      altar(b, w, d, h);
+      break;
+    case "altar_wall":
+      wallAltar(b, w, d, h);
+      return;
+    case "shoe_cabinet":
+      shoeCabinet(b, w, d, h);
+      break;
+    case "motorbike":
+      motorbike(b, w, d, h);
+      break;
+    case "fan_ceiling":
+      ceilingFan(b, w, d, h);
+      return;
+    case "fan_floor":
+      floorFan(b, w, d, h);
+      break;
+    case "water_heater":
+      waterHeater(b, w, d, h);
+      return;
+    case "drying_rack":
+      dryingRack(b, w, d, h);
+      break;
+    case "shoe_bench":
+      shoeBench(b, w, d, h);
+      break;
+    case "room_divider":
+      roomDivider(b, w, d, h);
+      break;
+    case "range_hood":
+      rangeHood(b, w, d, h);
+      return;
+    case "microwave":
+      microwave(b, w, d, h);
+      if (base > 0.05) return;
+      break;
+    case "water_purifier":
+      waterPurifier(b, w, d, h);
+      break;
+    case "kitchen_corner":
+      kitchenCorner(b, w, d, h);
+      break;
+    case "vanity":
+      vanity(b, w, d, h);
+      break;
+    case "crib":
+      crib(b, w, d, h);
+      break;
+    case "bed_single":
+    case "bed_double":
+      bed(b, w, d, h);
+      break;
+    case "sofa_l":
+      cornerSofa(b, w, d, h);
+      break;
+    case "sofa_bed":
+      sofaBed(b, w, d, h);
+      break;
+    case "shower_screen":
+      showerScreen(b, w, d, h);
+      break;
+    case "hammock":
+      hammock(b, w, d, h);
+      break;
+    case "stone_table_set":
+      stoneTableSet(b, w, d, h);
+      break;
+    case "planter_large":
+      plant(b, w, d, h);
+      break;
+    case "water_tank":
+      waterTank(b, w, d, h);
+      break;
+    case "gate":
+      gateOrFence(b, w, d, h, true);
+      break;
+    case "fence":
+      gateOrFence(b, w, d, h, false);
+      break;
     case "sofa":
       sofa(b, w, d, h, Math.max(1, Math.round((w - 0.4) / 0.62)));
       break;

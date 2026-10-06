@@ -155,6 +155,11 @@ export function mountBase(floor: Floor, f: Pick<Furniture, "type" | "x" | "z" | 
   // wall lights at the usual height, LED strips just under the ceiling
   if (f.type === "lamp_wall") return WALL_LAMP_Y;
   if (f.type === "led_strip") return Math.max(0, floor.height - 0.04 - Math.max(0.02, f.h));
+  if (f.type === "fan_ceiling") return Math.max(0, floor.height - Math.max(0.05, f.h));
+  if (f.type === "altar_wall") return 1.45;
+  if (f.type === "water_heater") return 1.7;
+  if (f.type === "range_hood") return 1.35;
+  if (f.type === "microwave") return surfaceHeight(floor, f.x, f.z);
   // An outdoor pump follows the lawn/terrace below it; inside a room it stays on that floor.
   if (f.type === "water_pump" && !floor.rooms.some((r) => r.points.length >= 3 && pointInPolygon([f.x, f.z], r.points))) return outdoorGround(floor, f.x, f.z);
   switch (item?.mount) {

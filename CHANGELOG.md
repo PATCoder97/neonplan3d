@@ -4,6 +4,14 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.18.0
+
+### Added
+
+- Added 27 dedicated Vietnamese-home items across entrances, living rooms, kitchens, bedrooms, bathrooms and outdoor areas, each with its own plan symbol, procedural 3D model and practical default dimensions.
+- Added automatic wall, ceiling and worktop mounting for suitable items, plus Home Assistant entity matching and live status details for fans, water heaters, range hoods, microwaves and water purifiers.
+- Added Vietnamese, English and German names for the expanded furniture library and regression coverage for its geometry, mounting and entity links.
+
 ## 1.17.6
 
 ### Fixed

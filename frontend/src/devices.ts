@@ -25,6 +25,7 @@ const DOMAIN_KIND: Record<string, DeviceKind> = {
   switch: "switch",
   input_boolean: "switch",
   fan: "fan",
+  water_heater: "switch",
   cover: "cover",
   climate: "climate",
   media_player: "media",
@@ -685,6 +686,12 @@ const FURNITURE_NAMES: Record<string, RegExp> = {
   radiator: /(heiz|radiator|thermostat|climate|hk|trv)/i,
   air_conditioner: /(klima|air ?condition|aircon|airco|split|điều hòa|dieu hoa|máy lạnh|may lanh)/i,
   water_pump: /(wasserpumpe|gartenpumpe|brunnenpumpe|water ?pump|garden ?pump|well ?pump|pool ?pump|irrigation|máy bơm|may bom|bơm nước|bom nuoc|bơm giếng|bom gieng|bơm tưới|bom tuoi)/i,
+  fan_ceiling: /(deckenventilator|ceiling ?fan|quạt trần|quat tran)/i,
+  fan_floor: /(standventilator|standing ?fan|floor ?fan|quạt đứng|quat dung)/i,
+  water_heater: /(warmwasser|water ?heater|boiler|bình nóng lạnh|binh nong lanh|máy nước nóng|may nuoc nong)/i,
+  range_hood: /(dunstabzug|range ?hood|extractor|hút mùi|hut mui)/i,
+  microwave: /(mikrowelle|microwave|lò vi sóng|lo vi song)/i,
+  water_purifier: /(wasserfilter|water ?purifier|water ?dispenser|lọc nước|loc nuoc|cây nước|cay nuoc)/i,
 };
 const MEDIA_FURNITURE = new Set(["tv_board", "tv_wall"]);
 

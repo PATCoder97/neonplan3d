@@ -6084,7 +6084,7 @@ export class Fp3dEditor extends LitElement {
             : f.type === "robot_vacuum"
               ? id.startsWith("vacuum.")
               : // or a status sensor (a 3D printer's print status: running, idle, finish …)
-                /^(switch|media_player|fan|input_boolean|climate)\./.test(id) || isStatusSensor(hass.states[id]),
+                /^(switch|media_player|fan|water_heater|input_boolean|climate)\./.test(id) || isStatusSensor(hass.states[id]),
     );
     const power = this.entityOptions((id) => this.isPowerSensor(id));
     const doorSensors = f.type === "fridge_smart" ? this.entityOptions((id) => id.startsWith("binary_sensor.")) : [];

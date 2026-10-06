@@ -74,6 +74,7 @@ test("kinds, active states and light glow", () => {
   const hass = hassWith();
   assert.equal(kindOf("media_player.tv"), "media");
   assert.equal(kindOf("input_boolean.gast"), "switch");
+  assert.equal(kindOf("water_heater.bathroom"), "switch");
   assert.equal(kindOf("automation.x"), null);
   assert.ok(isActive(hass.states["light.decke"]));
   assert.ok(isActive(hass.states["cover.rollo"]));
@@ -603,6 +604,36 @@ test("a wall air conditioner automatically takes the room's climate entity", () 
   const ac = { id: "ac", type: "air_conditioner", x: 2, z: 0.2, w: 1, d: 0.22, h: 0.3, rotation: 0, variant: null };
   const links = furnitureEntities(hass, [{ ...newFloor("eg", "Tầng trệt", 0), rooms: [room], furniture: [ac] }]);
   assert.equal(links.get("ac")?.entity, "climate.dieu_hoa_phong_khach");
+});
+
+test("Vietnamese fans and water heater automatically take matching room entities", () => {
+  const st = (entity_id: string, state: string, attributes: Record<string, unknown> = {}) => ({ entity_id, state, attributes });
+  const states = {
+    "fan.quat_tran_phong_khach": st("fan.quat_tran_phong_khach", "off", { friendly_name: "Quạt trần phòng khách" }),
+    "fan.quat_dung_phong_khach": st("fan.quat_dung_phong_khach", "off", { friendly_name: "Quạt đứng phòng khách" }),
+    "water_heater.binh_nong_lanh": st("water_heater.binh_nong_lanh", "off", { friendly_name: "Bình nóng lạnh" }),
+    "fan.may_hut_mui": st("fan.may_hut_mui", "off", { friendly_name: "Máy hút mùi" }),
+    "switch.lo_vi_song": st("switch.lo_vi_song", "off", { friendly_name: "Lò vi sóng" }),
+    "switch.may_loc_nuoc": st("switch.may_loc_nuoc", "off", { friendly_name: "Máy lọc nước" }),
+  };
+  const entities = Object.fromEntries(Object.keys(states).map((entity_id) => [entity_id, { entity_id, area_id: "phong_khach" }]));
+  const hass = { language: "vi", states, entities, devices: {}, areas: { phong_khach: { area_id: "phong_khach", name: "Phòng khách" } } } as unknown as HomeAssistant;
+  const room = { id: "r", name: "Phòng khách", area_id: "phong_khach", points: [[0, 0], [4, 0], [4, 4], [0, 4]] as [number, number][], floor_material: "wood" as const };
+  const furniture = [
+    { id: "ceiling", type: "fan_ceiling", x: 1, z: 1, w: 1.4, d: 1.4, h: 0.32, rotation: 0, variant: null },
+    { id: "floor", type: "fan_floor", x: 2, z: 2, w: 0.45, d: 0.45, h: 1.25, rotation: 0, variant: null },
+    { id: "heater", type: "water_heater", x: 3, z: 3, w: 0.75, d: 0.35, h: 0.45, rotation: 0, variant: null },
+    { id: "hood", type: "range_hood", x: 1, z: 3, w: 0.75, d: 0.5, h: 0.5, rotation: 0, variant: null },
+    { id: "microwave", type: "microwave", x: 2, z: 3, w: 0.5, d: 0.4, h: 0.3, rotation: 0, variant: null },
+    { id: "purifier", type: "water_purifier", x: 3, z: 1, w: 0.32, d: 0.36, h: 1.05, rotation: 0, variant: null },
+  ];
+  const links = furnitureEntities(hass, [{ ...newFloor("eg", "Tầng trệt", 0), rooms: [room], furniture }]);
+  assert.equal(links.get("ceiling")?.entity, "fan.quat_tran_phong_khach");
+  assert.equal(links.get("floor")?.entity, "fan.quat_dung_phong_khach");
+  assert.equal(links.get("heater")?.entity, "water_heater.binh_nong_lanh");
+  assert.equal(links.get("hood")?.entity, "fan.may_hut_mui");
+  assert.equal(links.get("microwave")?.entity, "switch.lo_vi_song");
+  assert.equal(links.get("purifier")?.entity, "switch.may_loc_nuoc");
 });
 
 test("an outdoor water pump can find a clearly named switch without a room", () => {

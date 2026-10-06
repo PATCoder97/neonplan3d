@@ -37,6 +37,89 @@ function seating(w: number, d: number, seats: number, arms: boolean): Part[] {
 /** Symbol parts for a furniture type of size w × d (metres). */
 export function furnitureSymbol(type: string, w: number, d: number): Part[] | typeof nothing {
   switch (type) {
+    case "altar":
+      return [
+        rect(-w / 2, -d / 2, w / 2, d / 2),
+        rect(-w * 0.42, d * 0.18, w * 0.42, d / 2, "fp3d-sym-fill"),
+        circle(0, d * 0.05, Math.min(w, d) * 0.08),
+      ];
+    case "altar_wall":
+      return [rect(-w / 2, -d / 2, w / 2, d / 2), line(-w * 0.35, d * 0.15, w * 0.35, d * 0.15, "fp3d-sym-strong")];
+    case "shoe_cabinet":
+      return [...fronts(w, d, Math.max(2, Math.round(w / 0.45))), line(-w / 2, d * 0.12, w / 2, d * 0.12, "fp3d-sym-strong")];
+    case "motorbike":
+      return [
+        ellipse(0, -d * 0.34, w * 0.24, d * 0.11),
+        ellipse(0, d * 0.34, w * 0.24, d * 0.11),
+        line(0, -d * 0.28, 0, d * 0.3, "fp3d-sym-strong"),
+        ellipse(0, 0, w * 0.3, d * 0.2, "fp3d-sym-fill"),
+        line(-w * 0.32, d * 0.23, w * 0.32, d * 0.23),
+      ];
+    case "fan_ceiling":
+      return [
+        circle(0, 0, Math.min(w, d) * 0.09, "fp3d-sym-fill"),
+        rect(-w / 2, -d * 0.055, w / 2, d * 0.055),
+        rect(-w * 0.055, -d / 2, w * 0.055, d / 2),
+      ];
+    case "fan_floor":
+      return [circle(0, 0, Math.min(w, d) * 0.46), circle(0, 0, Math.min(w, d) * 0.12, "fp3d-sym-fill")];
+    case "water_heater":
+      return [rect(-w / 2, -d / 2, w / 2, d / 2), circle(w * 0.3, d * 0.18, Math.min(w, d) * 0.06, "fp3d-sym-fill")];
+    case "drying_rack": {
+      const out: Part[] = [rect(-w / 2, -d / 2, w / 2, d / 2)];
+      for (let i = 1; i < 6; i++) out.push(line(-w / 2, -d / 2 + (d * i) / 6, w / 2, -d / 2 + (d * i) / 6));
+      return out;
+    }
+    case "shoe_bench":
+      return [rect(-w / 2, -d / 2, w / 2, d / 2), line(-w / 2, 0, w / 2, 0), ...fronts(w, d, Math.max(2, Math.round(w / 0.35)))];
+    case "room_divider": {
+      const out: Part[] = [rect(-w / 2, -d / 2, w / 2, d / 2)];
+      for (let i = 1; i < 7; i++) out.push(line(-w / 2 + (w * i) / 7, -d / 2, -w / 2 + (w * i) / 7, d / 2));
+      return out;
+    }
+    case "range_hood":
+      return [rect(-w / 2, -d / 2, w / 2, d / 2), line(-w * 0.35, d * 0.28, w * 0.35, d * 0.28, "fp3d-sym-strong")];
+    case "microwave":
+      return [rect(-w / 2, -d / 2, w / 2, d / 2), rect(-w * 0.38, -d * 0.05, w * 0.2, d / 2, "fp3d-sym-fill"), circle(w * 0.34, d * 0.22, Math.min(w, d) * 0.06)];
+    case "water_purifier":
+      return [rect(-w / 2, -d / 2, w / 2, d / 2), circle(0, d * 0.18, Math.min(w, d) * 0.12, "fp3d-sym-fill")];
+    case "kitchen_corner":
+      return [rect(-w / 2, -d / 2, w / 2, -d * 0.05), rect(-w / 2, -d * 0.05, -w * 0.05, d / 2), line(-w * 0.05, -d * 0.05, w / 2, -d * 0.05)];
+    case "vanity":
+      return [rect(-w / 2, -d / 2, w / 2, d / 2), ellipse(0, -d * 0.28, w * 0.28, d * 0.12, "fp3d-sym-strong")];
+    case "crib": {
+      const out: Part[] = [rect(-w / 2, -d / 2, w / 2, d / 2)];
+      for (let i = 1; i < 6; i++) out.push(line(-w / 2 + (w * i) / 6, -d / 2, -w / 2 + (w * i) / 6, -d / 2 + d * 0.12));
+      return out;
+    }
+    case "bed_single":
+    case "bed_double": {
+      const pillows = type === "bed_double" ? 2 : 1;
+      const out: Part[] = [rect(-w / 2, -d / 2, w / 2, -d / 2 + 0.07, "fp3d-sym-fill"), line(-w / 2, -d * 0.12, w / 2, -d * 0.12)];
+      for (let i = 0; i < pillows; i++) out.push(rect(-w / 2 + (w * i) / pillows + 0.08, -d / 2 + 0.1, -w / 2 + (w * (i + 1)) / pillows - 0.08, -d * 0.15));
+      return out;
+    }
+    case "sofa_l":
+      return [...seating(w, Math.min(d, 0.9), Math.max(2, Math.round(w / 0.65)), true), rect(-w / 2, -d / 2, -w / 2 + Math.min(0.9, w * 0.36), d / 2, "fp3d-sym-fill")];
+    case "sofa_bed":
+      return [rect(-w / 2, -d / 2, w / 2, d / 2), rect(-w / 2, -d / 2, w / 2, -d / 2 + Math.min(0.24, d * 0.22), "fp3d-sym-fill"), line(0, -d / 2 + Math.min(0.24, d * 0.22), 0, d / 2)];
+    case "shower_screen":
+      return [line(-w / 2, 0, w / 2, 0, "fp3d-sym-strong"), circle(w * 0.34, 0, Math.min(w, d) * 0.25)];
+    case "hammock":
+      return [line(-w / 2, 0, -w * 0.32, 0), line(w * 0.32, 0, w / 2, 0), ellipse(0, 0, w * 0.32, d * 0.42, "fp3d-sym-fill")];
+    case "stone_table_set":
+      return [circle(0, 0, Math.min(w, d) * 0.22, "fp3d-sym-fill"), ...[[0, -0.38], [0.38, 0], [0, 0.38], [-0.38, 0]].map(([x, z]) => circle(x * w, z * d, Math.min(w, d) * 0.1))];
+    case "planter_large":
+      return [circle(0, 0, Math.min(w, d) * 0.47), circle(0, 0, Math.min(w, d) * 0.33, "fp3d-sym-fill")];
+    case "water_tank":
+      return [circle(0, 0, Math.min(w, d) * 0.48), circle(0, 0, Math.min(w, d) * 0.12, "fp3d-sym-fill")];
+    case "gate":
+      return [line(-w / 2, 0, w / 2, 0, "fp3d-sym-strong"), line(0, -d / 2, 0, d / 2)];
+    case "fence": {
+      const out: Part[] = [line(-w / 2, 0, w / 2, 0, "fp3d-sym-strong")];
+      for (let i = 0; i < 7; i++) out.push(line(-w / 2 + (w * i) / 6, -d / 2, -w / 2 + (w * i) / 6, d / 2));
+      return out;
+    }
     case "sofa":
       return seating(w, d, Math.max(1, Math.round((w - 0.4) / 0.62)), true);
     case "armchair":
