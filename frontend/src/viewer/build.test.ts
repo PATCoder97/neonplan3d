@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import type { BufferGeometry } from "three";
 import type { Floor, Furniture, Opening, Room } from "../model.ts";
-import { newFloor } from "../model.ts";
+import { furnitureFootprint, newFloor } from "../model.ts";
 import { buildFloorGeometry, clipAlong, stairHoles } from "./build.ts";
 
 const EXT = 0.24;
@@ -117,6 +117,16 @@ test("stairs cut a hole into the floor above", () => {
   // the opening is cut 3 mm in from its outline
   near(area(geo.floor), 12 - 0.994 * 1.994, 1e-6);
   assert.deepEqual(stairHoles([lower, upper], lower), []);
+});
+
+test("U-shaped stairs with a landing cut their full stairwell into the floor above", () => {
+  const stair: Furniture = { id: "u", type: "stairs_landing", x: 2, z: 2, rotation: 0, w: 2.1, d: 3.2, h: 2.75, variant: null };
+  const lower = floorWith([rect("a", 0, 0, 5, 4)], [], [stair]);
+  const upper = floorWith([rect("b", 0, 0, 5, 4)], [], []);
+  upper.elevation = 2.75;
+  const holes = stairHoles([lower, upper], upper);
+  assert.equal(holes.length, 1);
+  assert.deepEqual(holes[0], furnitureFootprint(stair));
 });
 
 test("clipping a wall footprint along its axis", () => {

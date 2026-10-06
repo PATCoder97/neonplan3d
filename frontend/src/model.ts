@@ -791,6 +791,7 @@ export const FURNITURE_TYPES = [
   "tall_cabinet",
   "coat_rack",
   "stairs",
+  "stairs_landing",
   "robot_vacuum",
   "inverter",
   "home_battery",
@@ -810,7 +811,7 @@ export const FURNITURE_GROUPS: Record<string, FurnitureType[]> = {
   kitchen: ["kitchen", "kitchen_wall", "kitchen_tall", "island", "worktop", "sink", "stove", "dishwasher", "fridge"],
   sleeping: ["bed", "bunk_bed", "nightstand", "wardrobe", "dresser"],
   bath: ["bathtub", "shower", "wc", "washbasin", "washer", "dryer"],
-  work: ["desk", "worktop", "office_chair", "tall_cabinet", "coat_rack", "radiator", "stairs", "robot_vacuum"],
+  work: ["desk", "worktop", "office_chair", "tall_cabinet", "coat_rack", "radiator", "stairs", "stairs_landing", "robot_vacuum"],
   vehicles: ["parking"],
 };
 
@@ -839,7 +840,7 @@ export const WALL_LAMP_Y = 1.75;
 
 /** Items that can be lifted off the floor (a wall cabinet, a shelf, a wall light, an LED strip): everything but lamps hung from the ceiling and the ceiling-mounted pack items. */
 export function canLift(f: Pick<Furniture, "type">): boolean {
-  if (["lamp_ceiling", "lamp_downlight", "lamp_spot", "lamp_panel", "lamp_pendant", "stairs", "stairwell", "parking"].includes(f.type)) return false;
+  if (["lamp_ceiling", "lamp_downlight", "lamp_spot", "lamp_panel", "lamp_pendant", "stairs", "stairs_landing", "stairwell", "parking"].includes(f.type)) return false;
   return packItem(f.type)?.mount !== "ceiling";
 }
 
@@ -988,6 +989,7 @@ export const FURNITURE_SIZE: Record<FurnitureType, [number, number, number]> = {
   plant: [0.45, 0.45, 1.1],
   rug: [2.0, 1.4, 0.01],
   stairs: [1.0, 3.2, 2.75],
+  stairs_landing: [2.1, 3.2, 2.75],
   stool: [0.55, 0.55, 0.42],
   lamp_ceiling: [0.4, 0.4, 0.08],
   lamp_downlight: [0.1, 0.1, 0.02],

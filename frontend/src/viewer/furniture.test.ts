@@ -34,6 +34,19 @@ function build(type: string) {
   return { buf, lines };
 }
 
+test("a U-shaped stair builds two flights and a half-height landing", () => {
+  const buf = new GeoBuffer();
+  const lines = new LineBuffer();
+  const stair: Furniture = { id: "u", type: "stairs_landing", x: 0, z: 0, rotation: 0, w: 2.1, d: 3.2, h: 2.8, variant: null };
+  pushFurniture(buf, lines, new GeoBuffer(), stair);
+  const ys = buf.p.filter((_, i) => i % 3 === 1);
+  assert.ok(buf.count > 100 && lines.p.length > 0, "steps, landing and rails are drawn");
+  assert.ok(buf.p.every(Number.isFinite) && lines.p.every(Number.isFinite), "finite geometry");
+  assert.ok(Math.abs(Math.min(...ys)) < 1e-6, "starts on the lower floor");
+  assert.ok(Math.abs(Math.max(...ys) - 2.8) < 1e-6, "reaches the upper floor");
+  assert.ok(ys.some((y) => Math.abs(y - 1.4) < 1e-6), "landing is at half-height");
+});
+
 test("loft and lying cylinder parts build finite geometry with their outlines", () => {
   setPacks([PACK]);
   const { buf, lines } = build("pack:t.cars:wedge");

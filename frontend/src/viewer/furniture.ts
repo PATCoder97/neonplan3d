@@ -534,6 +534,72 @@ function stairs(b: Builder, w: number, d: number, h: number): void {
   }
 }
 
+/** Vietnamese-style half-turn stair: two parallel flights joined by a landing at the back. */
+function stairsLanding(b: Builder, w: number, d: number, h: number): void {
+  const steps = Math.max(6, Math.round(h / 0.18));
+  const lowerSteps = Math.floor(steps / 2);
+  const upperSteps = steps - lowerSteps;
+  const rise = h / steps;
+  const landingY = rise * lowerSteps;
+  const gap = Math.min(0.16, w * 0.12);
+  const flightW = (w - gap) / 2;
+  // A landing roughly as deep as one flight is wide, while small custom sizes stay well formed.
+  const landingD = Math.min(d * 0.34, Math.max(d * 0.22, flightW));
+  const landingFront = -d / 2 + landingD;
+  const runD = d - landingD;
+  const lowerRun = runD / lowerSteps;
+  const upperRun = runD / upperSteps;
+  const left0 = -w / 2;
+  const left1 = -gap / 2;
+  const right0 = gap / 2;
+  const right1 = w / 2;
+
+  // First flight: from the front towards the landing at half-height.
+  for (let i = 0; i < lowerSteps; i++) {
+    const z1 = d / 2 - lowerRun * i;
+    const z0 = z1 - lowerRun;
+    const y1 = rise * (i + 1);
+    b.box(left0, left1, 0, y1, z0, z1, C.white, C.whiteTop);
+    b.seg(left0, y1, z1, left1, y1, z1, EDGE_FURN);
+  }
+
+  // Full-width chiếu nghỉ joins both flights.
+  b.box(-w / 2, w / 2, 0, landingY, -d / 2, landingFront, C.white, C.whiteTop, EDGE_FURN);
+
+  // Second flight turns 180° and rises from the landing back towards the front.
+  for (let i = 0; i < upperSteps; i++) {
+    const z0 = landingFront + upperRun * i;
+    const z1 = z0 + upperRun;
+    const y1 = landingY + rise * (i + 1);
+    b.box(right0, right1, 0, y1, z0, z1, C.white, C.whiteTop);
+    b.seg(right0, y1, z0, right1, y1, z0, EDGE_FURN);
+  }
+
+  const rail = Math.min(0.9, Math.max(0.55, h * 0.32));
+  // Rails on both sides make the central stairwell and the outer edges easy to read in 3D.
+  for (const x of [left0 + 0.03, left1 - 0.03]) {
+    b.seg(x, rise + rail, d / 2 - lowerRun / 2, x, landingY + rail, landingFront + lowerRun / 2, EDGE_GLOW);
+    for (let i = 0; i < lowerSteps; i += 3) {
+      const z = d / 2 - lowerRun * (i + 0.5);
+      const y = rise * (i + 1);
+      b.seg(x, y, z, x, y + rail, z, EDGE_FAINT);
+    }
+  }
+  const railSteps = Math.max(1, upperSteps - 3);
+  for (const x of [right0 + 0.03, right1 - 0.03]) {
+    b.seg(x, landingY + rise + rail, landingFront + upperRun / 2, x, landingY + rise * railSteps + rail, landingFront + upperRun * (railSteps - 0.5), EDGE_GLOW);
+    for (let i = 0; i < railSteps; i += 3) {
+      const z = landingFront + upperRun * (i + 0.5);
+      const y = landingY + rise * (i + 1);
+      b.seg(x, y, z, x, y + rail, z, EDGE_FAINT);
+    }
+  }
+  // Guard the small central opening at the edge of the landing.
+  b.seg(left1, landingY, landingFront, left1, landingY + rail, landingFront, EDGE_FAINT);
+  b.seg(right0, landingY, landingFront, right0, landingY + rail, landingFront, EDGE_FAINT);
+  b.seg(left1, landingY + rail, landingFront, right0, landingY + rail, landingFront, EDGE_GLOW);
+}
+
 function sideboard(b: Builder, w: number, d: number, h: number): void {
   legs(b, w, d, 0.12, 0.03, 0.04, C.metal);
   b.box(-w / 2, w / 2, 0.12, h, -d / 2, d / 2 - 0.02, C.wood, C.woodTop, EDGE_FURN);
@@ -1011,6 +1077,9 @@ function buildFurniture(buf: GeoBuffer, lines: LineBuffer, shadow: GeoBuffer, f:
       return; // flat, no contact shadow
     case "stairs":
       stairs(b, w, d, h);
+      break;
+    case "stairs_landing":
+      stairsLanding(b, w, d, h);
       break;
     case "stairwell":
       return; // only a hole in the floor (see stairHoles in build.ts), nothing to draw

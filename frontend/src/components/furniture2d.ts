@@ -171,6 +171,34 @@ export function furnitureSymbol(type: string, w: number, d: number): Part[] | ty
       out.push(line(0, d / 2 - 0.1, 0, -d / 2 + 0.25, "fp3d-sym-strong"), line(-0.15, -d / 2 + 0.45, 0, -d / 2 + 0.25, "fp3d-sym-strong"), line(0.15, -d / 2 + 0.45, 0, -d / 2 + 0.25, "fp3d-sym-strong"));
       return out;
     }
+    case "stairs_landing": {
+      // Two parallel flights, joined across the back by the landing; arrows show the half-turn route.
+      const gap = Math.min(0.16, w * 0.12);
+      const flightW = (w - gap) / 2;
+      const landingD = Math.min(d * 0.34, Math.max(d * 0.22, flightW));
+      const landingFront = -d / 2 + landingD;
+      const lowerX0 = -w / 2;
+      const lowerX1 = -gap / 2;
+      const upperX0 = gap / 2;
+      const upperX1 = w / 2;
+      const n = Math.max(3, Math.round((d - landingD) / 0.26));
+      const out: Part[] = [line(-w / 2, landingFront, w / 2, landingFront, "fp3d-sym-strong")];
+      for (let i = 1; i < n; i++) {
+        const z = d / 2 - ((d - landingD) / n) * i;
+        out.push(line(lowerX0, z, lowerX1, z), line(upperX0, z, upperX1, z));
+      }
+      const lx = (lowerX0 + lowerX1) / 2;
+      const ux = (upperX0 + upperX1) / 2;
+      out.push(
+        line(lx, d / 2 - 0.1, lx, landingFront + 0.18, "fp3d-sym-strong"),
+        line(lx - 0.12, landingFront + 0.36, lx, landingFront + 0.18, "fp3d-sym-strong"),
+        line(lx + 0.12, landingFront + 0.36, lx, landingFront + 0.18, "fp3d-sym-strong"),
+        line(ux, landingFront + 0.18, ux, d / 2 - 0.1, "fp3d-sym-strong"),
+        line(ux - 0.12, d / 2 - 0.28, ux, d / 2 - 0.1, "fp3d-sym-strong"),
+        line(ux + 0.12, d / 2 - 0.28, ux, d / 2 - 0.1, "fp3d-sym-strong"),
+      );
+      return out;
+    }
     default: {
       const item = packItem(type);
       return item ? packSymbol(item, w, d) : nothing;
