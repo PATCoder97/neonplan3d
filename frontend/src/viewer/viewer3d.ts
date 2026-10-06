@@ -50,7 +50,7 @@ import { roofUnderAt } from "../roof-sections.ts";
 import { buildFloorGeometry, SLAB, stairHoles, type FloorGeometry } from "./build.ts";
 import { OrbitControls, type OrbitView } from "./controls.ts";
 import { makeFoldable, type FoldMasks } from "./fold.ts";
-import { pushCameraModel, pushPackGlow, pushPackLamp, screenRect, pushFridgeDoors } from "./furniture.ts";
+import { pushCameraModel, pushFanRotor, pushPackGlow, pushPackLamp, screenRect, pushFridgeDoors } from "./furniture.ts";
 import { mountBase, packItem, setPacks, type FurniturePack } from "../packs.ts";
 import { withVehicles } from "../parking.ts";
 import { buildRoof, type RoofWindowState } from "./roof.ts";
@@ -423,6 +423,12 @@ interface FloorView {
   label: HTMLButtonElement;
 }
 
+interface FanRotor {
+  rotor: Group;
+  type: "fan_ceiling" | "fan_floor";
+  active: boolean;
+}
+
 const ACTIVE_FLOOR = new Color(0x1a2a4d);
 
 export function isLowEnd(): boolean {
@@ -478,6 +484,8 @@ export class FloorplanViewer {
   /** Ground grid texture, made when the ground first shows (the tablet level never shows it). */
   private groundTexture: CanvasTexture | null = null;
   private devices: DeviceMarker[] = [];
+  /** Fan blades kept outside the merged furniture mesh so linked fans can rotate while they are on. */
+  private fanRotors = new Map<string, FanRotor>();
   /** Device markers with the last written fields, so unchanged fields are not written again. */
   private readonly devicePins = new Map<string, { el: HTMLButtonElement; icon: string; text: string; watt: string; label: string; active: boolean; unavailable: boolean; glow: string; caption: string }>();
   private readonly ground: Mesh;
@@ -746,6 +754,8 @@ export class FloorplanViewer {
   /** Replace the device markers; pins are reused per entity, light cones rebuilt per floor. */
   setDevices(devices: DeviceMarker[]): void {
     this.devices = devices;
+    const activeFans = new Set(devices.filter((d) => d.active && d.furnitureId && this.fanRotors.has(d.furnitureId)).map((d) => d.furnitureId!));
+    for (const [id, fan] of this.fanRotors) fan.active = activeFans.has(id);
     this.labelsDirty = true;
     this.effectFloors = new Set(devices.filter((d) => d.effect && d.glow).map((d) => d.floorId));
     this.deviceFloor = new Map(devices.map((d) => [d.id, d.floorId]));
@@ -1249,6 +1259,19 @@ export class FloorplanViewer {
     return true;
   }
 
+  /** Rotate only the lightweight blade groups of fans whose linked Home Assistant entity is on. */
+  private stepFans(dt: number): boolean {
+    let moving = false;
+    for (const fan of this.fanRotors.values()) {
+      if (!fan.active) continue;
+      const step = dt * (fan.type === "fan_ceiling" ? 0.0048 : 0.009);
+      if (fan.type === "fan_ceiling") fan.rotor.rotation.y = (fan.rotor.rotation.y - step) % (Math.PI * 2);
+      else fan.rotor.rotation.z = (fan.rotor.rotation.z - step) % (Math.PI * 2);
+      moving = true;
+    }
+    return moving;
+  }
+
   private buildFridges(fv: FloorView): void {
     const buf = new GeoBuffer();
     for (const f of fv.floor.furniture) {
@@ -1388,6 +1411,7 @@ export class FloorplanViewer {
     }
     this.floors = [];
     this.floorMap = new Map();
+    this.fanRotors = new Map();
     // device pins survive a rebuild; only floor and room labels are recreated
     for (const el of [...this.labels.children]) if (!(el as HTMLElement).dataset.entity) el.remove();
   }
@@ -1732,6 +1756,25 @@ export class FloorplanViewer {
         glassWalls,
         ...(solarMesh ? [solarMesh] : []),
       );
+      // Fan rotors are separate groups: their bodies and cages stay in the merged furniture mesh,
+      // while these blades can rotate cheaply without rebuilding the floor geometry every frame.
+      for (const f of floor.furniture) {
+        if (f.type !== "fan_ceiling" && f.type !== "fan_floor") continue;
+        const solid = new GeoBuffer();
+        const edges = new LineBuffer();
+        pushFanRotor(solid, edges, f.type, f.w, f.d, f.h);
+        const rotor = new Group();
+        rotor.add(new Mesh(solid.geometry(), materials.wall), new LineSegments(edges.geometry(), materials.lines));
+        const holder = new Group();
+        const a = f.rotation * DEG;
+        holder.position.set(f.x, mountBase(floor, f), f.z);
+        holder.rotation.y = -a;
+        rotor.position.set(0, f.type === "fan_ceiling" ? f.h * 0.18 : f.h * 0.78, f.type === "fan_ceiling" ? 0 : f.d * 0.15);
+        holder.add(rotor);
+        group.add(holder);
+        const active = this.devices.some((d) => d.furnitureId === f.id && d.active);
+        this.fanRotors.set(f.id, { rotor, type: f.type, active });
+      }
       this.root.add(group);
 
       const label = document.createElement("button");
@@ -3322,6 +3365,7 @@ export class FloorplanViewer {
     const cameraMoving = this.controls.update(now);
     const floorsMoving = this.stepFloors(dt);
     const openingsMoving = this.stepOpenings(dt) || this.stepFridges(dt);
+    const fansMoving = this.stepFans(dt);
     let flashing = false;
     if (this.flashes.size) {
       // only the floors with a flashing lamp are recoloured (an expired flash needs one last pass)
@@ -3337,11 +3381,12 @@ export class FloorplanViewer {
     const roofMoving = this.placeRoof(dt);
     const robotsMoving = this.stepRobots(now);
     const weatherMoving = this.stepWeather(now);
-    const moving = cameraMoving || floorsMoving || openingsMoving || flashing || roofMoving;
+    const moving = cameraMoving || floorsMoving || openingsMoving || fansMoving || flashing || roofMoving;
     const busy: string[] = [];
     if (cameraMoving) busy.push("camera");
     if (floorsMoving) busy.push("floors");
     if (openingsMoving) busy.push("openings");
+    if (fansMoving) busy.push("fans");
     if (flashing) busy.push("flash");
     if (roofMoving) busy.push("roof");
     if (this.flowActive) busy.push("flow");

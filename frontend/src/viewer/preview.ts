@@ -4,7 +4,7 @@
 import { Box3, Color, LineBasicMaterial, LineSegments, Mesh, MeshBasicMaterial, OrthographicCamera, Scene, Vector3, WebGLRenderer } from "three";
 import type { Furniture } from "../model.ts";
 import { packItem, setPacks, type FurniturePack } from "../packs.ts";
-import { pushFurniture, pushPackLamp } from "./furniture.ts";
+import { pushFanRotor, pushFurniture, pushPackLamp } from "./furniture.ts";
 import { GeoBuffer, LineBuffer } from "./geo.ts";
 import { pushLampModel, type LampModel } from "./viewer3d.ts";
 
@@ -43,6 +43,17 @@ export function furniturePreview(item: PreviewItem, size = 180, packs?: Furnitur
   } else {
     const f: Furniture = { id: "preview", type: item.type, x: 0, z: 0, rotation: 0, w: item.w, d: item.d, h: item.h, variant: item.variant ?? null, entity: null, power: null };
     pushFurniture(buf, lines, new GeoBuffer(), f);
+    if (item.type === "fan_ceiling" || item.type === "fan_floor") {
+      const p0 = buf.p.length;
+      const l0 = lines.p.length;
+      pushFanRotor(buf, lines, item.type, item.w, item.d, item.h);
+      const y = item.type === "fan_ceiling" ? item.h * 0.18 : item.h * 0.78;
+      const z = item.type === "fan_ceiling" ? 0 : item.d * 0.15;
+      for (let i = p0 + 1; i < buf.p.length; i += 3) buf.p[i] += y;
+      for (let i = p0 + 2; i < buf.p.length; i += 3) buf.p[i] += z;
+      for (let i = l0 + 1; i < lines.p.length; i += 3) lines.p[i] += y;
+      for (let i = l0 + 2; i < lines.p.length; i += 3) lines.p[i] += z;
+    }
   }
   const scene = new Scene();
   // the neon palette is made for a dark room: pictures get a little more light and brighter edges

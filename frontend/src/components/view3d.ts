@@ -1550,7 +1550,7 @@ export class Fp3dView3d extends LitElement {
         } else if (f.type === "water_pump" && running) {
           screens.set(f.id, { color: [0.2, 0.78, 1], level: 0.85, plain: true });
         } else if (f.type === "water_heater" && running) {
-          screens.set(f.id, { color: [1, 0.48, 0.16], level: 0.85, plain: true });
+          screens.set(f.id, { color: [0.2, 0.78, 1], level: 0.85, plain: true });
         } else if (["range_hood", "microwave", "water_purifier"].includes(f.type) && running) {
           screens.set(f.id, { color: f.type === "microwave" ? [1, 0.58, 0.2] : [0.2, 0.78, 1], level: 0.8, plain: true });
         } else if ((f.type === "washer" || f.type === "dryer" || f.type === "dishwasher") && running) {

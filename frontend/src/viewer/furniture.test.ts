@@ -3,7 +3,7 @@ import { test } from "node:test";
 import type { Furniture } from "../model.ts";
 import { mountBase, setPacks, type FurniturePack } from "../packs.ts";
 import { FURNITURE_SIZE, newFloor } from "../model.ts";
-import { pushFurniture, screenRect } from "./furniture.ts";
+import { pushFanRotor, pushFurniture, screenRect } from "./furniture.ts";
 import { GeoBuffer, LineBuffer } from "./geo.ts";
 
 const PACK: FurniturePack = {
@@ -159,6 +159,18 @@ test("Vietnamese home furniture builds finite dedicated geometry at the correct 
   assert.ok(indicator.y0 > 1.7 && indicator.y1 < 2.15, "the water heater exposes its live status lamp");
   floor.furniture.push({ id: "counter", type: "worktop", x: 1, z: 1, w: 1.2, d: 0.62, h: 0.91, rotation: 0, variant: null } as Furniture);
   assert.equal(mountBase(floor, { type: "microwave", x: 1, z: 1, h: 0.3 }), 0.91);
+});
+
+test("ceiling and floor fans have separate finite rotors for live animation", () => {
+  for (const type of ["fan_ceiling", "fan_floor"] as const) {
+    const [w, d, h] = FURNITURE_SIZE[type];
+    const buf = new GeoBuffer();
+    const lines = new LineBuffer();
+    pushFanRotor(buf, lines, type, w, d, h);
+    assert.ok(buf.count > 20, `${type}: solid blades and hub`);
+    assert.ok(lines.p.length > 0, `${type}: outlined rotor`);
+    assert.ok(buf.p.every(Number.isFinite) && lines.p.every(Number.isFinite), `${type}: finite geometry`);
+  }
 });
 
 /** Signed volume of a closed-ish mesh: positive when its triangles face outwards. */

@@ -4,6 +4,13 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.18.2
+
+### Changed
+
+- Replaced the red and warm accents on the Vietnamese-home furniture with the existing blue-cyan neon palette.
+- Made ceiling and floor fan blades rotate while their linked Home Assistant entity is on and stop when it is off.
+
 ## 1.18.1
 
 ### Changed

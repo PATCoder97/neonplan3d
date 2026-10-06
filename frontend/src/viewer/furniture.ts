@@ -27,14 +27,6 @@ const C = {
   plantTop: 0x1a4540,
   pot: 0x1d2640,
   accent: 0x2b8fb3,
-  // Warmer, familiar finishes used by the Vietnamese-home collection. They still sit inside the
-  // dark neon palette, but keep timber, brass, steel and painted appliances visually distinct.
-  vnWood: 0x4a1f1b,
-  vnWoodTop: 0x71362a,
-  brass: 0xa66d27,
-  steel: 0x66738b,
-  ceramic: 0xd3d8df,
-  red: 0xa83d36,
 };
 
 const EDGE_FURN = shade(0x5b7cff, 0.3);
@@ -844,10 +836,10 @@ function altar(b: Builder, w: number, d: number, h: number): void {
   const leg = Math.min(0.09, w * 0.08);
   // Four legs and the carved front apron leave the base open like a traditional tủ thờ.
   for (const x of [-w / 2 + leg, w / 2 - leg]) {
-    for (const z of [-d / 2 + leg, d / 2 - leg]) b.loft([x - leg * 0.36, x + leg * 0.36, z - leg * 0.36, z + leg * 0.36], [x - leg / 2, x + leg / 2, z - leg / 2, z + leg / 2], 0, top - 0.03, C.vnWood, C.vnWoodTop);
+    for (const z of [-d / 2 + leg, d / 2 - leg]) b.loft([x - leg * 0.36, x + leg * 0.36, z - leg * 0.36, z + leg * 0.36], [x - leg / 2, x + leg / 2, z - leg / 2, z + leg / 2], 0, top - 0.03, C.wood, C.woodTop);
   }
-  b.box(-w / 2, w / 2, top - 0.08, top, -d / 2, d / 2, C.vnWood, C.vnWoodTop, EDGE_FURN);
-  b.box(-w * 0.43, w * 0.43, h * 0.18, top - 0.1, d / 2 - 0.065, d / 2, C.vnWood, C.vnWoodTop, EDGE_FURN);
+  b.box(-w / 2, w / 2, top - 0.08, top, -d / 2, d / 2, C.wood, C.woodTop, EDGE_FURN);
+  b.box(-w * 0.43, w * 0.43, h * 0.18, top - 0.1, d / 2 - 0.065, d / 2, C.wood, C.woodTop, EDGE_FURN);
   // Repeating panel lines and a central diamond suggest carved timber without costly meshes.
   for (const x of [-w * 0.28, 0, w * 0.28]) b.seg(x, h * 0.23, d / 2 + 0.004, x, top - 0.16, d / 2 + 0.004, EDGE_FAINT);
   b.seg(-w * 0.12, h * 0.4, d / 2 + 0.006, 0, h * 0.52, d / 2 + 0.006, EDGE_GLOW);
@@ -855,32 +847,32 @@ function altar(b: Builder, w: number, d: number, h: number): void {
   b.seg(w * 0.12, h * 0.4, d / 2 + 0.006, 0, h * 0.28, d / 2 + 0.006, EDGE_GLOW);
   b.seg(0, h * 0.28, d / 2 + 0.006, -w * 0.12, h * 0.4, d / 2 + 0.006, EDGE_GLOW);
   // Incense bowl, three incense sticks and two brass candle holders.
-  b.cyl(0, d * 0.06, Math.min(w, d) * 0.09, top, top + h * 0.075, C.brass, C.vnWoodTop, 14, EDGE_GLOW);
-  for (const x of [-w * 0.035, 0, w * 0.035]) b.box(x - 0.006, x + 0.006, top + h * 0.06, top + h * 0.2, d * 0.05, d * 0.065, C.red);
+  b.cyl(0, d * 0.06, Math.min(w, d) * 0.09, top, top + h * 0.075, C.accent, C.woodTop, 14, EDGE_GLOW);
+  for (const x of [-w * 0.035, 0, w * 0.035]) b.box(x - 0.006, x + 0.006, top + h * 0.06, top + h * 0.2, d * 0.05, d * 0.065, C.accent);
   for (const x of [-w * 0.28, w * 0.28]) {
-    b.cyl(x, d * 0.02, Math.min(w, d) * 0.035, top, top + h * 0.035, C.brass, C.brass, 10);
-    b.cyl(x, d * 0.02, Math.min(w, d) * 0.017, top + h * 0.035, top + h * 0.15, C.brass, C.brass, 8);
+    b.cyl(x, d * 0.02, Math.min(w, d) * 0.035, top, top + h * 0.035, C.metal, C.metal, 10);
+    b.cyl(x, d * 0.02, Math.min(w, d) * 0.017, top + h * 0.035, top + h * 0.15, C.metal, C.metal, 8);
   }
   // Ancestral tablet/back panel and a layered canopy.
-  b.box(-w * 0.18, w * 0.18, top + h * 0.04, h * 0.85, -d * 0.33, -d * 0.27, C.vnWood, C.vnWoodTop, EDGE_GLOW);
-  b.box(-w * 0.46, w * 0.46, h * 0.875, h * 0.92, -d * 0.42, d * 0.36, C.vnWood, C.vnWoodTop, EDGE_FURN);
-  for (const x of [-w * 0.4, w * 0.4]) b.box(x - leg / 2, x + leg / 2, top, h * 0.92, -d * 0.36, -d * 0.26, C.vnWood, C.vnWoodTop, EDGE_FURN);
-  b.loft([-w / 2, w / 2, -d / 2, d * 0.42], [-w * 0.42, w * 0.42, -d * 0.42, d * 0.31], h * 0.92, h, C.vnWood, C.vnWoodTop, EDGE_FURN);
+  b.box(-w * 0.18, w * 0.18, top + h * 0.04, h * 0.85, -d * 0.33, -d * 0.27, C.wood, C.woodTop, EDGE_GLOW);
+  b.box(-w * 0.46, w * 0.46, h * 0.875, h * 0.92, -d * 0.42, d * 0.36, C.wood, C.woodTop, EDGE_FURN);
+  for (const x of [-w * 0.4, w * 0.4]) b.box(x - leg / 2, x + leg / 2, top, h * 0.92, -d * 0.36, -d * 0.26, C.wood, C.woodTop, EDGE_FURN);
+  b.loft([-w / 2, w / 2, -d / 2, d * 0.42], [-w * 0.42, w * 0.42, -d * 0.42, d * 0.31], h * 0.92, h, C.wood, C.woodTop, EDGE_FURN);
 }
 
 /** Compact altar shelf mounted on a wall, with a back panel and incense bowl. */
 function wallAltar(b: Builder, w: number, d: number, h: number): void {
   const shelf = h * 0.18;
-  b.box(-w / 2, w / 2, shelf, shelf + h * 0.14, -d / 2, d / 2, C.vnWood, C.vnWoodTop, EDGE_FURN);
-  b.box(-w * 0.43, w * 0.43, shelf + h * 0.14, h * 0.86, -d / 2, -d / 2 + Math.min(0.05, d * 0.18), C.vnWood, C.vnWoodTop, EDGE_FURN);
+  b.box(-w / 2, w / 2, shelf, shelf + h * 0.14, -d / 2, d / 2, C.wood, C.woodTop, EDGE_FURN);
+  b.box(-w * 0.43, w * 0.43, shelf + h * 0.14, h * 0.86, -d / 2, -d / 2 + Math.min(0.05, d * 0.18), C.wood, C.woodTop, EDGE_FURN);
   // Two angled braces support the shelf against the wall.
   for (const x of [-w * 0.36, w * 0.36]) {
-    b.box(x - 0.025, x + 0.025, 0, shelf, -d / 2, -d * 0.18, C.vnWood, C.vnWoodTop, EDGE_FURN);
+    b.box(x - 0.025, x + 0.025, 0, shelf, -d / 2, -d * 0.18, C.wood, C.woodTop, EDGE_FURN);
     b.seg(x, h * 0.02, -d * 0.18, x, shelf, d * 0.34, EDGE_FURN);
   }
-  b.loft([-w / 2, w / 2, -d / 2, d / 2], [-w * 0.42, w * 0.42, -d * 0.42, d * 0.36], h * 0.86, h, C.vnWood, C.vnWoodTop, EDGE_FURN);
-  b.cyl(0, d * 0.08, Math.min(w, d) * 0.09, shelf + h * 0.14, shelf + h * 0.28, C.brass, C.vnWoodTop, 12, EDGE_GLOW);
-  for (const x of [-w * 0.03, 0, w * 0.03]) b.box(x - 0.005, x + 0.005, shelf + h * 0.25, shelf + h * 0.5, d * 0.075, d * 0.09, C.red);
+  b.loft([-w / 2, w / 2, -d / 2, d / 2], [-w * 0.42, w * 0.42, -d * 0.42, d * 0.36], h * 0.86, h, C.wood, C.woodTop, EDGE_FURN);
+  b.cyl(0, d * 0.08, Math.min(w, d) * 0.09, shelf + h * 0.14, shelf + h * 0.28, C.accent, C.woodTop, 12, EDGE_GLOW);
+  for (const x of [-w * 0.03, 0, w * 0.03]) b.box(x - 0.005, x + 0.005, shelf + h * 0.25, shelf + h * 0.5, d * 0.075, d * 0.09, C.accent);
 }
 
 function shoeCabinet(b: Builder, w: number, d: number, h: number): void {
@@ -905,7 +897,7 @@ function motorbike(b: Builder, w: number, d: number, h: number): void {
     b.lyingCyl("x", 0, z, wheel * 0.16, wheel * 0.84, axle + 0.012, wheel * 0.46, C.metal, C.metal, 12, EDGE_FAINT);
   }
   // Step-through fairing, footboard and rear engine casing.
-  b.loft([-w * 0.3, w * 0.3, rearZ, d * 0.12], [-w * 0.2, w * 0.2, -d * 0.18, d * 0.06], wheel * 0.45, h * 0.58, C.red, C.bodyTop, EDGE_FURN);
+  b.loft([-w * 0.3, w * 0.3, rearZ, d * 0.12], [-w * 0.2, w * 0.2, -d * 0.18, d * 0.06], wheel * 0.45, h * 0.58, C.body, C.bodyTop, EDGE_FURN);
   b.box(-w * 0.3, w * 0.3, wheel * 0.37, wheel * 0.44, -d * 0.08, d * 0.22, C.dark, C.metal, EDGE_FAINT);
   b.lyingCyl("z", w * 0.24, rearZ - d * 0.04, wheel * 0.2, wheel * 0.47, d * 0.4, wheel * 0.25, C.metal, C.dark, 10, EDGE_FAINT);
   b.pad(-w * 0.3, w * 0.3, h * 0.52, h * 0.62, -d * 0.25, d * 0.05, C.dark, C.fabricTop, 0.025, EDGE_FURN);
@@ -915,8 +907,8 @@ function motorbike(b: Builder, w: number, d: number, h: number): void {
   b.seg(-w * 0.19, wheel * 0.63, rearZ, -w * 0.21, h * 0.54, -d * 0.12, EDGE_FAINT);
   b.seg(w * 0.19, wheel * 0.63, rearZ, w * 0.21, h * 0.54, -d * 0.12, EDGE_FAINT);
   b.seg(-w * 0.36, h * 0.9, frontZ, w * 0.36, h * 0.9, frontZ, EDGE_GLOW);
-  b.box(-w * 0.23, w * 0.23, h * 0.72, h * 0.98, frontZ - d * 0.07, frontZ + d * 0.07, C.red, C.bodyTop, EDGE_FURN);
-  b.cyl(0, frontZ + d * 0.075, Math.min(w, d) * 0.07, h * 0.82, h * 0.94, C.ceramic, C.accent, 12, EDGE_GLOW);
+  b.box(-w * 0.23, w * 0.23, h * 0.72, h * 0.98, frontZ - d * 0.07, frontZ + d * 0.07, C.body, C.bodyTop, EDGE_FURN);
+  b.cyl(0, frontZ + d * 0.075, Math.min(w, d) * 0.07, h * 0.82, h * 0.94, C.white, C.accent, 12, EDGE_GLOW);
   // Mirrors and rear rack, common on everyday Vietnamese step-through bikes.
   for (const sx of [-1, 1]) {
     b.seg(sx * w * 0.22, h * 0.9, frontZ, sx * w * 0.39, h, frontZ - d * 0.04, EDGE_FURN);
@@ -929,28 +921,17 @@ function ceilingFan(b: Builder, w: number, d: number, h: number): void {
   const y = h * 0.18;
   b.cyl(0, 0, Math.min(w, d) * 0.115, y, h * 0.62, C.body, C.bodyTop, 16, EDGE_FURN);
   b.cyl(0, 0, Math.min(w, d) * 0.025, h * 0.7, h, C.metal, C.metal, 8);
-  // Three tapered blades have a more natural silhouette than crossed rectangular bars.
-  const bladeW = Math.min(w, d) * 0.13;
-  for (const a of [0, 120, 240]) {
-    b.rotated(0, 0, a).loft([w * 0.08, w * 0.48, -bladeW * 0.52, bladeW * 0.52], [w * 0.12, w * 0.46, -bladeW * 0.32, bladeW * 0.32], y, y + h * 0.07, C.vnWood, C.vnWoodTop, EDGE_FURN);
-  }
-  b.cyl(0, 0, Math.min(w, d) * 0.14, y - h * 0.035, y + h * 0.08, C.body, C.bodyTop, 18, EDGE_GLOW);
 }
 
 function floorFan(b: Builder, w: number, d: number, h: number): void {
   b.loft([-w * 0.4, w * 0.4, -d * 0.33, d * 0.33], [-w * 0.34, w * 0.34, -d * 0.28, d * 0.28], 0, h * 0.045, C.body, C.metal, EDGE_FURN);
-  b.cyl(0, 0, Math.min(w, d) * 0.055, h * 0.04, h * 0.62, C.steel, C.metal, 10);
+  b.cyl(0, 0, Math.min(w, d) * 0.055, h * 0.04, h * 0.62, C.metal, C.metal, 10);
   b.box(-w * 0.13, w * 0.13, h * 0.06, h * 0.14, -d * 0.2, d * 0.2, C.body, C.bodyTop, EDGE_FAINT);
   for (const x of [-w * 0.07, 0, w * 0.07]) b.cyl(x, d * 0.12, w * 0.018, h * 0.14, h * 0.155, C.accent, C.accent, 8, EDGE_GLOW);
   const cy = h * 0.78;
   const r = Math.min(w, h * 0.42) * 0.46;
   b.lyingCyl("z", 0, 0, cy - r * 0.25, cy + r * 0.25, d * 0.28, r * 0.25, C.body, C.bodyTop, 14, EDGE_FURN);
-  // Five swept blades, front and rear cage rings, and radial cage wires.
-  for (let i = 0; i < 5; i++) {
-    const a = (i / 5) * Math.PI * 2;
-    const a1 = a + 0.48;
-    b.seg(Math.cos(a) * r * 0.13, cy + Math.sin(a) * r * 0.13, d * 0.145, Math.cos(a1) * r * 0.72, cy + Math.sin(a1) * r * 0.72, d * 0.145, EDGE_FURN);
-  }
+  // Front and rear cage rings with radial cage wires; the blades are a separate live rotor.
   for (let i = 0; i < 12; i++) {
     const a = (i / 12) * Math.PI * 2;
     b.seg(Math.cos(a) * r * 0.18, cy + Math.sin(a) * r * 0.18, d * 0.15, Math.cos(a) * r, cy + Math.sin(a) * r, d * 0.15, EDGE_FAINT);
@@ -960,17 +941,56 @@ function floorFan(b: Builder, w: number, d: number, h: number): void {
   ring(b, 0, cy, r, -d * 0.15, 28);
 }
 
+/** Moving blades of a built-in fan, centred on its rotation axis for the viewer to spin as one group. */
+export function pushFanRotor(buf: GeoBuffer, lines: LineBuffer, type: "fan_ceiling" | "fan_floor", w: number, d: number, h: number): void {
+  if (type === "fan_ceiling") {
+    const b = new Builder(buf, lines, (x, z) => [x, z]);
+    const bladeW = Math.min(w, d) * 0.13;
+    // Three tapered blades have a natural silhouette while remaining light enough for live animation.
+    for (const a of [0, 120, 240]) {
+      b.rotated(0, 0, a).loft([w * 0.08, w * 0.48, -bladeW * 0.52, bladeW * 0.52], [w * 0.12, w * 0.46, -bladeW * 0.32, bladeW * 0.32], 0, h * 0.07, C.wood, C.woodTop, EDGE_FURN);
+    }
+    b.cyl(0, 0, Math.min(w, d) * 0.14, -h * 0.035, h * 0.08, C.body, C.bodyTop, 18, EDGE_GLOW);
+    return;
+  }
+
+  const r = Math.min(w, h * 0.42) * 0.46;
+  const z0 = -Math.max(0.008, d * 0.018);
+  const z1 = -z0;
+  const front = new Color(C.bodyTop);
+  const side = new Color(C.body);
+  const P = (radius: number, angle: number): [number, number] => [Math.cos(angle) * radius, Math.sin(angle) * radius];
+  for (let i = 0; i < 5; i++) {
+    const a = (i / 5) * Math.PI * 2;
+    const poly = [P(r * 0.14, a - 0.08), P(r * 0.7, a + 0.12), P(r * 0.84, a + 0.48), P(r * 0.24, a + 0.42)];
+    const V = (p: [number, number], z: number) => [p[0], p[1], z];
+    // Front, back and four thin sides make each blade visible from either side of the cage.
+    buf.tri(V(poly[0], z1), V(poly[1], z1), V(poly[2], z1), front);
+    buf.tri(V(poly[0], z1), V(poly[2], z1), V(poly[3], z1), front);
+    buf.tri(V(poly[0], z0), V(poly[2], z0), V(poly[1], z0), side);
+    buf.tri(V(poly[0], z0), V(poly[3], z0), V(poly[2], z0), side);
+    for (let j = 0; j < poly.length; j++) {
+      const k = (j + 1) % poly.length;
+      buf.tri(V(poly[j], z0), V(poly[k], z1), V(poly[k], z0), side);
+      buf.tri(V(poly[j], z0), V(poly[j], z1), V(poly[k], z1), side);
+      lines.seg(V(poly[j], z1), V(poly[k], z1), EDGE_FURN, ALWAYS);
+    }
+  }
+  const b = new Builder(buf, lines, (x, z) => [x, z]);
+  b.lyingCyl("z", 0, 0, -r * 0.13, r * 0.13, d * 0.12, r * 0.26, C.body, C.bodyTop, 14, EDGE_GLOW);
+}
+
 /** Horizontal wall-mounted storage water heater with pipes and status lamp. */
 function waterHeater(b: Builder, w: number, d: number, h: number): void {
   const dia = Math.min(d * 0.88, h * 0.92);
   const y0 = (h - dia) / 2;
-  b.lyingCyl("x", 0, 0, y0, y0 + dia, w * 0.9, dia, C.ceramic, C.whiteTop, 22, EDGE_FURN);
+  b.lyingCyl("x", 0, 0, y0, y0 + dia, w * 0.9, dia, C.white, C.whiteTop, 22, EDGE_FURN);
   // End caps, wall brackets, hot/cold pipes and a small thermostat panel.
   for (const x of [-w * 0.46, w * 0.46]) b.lyingCyl("x", x, 0, y0 + dia * 0.04, y0 + dia * 0.96, w * 0.035, dia * 0.92, C.white, C.whiteTop, 18, EDGE_FAINT);
-  for (const x of [-w * 0.28, w * 0.28]) b.box(x - 0.025, x + 0.025, 0, y0 + dia * 0.25, -d * 0.42, -d * 0.28, C.steel, C.steel);
-  for (const [x, color] of [[-w * 0.2, C.accent], [w * 0.2, C.red]] as [number, number][]) {
+  for (const x of [-w * 0.28, w * 0.28]) b.box(x - 0.025, x + 0.025, 0, y0 + dia * 0.25, -d * 0.42, -d * 0.28, C.metal, C.metal);
+  for (const [x, color] of [[-w * 0.2, C.accent], [w * 0.2, C.fabricTop]] as [number, number][]) {
     b.cyl(x, d * 0.05, Math.min(w, d) * 0.025, 0, y0 + dia * 0.18, color, color, 10, EDGE_FAINT);
-    b.cyl(x, d * 0.05, Math.min(w, d) * 0.04, y0 + dia * 0.14, y0 + dia * 0.2, C.brass, C.brass, 10);
+    b.cyl(x, d * 0.05, Math.min(w, d) * 0.04, y0 + dia * 0.14, y0 + dia * 0.2, C.metal, C.metal, 10);
   }
   b.box(w * 0.18, w * 0.4, y0 + dia * 0.38, y0 + dia * 0.68, d * 0.43, d * 0.48, C.body, C.glass, EDGE_GLOW);
   b.seg(w * 0.24, y0 + dia * 0.53, d * 0.485, w * 0.35, y0 + dia * 0.53, d * 0.485, EDGE_GLOW);
@@ -996,8 +1016,8 @@ function dryingRack(b: Builder, w: number, d: number, h: number): void {
 
 function shoeBench(b: Builder, w: number, d: number, h: number): void {
   const frame = Math.min(0.045, w * 0.04);
-  for (const x of [-w / 2 + frame, w / 2 - frame]) b.box(x - frame, x + frame, 0, h * 0.64, -d / 2 + frame, d / 2 - frame, C.vnWood, C.vnWoodTop, EDGE_FURN);
-  for (const y of [h * 0.18, h * 0.4]) b.box(-w / 2 + frame, w / 2 - frame, y - frame / 2, y + frame / 2, -d / 2 + frame, d / 2 - frame, C.vnWood, C.vnWoodTop, EDGE_FAINT);
+  for (const x of [-w / 2 + frame, w / 2 - frame]) b.box(x - frame, x + frame, 0, h * 0.64, -d / 2 + frame, d / 2 - frame, C.wood, C.woodTop, EDGE_FURN);
+  for (const y of [h * 0.18, h * 0.4]) b.box(-w / 2 + frame, w / 2 - frame, y - frame / 2, y + frame / 2, -d / 2 + frame, d / 2 - frame, C.wood, C.woodTop, EDGE_FAINT);
   const n = Math.max(2, Math.round(w / 0.35));
   for (let i = 1; i < n; i++) b.seg(-w / 2 + (w * i) / n, h * 0.08, d / 2 + 0.003, -w / 2 + (w * i) / n, h * 0.58, d / 2 + 0.003, EDGE_FAINT);
   b.pad(-w / 2, w / 2, h * 0.62, h, -d / 2, d / 2, C.cushion, C.fabricTop, 0.025, EDGE_FURN);
@@ -1031,7 +1051,7 @@ function waterPurifier(b: Builder, w: number, d: number, h: number): void {
   b.box(-w / 2, w / 2, 0, h, -d / 2, d / 2, C.white, C.whiteTop, EDGE_FURN);
   b.box(-w * 0.34, w * 0.34, h * 0.44, h * 0.72, d / 2, d / 2 + 0.008, C.dark, C.dark, EDGE_GLOW);
   for (const x of [-w * 0.14, w * 0.14]) {
-    b.cyl(x, d / 2 + 0.015, w * 0.035, h * 0.55, h * 0.68, x < 0 ? C.accent : 0xc75b4d, x < 0 ? C.accent : 0xc75b4d, 8);
+    b.cyl(x, d / 2 + 0.015, w * 0.035, h * 0.55, h * 0.68, x < 0 ? C.accent : C.fabricTop, x < 0 ? C.accent : C.fabricTop, 8);
     b.box(x - w * 0.025, x + w * 0.025, h * 0.46, h * 0.56, d / 2, d / 2 + 0.04, C.metal);
   }
   b.seg(-w * 0.32, h * 0.12, d / 2 + 0.006, w * 0.32, h * 0.12, d / 2 + 0.006, EDGE_FAINT);
