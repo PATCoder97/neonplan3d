@@ -3747,7 +3747,7 @@ export class Fp3dEditor extends LitElement {
     const speakerish = /speaker|sound|subwoofer|receiver|smart_|display|tv|media|turntable|projector|console/;
     const fits = (t: string): boolean => {
       if (kind === "light") return isLamp(t);
-      if (kind === "climate") return t === "radiator";
+      if (kind === "climate") return t === "radiator" || t === "air_conditioner";
       if (entityId.startsWith("vacuum.")) return t === "robot_vacuum";
       if (kind === "media") return hasScreen(t) || (isElectric(t) && speakerish.test(t));
       return isElectric(t) && !isLamp(t);
@@ -5968,7 +5968,7 @@ export class Fp3dEditor extends LitElement {
         : media
           ? // a media player, or the smart plug an older TV is switched with
             /^(media_player|switch|input_boolean|light)\./.test(id)
-          : f.type === "radiator"
+          : f.type === "radiator" || f.type === "air_conditioner"
             ? id.startsWith("climate.")
             : f.type === "robot_vacuum"
               ? id.startsWith("vacuum.")
@@ -5980,7 +5980,7 @@ export class Fp3dEditor extends LitElement {
     return html`<div class="fp3d-form fp3d-links">
         ${f.type === "grid_point"
           ? html`<p class="fp3d-sub fp3d-wide">${this.t("grid_point_hint")}</p>`
-          : this.entitySelect(this.t(lamp ? "furn_entity_light" : media ? "furn_entity_tv" : f.type === "radiator" ? "furn_entity_climate" : f.type === "robot_vacuum" ? "furn_entity_vacuum" : "furn_entity"), f.entity ?? null, autoPick("entity"), entities, (v) =>
+          : this.entitySelect(this.t(lamp ? "furn_entity_light" : media ? "furn_entity_tv" : f.type === "radiator" || f.type === "air_conditioner" ? "furn_entity_climate" : f.type === "robot_vacuum" ? "furn_entity_vacuum" : "furn_entity"), f.entity ?? null, autoPick("entity"), entities, (v) =>
               this.updateFurniture({ entity: v }),
             )}
         ${!lamp && !(ENERGY_DEVICES as readonly string[]).includes(f.type) && !hasScreen(f.type)

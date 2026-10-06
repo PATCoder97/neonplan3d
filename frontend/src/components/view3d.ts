@@ -1541,6 +1541,12 @@ export class Fp3dView3d extends LitElement {
             const gap = typeof a.temperature === "number" && typeof a.current_temperature === "number" ? a.temperature - a.current_temperature : 1;
             screens.set(f.id, { color: [1, 0.42, 0.1], level: Math.min(1, 0.45 + 0.25 * Math.max(0, gap)) });
           }
+        } else if (f.type === "air_conditioner" && st && kindOf(st.entity_id) === "climate") {
+          const action = String(st.attributes.hvac_action ?? st.state);
+          if (!["off", "idle", "unavailable", "unknown"].includes(action)) {
+            const heating = action === "heating" || action === "heat";
+            screens.set(f.id, { color: heating ? [1, 0.5, 0.18] : [0.28, 0.8, 1], level: action === "cooling" || heating ? 0.85 : 0.55 });
+          }
         } else if ((f.type === "washer" || f.type === "dryer" || f.type === "dishwasher") && running) {
           screens.set(f.id, { color: [0.3, 0.85, 1], level: 0.8 });
         }

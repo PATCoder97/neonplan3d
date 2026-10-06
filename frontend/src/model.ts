@@ -750,6 +750,7 @@ export const FURNITURE_TYPES = [
   "lamp_bollard",
   "lamp_garden",
   "radiator",
+  "air_conditioner",
   "sofa",
   "armchair",
   "stool",
@@ -811,7 +812,8 @@ export const FURNITURE_GROUPS: Record<string, FurnitureType[]> = {
   kitchen: ["kitchen", "kitchen_wall", "kitchen_tall", "island", "worktop", "sink", "stove", "dishwasher", "fridge"],
   sleeping: ["bed", "bunk_bed", "nightstand", "wardrobe", "dresser"],
   bath: ["bathtub", "shower", "wc", "washbasin", "washer", "dryer"],
-  work: ["desk", "worktop", "office_chair", "tall_cabinet", "coat_rack", "radiator", "stairs", "stairs_landing", "robot_vacuum"],
+  climate: ["air_conditioner", "radiator"],
+  work: ["desk", "worktop", "office_chair", "tall_cabinet", "coat_rack", "stairs", "stairs_landing", "robot_vacuum"],
   vehicles: ["parking"],
 };
 
@@ -909,6 +911,8 @@ export function builtinBase(f: Pick<Furniture, "type" | "h"> & { variant?: strin
       return Math.max(0, 1.3 - f.h / 2);
     case "radiator":
       return 0.12;
+    case "air_conditioner":
+      return 1.9;
     case "inverter":
       return 1.1;
     case "wallbox":
@@ -932,6 +936,7 @@ export function surfaceHeight(floor: Floor, x: number, z: number): number {
 export const ELECTRIC_FURNITURE = new Set<string>([
   ...LAMP_TYPES,
   "radiator",
+  "air_conditioner",
   "robot_vacuum",
   "inverter",
   "home_battery",
@@ -999,6 +1004,7 @@ export const FURNITURE_SIZE: Record<FurnitureType, [number, number, number]> = {
   lamp_bollard: [0.16, 0.16, 0.8],
   lamp_garden: [0.12, 0.12, 0.3],
   radiator: [1.0, 0.1, 0.6],
+  air_conditioner: [1.0, 0.22, 0.3],
   robot_vacuum: [0.36, 0.5, 0.1],
   parking: [2.6, 5.2, 0.02],
   lamp_pendant: [0.4, 0.4, 0.8],

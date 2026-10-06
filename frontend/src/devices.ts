@@ -683,6 +683,7 @@ const FURNITURE_NAMES: Record<string, RegExp> = {
   island: /(kochfeld|herd|induktion|cooktop)/i,
   sink: /(spülmaschine|geschirrspül|dishwasher)/i,
   radiator: /(heiz|radiator|thermostat|climate|hk|trv)/i,
+  air_conditioner: /(klima|air ?condition|aircon|airco|split|điều hòa|dieu hoa|máy lạnh|may lanh)/i,
 };
 const MEDIA_FURNITURE = new Set(["tv_board", "tv_wall"]);
 
@@ -797,7 +798,7 @@ export function furnitureEntities(hass: HomeAssistant, floors: readonly Floor[])
           // vacuums are no device kind of their own: look them up in the room's area directly
           const area = room?.area_id ?? null;
           entity = Object.keys(hass.entities ?? {}).find((id) => id.startsWith("vacuum.") && !used.has(id) && entityAreaId(hass, id) === area) ?? null;
-        } else if (f.type === "radiator") {
+        } else if (f.type === "radiator" || f.type === "air_conditioner") {
           const climates = free.filter((id) => kindOf(id) === "climate");
           entity = climates.find((id) => pattern.test(name(id))) ?? climates[0] ?? null;
         } else if (isMediaFurniture(f.type)) {

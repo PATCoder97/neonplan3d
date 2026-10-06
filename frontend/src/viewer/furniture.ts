@@ -776,6 +776,29 @@ function radiator(b: Builder, w: number, d: number, h: number): void {
   }
 }
 
+/** Wall-mounted split air conditioner, with a dark outlet and movable-looking guide vanes. */
+function airConditioner(b: Builder, w: number, d: number, h: number): void {
+  const y0 = AIR_CONDITIONER_Y;
+  const front = d / 2;
+  // brackets against the wall
+  b.box(-w * 0.34, -w * 0.27, y0 + h * 0.2, y0 + h * 0.75, -d / 2 - 0.015, -d / 2 + 0.025, C.metal);
+  b.box(w * 0.27, w * 0.34, y0 + h * 0.2, y0 + h * 0.75, -d / 2 - 0.015, -d / 2 + 0.025, C.metal);
+  // main white indoor unit and its front cover
+  b.box(-w / 2, w / 2, y0, y0 + h, -d / 2, front, C.white, C.whiteTop, EDGE_FURN);
+  b.seg(-w * 0.42, y0 + h * 0.82, front + 0.003, w * 0.42, y0 + h * 0.82, front + 0.003, EDGE_FAINT);
+  // outlet, flap and vertical vanes along the underside/front
+  const ventY0 = y0 + h * 0.08;
+  const ventY1 = y0 + h * 0.27;
+  b.box(-w * 0.43, w * 0.43, ventY0, ventY1, front - 0.018, front + 0.006, C.dark, C.dark, EDGE_FAINT);
+  b.seg(-w * 0.42, ventY0 + h * 0.04, front + 0.009, w * 0.42, ventY1 - h * 0.025, front + 0.009, EDGE_GLOW);
+  for (let i = 1; i < 8; i++) {
+    const x = -w * 0.4 + w * 0.8 * (i / 8);
+    b.seg(x, ventY0 + h * 0.025, front + 0.011, x + w * 0.018, ventY1 - h * 0.025, front + 0.011, EDGE_FAINT);
+  }
+  // small status LED
+  b.seg(w * 0.37, y0 + h * 0.67, front + 0.006, w * 0.4, y0 + h * 0.67, front + 0.006, EDGE_GLOW);
+}
+
 /** A ring of glowing line on a front face (z = front), for dials and fans. */
 function ring(b: Builder, cx: number, cy: number, r: number, z: number, n = 20): void {
   for (let i = 0; i < n; i++) {
@@ -882,6 +905,8 @@ function homeBattery(b: Builder, w: number, d: number, h: number, variant: strin
 
 /** Height of the underside of a radiator. */
 export const RADIATOR_Y = 0.12;
+/** Default underside of a wall-mounted split air conditioner. */
+export const AIR_CONDITIONER_Y = 1.9;
 
 /**
  * Screen of a TV or monitor in local coordinates (x across, y up, z = its front face), for the glow
@@ -929,6 +954,7 @@ function builtInScreen(f: Furniture, w: number, d: number, h: number, floor?: Fl
   }
   // glowing fronts of appliances that run and of a radiator that heats
   if (f.type === "radiator") return { x0: -w / 2 + 0.02, x1: w / 2 - 0.02, y0: RADIATOR_Y + 0.02, y1: RADIATOR_Y + h - 0.02, z: d / 2 + 0.004 };
+  if (f.type === "air_conditioner") return { x0: -w * 0.43, x1: w * 0.43, y0: AIR_CONDITIONER_Y + h * 0.08, y1: AIR_CONDITIONER_Y + h * 0.27, z: d / 2 + 0.008 };
   if (f.type === "washer" || f.type === "dryer") {
     const cy = (h - 0.14) / 2 + 0.04;
     const r = Math.min(w * 0.36, (h - 0.2) * 0.42) * 0.8;
@@ -1162,6 +1188,9 @@ function buildFurniture(buf: GeoBuffer, lines: LineBuffer, shadow: GeoBuffer, f:
     case "radiator":
       radiator(b, w, d, h);
       return; // on the wall, no shadow on the floor
+    case "air_conditioner":
+      airConditioner(b, w, d, h);
+      return; // mounted high on the wall, no shadow on the floor
     case "inverter":
       inverter(b, w, d, h, f.variant ?? null);
       return;

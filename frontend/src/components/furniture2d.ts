@@ -137,6 +137,15 @@ export function furnitureSymbol(type: string, w: number, d: number): Part[] | ty
       for (let i = 1; i < n; i++) out.push(line(-w / 2 + (w / n) * i, -d / 2, -w / 2 + (w / n) * i, d / 2));
       return out;
     }
+    case "air_conditioner": {
+      // slim wall unit: casing, outlet and guide vanes viewed from above
+      const out: Part[] = [rect(-w / 2, -d / 2, w / 2, d / 2), line(-w * 0.43, d * 0.28, w * 0.43, d * 0.28, "fp3d-sym-strong")];
+      for (let i = 1; i < 6; i++) {
+        const x = -w * 0.4 + w * 0.8 * (i / 6);
+        out.push(line(x, d * 0.12, x + w * 0.025, d * 0.42));
+      }
+      return out;
+    }
     case "lamp_panel":
       return [rect(-w / 2 + 0.03, -d / 2 + 0.03, w / 2 - 0.03, d / 2 - 0.03, "fp3d-sym-fill")];
     case "lamp_uplight":

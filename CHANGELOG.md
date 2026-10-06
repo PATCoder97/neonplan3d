@@ -4,6 +4,12 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.14.0
+
+### New
+
+- **Wall-mounted split air conditioner:** a wall-mounted indoor unit with outlet flap, guide vanes and status light; it can automatically link to a room's Home Assistant `climate` entity and glows cool blue while cooling or warm while heating.
+
 ## 1.13.0
 
 ### New

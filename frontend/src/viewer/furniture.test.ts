@@ -3,7 +3,7 @@ import { test } from "node:test";
 import type { Furniture } from "../model.ts";
 import { mountBase, setPacks, type FurniturePack } from "../packs.ts";
 import { newFloor } from "../model.ts";
-import { pushFurniture } from "./furniture.ts";
+import { pushFurniture, screenRect } from "./furniture.ts";
 import { GeoBuffer, LineBuffer } from "./geo.ts";
 
 const PACK: FurniturePack = {
@@ -91,6 +91,22 @@ test("the mount height is absolute: a wall cabinet hangs at 1.45 m and can go lo
   assert.equal(mountBase(floor, cab), 1.45);
   assert.ok(Math.abs(minY(cab) - 1.45) < 1e-6);
   assert.ok(Math.abs(minY({ ...cab, mount_y: 1.0 }) - 1.0) < 1e-6);
+});
+
+test("a split air conditioner hangs high on the wall and exposes its outlet as the active face", () => {
+  const ac = { id: "ac", type: "air_conditioner", x: 0, z: 0, w: 1, d: 0.22, h: 0.3, rotation: 0, variant: null } as Furniture;
+  const floor = newFloor("eg", "EG", 0);
+  const buf = new GeoBuffer();
+  const shadow = new GeoBuffer();
+  const base = mountBase(floor, ac);
+  pushFurniture(buf, new LineBuffer(), shadow, ac, base);
+  const ys = buf.p.filter((_, i) => i % 3 === 1);
+  assert.equal(base, 1.9);
+  assert.ok(Math.abs(Math.min(...ys) - 1.9) < 1e-6);
+  assert.ok(Math.abs(Math.max(...ys) - 2.2) < 1e-6);
+  assert.equal(shadow.p.length, 0, "a wall unit casts no floor contact shadow");
+  const outlet = screenRect(ac, floor)!;
+  assert.ok(outlet.y0 >= 1.9 && outlet.y1 < 2.2 && outlet.x0 < 0 && outlet.x1 > 0);
 });
 
 /** Signed volume of a closed-ish mesh: positive when its triangles face outwards. */

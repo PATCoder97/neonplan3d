@@ -25,6 +25,7 @@ test("pack furniture resolves by type, with size, name and power link", () => {
   assert.equal(packItem(type), undefined);
   assert.deepEqual(furnitureSize(type), [0.6, 0.6, 0.8]);
   assert.equal(isElectric(type), false);
+  assert.equal(isElectric("air_conditioner"), true);
 });
 
 test("pack items stand on the floor, on furniture, on a wall or hang from the ceiling", () => {

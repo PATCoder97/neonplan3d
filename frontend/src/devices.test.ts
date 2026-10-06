@@ -589,3 +589,18 @@ test("a desk's monitor does not take the room's smart speaker, a placed device s
   const placed = furnitureEntities(hass, [{ ...newFloor("eg", "EG", 0), rooms: [room], furniture: [tv], placements: [{ entity_id: "media_player.echo_show_buero", x: 3.8, z: 2.8, y: null }] }]);
   assert.equal(placed.get("t")?.entity ?? null, null);
 });
+
+test("a wall air conditioner automatically takes the room's climate entity", () => {
+  const st = (entity_id: string, state: string, attributes: Record<string, unknown> = {}) => ({ entity_id, state, attributes });
+  const hass = {
+    language: "vi",
+    states: { "climate.dieu_hoa_phong_khach": st("climate.dieu_hoa_phong_khach", "cool", { friendly_name: "Điều hòa phòng khách", hvac_action: "cooling" }) },
+    entities: { "climate.dieu_hoa_phong_khach": { entity_id: "climate.dieu_hoa_phong_khach", area_id: "phong_khach" } },
+    devices: {},
+    areas: { phong_khach: { area_id: "phong_khach", name: "Phòng khách" } },
+  } as unknown as HomeAssistant;
+  const room = { id: "r", name: "Phòng khách", area_id: "phong_khach", points: [[0, 0], [4, 0], [4, 4], [0, 4]] as [number, number][], floor_material: "wood" as const };
+  const ac = { id: "ac", type: "air_conditioner", x: 2, z: 0.2, w: 1, d: 0.22, h: 0.3, rotation: 0, variant: null };
+  const links = furnitureEntities(hass, [{ ...newFloor("eg", "Tầng trệt", 0), rooms: [room], furniture: [ac] }]);
+  assert.equal(links.get("ac")?.entity, "climate.dieu_hoa_phong_khach");
+});
