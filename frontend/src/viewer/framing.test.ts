@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { Vector3 } from "three";
+import { Box3, Vector3 } from "three";
 import { newFloor } from "../model.ts";
-import { cameraFitRadius, cameraFitView, framingBox } from "./framing.ts";
+import { cameraFitPlacement, cameraFitRadius, cameraFitView, framingBox } from "./framing.ts";
 
 test("camera framing includes rooms, outdoor structures and free walls", () => {
   const floor = newFloor("ground", "Ground", 0);
@@ -60,4 +60,46 @@ test("a long narrow building turns further across a wide screen before it is fit
   assert.equal(fitted.theta, -0.95);
   assert.ok(fitted.radius < diagonal * 0.9);
   assert.equal(cameraFitView(box, 0.85, 9 / 16, fov, 1.12).theta, -0.6, "portrait screens keep the balanced diagonal");
+});
+
+test("camera placement tightly uses the screen area beside floor thumbnails", () => {
+  const box = new Box3(new Vector3(0, 0, 0), new Vector3(5.5, 3, 21.6));
+  const width = 1600;
+  const height = 900;
+  const theta = -0.95;
+  const phi = 0.85;
+  const fov = (38 * Math.PI) / 180;
+  const frame = { width, height, left: 192, right: 18, top: 18, bottom: 18 };
+  const fit = cameraFitPlacement(box, theta, phi, width / height, fov, frame);
+  const center = box.getCenter(new Vector3()).add(fit.offset);
+  const towardCamera = new Vector3(Math.sin(phi) * Math.sin(theta), Math.cos(phi), Math.sin(phi) * Math.cos(theta));
+  const right = new Vector3(Math.cos(theta), 0, -Math.sin(theta));
+  const up = new Vector3(-Math.sin(theta) * Math.cos(phi), Math.sin(phi), -Math.cos(theta) * Math.cos(phi));
+  const tanV = Math.tan(fov / 2);
+  const tanH = tanV * (width / height);
+  let minX = Infinity;
+  let maxX = -Infinity;
+  let minY = Infinity;
+  let maxY = -Infinity;
+  for (const x of [box.min.x, box.max.x])
+    for (const y of [box.min.y, box.max.y])
+      for (const z of [box.min.z, box.max.z]) {
+        const p = new Vector3(x, y, z).sub(center);
+        const depth = fit.radius - p.dot(towardCamera);
+        const sx = p.dot(right) / (depth * tanH);
+        const sy = p.dot(up) / (depth * tanV);
+        minX = Math.min(minX, sx);
+        maxX = Math.max(maxX, sx);
+        minY = Math.min(minY, sy);
+        maxY = Math.max(maxY, sy);
+      }
+  const left = -1 + (2 * frame.left) / width;
+  const rightEdge = 1 - (2 * frame.right) / width;
+  const bottom = -1 + (2 * frame.bottom) / height;
+  const top = 1 - (2 * frame.top) / height;
+
+  assert.ok(minX >= left - 1e-9 && maxX <= rightEdge + 1e-9);
+  assert.ok(minY >= bottom - 1e-9 && maxY <= top + 1e-9);
+  assert.ok(Math.min(Math.abs(minX - left), Math.abs(maxX - rightEdge), Math.abs(minY - bottom), Math.abs(maxY - top)) < 1e-8, "one projected edge is tight");
+  assert.ok(fit.offset.length() > 0, "the orbit target moves away from the left overlay");
 });

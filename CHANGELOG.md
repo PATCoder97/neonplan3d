@@ -4,6 +4,12 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.18.12
+
+### Fixed
+
+- Fit the initial 3D camera tightly inside the usable viewport beside the floor thumbnails, moving the orbit target so long diagonal buildings reach close to both the upper and lower edges without clipping.
+
 ## 1.18.11
 
 ### Fixed

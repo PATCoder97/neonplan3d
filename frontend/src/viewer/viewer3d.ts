@@ -50,7 +50,7 @@ import { roofUnderAt } from "../roof-sections.ts";
 import { buildFloorGeometry, SLAB, stairHoles, type FloorGeometry } from "./build.ts";
 import { OrbitControls, type OrbitView } from "./controls.ts";
 import { makeFoldable, type FoldMasks } from "./fold.ts";
-import { cameraFitRadius, cameraFitView, framingBox } from "./framing.ts";
+import { cameraFitPlacement, cameraFitView, framingBox } from "./framing.ts";
 import { pushCameraModel, pushFanRotor, pushPackGlow, pushPackLamp, screenRect, pushFridgeDoors } from "./furniture.ts";
 import { mountBase, packItem, setPacks, type FurniturePack } from "../packs.ts";
 import { withVehicles } from "../parking.ts";
@@ -652,6 +652,7 @@ export class FloorplanViewer {
     if (this.labelInset === px) return;
     this.labelInset = px;
     this.labelsDirty = true;
+    if (this.building) this.fit(350);
     this.invalidate();
   }
 
@@ -2719,13 +2720,20 @@ export class FloorplanViewer {
     const start = this.startView;
     const house = this.floorId === null;
     const phi = start ? start.phi : 0.85;
-    const margin = this.camera.aspect < 1 ? 1.12 : 1.06;
-    const automatic = cameraFitView(box, phi, this.camera.aspect, this.camera.fov * DEG, margin);
+    const edge = this.size.w < 700 ? 12 : 18;
+    const left = Math.min(this.size.w * 0.4, this.labelInset ? this.labelInset + 8 : edge);
+    const frame = { width: this.size.w, height: this.size.h, left, right: edge, top: edge, bottom: edge };
+    const usableAspect = Math.max(0.1, (this.size.w - frame.left - frame.right) / Math.max(1, this.size.h - frame.top - frame.bottom));
+    const margin = usableAspect < 1 ? 1.12 : 1.06;
+    const automatic = cameraFitView(box, phi, usableAspect, this.camera.fov * DEG, margin);
     const theta = start ? start.theta : automatic.theta;
-    // Fit the box as projected from this angle. A bounding sphere leaves excessive empty space around long, narrow houses.
-    const radius = Math.max(8, start ? cameraFitRadius(box, theta, phi, this.camera.aspect, this.camera.fov * DEG, margin) : automatic.radius);
+    // Fit against the actually usable rectangle. The returned offset shifts the orbit target away
+    // from the floor thumbnails, so a diagonal house can reach both the upper and lower edge.
+    const placement = cameraFitPlacement(box, theta, phi, this.camera.aspect, this.camera.fov * DEG, frame);
+    const radius = Math.max(8, placement.radius);
     this.controls.maxRadius = Math.max(40, radius * 3);
-    center.y = box.min.y + size.y * (this.houseView ? 0.45 : 0.3);
+    if (start && house) center.y = box.min.y + size.y * (this.houseView ? 0.45 : 0.3);
+    else center.add(placement.offset);
     if (this.floorId === null) this.houseRadius = radius;
     // the house view opens as set up (from the garden side, closer …); an opened floor keeps the fitted
     // distance but looks from the same side, so the house never turns round when a floor is opened
