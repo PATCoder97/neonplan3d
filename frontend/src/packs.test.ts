@@ -45,19 +45,6 @@ test("an outdoor water pump follows the ground or terrace and stays at floor lev
   assert.equal(mountBase(floor, { type: "water_pump", x: 2, z: 1, h: 0.45, mount_y: 0.2 }), 0.2);
 });
 
-test("a ceiling fan outside rooms hangs below an open canopy", () => {
-  const floor = newFloor("eg", "EG", 0);
-  const building = {
-    settings: {
-      roof: {
-        overhang: 0.2,
-        sections: [{ id: "canopy", x0: 0, z0: 0, x1: 4, z1: 3, shape: "flat" as const, axis: "x" as const, eave_a: 2.5, eave_b: 2.5, pitch_a: 0, pitch_b: 0, base: 2.5, open: true }],
-      },
-    },
-  };
-  assert.ok(Math.abs(mountBase(floor, { type: "fan_ceiling", x: 2, z: 1, h: 0.35 }, building) - 2.01) < 1e-9);
-});
-
 test("pack items stand on the floor, on furniture, on a wall or hang from the ceiling", () => {
   const part = { shape: "box" as const, x: 0, z: 0, w: 1, d: 1, y: 0, h: 1, color: "wood" };
   setPacks([

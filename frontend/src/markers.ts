@@ -6,7 +6,6 @@ import { formatNumber, translate, type I18nKey } from "./i18n.ts";
 import { iconSvg, mdiIcon } from "./icons.ts";
 import type { Building } from "./model.ts";
 import { pointInPolygon } from "./model.ts";
-import { canopyUnderAt } from "./roof-sections.ts";
 import type { HassEntity, HomeAssistant } from "./types.ts";
 import type { DeviceMarker } from "./viewer/viewer3d.ts";
 
@@ -73,21 +72,13 @@ export function buildMarkers(hass: HomeAssistant, building: Building): DeviceMar
       if (!kind || !st) continue;
       const room = floor.rooms.find((r) => r.points.length >= 3 && pointInPolygon([pl.x, pl.z], r.points)) ?? null;
       const areaName = room?.area_id ? hass.areas?.[room.area_id]?.name : undefined;
-      const canopy = !room && pl.y == null && (pl.mount === "ceiling" || (kind === "light" && pl.mount == null))
-        ? canopyUnderAt(building, pl.x, pl.z)
-        : null;
-      const ceiling = canopy !== null && canopy > floor.elevation + 0.1 ? canopy - floor.elevation : null;
-      const autoHeight = ceiling !== null && pl.mount === "ceiling" && kind !== "light" && kind !== "camera"
-        ? Math.max(0.3, ceiling - 0.18)
-        : defaultHeight(kind, ceiling ?? floor.height, pl.mount ?? null);
       out.push({
         id: pl.entity_id,
         floorId: floor.id,
         roomId: room?.id ?? null,
         x: pl.x,
         z: pl.z,
-        y: pl.y ?? autoHeight,
-        ceiling: ceiling ?? undefined,
+        y: pl.y ?? defaultHeight(kind, floor.height, pl.mount ?? null),
         lamp: kind === "light" ? (pl.mount ?? "ceiling") : null,
         model: kind === "camera" ? (pl.mount === "ceiling" ? "camera_ceiling" : "camera_wall") : undefined,
         motion: kind === "camera" ? cameraMotion(hass, pl.entity_id) : undefined,

@@ -77,22 +77,6 @@ test("a placement's marker setting reaches the marker", () => {
   assert.equal(s.show, undefined);
 });
 
-test("a ceiling device outside rooms follows the underside of a canopy", () => {
-  const b: Building = emptyBuilding();
-  b.floors = [{ ...newFloor("eg", "EG", 0), placements: [{ entity_id: "camera.terrace", x: 2, z: 1, y: null, mount: "ceiling" }, { entity_id: "sensor.motion", x: 3, z: 1, y: null, mount: "ceiling" }] }];
-  b.settings.roof = {
-    type: "custom",
-    pitch: 35,
-    overhang: 0.2,
-    sections: [{ id: "canopy", x0: 0, z0: 0, x1: 4, z1: 3, shape: "flat", axis: "x", eave_a: 2.5, eave_b: 2.5, pitch_a: 0, pitch_b: 0, base: 2.5, open: true }],
-  };
-  const [camera, sensor] = buildMarkers(hassWith([st("camera.terrace", "idle"), st("sensor.motion", "clear")]), b);
-  assert.ok(Math.abs(camera.ceiling! - 2.36) < 1e-9);
-  assert.ok(Math.abs(camera.y - 2.31) < 1e-9);
-  assert.equal(camera.model, "camera_ceiling");
-  assert.ok(Math.abs(sensor.y - 2.18) < 1e-9);
-});
-
 test("a camera's detection sensors are told apart by what they detect", () => {
   const hass = { states: { "binary_sensor.einfahrt_car_occupancy": { entity_id: "binary_sensor.einfahrt_car_occupancy", state: "on", attributes: {} }, "binary_sensor.x": { entity_id: "binary_sensor.x", state: "on", attributes: { friendly_name: "Terrasse Hund erkannt" } } } } as unknown as Parameters<typeof detectionKind>[0];
   assert.equal(detectionKind(hass, "binary_sensor.haustuer_person_occupancy"), "person");
