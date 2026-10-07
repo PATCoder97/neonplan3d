@@ -4,6 +4,12 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.18.11
+
+### Fixed
+
+- Automatically turn long, narrow buildings further across wide screens before fitting the initial camera, using more of the available viewport without clipping the structure.
+
 ## 1.18.10
 
 ### Fixed

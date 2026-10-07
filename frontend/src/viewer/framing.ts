@@ -57,3 +57,13 @@ export function cameraFitRadius(box: Box3, theta: number, phi: number, aspect: n
   }
   return radius;
 }
+
+/** A front-left view that uses a wide screen better for a long, narrow plan. */
+export function cameraFitView(box: Box3, phi: number, aspect: number, verticalFov: number, margin = 1): { theta: number; radius: number } {
+  const size = box.getSize(new Vector3());
+  const narrow = Math.max(0.01, Math.min(size.x, size.z));
+  const elongated = Math.max(size.x, size.z) / narrow >= 2;
+  let theta = -0.6;
+  if (elongated && aspect >= 1.2) theta = size.z >= size.x ? -0.95 : -0.35;
+  return { theta, radius: cameraFitRadius(box, theta, phi, aspect, verticalFov, margin) };
+}

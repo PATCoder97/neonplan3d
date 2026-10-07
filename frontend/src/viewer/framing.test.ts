@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { Vector3 } from "three";
 import { newFloor } from "../model.ts";
-import { cameraFitRadius, framingBox } from "./framing.ts";
+import { cameraFitRadius, cameraFitView, framingBox } from "./framing.ts";
 
 test("camera framing includes rooms, outdoor structures and free walls", () => {
   const floor = newFloor("ground", "Ground", 0);
@@ -47,4 +47,17 @@ test("camera distance fits a long narrow building at its actual diagonal view", 
 
   assert.ok(radius > 0);
   assert.ok(radius < sphereDistance, "the diagonal house should not be framed as an orientation-independent sphere");
+});
+
+test("a long narrow building turns further across a wide screen before it is fitted", () => {
+  const floor = newFloor("ground", "Ground", 0);
+  floor.rooms = [{ id: "room", name: "Room", area_id: null, points: [[0, 0], [5.5, 0], [5.5, 21.6], [0, 21.6]], floor_material: "wood" }];
+  const box = framingBox([{ floor, ty: 0 }]);
+  const fov = (45 * Math.PI) / 180;
+  const diagonal = cameraFitRadius(box, -0.6, 0.85, 16 / 9, fov, 1.06);
+  const fitted = cameraFitView(box, 0.85, 16 / 9, fov, 1.06);
+
+  assert.equal(fitted.theta, -0.95);
+  assert.ok(fitted.radius < diagonal * 0.9);
+  assert.equal(cameraFitView(box, 0.85, 9 / 16, fov, 1.12).theta, -0.6, "portrait screens keep the balanced diagonal");
 });

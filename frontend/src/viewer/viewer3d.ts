@@ -50,7 +50,7 @@ import { roofUnderAt } from "../roof-sections.ts";
 import { buildFloorGeometry, SLAB, stairHoles, type FloorGeometry } from "./build.ts";
 import { OrbitControls, type OrbitView } from "./controls.ts";
 import { makeFoldable, type FoldMasks } from "./fold.ts";
-import { cameraFitRadius, framingBox } from "./framing.ts";
+import { cameraFitRadius, cameraFitView, framingBox } from "./framing.ts";
 import { pushCameraModel, pushFanRotor, pushPackGlow, pushPackLamp, screenRect, pushFridgeDoors } from "./furniture.ts";
 import { mountBase, packItem, setPacks, type FurniturePack } from "../packs.ts";
 import { withVehicles } from "../parking.ts";
@@ -2719,9 +2719,11 @@ export class FloorplanViewer {
     const start = this.startView;
     const house = this.floorId === null;
     const phi = start ? start.phi : 0.85;
-    const theta = start ? start.theta : -0.6;
+    const margin = this.camera.aspect < 1 ? 1.12 : 1.06;
+    const automatic = cameraFitView(box, phi, this.camera.aspect, this.camera.fov * DEG, margin);
+    const theta = start ? start.theta : automatic.theta;
     // Fit the box as projected from this angle. A bounding sphere leaves excessive empty space around long, narrow houses.
-    const radius = Math.max(8, cameraFitRadius(box, theta, phi, this.camera.aspect, this.camera.fov * DEG, this.camera.aspect < 1 ? 1.12 : 1.06));
+    const radius = Math.max(8, start ? cameraFitRadius(box, theta, phi, this.camera.aspect, this.camera.fov * DEG, margin) : automatic.radius);
     this.controls.maxRadius = Math.max(40, radius * 3);
     center.y = box.min.y + size.y * (this.houseView ? 0.45 : 0.3);
     if (this.floorId === null) this.houseRadius = radius;
