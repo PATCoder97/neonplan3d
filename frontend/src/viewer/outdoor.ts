@@ -1,5 +1,5 @@
 // Areas outside the house: lawn, terrace, path, driveway, pool, bed, wild patch, hedge, fence and
-// pergola, in the neon look. Flat areas lie at ground level (the underside of the ground floor slab),
+// pergola and solid canopy, in the neon look. Flat areas lie at ground level (the underside of the ground floor slab),
 // the terrace a little higher, the pool water below; hedges are dark green blocks, fences posts with
 // rails along the outline, a pergola corner posts with beams, rafters and optional X-bracing. An area
 // can sit higher or lower (offset), fall along one direction (slope) and have patches cut out of it.
@@ -27,6 +27,7 @@ const LOOKS: Record<OutdoorType, Look> = {
   hedge: { color: 0x16402f, side: 0x103024, edge: 0x3de0a0, edgeAlpha: 0.35 },
   fence: { color: 0x1d2946, side: 0x1d2946, edge: 0x5b7cff, edgeAlpha: 0.45 },
   pergola: { color: 0x2a2238, side: 0x1f1a2c, edge: 0x5b7cff, edgeAlpha: 0.5 },
+  canopy: { color: 0x263451, side: 0x18223a, edge: 0x37e0ff, edgeAlpha: 0.5 },
 };
 
 /** Height of the visible surface of an area (for the lighting layer), at its high edge. */
@@ -62,6 +63,36 @@ function pushBeam(buf: GeoBuffer, p: Vec2, q: Vec2, w: number, y0: number, y1: n
   pushPrism(buf, ccw([[p[0] + nx, p[1] + nz], [q[0] + nx, q[1] + nz], [q[0] - nx, q[1] - nz], [p[0] - nx, p[1] - nz]]), y0, y1, side, top, { aoFrom: y0 - 1 });
 }
 
+/** A roof sheet of constant thickness whose top follows a slope. */
+function pushCanopyPanel(buf: GeoBuffer, poly: Vec2[], topAt: (x: number, z: number) => number, thickness: number, side: number, top: number): void {
+  const topC = new Color(top);
+  const bottomC = new Color(shade(side, 0.72));
+  const sideC = new Color(side);
+  for (const [i, j, k] of triangulate(poly)) {
+    const a = poly[i];
+    const b = poly[j];
+    const c = poly[k];
+    const ta: [number, number, number] = [a[0], topAt(a[0], a[1]), a[1]];
+    const tb: [number, number, number] = [b[0], topAt(b[0], b[1]), b[1]];
+    const tc: [number, number, number] = [c[0], topAt(c[0], c[1]), c[1]];
+    const ba: [number, number, number] = [ta[0], ta[1] - thickness, ta[2]];
+    const bb: [number, number, number] = [tb[0], tb[1] - thickness, tb[2]];
+    const bc: [number, number, number] = [tc[0], tc[1] - thickness, tc[2]];
+    buf.tri(ta, tc, tb, topC, topC, topC, undefined, ALWAYS);
+    buf.tri(ba, bb, bc, bottomC, bottomC, bottomC, undefined, ALWAYS);
+  }
+  for (let i = 0; i < poly.length; i++) {
+    const p = poly[i];
+    const q = poly[(i + 1) % poly.length];
+    const pt: [number, number, number] = [p[0], topAt(p[0], p[1]), p[1]];
+    const qt: [number, number, number] = [q[0], topAt(q[0], q[1]), q[1]];
+    const pb: [number, number, number] = [pt[0], pt[1] - thickness, pt[2]];
+    const qb: [number, number, number] = [qt[0], qt[1] - thickness, qt[2]];
+    buf.tri(pb, pt, qt, sideC, sideC, sideC, undefined, ALWAYS);
+    buf.tri(pb, qt, qb, sideC, sideC, sideC, undefined, ALWAYS);
+  }
+}
+
 export function pushOutdoor(buf: GeoBuffer, lines: LineBuffer, floor: Floor): void {
   const ground = groundLevel(floor);
   const areas = floor.outdoor ?? [];
@@ -71,13 +102,13 @@ export function pushOutdoor(buf: GeoBuffer, lines: LineBuffer, floor: Floor): vo
     const g = ground + (a.offset ?? 0);
     const groundAt = (x: number, z: number) => g - outdoorDrop(a, x, z);
     const lowest = g - (a.type === "pool" ? 0 : (a.slope ?? 0));
-    // hedges, fences and pergolas take their own height; the outline can be switched off per area
+    // standing structures take their own height; the outline can be switched off per area
     const own = outdoorStanding(a.type) && a.height ? a.height : OUTDOOR_TOP[a.type];
     const look = { ...LOOKS[a.type], top: own };
     const poly = ccw(a.points);
     const edge = shade(look.edge, look.edgeAlpha);
-    // fences and pergolas may leave their closing edge out (leaning against the house)
-    const openEnd = a.open && (a.type === "fence" || a.type === "pergola") ? poly.length - 1 : -1;
+    // fences, pergolas and canopies may leave their closing edge out (leaning against the house)
+    const openEnd = a.open && (a.type === "fence" || a.type === "pergola" || a.type === "canopy") ? poly.length - 1 : -1;
     const outline = (yAt: (x: number, z: number) => number) => {
       if (a.outline === false) return;
       for (let i = 0; i < poly.length; i++) {
@@ -168,6 +199,26 @@ export function pushOutdoor(buf: GeoBuffer, lines: LineBuffer, floor: Floor): vo
           }
         }
         outline((x, z) => groundAt(x, z) + h + 0.004);
+        break;
+      }
+      case "canopy": {
+        // A Vietnamese-style terrace/carport canopy: posts and perimeter beams carry a solid,
+        // slightly sloped sheet.
+        const h = look.top;
+        const roofAt = (x: number, z: number) => g + h - outdoorDrop(a, x, z);
+        for (const [x, z] of poly) {
+          const top = roofAt(x, z) - 0.08;
+          pushPrism(buf, ccw([[x - 0.06, z - 0.06], [x + 0.06, z - 0.06], [x + 0.06, z + 0.06], [x - 0.06, z + 0.06]]), g, top, look.side, look.color);
+        }
+        for (let i = 0; i < poly.length; i++) {
+          if (i === openEnd) continue;
+          const p = poly[i];
+          const q = poly[(i + 1) % poly.length];
+          const y = (roofAt(p[0], p[1]) + roofAt(q[0], q[1])) / 2;
+          pushBeam(buf, p, q, 0.12, y - 0.18, y - 0.08, look.side, look.color);
+        }
+        pushCanopyPanel(buf, poly, roofAt, 0.08, look.side, look.color);
+        outline((x, z) => roofAt(x, z) + 0.004);
         break;
       }
       default: {
