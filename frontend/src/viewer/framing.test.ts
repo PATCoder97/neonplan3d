@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { Box3, Vector3 } from "three";
 import { newFloor } from "../model.ts";
-import { cameraFitPlacement, cameraFitRadius, cameraFitView, framingBox } from "./framing.ts";
+import { cameraFitPlacement, cameraFitRadius, cameraFitView, framingBox, roomFramingBox } from "./framing.ts";
 
 test("camera framing includes rooms, outdoor structures and free walls", () => {
   const floor = newFloor("ground", "Ground", 0);
@@ -25,6 +25,18 @@ test("camera framing works for an outdoor-only floor with its current vertical o
 
   assert.deepEqual(box.min.toArray(), [1, 4.5, 2]);
   assert.deepEqual(box.max.toArray(), [4, 7.1, 6]);
+});
+
+test("room framing includes its true lowest and highest structural points", () => {
+  const floor = newFloor("upper", "Upper", 2.8);
+  floor.height = 3.2;
+  floor.rooms = [{ id: "room", name: "Room", area_id: null, points: [[-1, 2], [4, 2], [4, 7], [-1, 7]], floor_material: "wood" }];
+
+  const box = roomFramingBox(floor, floor.rooms[0], 1.4);
+
+  assert.deepEqual([box.min.x, box.min.z, box.max.x, box.max.z], [-1, 2, 4, 7]);
+  assert.ok(Math.abs(box.min.y - 4.2) < 1e-9);
+  assert.ok(Math.abs(box.max.y - 7.4) < 1e-9);
 });
 
 test("camera distance fits a long narrow building at its actual diagonal view", () => {
@@ -102,4 +114,13 @@ test("camera placement tightly uses the screen area beside floor thumbnails", ()
   assert.ok(minY >= bottom - 1e-9 && maxY <= top + 1e-9);
   assert.ok(Math.min(Math.abs(minX - left), Math.abs(maxX - rightEdge), Math.abs(minY - bottom), Math.abs(maxY - top)) < 1e-8, "one projected edge is tight");
   assert.ok(fit.offset.length() > 0, "the orbit target moves away from the left overlay");
+});
+
+test("camera placement allows a room to zoom closer than a whole building", () => {
+  const box = new Box3(new Vector3(0, 2.8, 0), new Vector3(2, 5.6, 2));
+  const frame = { width: 1200, height: 800, left: 18, right: 18, top: 18, bottom: 18 };
+  const fit = cameraFitPlacement(box, -0.6, 0.72, 1200 / 800, (45 * Math.PI) / 180, frame, 4);
+
+  assert.ok(fit.radius >= 4);
+  assert.ok(fit.radius < 8);
 });

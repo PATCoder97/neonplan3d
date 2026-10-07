@@ -4,6 +4,12 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.18.15
+
+### Fixed
+
+- Fit a selected room from its true lowest and highest structural points, using the same viewport-aware camera framing as the complete building while retaining a closer room zoom.
+
 ## 1.18.12
 
 ### Fixed

@@ -1,5 +1,5 @@
 import { Box3, Vector3 } from "three";
-import { groundLevel, OUTDOOR_TOP, outdoorStanding, type Floor } from "../model.ts";
+import { groundLevel, OUTDOOR_TOP, outdoorStanding, type Floor, type Room } from "../model.ts";
 
 export interface FramingFloor {
   floor: Floor;
@@ -33,6 +33,14 @@ export function framingBox(floors: readonly FramingFloor[]): Box3 {
       expandColumn(box, wall.b[0], wall.b[1], floorY, top);
     }
   }
+  return box;
+}
+
+/** Full structural bounds of one room at its floor's current displayed height. */
+export function roomFramingBox(floor: Floor, room: Room, ty: number): Box3 {
+  const box = new Box3();
+  const floorY = floor.elevation + ty;
+  for (const [x, z] of room.points) expandColumn(box, x, z, floorY, floorY + floor.height);
   return box;
 }
 
@@ -88,6 +96,7 @@ export function cameraFitPlacement(
   aspect: number,
   verticalFov: number,
   frame: CameraFrameInsets,
+  minRadius = 8,
 ): { radius: number; offset: Vector3 } {
   if (box.isEmpty()) return { radius: 0, offset: new Vector3() };
   const width = Math.max(1, frame.width);
@@ -131,7 +140,7 @@ export function cameraFitPlacement(
     const i = intervals(radius);
     return i.x0 <= i.x1 && i.y0 <= i.y1;
   };
-  let low = Math.max(near, 8);
+  let low = Math.max(near, minRadius);
   let high = Math.max(low, cameraFitRadius(box, theta, phi, aspect, verticalFov));
   while (!feasible(high)) high *= 2;
   for (let i = 0; i < 60; i++) {

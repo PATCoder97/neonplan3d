@@ -50,7 +50,7 @@ import { roofUnderAt } from "../roof-sections.ts";
 import { buildFloorGeometry, SLAB, stairHoles, type FloorGeometry } from "./build.ts";
 import { OrbitControls, type OrbitView } from "./controls.ts";
 import { makeFoldable, type FoldMasks } from "./fold.ts";
-import { cameraFitPlacement, cameraFitView, framingBox } from "./framing.ts";
+import { cameraFitPlacement, cameraFitView, framingBox, roomFramingBox, type CameraFrameInsets } from "./framing.ts";
 import { pushCameraModel, pushFanRotor, pushPackGlow, pushPackLamp, screenRect, pushFridgeDoors } from "./furniture.ts";
 import { mountBase, packItem, setPacks, type FurniturePack } from "../packs.ts";
 import { withVehicles } from "../parking.ts";
@@ -739,11 +739,11 @@ export class FloorplanViewer {
     const fv = this.floors.find((f) => f.floor.rooms.some((r) => r.id === roomId));
     const room = fv?.floor.rooms.find((r) => r.id === roomId);
     if (!fv || !room) return;
-    const [cx, cz] = centroid(room.points);
-    const xs = room.points.map((p) => p[0]);
-    const zs = room.points.map((p) => p[1]);
-    const size = new Vector3(Math.max(...xs) - Math.min(...xs), fv.floor.cut_height, Math.max(...zs) - Math.min(...zs));
-    this.controls.flyTo({ target: new Vector3(cx, fv.floor.elevation + fv.ty + 0.3, cz), radius: Math.max(4, this.distanceFor(size) * 1.05), phi: 0.72 });
+    const box = roomFramingBox(fv.floor, room, fv.ty);
+    const phi = 0.72;
+    const theta = this.controls.view.theta;
+    const placement = cameraFitPlacement(box, theta, phi, this.camera.aspect, this.camera.fov * DEG, this.cameraFrame(), 4);
+    this.controls.flyTo({ target: box.getCenter(new Vector3()).add(placement.offset), radius: placement.radius, phi });
   }
 
   setWallMode(mode: WallMode): void {
@@ -2720,9 +2720,7 @@ export class FloorplanViewer {
     const start = this.startView;
     const house = this.floorId === null;
     const phi = start ? start.phi : 0.85;
-    const edge = this.size.w < 700 ? 12 : 18;
-    const left = Math.min(this.size.w * 0.4, this.labelInset ? this.labelInset + 8 : edge);
-    const frame = { width: this.size.w, height: this.size.h, left, right: edge, top: edge, bottom: edge };
+    const frame = this.cameraFrame();
     const usableAspect = Math.max(0.1, (this.size.w - frame.left - frame.right) / Math.max(1, this.size.h - frame.top - frame.bottom));
     const margin = usableAspect < 1 ? 1.12 : 1.06;
     const automatic = cameraFitView(box, phi, usableAspect, this.camera.fov * DEG, margin);
@@ -2739,6 +2737,13 @@ export class FloorplanViewer {
     // distance but looks from the same side, so the house never turns round when a floor is opened
     if (start && house) this.controls.maxRadius = Math.max(this.controls.maxRadius, start.radius * 1.5);
     this.controls.flyTo({ target: center, radius: start && house ? start.radius : radius, phi, theta }, duration);
+  }
+
+  /** Screen rectangle left after thumbnails and safe edge spacing. */
+  private cameraFrame(): CameraFrameInsets {
+    const edge = this.size.w < 700 ? 12 : 18;
+    const left = Math.min(this.size.w * 0.4, this.labelInset ? this.labelInset + 8 : edge);
+    return { width: this.size.w, height: this.size.h, left, right: edge, top: edge, bottom: edge };
   }
 
   /** The ground grid lies under the lowest floor and reaches well beyond the building. */
@@ -2764,13 +2769,6 @@ export class FloorplanViewer {
     const span = GROUND_CELLS * Math.ceil((Math.max(s.x, s.z) + 16) / GROUND_CELLS);
     this.ground.scale.set(span, span, 1);
     this.ground.position.set(c.x, y - SLAB - 0.02, c.z);
-  }
-
-  /** Camera distance at which a box of this size fits the view (bounding sphere against the narrower field of view). */
-  private distanceFor(size: Vector3): number {
-    const vfov = this.camera.fov * DEG;
-    const hfov = 2 * Math.atan(Math.tan(vfov / 2) * this.camera.aspect);
-    return size.length() / 2 / Math.sin(Math.min(vfov, hfov) / 2);
   }
 
   /**
