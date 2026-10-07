@@ -1,0 +1,37 @@
+import { Box3, Vector3 } from "three";
+import { groundLevel, OUTDOOR_TOP, outdoorStanding, type Floor } from "../model.ts";
+
+export interface FramingFloor {
+  floor: Floor;
+  /** Current vertical offset while floors are stacked or pulled apart. */
+  ty: number;
+}
+
+const expandColumn = (box: Box3, x: number, z: number, y0: number, y1: number): void => {
+  box.expandByPoint(new Vector3(x, y0, z));
+  box.expandByPoint(new Vector3(x, y1, z));
+};
+
+/** Bounds of every structural part that the camera should keep inside the initial view. */
+export function framingBox(floors: readonly FramingFloor[]): Box3 {
+  const box = new Box3();
+  for (const { floor, ty } of floors) {
+    const floorY = floor.elevation + ty;
+    for (const room of floor.rooms) {
+      for (const [x, z] of room.points) expandColumn(box, x, z, floorY, floorY + floor.height);
+    }
+    for (const area of floor.outdoor ?? []) {
+      const ground = floorY + groundLevel(floor) + (area.offset ?? 0);
+      const low = ground - (area.type === "pool" ? 0 : (area.slope ?? 0));
+      const ownHeight = outdoorStanding(area.type) && area.height ? area.height : OUTDOOR_TOP[area.type];
+      const high = ground + (area.type === "pool" ? 0.06 : ownHeight);
+      for (const [x, z] of area.points) expandColumn(box, x, z, low, high);
+    }
+    for (const wall of floor.walls ?? []) {
+      const top = floorY + Math.min(floor.height, wall.height ?? floor.height);
+      expandColumn(box, wall.a[0], wall.a[1], floorY, top);
+      expandColumn(box, wall.b[0], wall.b[1], floorY, top);
+    }
+  }
+  return box;
+}

@@ -50,6 +50,7 @@ import { roofUnderAt } from "../roof-sections.ts";
 import { buildFloorGeometry, SLAB, stairHoles, type FloorGeometry } from "./build.ts";
 import { OrbitControls, type OrbitView } from "./controls.ts";
 import { makeFoldable, type FoldMasks } from "./fold.ts";
+import { framingBox } from "./framing.ts";
 import { pushCameraModel, pushFanRotor, pushPackGlow, pushPackLamp, screenRect, pushFridgeDoors } from "./furniture.ts";
 import { mountBase, packItem, setPacks, type FurniturePack } from "../packs.ts";
 import { withVehicles } from "../parking.ts";
@@ -2706,16 +2707,7 @@ export class FloorplanViewer {
   }
 
   private fit(duration: number): void {
-    const box = new Box3();
-    for (const fv of this.activeFloors()) {
-      const y0 = fv.floor.elevation + fv.ty;
-      for (const room of fv.floor.rooms) {
-        for (const [x, z] of room.points) {
-          box.expandByPoint(new Vector3(x, y0, z));
-          box.expandByPoint(new Vector3(x, y0 + fv.floor.height, z));
-        }
-      }
-    }
+    const box = framingBox(this.activeFloors());
     if (box.isEmpty()) box.set(new Vector3(-4, 0, -4), new Vector3(4, 2.5, 4));
     this.placeGround();
     // the weather falls over the plot and a margin around it
@@ -2725,7 +2717,7 @@ export class FloorplanViewer {
     const center = box.getCenter(new Vector3());
     const size = box.getSize(new Vector3());
     // perspective widens the near corners; portrait screens need a little more room for that
-    const radius = Math.max(8, this.distanceFor(size) * (this.camera.aspect < 1 ? 1.16 : 1.02));
+    const radius = Math.max(8, this.distanceFor(size) * (this.camera.aspect < 1 ? 1.2 : 1.08));
     this.controls.maxRadius = Math.max(40, radius * 3);
     center.y = box.min.y + size.y * (this.houseView ? 0.45 : 0.3);
     if (this.floorId === null) this.houseRadius = radius;

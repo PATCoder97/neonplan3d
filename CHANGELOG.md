@@ -4,6 +4,12 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.18.9
+
+### Fixed
+
+- Kept terraces, outdoor structures and free-standing walls inside the initial 3D camera frame, with extra breathing room around the complete building.
+
 ## 1.18.8
 
 ### Changed
