@@ -35,3 +35,25 @@ export function framingBox(floors: readonly FramingFloor[]): Box3 {
   }
   return box;
 }
+
+/** Camera distance that fits an axis-aligned box at the actual orbit angle, instead of a wasteful bounding sphere. */
+export function cameraFitRadius(box: Box3, theta: number, phi: number, aspect: number, verticalFov: number, margin = 1): number {
+  if (box.isEmpty()) return 0;
+  const center = box.getCenter(new Vector3());
+  const towardCamera = new Vector3(Math.sin(phi) * Math.sin(theta), Math.cos(phi), Math.sin(phi) * Math.cos(theta));
+  const right = new Vector3(Math.cos(theta), 0, -Math.sin(theta));
+  const up = new Vector3(-Math.sin(theta) * Math.cos(phi), Math.sin(phi), -Math.cos(theta) * Math.cos(phi));
+  const tanV = Math.tan(verticalFov / 2);
+  const tanH = tanV * Math.max(0.01, aspect);
+  let radius = 0;
+  for (const x of [box.min.x, box.max.x]) {
+    for (const y of [box.min.y, box.max.y]) {
+      for (const z of [box.min.z, box.max.z]) {
+        const p = new Vector3(x, y, z).sub(center);
+        const near = p.dot(towardCamera);
+        radius = Math.max(radius, near + (Math.abs(p.dot(right)) * margin) / tanH, near + (Math.abs(p.dot(up)) * margin) / tanV);
+      }
+    }
+  }
+  return radius;
+}

@@ -1,7 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { Vector3 } from "three";
 import { newFloor } from "../model.ts";
-import { framingBox } from "./framing.ts";
+import { cameraFitRadius, framingBox } from "./framing.ts";
 
 test("camera framing includes rooms, outdoor structures and free walls", () => {
   const floor = newFloor("ground", "Ground", 0);
@@ -24,4 +25,26 @@ test("camera framing works for an outdoor-only floor with its current vertical o
 
   assert.deepEqual(box.min.toArray(), [1, 4.5, 2]);
   assert.deepEqual(box.max.toArray(), [4, 7.1, 6]);
+});
+
+test("camera distance fits a long narrow building at its actual diagonal view", () => {
+  const box = framingBox([
+    {
+      floor: {
+        ...newFloor("ground", "Ground", 0),
+        height: 5.6,
+        rooms: [{ id: "room", name: "Room", area_id: null, points: [[0, 0], [5.5, 0], [5.5, 21.6], [0, 21.6]], floor_material: "wood" }],
+      },
+      ty: 0,
+    },
+  ]);
+  const theta = -0.6;
+  const phi = 0.85;
+  const aspect = 16 / 9;
+  const fov = (45 * Math.PI) / 180;
+  const radius = cameraFitRadius(box, theta, phi, aspect, fov, 1.06);
+  const sphereDistance = box.getSize(new Vector3()).length() / 2 / Math.sin(Math.min(fov, 2 * Math.atan(Math.tan(fov / 2) * aspect)) / 2);
+
+  assert.ok(radius > 0);
+  assert.ok(radius < sphereDistance, "the diagonal house should not be framed as an orientation-independent sphere");
 });

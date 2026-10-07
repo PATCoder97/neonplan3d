@@ -50,7 +50,7 @@ import { roofUnderAt } from "../roof-sections.ts";
 import { buildFloorGeometry, SLAB, stairHoles, type FloorGeometry } from "./build.ts";
 import { OrbitControls, type OrbitView } from "./controls.ts";
 import { makeFoldable, type FoldMasks } from "./fold.ts";
-import { framingBox } from "./framing.ts";
+import { cameraFitRadius, framingBox } from "./framing.ts";
 import { pushCameraModel, pushFanRotor, pushPackGlow, pushPackLamp, screenRect, pushFridgeDoors } from "./furniture.ts";
 import { mountBase, packItem, setPacks, type FurniturePack } from "../packs.ts";
 import { withVehicles } from "../parking.ts";
@@ -2716,17 +2716,19 @@ export class FloorplanViewer {
     this.placeSky();
     const center = box.getCenter(new Vector3());
     const size = box.getSize(new Vector3());
-    // perspective widens the near corners; portrait screens need a little more room for that
-    const radius = Math.max(8, this.distanceFor(size) * (this.camera.aspect < 1 ? 1.2 : 1.08));
+    const start = this.startView;
+    const house = this.floorId === null;
+    const phi = start ? start.phi : 0.85;
+    const theta = start ? start.theta : -0.6;
+    // Fit the box as projected from this angle. A bounding sphere leaves excessive empty space around long, narrow houses.
+    const radius = Math.max(8, cameraFitRadius(box, theta, phi, this.camera.aspect, this.camera.fov * DEG, this.camera.aspect < 1 ? 1.12 : 1.06));
     this.controls.maxRadius = Math.max(40, radius * 3);
     center.y = box.min.y + size.y * (this.houseView ? 0.45 : 0.3);
     if (this.floorId === null) this.houseRadius = radius;
     // the house view opens as set up (from the garden side, closer …); an opened floor keeps the fitted
     // distance but looks from the same side, so the house never turns round when a floor is opened
-    const start = this.startView;
-    const house = this.floorId === null;
     if (start && house) this.controls.maxRadius = Math.max(this.controls.maxRadius, start.radius * 1.5);
-    this.controls.flyTo({ target: center, radius: start && house ? start.radius : radius, phi: start ? start.phi : 0.85, theta: start ? start.theta : -0.6 }, duration);
+    this.controls.flyTo({ target: center, radius: start && house ? start.radius : radius, phi, theta }, duration);
   }
 
   /** The ground grid lies under the lowest floor and reaches well beyond the building. */
