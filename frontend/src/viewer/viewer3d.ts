@@ -120,6 +120,8 @@ export interface DeviceMarker {
   z: number;
   /** Height above the floor. */
   y: number;
+  /** Local ceiling height when attached below a canopy; otherwise the floor ceiling is used. */
+  ceiling?: number;
   /** Inline SVG markup of the icon. */
   icon: string;
   name: string;
@@ -1515,7 +1517,6 @@ export class FloorplanViewer {
 
   /** Light sources of the lights that are on, with the height and characteristic of their lamp. */
   private lightSources(fv: FloorView): LightSource[] {
-    const H = fv.floor.height;
     const out: LightSource[] = [];
     for (const d of this.devices) {
       const glow = this.glowOf(d);
@@ -1524,6 +1525,7 @@ export class FloorplanViewer {
       const room = zoneOf(fv.lightZones, ri);
       const [w, , h] = d.size ?? (d.lamp ? LAMP_SIZE[d.lamp] : [0.3, 0.3, 0.3]);
       const base = d.base ?? 0;
+      const H = d.ceiling ?? fv.floor.height;
       const kinds: Record<LampModel, [number, LightKind]> = {
         ceiling: [H - 0.12, "ceiling"],
         downlight: [H - 0.03, "spot"],
@@ -1686,7 +1688,8 @@ export class FloorplanViewer {
             return y === null ? null : y - floor.elevation;
           }
         : undefined;
-      const geo = buildFloorGeometry(withVehicles(floor, this.parked), b.settings.wall_exterior, b.settings.wall_interior, stairHoles(b.floors, floor), garden, roofUnder);
+      const renderedFloor = withVehicles(floor, this.parked);
+      const geo = buildFloorGeometry(renderedFloor, b.settings.wall_exterior, b.settings.wall_interior, stairHoles(b.floors, floor), garden, roofUnder, (f) => mountBase(renderedFloor, f, b));
       const mask: FoldMasks = { standing: { value: 0xffff }, glass: { value: 0 } };
       const materials = this.makeMaterials(mask);
       const group = new Group();
@@ -1769,7 +1772,7 @@ export class FloorplanViewer {
         rotor.add(new Mesh(solid.geometry(), materials.wall), new LineSegments(edges.geometry(), materials.lines));
         const holder = new Group();
         const a = f.rotation * DEG;
-        holder.position.set(f.x, mountBase(floor, f), f.z);
+        holder.position.set(f.x, mountBase(floor, f, b), f.z);
         holder.rotation.y = -a;
         rotor.position.set(0, f.type === "fan_ceiling" ? f.h * 0.18 : f.h * 0.78, 0);
         holder.add(rotor);
@@ -2162,7 +2165,7 @@ export class FloorplanViewer {
     const shapeSig =
       this.wallMode +
       (this.lowQuality ? "L" : this.highQuality ? "H" : "M") +
-      lamps.map((d) => `${d.id},${d.lamp ?? d.model},${d.variant},${d.x},${d.z},${d.y},${d.rotation ?? 0},${d.roll ?? 0},${d.upright ? 1 : 0},${d.size?.join("/")},${d.base ?? 0},${d.pack ?? ""},${d.mirror ? 1 : 0}`).join(";");
+      lamps.map((d) => `${d.id},${d.lamp ?? d.model},${d.variant},${d.x},${d.z},${d.y},${d.ceiling ?? ""},${d.rotation ?? 0},${d.roll ?? 0},${d.upright ? 1 : 0},${d.size?.join("/")},${d.base ?? 0},${d.pack ?? ""},${d.mirror ? 1 : 0}`).join(";");
     const glows = lamps.map((d) => this.glowOf(d));
     const colorSig = lamps.map((d, i) => `${flash(d.id)},${glows[i] ? `${glows[i]!.level.toFixed(3)},${glows[i]!.color.map((c) => c.toFixed(3)).join("/")}` : "off"}`).join(";");
     if (shapeSig !== fv.lampShapeSig || !fv.lampMesh.geometry.getAttribute("position")) {
@@ -2172,8 +2175,8 @@ export class FloorplanViewer {
       const tris: FloorView["lampTris"] = [];
       const furnTris: FloorView["lampFurnTris"] = [];
       const ranges = new Map<string, { start: number; end: number }>();
-      const H = fv.floor.height;
       for (const d of lamps) {
+        const H = d.ceiling ?? fv.floor.height;
         // hanging lamps (and ceiling cameras) would float above cut walls
         const hanging = d.lamp === "strip" ? (d.base ?? H) > Math.min(fv.floor.cut_height, H) : d.lamp ? HANGING.has(d.lamp) : d.model === "camera_ceiling";
         if ((!d.lamp && !d.model) || (hanging && this.wallMode === "cut")) continue;
@@ -2297,7 +2300,6 @@ export class FloorplanViewer {
       fv.coneMesh.visible = false;
       return;
     }
-    const H = fv.floor.height;
     const hp: number[] = [];
     const hc: number[] = [];
     const cones = new GeoBuffer();
@@ -2345,6 +2347,7 @@ export class FloorplanViewer {
       }
       const glow = this.glowOf(d);
       if (d.floorId !== fv.floor.id || !d.lamp || !glow) continue;
+      const H = d.ceiling ?? fv.floor.height;
       if (HANGING.has(d.lamp) && this.wallMode === "cut") continue;
       const [w, dd, h] = d.size ?? LAMP_SIZE[d.lamp];
       const base = d.base ?? 0;
@@ -3055,12 +3058,12 @@ export class FloorplanViewer {
     const hanging = ["lamp_ceiling", "lamp_downlight", "lamp_spot", "lamp_panel", "lamp_pendant"].includes(f.type);
     const h = Math.max(0.1, f.type === "lamp_pendant" ? 0.3 : f.h);
     const y0 = packItem(f.type) || f.type === "lamp_wall" || f.type === "led_strip"
-      ? mountBase(fv.floor, f)
+      ? mountBase(fv.floor, f, this.building ?? undefined)
       : hanging
         ? f.type === "lamp_pendant"
           ? H - f.h - 0.1
           : H - h
-        : mountBase(fv.floor, f);
+        : mountBase(fv.floor, f, this.building ?? undefined);
     const a = f.rotation * DEG;
     const c = Math.cos(a);
     const sn = Math.sin(a);
@@ -3336,7 +3339,7 @@ export class FloorplanViewer {
     const ceiling = d.model === "camera_ceiling";
     // tilt below the horizon; the orbit's polar angle then is 90 degrees minus the tilt (kept inside the orbit's limits)
     const tilt = Math.min(1.45, Math.max(0.22, (d.tilt ?? (ceiling ? 65 : 20)) * DEG));
-    const y = fv.floor.elevation + fv.ty + (ceiling ? fv.floor.height - 0.1 : d.y);
+    const y = fv.floor.elevation + fv.ty + (ceiling ? (d.ceiling ?? fv.floor.height) - 0.1 : d.y);
     const dir = new Vector3(-Math.sin(a) * Math.cos(tilt), -Math.sin(tilt), Math.cos(a) * Math.cos(tilt));
     this.controls.flyTo({ target: new Vector3(d.x, y, d.z).addScaledVector(dir, 3.15), radius: 3, phi: Math.PI / 2 - tilt, theta: Math.atan2(Math.sin(a), -Math.cos(a)) }, 900);
     return true;

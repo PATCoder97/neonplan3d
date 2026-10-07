@@ -11,7 +11,7 @@
 //   fold = 48 + b    top face of the lower part at the cut height: visible while bucket b is cut
 
 import { Color, type BufferGeometry } from "three";
-import type { Floor, Opening, Room, SolarField, Vec2 } from "../model.ts";
+import type { Floor, Furniture, Opening, Room, SolarField, Vec2 } from "../model.ts";
 import { furnitureFootprint, isLamp, pointInPolygon } from "../model.ts";
 import { generateWalls, locateOpening, openingHost, type Wall } from "../geometry/walls.ts";
 import { holeInRoom, insetHole, mergeHoles } from "../geometry/holes.ts";
@@ -113,6 +113,8 @@ export function buildFloorGeometry(
    * there: knee walls at the eaves, gables up to the ridge, inner walls cut by the slope.
    */
   roofUnder?: (x: number, z: number) => number | null,
+  /** Resolves furniture mounting against surfaces outside the ordinary room ceiling (for example a canopy). */
+  furnitureBase: (f: Furniture) => number = (f) => mountBase(floor, f),
 ): FloorGeometry {
   const { walls, open: openRooms } = generateWalls(floor.rooms, { exterior: wallExterior, interior: wallInterior }, floor.walls ?? []);
   // the top of a wall at a point: its own height, or the roof above when that is lower
@@ -354,7 +356,7 @@ export function buildFloorGeometry(
     if (isLamp(f.type)) continue;
     const start = wallBuf.count;
     const l0 = lines.p.length / 6;
-    const base = mountBase(floor, f);
+    const base = furnitureBase(f);
     pushFurniture(wallBuf, lines, shadow, f, base);
     // a wardrobe or a stair reaching above the cut height is cut with the walls, so it hides nothing behind it
     if (base + f.h > cut + 0.05) {

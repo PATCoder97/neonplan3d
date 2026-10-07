@@ -15,7 +15,7 @@ import { hasFeature, manualUrl, shopUrl } from "../features.ts";
 import { cameraMotionSensors, detectionKind } from "../markers.ts";
 import { deviceSensors, energySummary, flowSegments, gridPoint, proposeEnergySensors, type EnergyPrefs, type FlowSegment } from "../energy.ts";
 import { isStatusSensor, robotRoomSensor, TOGGLE_KINDS } from "../devices.ts";
-import { sectionFloor, dormerParent, effectiveDormer, proposeDormer, sectionGeometry, floorOutline, polygonBox, headroomLines, ridgeHeight, roofSectionsFromRooms, sectionFrame, wallTopUnder } from "../roof-sections.ts";
+import { canopyUnderAt, sectionFloor, dormerParent, effectiveDormer, proposeDormer, sectionGeometry, floorOutline, polygonBox, headroomLines, ridgeHeight, roofSectionsFromRooms, sectionFrame, wallTopUnder } from "../roof-sections.ts";
 import { bestFace, clampField, faceAt, faceCompass, fieldFace, fieldModules, GROUND, pointOnFace, proposeField, proposeGroundField, proposeWindow, proposeWallField, roofFaces, rowCounts, turnGroundField, fieldCenter, wallFaces, windowAsField, windowCorners, onFace, onField, rayOnFace, type RoofFace } from "../solar.ts";
 import type { SurfaceGrab, SurfaceRay } from "../viewer/viewer3d.ts";
 import { storedImageIds } from "../transfer.ts";
@@ -565,7 +565,7 @@ export class Fp3dEditor extends LitElement {
     if (d) {
       const kind = kindOf(d.entity_id);
       const light = kind === "light";
-      const auto = kind ? defaultHeight(kind, this.floor?.height ?? 2.5, light ? (d.mount ?? "ceiling") : null) : 1;
+      const auto = this.deviceAutoHeight(d);
       return html`<div class="fp3d-3d-bar">
         <span>${entityName(this.hass, d.entity_id)}</span>
         ${light
@@ -2376,6 +2376,29 @@ export class Fp3dEditor extends LitElement {
     this._roofId = copy.id;
   }
 
+  /** Put an entity below a canopy and let its height follow the roof underside. */
+  private placeCanopyDeviceAt(floorId: string, x: number, z: number, entityId: string): void {
+    if (!this.isAdmin || !isPlaceable(kindOf(entityId))) return;
+    this.change((doc) => {
+      for (const floor of doc.floors) {
+        floor.placements = floor.placements.filter((pl) => pl.entity_id !== entityId);
+        floor.furniture = floor.furniture.filter((f) => !(isLamp(f.type) && f.entity === entityId));
+      }
+      const floor = doc.floors.find((f) => f.id === floorId);
+      floor?.placements.push({ entity_id: entityId, x: round(x), z: round(z), y: null, mount: "ceiling", rotation: 0 });
+    });
+    this._deviceId = entityId;
+  }
+
+  private placeCanopyDevice(sec: RoofSection, entityId: string): void {
+    if (!sec.open) return;
+    const floorId = sectionFloor(this._doc, sec)?.id ?? [...this._doc.floors].sort((a, b) => a.elevation - b.elevation)[0]?.id;
+    if (!floorId) return;
+    const fr = sectionFrame(sec);
+    const [x, z] = fr.at((fr.u0 + fr.u1) / 2, fr.w / 2);
+    this.placeCanopyDeviceAt(floorId, x, z, entityId);
+  }
+
   /** The sections over the plan: outline, ridge (and hips), a label; the selected one with corner handles. */
   private renderRoofSections() {
     const roof = this._doc.settings.roof;
@@ -3457,6 +3480,18 @@ export class Fp3dEditor extends LitElement {
             <p class="fp3d-sub">${this.t(sec.points ? "roof_points_hint" : "roof_outline_hint")}</p>`
           : nothing}
         <p class="fp3d-sub">${this.t("roof_ridge_height")}: ${formatNumber(this.hass, ridgeHeight(sec), 2)} m · ${this.t("roof_section_hint")}</p>
+        ${sec.open
+          ? html`${this.entitySelect(
+              `${this.t("devices")} · ${this.t("roof_open_short")}`,
+              null,
+              undefined,
+              this.entityOptions((id) => isPlaceable(kindOf(id))),
+              (id) => {
+                if (id && id !== "none") this.placeCanopyDevice(sec, id);
+              },
+            )}
+            <p class="fp3d-sub">${this.t("roof_open_hint")}</p>`
+          : nothing}
         ${admin
           ? html`<div class="fp3d-actions">
               ${flat
@@ -3906,6 +3941,17 @@ export class Fp3dEditor extends LitElement {
   private updateDevice(patch: Partial<Placement>): void {
     const id = this._deviceId;
     this.change((_, floor) => Object.assign(floor.placements.find((p) => p.entity_id === id)!, patch));
+  }
+
+  private deviceAutoHeight(pl: Placement): number {
+    const floor = this.floor;
+    const kind = kindOf(pl.entity_id);
+    if (!floor || !kind) return 1;
+    const inRoom = floor.rooms.some((r) => r.points.length >= 3 && pointInPolygon([pl.x, pl.z], r.points));
+    const under = !inRoom && (pl.mount === "ceiling" || (kind === "light" && pl.mount == null)) ? canopyUnderAt(this._doc, pl.x, pl.z) : null;
+    const ceiling = under !== null && under > floor.elevation + 0.1 ? under - floor.elevation : null;
+    if (ceiling !== null && pl.mount === "ceiling" && kind !== "light" && kind !== "camera") return Math.max(0.3, ceiling - 0.18);
+    return defaultHeight(kind, ceiling ?? floor.height, kind === "light" ? (pl.mount ?? "ceiling") : pl.mount ?? null);
   }
 
   /** Move the selected device to the middle of its room. */
@@ -4625,6 +4671,8 @@ export class Fp3dEditor extends LitElement {
     const admin = this.isAdmin;
     const rect = isAxisRect(a.points);
     const b = bounds(a.points);
+    const [cx, cz] = centroid(a.points);
+    const underCanopy = canopyUnderAt(this._doc, cx, cz) !== null;
     const setRect = (field: "x" | "z" | "w" | "d", v: number) => {
       let { x0, z0, x1, z1 } = b;
       if (field === "x") [x0, x1] = [v, v + (x1 - x0)];
@@ -4682,6 +4730,17 @@ export class Fp3dEditor extends LitElement {
       </div>
       ${a.slope ? html`<p class="fp3d-sub">${this.t("outdoor_slope_hint")}</p>` : nothing}
       <p class="fp3d-sub">${this.t("outdoor_hint")}</p>
+      ${underCanopy && this.floor
+        ? html`${this.entitySelect(
+            `${this.t("devices")} · ${this.t("roof_open_short")}`,
+            null,
+            undefined,
+            this.entityOptions((id) => isPlaceable(kindOf(id))),
+            (id) => {
+              if (id && id !== "none") this.placeCanopyDeviceAt(this.floor!.id, cx, cz, id);
+            },
+          )}`
+        : nothing}
       ${admin
         ? html`<div class="fp3d-actions">
             <button class="fp3d-btn" @click=${() => this.duplicateOutdoor()}>${this.t("duplicate")}</button>
@@ -6619,7 +6678,7 @@ export class Fp3dEditor extends LitElement {
     const kind = kindOf(pl.entity_id);
     const light = kind === "light";
     const mount = pl.mount ?? "ceiling";
-    const auto = kind ? defaultHeight(kind, this.floor?.height ?? 2.5, light ? mount : null) : 1;
+    const auto = this.deviceAutoHeight(pl);
     return html`<section>
       <div class="fp3d-h3row"><h3>${this.t("device")}</h3>${this.fixButton("device", pl.entity_id)}</div>
       <p class="fp3d-dev-title">

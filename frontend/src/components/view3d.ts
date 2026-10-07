@@ -75,6 +75,7 @@ import { coverPositionable, lightAbilities } from "./quick-menu.ts";
 import "./quick-menu.ts";
 import { load3d } from "../load3d.ts";
 import { detectionKind, buildMarkers, cameraMotionSensors, openMoreInfo, placedEntities, stateText, toggleEntity } from "../markers.ts";
+import { canopyUnderAt } from "../roof-sections.ts";
 import { furnitureFootprint, isLamp, LAMP_MODEL, outdoorGround, pointInPolygon, surfaceHeight, type Building, type Furniture, type StartView } from "../model.ts";
 import { floorCounts, floorInfoText, personsInRooms } from "../presence.ts";
 import { controls, tokens } from "../styles.ts";
@@ -823,7 +824,7 @@ export class Fp3dView3d extends LitElement {
           const c = consumers.find((k) => k.id === f.id);
           if (!sensor && !c) continue;
           // anchors are building coordinates: the floor's elevation plus the device's top on its floor (#151)
-          const top = floor.elevation + mountBase(floor, f) + f.h;
+          const top = floor.elevation + mountBase(floor, f, b) + f.h;
           anchors.push({ p: [f.x, top + 0.1, f.z], n: [0, 1, 0], floorId: floor.id, size: holo.size * 0.7, roof: false, views: "all" });
           cards.push({
             kind: "device",
@@ -889,7 +890,7 @@ export class Fp3dView3d extends LitElement {
         for (const f of floor.furniture) {
           if ((f.entity != null && f.entity !== "none") !== byHand) continue;
           const e = this.furnitureLinks?.get(f.id)?.entity;
-          if (e) add(floor, e, f.x, f.z, mountBase(floor, f) + f.h, f.name || furnitureName(hass, f.type));
+          if (e) add(floor, e, f.x, f.z, mountBase(floor, f, b) + f.h, f.name || furnitureName(hass, f.type));
         }
       };
       for (const floor of b.floors) furn(floor, true);
@@ -907,7 +908,7 @@ export class Fp3dView3d extends LitElement {
           const car = carState(hass, f);
           if (car.soc === null && car.range === null && car.locked === null && car.climateOn === null) continue;
           const veh = vehicleFurniture(f, vehicle);
-          const top = mountBase(floor, f) + (veh?.h ?? 1.6);
+          const top = mountBase(floor, f, b) + (veh?.h ?? 1.6);
           anchors.push({ p: [f.x, floor.elevation + top + 0.25, f.z], n: [0, 1, 0], floorId: floor.id, size: holoSize * 0.7, roof: false, views: "all" });
           const e = car.entities;
           cards.push({
@@ -1592,7 +1593,7 @@ export class Fp3dView3d extends LitElement {
           roomId: room?.id ?? null,
           x: f.x,
           z: f.z,
-          y: markerHeight(f) + mountBase(floor, f),
+          y: markerHeight(f) + mountBase(floor, f, b),
           icon: f.icon ? mdiIcon(f.icon) : iconSvg(kind ?? "switch"),
           name: f.name || (link.entity ? entityName(hass, link.entity) : furnitureName(hass, f.type)),
           ownName: f.name || undefined,
@@ -1842,19 +1843,21 @@ export class Fp3dView3d extends LitElement {
     // a height above the floor set by hand wins (a table lamp on a shelf, a floor lamp on a platform);
     // an LED strip outside the house counts from the ground there (a path light flush with the lawn)
     const inRoom = floor.rooms.some((r) => r.points.length >= 3 && pointInPolygon([f.x, f.z], r.points));
+    const canopy = !inRoom && this.building ? canopyUnderAt(this.building, f.x, f.z) : null;
+    const canopyCeiling = canopy !== null && canopy > floor.elevation + 0.1 ? canopy - floor.elevation : null;
     const base = model === "strip" && !inRoom
       ? outdoorGround(floor, f.x, f.z) + (f.mount_y ?? 0)
       : f.mount_y != null && !item
       ? f.mount_y
       : item || model === "wall" || model === "strip"
-      ? mountBase(floor, f)
+      ? mountBase(floor, f, this.building ?? undefined)
       : model === "table"
         ? surfaceHeight(floor, f.x, f.z)
         : model === "bollard" || model === "garden"
           ? outdoorGround(floor, f.x, f.z)
           : 0;
     const room = floor.rooms.find((r) => r.points.length >= 3 && pointInPolygon([f.x, f.z], r.points));
-    const H = floor.height;
+    const H = canopyCeiling ?? floor.height;
     // pack lamps: the marker sits above the lamp (below it when it hangs from the ceiling)
     const y = item
       ? item.mount === "ceiling"
@@ -1882,6 +1885,7 @@ export class Fp3dView3d extends LitElement {
       x: f.x,
       z: f.z,
       y,
+      ceiling: canopyCeiling ?? undefined,
       icon: iconSvg("light"),
       name: f.name || (entity ? entityName(hass, entity) : furnitureName(hass, f.type)),
       text: st ? stateText(hass, st) : "",

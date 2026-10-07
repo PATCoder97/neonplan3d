@@ -65,27 +65,19 @@ export type RoofHolder = { settings: { roof: { sections?: readonly RoofSection[]
 /** Thickness of the roof slab (the walls under it end this far below the profile). */
 export const ROOF_THICK = 0.14;
 
-/**
- * The underside of the roof above a plan point (absolute height): the lowest covered section, or
- * null outside every section (canopies do not count, and neither does a single roof: it sits on
- * the top floor's walls anyway).
- */
-export function roofUnderAt(b: RoofHolder, x: number, z: number): number | null {
+/** Height of a matching roof face at a plan point. */
+function sectionUnderAt(b: RoofHolder, x: number, z: number, open: boolean): number | null {
   let best: number | null = null;
   const o = Math.max(0, b.settings.roof.overhang ?? 0);
-  // where sections overlap, the higher roof is the ceiling: a dormer or a cross gable over the main
-  // slope, a lower annex roof running under a higher one
   for (const s of b.settings.roof.sections ?? []) {
-    if (s.open) continue;
+    if (!!s.open !== open) continue;
     const x0 = Math.min(s.x0, s.x1);
     const x1 = Math.max(s.x0, s.x1);
     const z0 = Math.min(s.z0, s.z1);
     const z1 = Math.max(s.z0, s.z1);
     if (x < x0 - 1e-6 || x > x1 + 1e-6 || z < z0 - 1e-6 || z > z1 + 1e-6) continue;
-    // a free-shaped flat roof covers its polygon only
     if (s.points && s.points.length >= 3 && !pointInPolygon([x, z], s.points)) continue;
     const [u, v] = sectionUV(s, x, z);
-    // hipped ends and broken slopes: the planes decide, the profile across is the fallback
     const flat = s.shape === "flat" || s.shape === "parapet";
     const so = Math.max(0, s.overhang ?? o);
     const planes = flat ? null : sectionHeightAt(sectionGeometry(s, { u0: so, u1: so, a: so, b: so }), u, v);
@@ -93,6 +85,20 @@ export function roofUnderAt(b: RoofHolder, x: number, z: number): number | null 
     best = best === null ? y : Math.max(best, y);
   }
   return best;
+}
+
+/**
+ * The underside of the roof above a plan point (absolute height): the lowest covered section, or
+ * null outside every section (canopies do not count, and neither does a single roof: it sits on
+ * the top floor's walls anyway).
+ */
+export function roofUnderAt(b: RoofHolder, x: number, z: number): number | null {
+  return sectionUnderAt(b, x, z, false);
+}
+
+/** The underside of an open roof (terrace canopy/carport) above a plan point, in absolute metres. */
+export function canopyUnderAt(b: RoofHolder, x: number, z: number): number | null {
+  return sectionUnderAt(b, x, z, true);
 }
 
 /**

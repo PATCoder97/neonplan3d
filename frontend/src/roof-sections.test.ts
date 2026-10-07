@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { emptyBuilding, newFloor, ROOF_SHAPES, type Room, type RoofSection } from "./model.ts";
-import { cutHole, dormerHole, dormerHoles, dormerParent, floorOutline, offsetPolygon, polygonBox, proposeDormer, ridgeHeight, roofSectionsFromRooms, roofUnderAt, sectionFrame, sectionGeometry, sectionHeightAt, sectionOverhang, sectionPolygon, sectionProfile, wallTopUnder } from "./roof-sections.ts";
+import { canopyUnderAt, cutHole, dormerHole, dormerHoles, dormerParent, floorOutline, offsetPolygon, polygonBox, proposeDormer, ridgeHeight, roofSectionsFromRooms, roofUnderAt, sectionFrame, sectionGeometry, sectionHeightAt, sectionOverhang, sectionPolygon, sectionProfile, wallTopUnder } from "./roof-sections.ts";
 import { buildRoof } from "./viewer/roof.ts";
 
 const near = (a: number, b: number, eps = 1e-6) => assert.ok(Math.abs(a - b) < eps, `${a} != ${b}`);
@@ -125,6 +125,9 @@ test("a canopy over a terrace draws see-through panels and posts instead of wall
   near(Math.min(...ys), 0);
   // the side at the house wall has no overhang
   assert.equal(sectionOverhang(b, canopy, 0.15).b, 0);
+  near(canopyUnderAt(b, 5, 9)!, sectionProfile(canopy).y(2) - 0.14);
+  assert.equal(canopyUnderAt(b, 1, 9), null, "outside the canopy");
+  assert.equal(roofUnderAt(b, 5, 9), null, "an open canopy is not an attic ceiling");
 });
 
 test("a flat roof as a free shape: the floor's outline, grown by the wall thickness, covers the rooms only", () => {
