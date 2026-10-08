@@ -5,23 +5,11 @@ import { GeoBuffer } from "./geo.ts";
 import { SHADE_SENTINEL } from "./lamp-colors.ts";
 import { pushLampModel } from "./viewer3d.ts";
 
-const GALLERY_LIGHTS = [
-  "lamp_column",
-  "lamp_tv_bars",
-  "lamp_orb_table",
-  "lamp_portable",
-  "lamp_ambient_spot",
-  "lamp_cube",
-  "lamp_panel_round",
-  "lamp_garden_spots",
-  "lamp_wall_updown",
-] as const satisfies readonly FurnitureType[];
-
-test("the gallery light family builds finite dedicated 3D geometry", () => {
-  for (const type of GALLERY_LIGHTS) {
+test("every lamp catalog item builds visible finite 3D geometry", () => {
+  for (const [type, lamp] of Object.entries(LAMP_MODEL) as [FurnitureType, (typeof LAMP_MODEL)[string]][]) {
     const buf = new GeoBuffer();
     pushLampModel(buf, {
-      lamp: LAMP_MODEL[type],
+      lamp,
       x: 1,
       z: 2,
       size: FURNITURE_SIZE[type],

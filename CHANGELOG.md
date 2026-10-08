@@ -4,6 +4,17 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.19.16
+
+### Added
+
+- Added a development gallery that renders all 135 built-in catalog entries with their production 3D previews and 2D symbols, plus search, group filters and per-item error reporting.
+- Added complete finite-geometry checks for every standalone furniture and lamp model, and documented the structural-only stairwell entry explicitly.
+
+### Fixed
+
+- Included line-only geometry when framing furniture previews, so parking-space markings no longer produce an empty thumbnail.
+
 ## 1.19.15
 
 ### Changed

@@ -17,6 +17,9 @@ export const HIDDEN_FURNITURE_TYPES = [
   "stairwell",
 ] as const satisfies readonly FurnitureType[];
 
+/** Catalog entries that modify building geometry instead of drawing a standalone 3D object. */
+export const STRUCTURAL_ONLY_FURNITURE_TYPES = ["stairwell"] as const satisfies readonly FurnitureType[];
+
 /** Public pack categories and counts shown by the original project; used only as a coverage target. */
 export const REFERENCE_PACK_TARGETS = {
   home_cinema: 35,
@@ -159,6 +162,7 @@ export function furnitureCatalogIssues(): string[] {
   }
 
   const hidden = new Set<string>(HIDDEN_FURNITURE_TYPES);
+  const structural = new Set<string>(STRUCTURAL_ONLY_FURNITURE_TYPES);
   for (const item of BUILTIN_FURNITURE_CATALOG) {
     if (item.nameKey !== `furn_${item.id}`) issues.push(`invalid name key: ${item.id}`);
     if (!item.renderer) issues.push(`missing renderer: ${item.id}`);
@@ -170,6 +174,10 @@ export function furnitureCatalogIssues(): string[] {
     if (types.join("\0") !== FURNITURE_GROUPS[group].join("\0")) issues.push(`catalog group order differs: ${group}`);
   }
   for (const type of hidden) if (!known.has(type)) issues.push(`unknown hidden type: ${type}`);
+  for (const type of structural) {
+    if (!known.has(type)) issues.push(`unknown structural-only type: ${type}`);
+    if (!hidden.has(type)) issues.push(`structural-only type must be hidden: ${type}`);
+  }
 
   const assigned = new Map<string, ReferencePack>();
   for (const [pack, types] of Object.entries(REFERENCE_PACK_ITEMS) as [ReferencePack, readonly FurnitureType[]][]) {

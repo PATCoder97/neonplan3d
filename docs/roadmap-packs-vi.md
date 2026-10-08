@@ -129,7 +129,9 @@ Mục tiêu: có nền tảng đủ gọn để thêm nhiều mẫu theo lô.
   - Toàn bộ 127 symbol built-in hiện có đã chuyển sang registry theo họ và dùng chung primitive SVG; `furniture2d.ts` chỉ còn lookup cùng fallback cho pack nhập ngoài.
 - [x] Cho nhóm thư viện, tìm kiếm và tên hiển thị đọc trực tiếp từ catalog; các export cũ vẫn được giữ để tương thích.
 - [x] Thêm validator bắt buộc ID ổn định, kích thước hợp lệ, tên `vi`/`en`, renderer và symbol; CI chạy `npm run catalog` ở mỗi push/PR.
-- [ ] Thêm trang gallery phát triển để render toàn bộ catalog trong một lần.
+- [x] Thêm trang gallery phát triển để render toàn bộ catalog trong một lần.
+  - Chạy `cd frontend && npm run gallery`, mở `http://127.0.0.1:4173`; trang dùng chính renderer 3D và registry symbol 2D của editor, có tìm kiếm/lọc nhóm và báo lỗi theo từng mẫu.
+  - `npm run gallery:check` bundle trang độc lập mà không đưa mã gallery vào frontend production.
 
 Điều kiện hoàn thành: 92 mục cũ hiển thị tương đương, typecheck/test/build qua và gallery không có mẫu mất hình.
 

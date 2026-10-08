@@ -5,6 +5,8 @@
   "scripts": {
     "build": "node build.mjs",
     "catalog": "node catalog-report.mjs",
+    "gallery": "node gallery.mjs --serve",
+    "gallery:check": "node gallery.mjs",
     "watch": "node build.mjs --watch",
     "test": "node --experimental-strip-types --test \"src/**/*.test.ts\"",
     "typecheck": "tsc --noEmit",

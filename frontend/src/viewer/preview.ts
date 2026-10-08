@@ -78,7 +78,9 @@ export function furniturePreview(item: PreviewItem, size = 180, packs?: Furnitur
   scene.add(mesh, edges);
 
   // look from the front right, a little from above; fit the item's box into the picture
-  const box = new Box3().setFromObject(mesh);
+  // Some plan-native objects (notably a parking space) are intentionally line-only. Include the
+  // outline in framing so their preview does not collapse around an empty triangle mesh.
+  const box = new Box3().setFromObject(scene);
   const center = box.getCenter(new Vector3());
   const camera = new OrthographicCamera(-1, 1, 1, -1, 0.01, 100);
   camera.position.copy(center).add(new Vector3(0.9, 0.75, 1.3).normalize().multiplyScalar(20));

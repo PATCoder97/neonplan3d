@@ -1,8 +1,9 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import { STRUCTURAL_ONLY_FURNITURE_TYPES } from "../furniture/catalog.ts";
 import type { Furniture } from "../model.ts";
 import { mountBase, setPacks, type FurniturePack } from "../packs.ts";
-import { FURNITURE_SIZE, newFloor } from "../model.ts";
+import { FURNITURE_SIZE, FURNITURE_TYPES, LAMP_MODEL, newFloor } from "../model.ts";
 import { pushFanRotor, pushFurniture, screenRect } from "./furniture.ts";
 import { GeoBuffer, LineBuffer } from "./geo.ts";
 
@@ -33,6 +34,19 @@ function build(type: string) {
   pushFurniture(buf, lines, new GeoBuffer(), f);
   return { buf, lines };
 }
+
+test("every non-lamp catalog item builds visible finite 3D geometry", () => {
+  for (const type of FURNITURE_TYPES) {
+    if (LAMP_MODEL[type] || (STRUCTURAL_ONLY_FURNITURE_TYPES as readonly string[]).includes(type)) continue;
+    const [w, d, h] = FURNITURE_SIZE[type];
+    const buf = new GeoBuffer();
+    const lines = new LineBuffer();
+    const shadow = new GeoBuffer();
+    pushFurniture(buf, lines, shadow, { id: type, type, x: 0, z: 0, rotation: 0, w, d, h, variant: null } as Furniture);
+    assert.ok(buf.count > 0 || lines.p.length > 0, `${type}: visible geometry`);
+    assert.ok(buf.p.every(Number.isFinite) && buf.c.every(Number.isFinite) && lines.p.every(Number.isFinite), `${type}: finite geometry`);
+  }
+});
 
 test("a U-shaped stair builds two flights and a half-height landing", () => {
   const buf = new GeoBuffer();

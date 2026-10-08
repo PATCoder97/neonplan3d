@@ -23,6 +23,8 @@ jobs:
       - run: npm test
       - name: Validate built-in furniture catalog
         run: npm run catalog
+      - name: Build development furniture gallery
+        run: npm run gallery:check
       - name: Build and check budgets
         run: npm run build
       - name: Committed bundles are up to date
