@@ -118,50 +118,6 @@ function sink(b: Builder, w: number, d: number, h: number): void {
   b.box(-0.015, 0.015, h + 0.24, h + 0.28, -d / 2 + 0.05, -d / 2 + 0.22, C.metal);
 }
 
-function bathtub(b: Builder, w: number, d: number, h: number): void {
-  const rim = 0.07;
-  b.box(-w / 2, w / 2, 0, h - 0.02, -d / 2, d / 2, C.white, C.whiteTop, EDGE_FURN);
-  b.box(-w / 2, w / 2, h - 0.02, h, -d / 2, -d / 2 + rim, C.whiteTop);
-  b.box(-w / 2, w / 2, h - 0.02, h, d / 2 - rim, d / 2, C.whiteTop);
-  b.box(-w / 2, -w / 2 + rim, h - 0.02, h, -d / 2 + rim, d / 2 - rim, C.whiteTop);
-  b.box(w / 2 - rim, w / 2, h - 0.02, h, -d / 2 + rim, d / 2 - rim, C.whiteTop);
-  b.box(-w / 2 + rim, w / 2 - rim, h - 0.03, h - 0.02, -d / 2 + rim, d / 2 - rim, C.glass, C.glass, EDGE_GLOW);
-  b.cyl(-w / 2 + 0.04, 0, 0.02, h, h + 0.12, C.metal, C.metal, 8);
-}
-
-function shower(b: Builder, w: number, d: number, h: number): void {
-  b.box(-w / 2, w / 2, 0, 0.05, -d / 2, d / 2, C.whiteTop, C.whiteTop, EDGE_FURN);
-  b.cyl(0, 0, 0.04, 0.05, 0.052, C.metal, C.metal, 8);
-  // glass walls on the front and one side: only edges, the glass itself stays clear
-  for (const [xa, za, xb, zb] of [
-    [-w / 2, d / 2, w / 2, d / 2],
-    [w / 2, -d / 2, w / 2, d / 2],
-  ]) {
-    b.seg(xa, 0.05, za, xb, 0.05, zb, EDGE_GLOW);
-    b.seg(xa, h, za, xb, h, zb, EDGE_GLOW);
-    b.seg(xb, 0.05, zb, xb, h, zb, EDGE_GLOW);
-  }
-  b.cyl(-w / 2 + 0.06, -d / 2 + 0.06, 0.015, 0.05, h - 0.05, C.metal, C.metal, 6);
-  b.cyl(-w / 2 + 0.2, -d / 2 + 0.2, 0.1, h - 0.08, h - 0.06, C.metal, C.metal, 12, EDGE_GLOW);
-}
-
-function wc(b: Builder, w: number, d: number, h: number): void {
-  const tankD = Math.min(0.18, d * 0.3);
-  b.box(-w / 2, w / 2, 0.45, h, -d / 2, -d / 2 + tankD, C.white, C.whiteTop, EDGE_FURN);
-  b.box(-w * 0.3, w * 0.3, 0, 0.36, -d / 2 + tankD - 0.02, d / 2 - 0.12, C.white, C.whiteTop);
-  b.cyl(0, d / 2 - 0.26, Math.min(w / 2, 0.19), 0.36, 0.41, C.white, C.whiteTop, 12, EDGE_FURN);
-  b.box(-w / 2 + 0.02, w / 2 - 0.02, 0.41, 0.43, -d / 2 + tankD, -d / 2 + tankD + 0.05, C.whiteTop);
-}
-
-function washbasin(b: Builder, w: number, d: number, h: number): void {
-  cabinet(b, w, d - 0.02, h - 0.12, w > 0.8 ? 2 : 1, h - 0.3);
-  b.box(-w / 2, w / 2, h - 0.12, h, -d / 2, d / 2, C.white, C.whiteTop, EDGE_FURN);
-  b.box(-w / 2 + 0.07, w / 2 - 0.07, h - 0.005, h, -d / 2 + 0.12, d / 2 - 0.06, C.glass, C.glass, EDGE_GLOW);
-  b.cyl(0, -d / 2 + 0.06, 0.018, h, h + 0.2, C.metal, C.metal, 8);
-  // mirror above
-  b.box(-w / 2 + 0.04, w / 2 - 0.04, h + 0.35, h + 1.0, -d / 2, -d / 2 + 0.02, C.glass, C.glass, EDGE_GLOW);
-}
-
 function kitchenWall(b: Builder, w: number, d: number, h: number): void {
   // hangs above the worktop
   const y0 = 1.45;
@@ -292,16 +248,7 @@ function kitchenCorner(b: Builder, w: number, d: number, h: number): void {
   b.seg(xFront + 0.004, h * 0.72, -d / 2 + arm + 0.08, xFront + 0.004, h * 0.72, -d / 2 + arm + 0.22, EDGE_GLOW);
 }
 
-function showerScreen(b: Builder, w: number, d: number, h: number): void {
-  const t = Math.min(0.025, Math.max(0.01, d * 0.35));
-  b.box(-w / 2, w / 2, 0, 0.025, -t, t, C.metal, C.metal, EDGE_GLOW);
-  for (const x of [-w / 2, 0, w / 2]) b.box(x - t, x + t, 0, h, -t, t, C.metal, C.metal, EDGE_GLOW);
-  b.seg(-w / 2, h, 0, w / 2, h, 0, EDGE_GLOW);
-  b.seg(w * 0.32, h * 0.42, t + 0.003, w * 0.32, h * 0.62, t + 0.003, EDGE_FURN);
-}
-
 export const KITCHEN_BATH_FURNITURE_MODELS: Readonly<Record<string, FurnitureModelRenderer>> = {
-  bathtub: ({ b, w, d, h }) => (bathtub(b, w, d, h), 0.5),
   fridge: ({ b, w, d, h }) => (fridge(b, w, d, h), 0.5),
   fridge_smart: ({ b, w, d, h }) => (fridgeSmart(b, w, d, h), 0.5),
   island: ({ b, w, d, h }) => (island(b, w, d, h), 0.5),
@@ -312,12 +259,7 @@ export const KITCHEN_BATH_FURNITURE_MODELS: Readonly<Record<string, FurnitureMod
   kitchen_wall: ({ b, w, d, h }) => (kitchenWall(b, w, d, h), false),
   microwave: ({ b, w, d, h, base }) => (microwave(b, w, d, h), base > 0.05 ? false : 0.5),
   range_hood: ({ b, w, d, h }) => (rangeHood(b, w, d, h), false),
-  shower: ({ b, w, d, h }) => (shower(b, w, d, h), 0.5),
-  shower_screen: ({ b, w, d, h }) => (showerScreen(b, w, d, h), 0.5),
   sink: ({ b, w, d, h }) => (sink(b, w, d, h), 0.5),
   stove: ({ b, w, d, h }) => (stove(b, w, d, h), 0.5),
-  washbasin: ({ b, w, d, h }) => (washbasin(b, w, d, h), 0.5),
   water_purifier: ({ b, w, d, h }) => (waterPurifier(b, w, d, h), 0.5),
-  wc: ({ b, w, d, h }) => (wc(b, w, d, h), 0.5),
 };
-

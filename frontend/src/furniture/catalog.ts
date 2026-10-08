@@ -56,7 +56,7 @@ export const REFERENCE_PACK_ITEMS: Record<ReferencePack, readonly FurnitureType[
     "range_hood", "microwave", "kitchen_corner", "kitchen_display", "table", "table_round", "chair", "bench", "corner_bench", "bar_stool", "kitchen", "kitchen_wall", "kitchen_tall", "island", "worktop", "sink", "stove", "dishwasher", "fridge",
   ],
   bedroom: ["vanity", "bed_single", "bed_double", "bed", "nightstand", "wardrobe", "dresser", "bed_90", "bed_140", "bed_160", "bed_180", "bed_200", "bed_upholstered_180", "bed_boxspring_180", "bed_futon_160", "wardrobe_2door", "wardrobe_3door", "wardrobe_4door", "wardrobe_6door", "wardrobe_mirror", "wardrobe_corner", "nightstand_drawer", "nightstand_slim", "nightstand_floating", "dresser_80_3", "dresser_140_6", "chest_tall_5", "clothes_rail", "bed_canopy", "wardrobe_sliding", "closet_walkin", "vanity_mirror", "bed_bench", "changing_table", "mirror_floor", "chest_tall", "reading_nook", "bed_ambient_180", "wardrobe_light", "alarm_sunrise", "vanity_light"],
-  bathroom: ["shower_screen", "bathtub", "shower", "wc", "washbasin"],
+  bathroom: ["shower_screen", "bathtub", "shower", "wc", "washbasin", "vanity_60", "vanity_80", "vanity_100", "double_vanity_120", "pedestal_basin", "bathtub_builtin", "bathtub_corner", "shower_corner_90", "shower_niche_120", "shower_walkin_140"],
   kids: ["crib", "bunk_bed"],
   office: ["desk", "office_chair", "tall_cabinet"],
   garden: ["hammock", "stone_table_set", "planter_large"],

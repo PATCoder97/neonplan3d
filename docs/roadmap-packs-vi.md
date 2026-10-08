@@ -25,7 +25,7 @@ Nói ngắn gọn: ảnh của họ được dùng để trả lời “cần c�
 
 ## Hiện trạng ngày 08/10/2026
 
-- Thư viện tích hợp hiện có **216 mục** trong 10 nhóm giao diện, gồm nhiều đồ dùng đặc trưng tại Việt Nam như bàn thờ, xe máy, bồn nước, võng, tủ giày, giàn phơi, quạt trần có đèn, quạt treo tường, robot cắt cỏ, cụm hạ tầng mạng/an toàn, cụm thiết bị kỹ thuật, bộ điều khiển/cảm biến nhà thông minh, chín kiểu đèn, sáu lô phòng khách và ba lô phòng ngủ theo gallery công khai.
+- Thư viện tích hợp hiện có **226 mục** trong 10 nhóm giao diện, gồm nhiều đồ dùng đặc trưng tại Việt Nam như bàn thờ, xe máy, bồn nước, võng, tủ giày, giàn phơi, quạt trần có đèn, quạt treo tường, robot cắt cỏ, cụm hạ tầng mạng/an toàn, cụm thiết bị kỹ thuật, bộ điều khiển/cảm biến nhà thông minh, chín kiểu đèn, sáu lô phòng khách, ba lô phòng ngủ và lô phòng tắm đầu tiên theo gallery công khai.
 - Có 9 gói bố trí nhanh cho phòng: hai kiểu bếp, phòng tắm, phòng ngủ, phòng khách, phòng ăn, văn phòng, phòng trẻ em và sảnh.
 - Trình chỉnh sửa đã có tìm kiếm song ngữ, nhóm thu gọn, xem trước, đổi kích thước, xoay, lật, đặt lên sàn/tường/trần/bề mặt và liên kết entity.
 - Định dạng pack nhập ngoài đã hỗ trợ khối hộp, trụ, khối vát, đèn, màn hình, bề mặt đặt đồ, phương tiện và lỗ cầu thang.
@@ -121,6 +121,16 @@ Bảng kiểm kê làm việc nên có các cột: `nhóm`, `nguồn ảnh`, `t�
 | Tủ mở, cửa lùa và phụ kiện | Thiếu tủ walk-in, giá treo, gương đứng và bàn thay tã | Thêm tủ áo cửa lùa, tủ walk-in chữ L, giá treo, gương đứng, ghế cuối giường, bàn thay tã và góc đọc sách. |
 | Nội thất phòng ngủ có đèn | Chưa có trạng thái đèn tích hợp | Thêm giường ambient, tủ áo có đèn, đồng hồ bình minh và bàn trang điểm có đèn gương; mỗi mẫu có vùng trạng thái riêng và bộ lọc tên entity. |
 
+### Đợt đối chiếu: Phòng tắm
+
+Đã xem [trang sản phẩm Bathroom](https://mastershort.de/product/neonplan3d-bathroom/) và toàn bộ gallery công khai ngày 08/10/2026. Danh sách công khai có 37 mục; hình học trong fork tiếp tục được dựng mới bằng primitive và tỷ lệ thực dụng riêng.
+
+| Họ công năng | Hiện trạng trước đợt | Hành động trong fork |
+|---|---|---|
+| Lavabo và tủ dưới | Chỉ có một `washbasin` đổi kích thước tự do | Thêm vanity cố định 60/80/100 cm, lavabo đôi 120 cm và lavabo chân đứng; số chậu cùng số khoang tủ được tham số hóa. |
+| Bồn tắm | Chỉ có một `bathtub` tổng quát | Thêm bồn xây âm chữ nhật và bồn góc có footprint riêng, giữ ID cũ tương thích. |
+| Khu tắm kính | Chỉ có `shower` và vách kính rời | Thêm buồng góc 90 × 90, buồng hốc 120 × 90 và walk-in 140 × 90 với cách bố trí vách riêng. |
+
 ## Kiến trúc cần làm trước
 
 Không tiếp tục thêm hàng trăm nhánh vào các `switch` lớn. Trước đợt nội dung đầu tiên, cần chuyển thư viện tích hợp sang catalog khai báo tập trung:
@@ -145,7 +155,7 @@ Các biến thể cùng họ, ví dụ sofa 2/3 chỗ, tủ bếp 40/60/80 cm ho
 Mục tiêu: biến hiện trạng thành đường cơ sở có thể đo được.
 
 - [x] Sinh báo cáo tự động từ `FURNITURE_TYPES`, `FURNITURE_GROUPS` và `FURNITURE_SIZE` để phát hiện ID trùng, thiếu tên hoặc thiếu kích thước (`cd frontend && npm run catalog`).
-- [x] Lập bảng ánh xạ các mục hiện tại vào 16 nhóm đích; catalog kiểm kê hiện khóa 223 type, 216 mục thư viện, 7 mục nội bộ và trường hợp `worktop` đang nằm trong hai nhóm. Mỗi mục chỉ được tính một lần trong `REFERENCE_PACK_ITEMS`.
+- [x] Lập bảng ánh xạ các mục hiện tại vào 16 nhóm đích; catalog kiểm kê hiện khóa 233 type, 226 mục thư viện, 7 mục nội bộ và trường hợp `worktop` đang nằm trong hai nhóm. Mỗi mục chỉ được tính một lần trong `REFERENCE_PACK_ITEMS`.
 - [ ] Duyệt toàn bộ ảnh gallery công khai của 16 trang sản phẩm, không chỉ ảnh đại diện ở trang Packs; lập bảng `đã phù hợp / cần sửa hình / cần thêm mới` kèm URL và ngày xem.
 - [ ] Chọn khoảng 10 mẫu hiện có cần sửa hình trước; `fan_ceiling` là mẫu thí điểm và phải giữ nguyên ID.
 - [ ] Chụp bộ ảnh chuẩn ở góc nhìn 2D, 3D và chế độ Day/Neon để so sánh hồi quy.
@@ -187,6 +197,7 @@ Mục tiêu: hoàn thiện bốn nhóm được dùng nhiều nhất trước, k
   - Đợt 2 đã thêm tủ áo 4/6 cánh, tủ gương, tủ góc, ba kiểu tủ đầu giường và ba tủ ngăn kéo; tủ đầu giường treo có cao độ 48 cm và không tạo bóng tiếp xúc sàn.
   - Đợt 3 đã thêm 14 mẫu tủ mở/phụ kiện/nội thất có đèn; độ phủ phòng ngủ đạt mốc tham chiếu 41/41, bốn mẫu có đèn có vùng trạng thái entity riêng.
 - [ ] Phòng tắm/giặt: lavabo bàn/treo, bồn cầu, khu tắm kính, bình nóng lạnh, máy giặt cửa trên/cửa trước và giàn phơi.
+  - Đợt 1 đã thêm năm loại lavabo/vanity, hai bồn tắm và ba khu tắm kính kích thước cố định; model/symbol mới nằm trong module Bathroom riêng, độ phủ đạt 15/37.
 - [ ] Đèn và làm mát: sửa hình `fan_ceiling`, thêm `fan_ceiling_light`, quạt treo tường và các kiểu đèn phổ biến; quạt có đèn phải điều khiển riêng phần quạt và phần sáng.
   - Đã hoàn thành `fan_ceiling`, biến thể 3/4/5 cánh, `fan_ceiling_light` với entity quạt/đèn riêng và `fan_wall`.
   - Đã thêm chín kiểu đèn theo gallery Smart Home: cột đèn, cặp thanh sáng TV, đèn bàn cầu, đèn xách tay, đèn ambient, khối đèn, panel tròn, cụm đèn sân vườn và đèn tường hắt hai đầu; mỗi kiểu có symbol 2D, hình học 3D và hiệu ứng sáng riêng.

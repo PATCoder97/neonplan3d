@@ -4,6 +4,18 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.20.9
+
+### Added
+
+- Added the first bathroom expansion batch: fixed 60/80/100 cm vanities, a 120 cm double vanity, pedestal basin, built-in and corner tubs, plus corner, niche and walk-in showers.
+- Added dedicated parameterized 2D symbols, low-poly 3D models and German/English/Vietnamese names for all ten items.
+
+### Changed
+
+- Split all new sanitary geometry into focused Bathroom model and symbol modules, separate from kitchen furniture.
+- Expanded the reproducible catalog inventory to 233 declared types and 226 library items, with bathroom reference coverage at 15 of 37.
+
 ## 1.20.8
 
 ### Added
