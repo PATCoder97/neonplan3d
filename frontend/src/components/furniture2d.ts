@@ -57,12 +57,12 @@ export function furnitureSymbol(type: string, w: number, d: number): Part[] | ty
       ];
     case "fan_ceiling":
     case "fan_ceiling_light": {
+      const r = Math.min(w, d);
       const out: Part[] = [
-        circle(0, 0, Math.min(w, d) * 0.09, "fp3d-sym-fill"),
-        rect(-w / 2, -d * 0.055, w / 2, d * 0.055),
-        rect(-w * 0.055, -d / 2, w * 0.055, d / 2),
+        ...Array.from({ length: 5 }, (_, i) => svg`<rect x=${r * 0.08} y=${-r * 0.055} width=${r * 0.4} height=${r * 0.11} rx=${r * 0.015} transform=${`rotate(${i * 72})`} />`),
+        circle(0, 0, r * 0.105, "fp3d-sym-fill"),
       ];
-      if (type === "fan_ceiling_light") out.push(circle(0, 0, Math.min(w, d) * 0.16), circle(0, 0, Math.min(w, d) * 0.11, "fp3d-sym-fill"));
+      if (type === "fan_ceiling_light") out.push(circle(0, 0, r * 0.15), circle(0, 0, r * 0.105, "fp3d-sym-fill"));
       return out;
     }
     case "fan_floor":

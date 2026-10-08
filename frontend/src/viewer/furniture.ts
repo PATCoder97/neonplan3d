@@ -1010,8 +1010,12 @@ function motorbike(b: Builder, w: number, d: number, h: number): void {
 
 function ceilingFan(b: Builder, w: number, d: number, h: number): void {
   const y = h * 0.18;
-  b.cyl(0, 0, Math.min(w, d) * 0.115, y, h * 0.62, C.body, C.bodyTop, 16, EDGE_FURN);
-  b.cyl(0, 0, Math.min(w, d) * 0.025, h * 0.7, h, C.metal, C.metal, 8);
+  const r = Math.min(w, d);
+  // Low round motor, short downrod and a broad ceiling canopy match the pack reference silhouette.
+  b.cyl(0, 0, r * 0.105, y, h * 0.34, C.dark, C.bodyTop, 18, EDGE_GLOW);
+  b.cyl(0, 0, r * 0.035, h * 0.3, h * 0.76, C.metal, C.bodyTop, 10, EDGE_FURN);
+  b.cyl(0, 0, r * 0.075, h * 0.74, h * 0.94, C.body, C.bodyTop, 16, EDGE_FURN);
+  b.cyl(0, 0, r * 0.095, h * 0.92, h, C.body, C.bodyTop, 16, EDGE_FAINT);
 }
 
 function floorFan(b: Builder, w: number, d: number, h: number): void {
@@ -1070,14 +1074,15 @@ function wallFan(b: Builder, w: number, d: number, h: number): void {
 export function pushFanRotor(buf: GeoBuffer, lines: LineBuffer, type: "fan_ceiling" | "fan_ceiling_light" | "fan_wall" | "fan_floor", w: number, d: number, h: number, variant: string | null = null): void {
   if (type === "fan_ceiling" || type === "fan_ceiling_light") {
     const b = new Builder(buf, lines, (x, z) => [x, z]);
-    const bladeW = Math.min(w, d) * 0.13;
-    const blades = variant === "4" ? 4 : variant === "5" ? 5 : 3;
-    // Existing plans keep the original three blades; the editor can opt into four or five.
+    const span = Math.min(w, d);
+    const bladeW = span * 0.115;
+    const blades = variant === "3" ? 3 : variant === "4" ? 4 : 5;
+    // The official pack reference uses five straight, dark paddles; 3/4 remain optional variants.
     for (let i = 0; i < blades; i++) {
       const a = (i / blades) * 360;
-      b.rotated(0, 0, a).loft([w * 0.08, w * 0.48, -bladeW * 0.52, bladeW * 0.52], [w * 0.12, w * 0.46, -bladeW * 0.32, bladeW * 0.32], 0, h * 0.07, C.wood, C.woodTop, EDGE_FURN);
+      b.rotated(0, 0, a).loft([span * 0.08, span * 0.48, -bladeW * 0.42, bladeW * 0.42], [span * 0.105, span * 0.465, -bladeW * 0.52, bladeW * 0.52], 0, h * 0.06, C.fabric, C.fabricTop, EDGE_FURN);
     }
-    b.cyl(0, 0, Math.min(w, d) * 0.14, -h * 0.035, h * 0.08, C.body, C.bodyTop, 18, EDGE_GLOW);
+    b.cyl(0, 0, span * 0.115, -h * 0.025, h * 0.07, C.dark, C.bodyTop, 18, EDGE_GLOW);
     return;
   }
 

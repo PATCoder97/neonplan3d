@@ -4,12 +4,19 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.19.3
+
+### Changed
+
+- Redrew both ceiling fans from the official Smart Home & Tech gallery reference with five straight dark blades, a low round motor, short downrod and broad ceiling canopy.
+- Changed the combined model to a compact hexagonal amber light cover and made the referenced five-blade silhouette the default while retaining optional three- and four-blade variants.
+
 ## 1.19.2
 
 ### Added
 
 - Added a wall-mounted fan with dedicated 2D/3D geometry, adjustable mounting height, live rotor animation and Home Assistant fan linking.
-- Added selectable three-, four- and five-blade variants for both ceiling-fan models while keeping existing plans on the original three-blade shape.
+- Added selectable three-, four- and five-blade variants for both ceiling-fan models.
 
 ## 1.19.1
 

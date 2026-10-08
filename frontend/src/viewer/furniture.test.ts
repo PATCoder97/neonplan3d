@@ -237,6 +237,9 @@ test("ceiling, ceiling-light, wall and floor fans have separate finite rotors fo
     return buf.count;
   });
   assert.ok(counts[0] < counts[1] && counts[1] < counts[2], "ceiling variants add one blade at a time");
+  const defaultRotor = new GeoBuffer();
+  pushFanRotor(defaultRotor, new LineBuffer(), "fan_ceiling", 1.4, 1.4, 0.32);
+  assert.equal(defaultRotor.count, counts[2], "the official five-blade pack shape is the default");
 });
 
 /** Signed volume of a closed-ish mesh: positive when its triangles face outwards. */

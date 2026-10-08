@@ -68,12 +68,12 @@ Bảng kiểm kê làm việc nên có các cột: `nhóm`, `nguồn ảnh`, `t�
 
 ### Đợt đối chiếu đầu tiên: Smart Home & Tech
 
-Ảnh gallery công khai của [Smart Home & Tech](https://mastershort.de/product/neonplan3d-smart-home-tech/) cho thấy rõ cả quạt trần thường và quạt trần có đèn. Đây là ví dụ đầu tiên để kiểm chứng quy trình:
+Ảnh gallery công khai của [Smart Home & Tech](https://mastershort.de/product/neonplan3d-smart-home-tech/) cho thấy rõ cả quạt trần thường và quạt trần có đèn ở [trang tổng quan 3/3](https://mastershort.de/wp-content/uploads/2026/10/neonplan3d-smarthome-r2-overview-3.jpg). Đây là ví dụ đầu tiên để kiểm chứng quy trình:
 
 | Mục | Hiện trạng | Hành động trong fork |
 |---|---|---|
-| Quạt trần | Đã có `fan_ceiling` | Đã giữ ID và hoạt ảnh quay hiện tại, đồng thời hỗ trợ biến thể 3/4/5 cánh bằng renderer tham số hóa. |
-| Quạt trần có đèn | Đã thêm `fan_ceiling_light` | Đã dùng hình học quạt riêng của dự án với cụm đèn trung tâm, rotor động và hai entity quạt/đèn độc lập; không sao chép chính xác mẫu trong ảnh. |
+| Quạt trần | Đã có `fan_ceiling` | Đã giữ ID và hoạt ảnh, vẽ lại theo dáng nhận diện trong ảnh 3/3: 5 cánh bản thẳng màu tối, motor tròn thấp, ty ngắn và bát áp trần rộng; vẫn có biến thể 3/4 cánh. |
+| Quạt trần có đèn | Đã thêm `fan_ceiling_light` | Dùng cùng họ hình học 5 cánh với chụp đèn đa giác màu vàng dưới tâm, rotor động và hai entity quạt/đèn độc lập. |
 | Quạt treo tường | Đã thêm `fan_wall` | Đã có ký hiệu 2D, thân và lồng quạt 3D gắn tường, chiều cao lắp đặt tùy chỉnh, rotor động và liên kết fan entity. |
 | Robot hút bụi có dock | Mới có robot cơ bản | Giữ `robot_vacuum`, bổ sung variant dock sạc và trạng thái đang sạc/dọn dẹp. |
 | Robot cắt cỏ có garage | Chưa có | Thêm một mẫu ngoài trời, hỗ trợ entity lawn mower khi Home Assistant cung cấp. |

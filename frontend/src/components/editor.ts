@@ -5867,7 +5867,7 @@ export class Fp3dEditor extends LitElement {
               >${this.t("fan_blades")}
               <select ?disabled=${!admin} @change=${(e: Event) => this.updateFurniture({ variant: (e.target as HTMLSelectElement).value || null })}>
                 ${(["3", "4", "5"] as const).map(
-                  (v) => html`<option value=${v} ?selected=${(f.variant ?? "3") === v}>${this.t(`fan_blades_${v}` as I18nKey)}</option>`,
+                  (v) => html`<option value=${v} ?selected=${(f.variant ?? "5") === v}>${this.t(`fan_blades_${v}` as I18nKey)}</option>`,
                 )}
               </select></label
             >

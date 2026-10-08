@@ -3954,9 +3954,9 @@ export function pushLampModel(
       break;
     case "fan": {
       // Light kit below a combined ceiling fan; its body and moving blades are built separately.
-      const lens = Math.min(w, dd) * 0.13;
-      cyl(lens * 1.16, base, base + h * 0.055, LAMP_BODY, LAMP_BODY, 18);
-      cyl(lens, base - h * 0.045, base, shadeCol, shadeCol, 18);
+      const lens = Math.min(w, dd) * 0.105;
+      cyl(lens * 1.18, base, base + h * 0.05, LAMP_BODY, LAMP_BODY, 12);
+      cyl(lens, base - h * 0.065, base, shadeCol, shadeCol, 6);
       break;
     }
     case "pendant": {
