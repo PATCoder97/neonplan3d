@@ -107,6 +107,7 @@ import { load3d } from "../load3d.ts";
 import type { WallMode } from "../viewer/viewer3d.ts";
 import { furnitureName } from "../furniture-names.ts";
 import { BUILTIN_FURNITURE_CATALOG, FURNITURE_LIBRARY_GROUPS } from "../furniture/catalog.ts";
+import { foldFurnitureText, furnitureFilterTraits, matchesFurnitureFilters, type FurnitureCapabilityFilter, type FurnitureFilterTraits, type FurnitureLibraryFilters, type FurnitureMountFilter, type FurnitureStyleFilter } from "../furniture/filters.ts";
 import { furnitureSize, isElectric, mountBase, packItem, packItemName, packType, setPacks, type FurniturePack } from "../packs.ts";
 import { EDITOR_TOOL_GROUPS, resolvedFurniturePane, type EditorTool, type FurniturePane } from "../editor-navigation.ts";
 import { planToScreen, screenToPlan, zoomPlanAt } from "../editor-view.ts";
@@ -192,6 +193,10 @@ export class Fp3dEditor extends LitElement {
     _energyNote: { state: true },
     _cableId: { state: true },
     _furnQuery: { state: true },
+    _furnGroup: { state: true },
+    _furnMount: { state: true },
+    _furnCapability: { state: true },
+    _furnStyle: { state: true },
     _furnPane: { state: true },
     _libOpen: { state: true },
     _expanded: { state: true },
@@ -266,6 +271,10 @@ export class Fp3dEditor extends LitElement {
   private cableCache: { doc: Building; segs: FlowSegment[] } | null = null;
   /** Furniture library: the search text, and which sections are open (built-in groups and packs). */
   private declare _furnQuery: string;
+  private declare _furnGroup: string;
+  private declare _furnMount: FurnitureMountFilter;
+  private declare _furnCapability: FurnitureCapabilityFilter;
+  private declare _furnStyle: FurnitureStyleFilter;
   /** Furniture tool: browse the library, or edit the selected item without mixing both long panels. */
   private declare _furnPane: FurniturePane;
   private declare _libOpen: Set<string>;
@@ -344,6 +353,10 @@ export class Fp3dEditor extends LitElement {
     this._energyNote = null;
     this._cableId = null;
     this._furnQuery = "";
+    this._furnGroup = "all";
+    this._furnMount = "all";
+    this._furnCapability = "all";
+    this._furnStyle = "all";
     this._furnPane = "library";
     this._libOpen = new Set(["group:lights", "group:living"]);
     try {
@@ -6491,14 +6504,15 @@ export class Fp3dEditor extends LitElement {
   }
 
   /** A section of the library: folded away unless open (or while a search shows its hits). */
-  private librarySection(key: string, title: string, items: { type: string; label: string; search?: string }[], q: string) {
+  private librarySection(key: string, title: string, items: { type: string; label: string; search?: string; traits: FurnitureFilterTraits }[], q: string, filters: FurnitureLibraryFilters) {
+    const filtered = items.filter((it) => matchesFurnitureFilters(it.traits, filters));
     // every word of the query somewhere in the item's names, its id or its section's title (D155)
-    const words = fold(q).split(/\s+/).filter(Boolean);
-    const hits = words.length ? items.filter((it) => {
-      const hay = fold(`${it.label} ${it.search ?? ""} ${it.type.replace(/[_:.]/g, " ")} ${title}`);
+    const words = foldFurnitureText(q).split(/\s+/).filter(Boolean);
+    const hits = words.length ? filtered.filter((it) => {
+      const hay = foldFurnitureText(`${it.label} ${it.search ?? ""} ${it.type.replace(/[_:.]/g, " ")} ${title}`);
       return words.every((w) => hay.includes(w));
-    }) : items;
-    if (q && !hits.length) return nothing;
+    }) : filtered;
+    if (!hits.length) return nothing;
     const open = q ? true : this._libOpen.has(key);
     return html`<button class="fp3d-lib-head fp3d-lib-toggle" aria-expanded=${open} @click=${() => this.toggleLibrary(key)}>
         <span class="fp3d-lib-caret">${open ? "▾" : "▸"}</span>${title} <span class="fp3d-lib-count">${hits.length}</span>
@@ -6507,15 +6521,22 @@ export class Fp3dEditor extends LitElement {
   }
 
   /** Whether the furniture library has any item for the query (else a "nothing found" line shows). */
-  private libraryHasHits(q: string): boolean {
-    const words = fold(q).split(/\s+/).filter(Boolean);
+  private libraryHasHits(q: string, filters: FurnitureLibraryFilters): boolean {
+    const words = foldFurnitureText(q).split(/\s+/).filter(Boolean);
     const lang = this.hass?.language ?? "en";
-    const all: string[] = [
-      ...Object.entries(FURNITURE_LIBRARY_GROUPS).flatMap(([g, types]) => types.map((t) => `${this.t(`furn_${t}` as I18nKey)} ${translate(EN_HASS, `furn_${t}` as I18nKey)} ${t.replace(/_/g, " ")} ${this.t(`furn_group_${g}` as I18nKey)}`)),
-      ...(this.packs ?? []).flatMap((p) => p.items.map((it) => `${packItemName(it, lang)} ${Object.values(it.name).join(" ")} ${it.id.replace(/_/g, " ")} ${p.name}`)),
+    const all: { search: string; traits: FurnitureFilterTraits }[] = [
+      ...Object.entries(FURNITURE_LIBRARY_GROUPS).flatMap(([g, types]) => types.map((t) => ({
+        search: `${this.t(`furn_${t}` as I18nKey)} ${translate(EN_HASS, `furn_${t}` as I18nKey)} ${t.replace(/_/g, " ")} ${this.t(`furn_group_${g}` as I18nKey)}`,
+        traits: furnitureFilterTraits(t, g, { light: isLamp(t), screen: hasScreen(t), electric: isElectric(t) }),
+      }))),
+      ...(this.packs ?? []).flatMap((p) => p.items.map((it) => ({
+        search: `${packItemName(it, lang)} ${Object.values(it.name).join(" ")} ${it.id.replace(/_/g, " ")} ${p.name}`,
+        traits: furnitureFilterTraits(packType(p.id, it.id), "packs", { mount: it.mount ?? "floor", light: !!it.light, screen: it.parts.some((part) => part.screen), electric: !!it.electric || !!it.light }),
+      }))),
     ];
-    return all.some((s) => {
-      const hay = fold(s);
+    return all.some((item) => {
+      if (!matchesFurnitureFilters(item.traits, filters)) return false;
+      const hay = foldFurnitureText(item.search);
       return words.every((w) => hay.includes(w));
     });
   }
@@ -6706,6 +6727,16 @@ export class Fp3dEditor extends LitElement {
     const room = this.room;
     const q = this._furnQuery.trim().toLowerCase();
     const lang = this.hass?.language ?? "en";
+    const filters: FurnitureLibraryFilters = { group: this._furnGroup, mount: this._furnMount, capability: this._furnCapability, style: this._furnStyle };
+    const selectFilter = (label: I18nKey, value: string, options: readonly [string, I18nKey][], change: (value: string) => void) => html`<label class="fp3d-lib-filter">
+      <span>${this.t(label)}</span>
+      <select .value=${value} @change=${(e: Event) => change((e.target as HTMLSelectElement).value)}>
+        ${options.map(([id, key]) => html`<option value=${id} ?selected=${id === value}>${this.t(key)}</option>`)}
+      </select>
+    </label>`;
+    const groupOptions: [string, I18nKey][] = [["all", "furniture_filter_all"]];
+    for (const group of Object.keys(FURNITURE_LIBRARY_GROUPS)) groupOptions.push([group, `furn_group_${group}` as I18nKey]);
+    if (this.packs?.length) groupOptions.push(["packs", "furniture_filter_packs"]);
     return html`<section>
       <h3>${this.t("furniture_add")}</h3>
       <p class="fp3d-sub">${room ? this.t("furniture_into", { room: room.name }) : this.t("furniture_pick_room")}</p>
@@ -6719,22 +6750,40 @@ export class Fp3dEditor extends LitElement {
           if (e.key === "Escape") this._furnQuery = "";
         }}
       />
-      ${q && !this.libraryHasHits(q) ? html`<p class="fp3d-sub">${this.t("furniture_search_none")}</p>` : nothing}
+      <div class="fp3d-lib-filters">
+        ${selectFilter("furniture_filter_room", this._furnGroup, groupOptions, (value) => (this._furnGroup = value))}
+        ${selectFilter("furniture_filter_mount", this._furnMount, [["all", "furniture_filter_all"], ["floor", "furniture_mount_floor"], ["surface", "furniture_mount_surface"], ["wall", "furniture_mount_wall"], ["ceiling", "furniture_mount_ceiling"]], (value) => (this._furnMount = value as FurnitureMountFilter))}
+        ${selectFilter("furniture_filter_capability", this._furnCapability, [["all", "furniture_filter_all"], ["static", "furniture_cap_static"], ["light", "furniture_cap_light"], ["screen", "furniture_cap_screen"], ["power", "furniture_cap_power"], ["motion", "furniture_cap_motion"]], (value) => (this._furnCapability = value as FurnitureCapabilityFilter))}
+        ${selectFilter("furniture_filter_style", this._furnStyle, [["all", "furniture_filter_all"], ["modern", "furniture_style_modern"], ["classic", "furniture_style_classic"], ["natural", "furniture_style_natural"], ["technical", "furniture_style_technical"]], (value) => (this._furnStyle = value as FurnitureStyleFilter))}
+      </div>
+      ${!this.libraryHasHits(q, filters) ? html`<p class="fp3d-sub">${this.t("furniture_search_none")}</p>` : nothing}
       ${Object.entries(FURNITURE_LIBRARY_GROUPS).map(([group, types]) =>
         this.librarySection(
           `group:${group}`,
           this.t(`furn_group_${group}` as I18nKey),
           // the smart fridge is exclusive: only an installed pack with the feature "fridge_smart" offers it
-          [...types, ...(group === "kitchen" && hasFeature("fridge_smart") ? ["fridge_smart"] : [])].map((t) => ({ type: t, label: this.t(`furn_${t}` as I18nKey), search: translate(EN_HASS, `furn_${t}` as I18nKey) })),
+          [...types, ...(group === "kitchen" && hasFeature("fridge_smart") ? ["fridge_smart"] : [])].map((t) => ({
+            type: t,
+            label: this.t(`furn_${t}` as I18nKey),
+            search: translate(EN_HASS, `furn_${t}` as I18nKey),
+            traits: furnitureFilterTraits(t, group, { light: isLamp(t), screen: hasScreen(t), electric: isElectric(t) }),
+          })),
           q,
+          filters,
         ),
       )}
       ${(this.packs ?? []).map((pack) =>
         this.librarySection(
           `pack:${pack.id}`,
           pack.name,
-          pack.items.map((it) => ({ type: packType(pack.id, it.id), label: packItemName(it, lang), search: Object.values(it.name).join(" ") })),
+          pack.items.map((it) => ({
+            type: packType(pack.id, it.id),
+            label: packItemName(it, lang),
+            search: Object.values(it.name).join(" "),
+            traits: furnitureFilterTraits(packType(pack.id, it.id), "packs", { mount: it.mount ?? "floor", light: !!it.light, screen: it.parts.some((part) => part.screen), electric: !!it.electric || !!it.light }),
+          })),
           q,
+          filters,
         ),
       )}
     </section>`;
@@ -8122,6 +8171,27 @@ export class Fp3dEditor extends LitElement {
         font-weight: 500;
         font-size: 13px;
       }
+      .fp3d-lib-filters {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 6px;
+        margin: 0 0 8px;
+      }
+      .fp3d-lib-filter {
+        display: grid;
+        gap: 2px;
+        color: var(--fp3d-muted);
+        font-size: 11px;
+      }
+      .fp3d-lib-filter select {
+        min-width: 0;
+        width: 100%;
+        color: var(--fp3d-text);
+        background: var(--fp3d-panel, #0d1424);
+        border: 1px solid var(--fp3d-line);
+        border-radius: 7px;
+        padding: 5px 6px;
+      }
       /* the background picture while it is edited: a dashed frame and a corner handle */
       .fp3d-bg-frame {
         fill: none;
@@ -9067,11 +9137,6 @@ function distToSegment(p: Vec2, a: Vec2, b: Vec2): number {
   const l2 = dx * dx + dz * dz || 1;
   const t = Math.min(1, Math.max(0, ((p[0] - a[0]) * dx + (p[1] - a[1]) * dz) / l2));
   return Math.hypot(p[0] - a[0] - dx * t, p[1] - a[1] - dz * t);
-}
-
-/** Lower case without accents, so "kuche" finds "Küche" and "chaise" finds "Chaise longue". */
-function fold(s: string): string {
-  return s.toLowerCase().normalize("NFD").replace(/\p{M}/gu, "");
 }
 
 /** A stand-in hass for English names (the furniture search also matches the English name). */

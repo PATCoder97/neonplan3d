@@ -4,6 +4,17 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.24.0
+
+### Added
+
+- Added composable furniture-library filters for room/group, floor/surface/wall/ceiling mount, static/light/screen/power/motion capability and modern/classic/natural/technical style.
+- Added filter classification and regression tests for built-in and imported-pack metadata, plus a visual test scenario for combined filters.
+
+### Changed
+
+- Furniture search and filters now work together across built-in groups and imported packs; accent-insensitive Vietnamese search is retained and covered by a dedicated test.
+
 ## 1.23.9
 
 ### Added
