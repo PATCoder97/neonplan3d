@@ -759,6 +759,33 @@ function kitchenTall(b: Builder, w: number, d: number, h: number): void {
   b.seg(w / 2 - 0.06, 1.6, z + 0.012, w / 2 - 0.06, 1.8, z + 0.012, EDGE_GLOW);
 }
 
+/** A tall crockery/display cabinet with framed glass doors and visible shelves. */
+function kitchenDisplay(b: Builder, w: number, d: number, h: number): void {
+  const frame = Math.min(0.055, w * 0.075);
+  const front = d / 2;
+  const rear = -d / 2;
+  const lower = Math.min(0.62, h * 0.3);
+  // carcass and a closed lower cupboard
+  b.box(-w / 2, w / 2, 0.02, h, rear, rear + 0.035, C.body, C.bodyTop, EDGE_FURN);
+  b.box(-w / 2, -w / 2 + frame, 0.02, h, rear, front, C.body, C.bodyTop, EDGE_FURN);
+  b.box(w / 2 - frame, w / 2, 0.02, h, rear, front, C.body, C.bodyTop, EDGE_FURN);
+  b.box(-w / 2, w / 2, h - frame, h, rear, front, C.body, C.bodyTop, EDGE_FURN);
+  b.box(-w / 2, w / 2, 0.02, lower, rear, front - 0.015, C.body, C.bodyTop, EDGE_FURN);
+  b.box(-w / 2 + 0.02, w / 2 - 0.02, 0, 0.08, rear + 0.02, front - 0.04, C.dark);
+  // lit display chamber: glass fronts, slim frames and three shelves
+  b.box(-w / 2 + frame, w / 2 - frame, lower, h - frame, rear + 0.036, rear + 0.05, C.dark, C.dark);
+  for (const y of [lower + (h - lower) * 0.25, lower + (h - lower) * 0.5, lower + (h - lower) * 0.75]) {
+    b.box(-w / 2 + frame, w / 2 - frame, y - 0.012, y + 0.012, rear + 0.05, front - 0.025, C.glass, C.glass, EDGE_GLOW);
+  }
+  b.box(-w / 2 + frame, -frame * 0.35, lower + frame, h - frame * 1.5, front - 0.012, front, C.glass, C.glass, EDGE_FAINT);
+  b.box(frame * 0.35, w / 2 - frame, lower + frame, h - frame * 1.5, front - 0.012, front, C.glass, C.glass, EDGE_FAINT);
+  b.box(-frame * 0.35, frame * 0.35, lower, h - frame, front - 0.02, front + 0.005, C.metal, C.metal, EDGE_FURN);
+  b.box(-w / 2, w / 2, lower - frame * 0.5, lower + frame * 0.5, front - 0.02, front + 0.005, C.body, C.bodyTop, EDGE_FURN);
+  b.seg(-frame * 1.4, lower + (h - lower) * 0.46, front + 0.012, -frame * 1.4, lower + (h - lower) * 0.62, front + 0.012, EDGE_GLOW);
+  b.seg(frame * 1.4, lower + (h - lower) * 0.46, front + 0.012, frame * 1.4, lower + (h - lower) * 0.62, front + 0.012, EDGE_GLOW);
+  b.seg(0, 0.12, front + 0.012, 0, lower - 0.12, front + 0.012, EDGE_FAINT);
+}
+
 function island(b: Builder, w: number, d: number, h: number): void {
   const inner = d - 0.3;
   b.box(-w / 2 + 0.05, w / 2 - 0.05, 0.08, h - 0.04, -d / 2 + 0.02, -d / 2 + inner, C.body, C.bodyTop, EDGE_FURN);
@@ -1230,6 +1257,17 @@ function kitchenCorner(b: Builder, w: number, d: number, h: number): void {
   b.box(-w / 2, w / 2, h - 0.04, h, -d / 2, -d / 2 + arm, C.whiteTop, C.whiteTop, EDGE_GLOW);
   b.box(-w / 2, -w / 2 + arm, h - 0.04, h, -d / 2 + arm, d / 2, C.whiteTop, C.whiteTop, EDGE_GLOW);
   b.seg(-w / 2 + arm, 0.08, -d / 2 + arm, -w / 2 + arm, h - 0.08, -d / 2 + arm, EDGE_FAINT);
+  // cabinet fronts follow both arms so the corner reads clearly in 3D
+  const zFront = -d / 2 + arm + 0.006;
+  const xFront = -w / 2 + arm + 0.006;
+  for (let i = 1; i < 3; i++) {
+    const x = -w / 2 + arm + ((w - arm) * i) / 3;
+    b.seg(x, 0.08, zFront, x, h - 0.08, zFront, EDGE_FAINT);
+    const z = -d / 2 + arm + ((d - arm) * i) / 3;
+    b.seg(xFront, 0.08, z, xFront, h - 0.08, z, EDGE_FAINT);
+  }
+  b.seg(-w / 2 + arm + 0.08, h * 0.72, zFront + 0.004, -w / 2 + arm + 0.22, h * 0.72, zFront + 0.004, EDGE_GLOW);
+  b.seg(xFront + 0.004, h * 0.72, -d / 2 + arm + 0.08, xFront + 0.004, h * 0.72, -d / 2 + arm + 0.22, EDGE_GLOW);
 }
 
 function vanity(b: Builder, w: number, d: number, h: number): void {
@@ -1644,6 +1682,9 @@ function buildFurniture(buf: GeoBuffer, lines: LineBuffer, shadow: GeoBuffer, f:
       return;
     case "kitchen_corner":
       kitchenCorner(b, w, d, h);
+      break;
+    case "kitchen_display":
+      kitchenDisplay(b, w, d, h);
       break;
     case "vanity":
       vanity(b, w, d, h);

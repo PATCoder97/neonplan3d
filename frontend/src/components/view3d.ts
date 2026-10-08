@@ -1495,6 +1495,10 @@ export class Fp3dView3d extends LitElement {
           markers.push(this.lampMarker(hass, floor, f, linked?.entity ?? null));
           continue;
         }
+        if (f.type === "kitchen_display") {
+          markers.push(this.cabinetLightMarker(hass, floor, f, linked?.entity ?? null));
+          continue;
+        }
         // a home battery with only its charge, a wallbox with only its status still gets its marker;
         // a parking spot with Auto Pro data gets one even without a presence sensor
         const autoPro = f.type === "parking" && hasFeature("auto_pro") && !!f.car;
@@ -1905,6 +1909,24 @@ export class Fp3dView3d extends LitElement {
       show: f.marker ?? undefined,
       fromFurniture: true,
     };
+  }
+
+  /** The display cabinet stays furniture; this linked strip is mounted visibly inside its glass doors. */
+  private cabinetLightMarker(hass: HomeAssistant, floor: Building["floors"][number], f: Furniture, entity: string | null): DeviceMarker & { fromFurniture: boolean } {
+    const a = (f.rotation * Math.PI) / 180;
+    const front = Math.max(0, f.d / 2 - 0.055);
+    const strip: Furniture = {
+      ...f,
+      type: "led_strip",
+      x: f.x - Math.sin(a) * front,
+      z: f.z + Math.cos(a) * front,
+      w: Math.max(0.18, f.w - 0.16),
+      d: 0.025,
+      h: 0.025,
+      mount_y: Math.max(0.3, f.h * 0.84),
+      name: f.name || furnitureName(hass, "kitchen_display"),
+    };
+    return this.lampMarker(hass, floor, strip, entity);
   }
 
   /**

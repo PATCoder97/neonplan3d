@@ -51,6 +51,8 @@ export interface CoveredRenderArea {
   slope_dir?: SlopeDir;
   open?: boolean;
   outline?: boolean;
+  /** Selected room-floor colour; opaque roofs follow it so they stay in the same theme palette. */
+  roomColor?: number;
 }
 
 type RenderArea = OutdoorArea | CoveredRenderArea;
@@ -58,7 +60,7 @@ type RenderArea = OutdoorArea | CoveredRenderArea;
 const isCoveredArea = (area: RenderArea): area is CoveredRenderArea => area.type === "canopy" || area.type === "veranda";
 
 function coveredLook(a: CoveredRenderArea, fallback: Look): { roof: number; under: number } {
-  const roof = a.roof_style === "glass" ? 0x315a72 : fallback.color;
+  const roof = a.roof_style === "glass" ? 0x315a72 : (a.roomColor ?? fallback.color);
   const under = a.roof_style === "glass" ? 0x203c50 : fallback.side;
   return { roof, under };
 }

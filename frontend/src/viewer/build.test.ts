@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import type { BufferGeometry } from "three";
+import { Color, type BufferGeometry } from "three";
 import type { Floor, Furniture, Opening, Room } from "../model.ts";
 import { furnitureFootprint, newFloor } from "../model.ts";
 import { buildFloorGeometry, clipAlong, FLOOR_LOOK, stairHoles } from "./build.ts";
@@ -78,7 +78,12 @@ test("a covered room uses the normal patterned room floor extended to the outsid
   assert.ok(geo.coveredRoomTris[0].end > geo.coveredRoomTris[0].start);
   const roof = geo.coveredRoomTris[0];
   const folds = geo.walls.getAttribute("fold");
+  const colors = geo.walls.getAttribute("color");
+  const roomColor = new Color(FLOOR_LOOK.wood.color);
   assert.ok(roof.roofStart! < roof.roofEnd!);
+  near(colors.getX(roof.roofStart! * 3), roomColor.r);
+  near(colors.getY(roof.roofStart! * 3), roomColor.g);
+  near(colors.getZ(roof.roofStart! * 3), roomColor.b);
   assert.equal(folds.getX(roof.roofStart! * 3), 15, "the roof uses the reserved fold bucket so it can open without hiding devices");
 });
 

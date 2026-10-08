@@ -74,8 +74,8 @@ function copyFonts() {
   }
 }
 
-// 3D gained 2 KB for the covered-yard fence and gate; still small enough for old wall tablets.
-const BUDGET = { "neonplan3d.js": 425 * 1024, "neonplan3d-3d.js": 742 * 1024, "neonplan3d-editor.js": 522 * 1024, "neonplan3d-card-editor.js": 165 * 1024 };
+// 3D gained 4 KB for the covered-yard structure and the lit glass cabinet; still suitable for old wall tablets.
+const BUDGET = { "neonplan3d.js": 425 * 1024, "neonplan3d-3d.js": 744 * 1024, "neonplan3d-editor.js": 522 * 1024, "neonplan3d-card-editor.js": 165 * 1024 };
 
 copyFonts();
 if (watch) {

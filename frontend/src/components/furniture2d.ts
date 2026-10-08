@@ -105,7 +105,19 @@ export function furnitureSymbol(type: string, w: number, d: number): Part[] | ty
       return out;
     }
     case "kitchen_corner":
-      return [rect(-w / 2, -d / 2, w / 2, -d * 0.05), rect(-w / 2, -d * 0.05, -w * 0.05, d / 2), line(-w * 0.05, -d * 0.05, w / 2, -d * 0.05)];
+      return [
+        rect(-w / 2, -d / 2, w / 2, -d * 0.05),
+        rect(-w / 2, -d * 0.05, -w * 0.05, d / 2),
+        line(-w * 0.05, -d * 0.05, w / 2, -d * 0.05),
+        line(-w * 0.05, -d * 0.05, -w * 0.05, d / 2),
+      ];
+    case "kitchen_display":
+      return [
+        rect(-w / 2, -d / 2, w / 2, d / 2),
+        line(0, -d / 2, 0, d / 2, "fp3d-sym-strong"),
+        line(-w * 0.38, d * 0.2, w * 0.38, d * 0.2),
+        line(-w * 0.32, d * 0.34, w * 0.32, d * 0.34, "fp3d-sym-strong"),
+      ];
     case "vanity":
       return [rect(-w / 2, -d / 2, w / 2, d / 2), ellipse(0, -d * 0.28, w * 0.28, d * 0.12, "fp3d-sym-strong")];
     case "crib": {

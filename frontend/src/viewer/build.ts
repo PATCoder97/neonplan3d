@@ -347,6 +347,7 @@ export function buildFloorGeometry(
     slope: room.slope,
     slope_dir: room.slope_dir,
     open: room.open ?? true,
+    roomColor: (FLOOR_LOOK[room.floor_material] ?? FLOOR_LOOK.wood).color,
     // Composite outdoor geometry normally starts at ground level. Move it so its finished floor is
     // exactly y=0 of this storey, matching normal rooms and every room-mounted device.
     offset: -groundLevel(floor) - coveredFloorTop(room.kind),

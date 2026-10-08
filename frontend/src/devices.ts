@@ -697,6 +697,7 @@ const FURNITURE_NAMES: Record<string, RegExp> = {
   security_camera: /(security ?camera|surveillance|überwachung|camera|kamera|cctv|cam an ninh)/i,
   smart_lock: /(smart ?lock|türschloss|door ?lock|khóa cửa|khoa cua)/i,
   smart_curtain: /(curtain|blind|shade|vorhang|rollladen|rèm|rem)/i,
+  kitchen_display: /(vitrine|display ?cabinet|cabinet ?light|schranklicht|tủ kính|tu kinh|tủ trưng bày|tu trung bay|đèn tủ|den tu|led tủ|led tu)/i,
 };
 const MEDIA_FURNITURE = new Set(["tv_board", "tv_wall"]);
 
@@ -823,6 +824,9 @@ export function furnitureEntities(hass: HomeAssistant, floors: readonly Floor[])
           const candidates = room ? free : Object.keys(hass.states ?? {}).filter((id) => !used.has(id));
           const matches = candidates.filter((id) => ["switch", "fan"].includes(kindOf(id) ?? "") && pattern.test(name(id)));
           entity = room ? (matches[0] ?? null) : matches.length === 1 ? matches[0] : null;
+        } else if (f.type === "kitchen_display") {
+          const lights = free.filter((id) => ["light", "switch"].includes(kindOf(id) ?? ""));
+          entity = lights.find((id) => pattern.test(name(id))) ?? null;
         } else if (isMediaFurniture(f.type)) {
           const media = free.filter((id) => kindOf(id) === "media");
           // a TV takes the TV (or any player of the room); a monitor or a smart speaker model only one whose name fits

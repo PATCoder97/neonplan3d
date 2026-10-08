@@ -643,6 +643,27 @@ test("Vietnamese fans and water heater automatically take matching room entities
   assert.equal(links.get("purifier")?.entity, "switch.may_loc_nuoc");
 });
 
+test("the LED display cabinet automatically takes its matching room light", () => {
+  const st = (entity_id: string, state: string, attributes: Record<string, unknown> = {}) => ({ entity_id, state, attributes });
+  const hass = {
+    language: "vi",
+    states: {
+      "light.den_tu_kinh_bep": st("light.den_tu_kinh_bep", "on", { friendly_name: "Đèn tủ kính bếp" }),
+      "light.den_tran_bep": st("light.den_tran_bep", "off", { friendly_name: "Đèn trần bếp" }),
+    },
+    entities: {
+      "light.den_tu_kinh_bep": { entity_id: "light.den_tu_kinh_bep", area_id: "bep" },
+      "light.den_tran_bep": { entity_id: "light.den_tran_bep", area_id: "bep" },
+    },
+    devices: {},
+    areas: { bep: { area_id: "bep", name: "Bếp" } },
+  } as unknown as HomeAssistant;
+  const kitchen = { id: "r", name: "Bếp", area_id: "bep", points: [[0, 0], [4, 0], [4, 4], [0, 4]] as [number, number][], floor_material: "wood" as const };
+  const cabinet = { id: "display", type: "kitchen_display", x: 2, z: 1, w: 0.8, d: 0.42, h: 2.1, rotation: 0, variant: null };
+  const links = furnitureEntities(hass, [{ ...newFloor("eg", "Tầng trệt", 0), rooms: [kitchen], furniture: [cabinet] }]);
+  assert.equal(links.get("display")?.entity, "light.den_tu_kinh_bep");
+});
+
 test("an outdoor water pump can find a clearly named switch without a room", () => {
   const st = (entity_id: string, state: string, attributes: Record<string, unknown> = {}) => ({ entity_id, state, attributes });
   const hass = {

@@ -157,7 +157,7 @@ test("Vietnamese home furniture builds finite dedicated geometry at the correct 
   const floor = newFloor("eg", "EG", 0);
   const types = [
     "altar", "altar_wall", "shoe_cabinet", "motorbike", "fan_ceiling", "fan_floor", "water_heater", "drying_rack",
-    "shoe_bench", "room_divider", "range_hood", "microwave", "water_purifier", "kitchen_corner", "vanity", "crib",
+    "shoe_bench", "room_divider", "range_hood", "microwave", "water_purifier", "kitchen_corner", "kitchen_display", "vanity", "crib",
     "bed_single", "bed_double", "sofa_l", "sofa_bed", "shower_screen", "hammock", "stone_table_set", "planter_large",
     "water_tank", "gate", "fence",
   ] as const;
