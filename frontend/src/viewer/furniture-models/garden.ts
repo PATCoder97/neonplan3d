@@ -95,6 +95,98 @@ function gardenTorch(b: Builder, w: number, d: number, h: number): void {
   b.loft([-r * 0.3, r * 0.3, -r * 0.3, r * 0.3], [-r * 0.08, r * 0.08, -r * 0.08, r * 0.08], h * 0.9, h, C.accent, C.accent, EDGE_GLOW);
 }
 
+function playTower(b: Builder, w: number, d: number, h: number): void {
+  const deckY = h * 0.48;
+  for (const x of [-w * 0.28, w * 0.28]) for (const z of [-d * 0.28, d * 0.08]) b.box(x - 0.04, x + 0.04, 0, h * 0.78, z - 0.04, z + 0.04, C.wood, C.woodTop, EDGE_FURN);
+  b.box(-w * 0.32, w * 0.32, deckY, deckY + 0.08, -d * 0.34, d * 0.14, C.wood, C.woodTop, EDGE_FURN);
+  b.loft([-w * 0.38, w * 0.38, -d * 0.38, d * 0.18], [-w * 0.05, w * 0.05, -d * 0.32, d * 0.12], h * 0.75, h, C.fabric, C.fabricTop, EDGE_GLOW);
+  b.loft([-w * 0.23, w * 0.23, d * 0.12, d * 0.28], [-w * 0.32, w * 0.32, d * 0.42, d * 0.5], deckY * 0.78, deckY, C.accent, C.accent, EDGE_FURN);
+  for (const x of [-w * 0.27, w * 0.27]) b.seg(x, 0, -d * 0.38, x, deckY, -d * 0.38, EDGE_FAINT);
+  for (let y = h * 0.12; y < deckY; y += h * 0.11) b.seg(-w * 0.27, y, -d * 0.385, w * 0.27, y, -d * 0.385, EDGE_FAINT);
+}
+
+function gardenShed(b: Builder, w: number, d: number, h: number): void {
+  b.box(-w / 2, w / 2, 0, h * 0.75, -d / 2, d / 2, C.wood, C.woodTop, EDGE_FURN);
+  b.loft([-w * 0.54, w * 0.54, -d * 0.54, d * 0.54], [-w * 0.08, w * 0.08, -d * 0.54, d * 0.54], h * 0.75, h, C.body, C.bodyTop, EDGE_FURN);
+  b.box(-w * 0.2, w * 0.2, 0, h * 0.64, d / 2, d / 2 + 0.025, C.dark, C.bodyTop, EDGE_GLOW);
+  b.seg(w * 0.13, h * 0.3, d / 2 + 0.03, w * 0.17, h * 0.3, d / 2 + 0.03, EDGE_GLOW);
+}
+
+function trampoline(b: Builder, w: number, d: number, h: number): void {
+  const r = Math.min(w, d) / 2;
+  b.cyl(0, 0, r, h * 0.34, h * 0.42, C.metal, C.dark, 24, EDGE_FURN);
+  b.cyl(0, 0, r * 0.82, h * 0.41, h * 0.43, C.dark, C.dark, 24, EDGE_FAINT);
+  for (let i = 0; i < 8; i++) {
+    const a = (i * Math.PI) / 4;
+    const x = Math.cos(a) * r * 0.9;
+    const z = Math.sin(a) * r * 0.9;
+    b.seg(x, 0, z, x, h, z, EDGE_FURN);
+  }
+  for (let i = 0; i < 24; i++) {
+    const a0 = (i * Math.PI * 2) / 24;
+    const a1 = ((i + 1) * Math.PI * 2) / 24;
+    b.seg(Math.cos(a0) * r * 0.9, h, Math.sin(a0) * r * 0.9, Math.cos(a1) * r * 0.9, h, Math.sin(a1) * r * 0.9, EDGE_FAINT);
+  }
+}
+
+function flowerPots(b: Builder, w: number, d: number, h: number): void {
+  const pots = [[-w * 0.28, 0, 0.24], [0, d * 0.08, 0.32], [w * 0.3, -d * 0.05, 0.2]] as const;
+  for (const [x, z, scale] of pots) {
+    const r = Math.min(w, d) * scale;
+    b.loft([x - r * 0.72, x + r * 0.72, z - r * 0.72, z + r * 0.72], [x - r, x + r, z - r, z + r], 0, h * (0.35 + scale), C.pot, C.bodyTop, EDGE_FURN);
+    b.cyl(x, z, r * 0.65, h * (0.35 + scale), h * (0.72 + scale * 0.5), C.plant, C.plantTop, 7, EDGE_FAINT);
+  }
+}
+
+function lawnSprinkler(b: Builder, w: number, d: number, h: number): void {
+  b.cyl(0, 0, Math.min(w, d) * 0.2, 0, h * 0.45, C.metal, C.metal, 12, EDGE_FURN);
+  b.box(-w * 0.38, w * 0.38, h * 0.42, h * 0.55, -d * 0.06, d * 0.06, C.metal, C.metal, EDGE_FAINT);
+  for (const x of [-w * 0.33, w * 0.33]) b.seg(x, h * 0.52, 0, x, h, x > 0 ? d * 0.35 : -d * 0.35, EDGE_GLOW);
+}
+
+function irrigationBox(b: Builder, w: number, d: number, h: number): void {
+  b.box(-w / 2, w / 2, 0, h, -d / 2, d / 2, C.plant, C.plantTop, EDGE_FURN);
+  b.box(-w * 0.43, w * 0.43, h, h + 0.035, -d * 0.43, d * 0.43, C.dark, C.bodyTop, EDGE_GLOW);
+  b.cyl(-w * 0.18, 0, Math.min(w, d) * 0.08, h * 0.7, h * 0.98, C.accent, C.metal, 10, EDGE_FAINT);
+  b.cyl(w * 0.18, 0, Math.min(w, d) * 0.08, h * 0.7, h * 0.98, C.accent, C.metal, 10, EDGE_FAINT);
+}
+
+function rainBarrel(b: Builder, w: number, d: number, h: number): void {
+  const r = Math.min(w, d) * 0.46;
+  b.cyl(0, 0, r, 0, h * 0.94, C.body, C.bodyTop, 18, EDGE_FURN);
+  for (const y of [h * 0.16, h * 0.48, h * 0.8]) for (let i = 0; i < 18; i++) {
+    const a0 = (i * Math.PI * 2) / 18;
+    const a1 = ((i + 1) * Math.PI * 2) / 18;
+    b.seg(Math.cos(a0) * r, y, Math.sin(a0) * r, Math.cos(a1) * r, y, Math.sin(a1) * r, EDGE_FAINT);
+  }
+  b.box(r * 0.72, r * 1.02, h * 0.16, h * 0.24, -0.035, 0.035, C.metal, C.metal, EDGE_GLOW);
+  b.cyl(0, 0, r * 0.78, h * 0.94, h, C.dark, C.bodyTop, 18, EDGE_FURN);
+}
+
+function gardenLantern(b: Builder, w: number, d: number, h: number): void {
+  const r = Math.min(w, d) / 2;
+  b.cyl(0, 0, r * 0.22, 0, h * 0.58, C.metal, C.metal, 10, EDGE_FAINT);
+  b.cyl(0, 0, r * 0.46, h * 0.55, h * 0.64, C.metal, C.metal, 10, EDGE_FURN);
+  b.loft([-r * 0.34, r * 0.34, -r * 0.34, r * 0.34], [-r * 0.48, r * 0.48, -r * 0.48, r * 0.48], h * 0.64, h * 0.9, C.glass, C.accent, EDGE_GLOW);
+  b.loft([-r * 0.5, r * 0.5, -r * 0.5, r * 0.5], [-r * 0.08, r * 0.08, -r * 0.08, r * 0.08], h * 0.9, h, C.metal, C.metal, EDGE_FURN);
+}
+
+function outdoorKitchen(b: Builder, w: number, d: number, h: number): void {
+  b.box(-w / 2, w / 2, 0, h * 0.86, -d / 2, d / 2, C.body, C.bodyTop, EDGE_FURN);
+  b.box(-w / 2, w / 2, h * 0.86, h, -d / 2, d / 2, C.metal, C.metal, EDGE_GLOW);
+  b.box(-w * 0.38, -w * 0.05, h * 0.82, h * 0.99, -d * 0.32, d * 0.18, C.dark, C.metal, EDGE_FAINT);
+  b.cyl(w * 0.24, -d * 0.05, Math.min(w, d) * 0.18, h * 0.92, h * 1.01, C.dark, C.metal, 14, EDGE_FURN);
+  for (const x of [-w * 0.25, 0, w * 0.25]) b.seg(x, 0.08, d / 2 + 0.003, x, h * 0.76, d / 2 + 0.003, EDGE_FAINT);
+}
+
+function patioHeater(b: Builder, w: number, d: number, h: number): void {
+  const r = Math.min(w, d) / 2;
+  b.cyl(0, 0, r * 0.5, 0, h * 0.08, C.body, C.bodyTop, 16, EDGE_FURN);
+  b.cyl(0, 0, r * 0.14, h * 0.08, h * 0.77, C.metal, C.metal, 12, EDGE_FAINT);
+  b.cyl(0, 0, r * 0.42, h * 0.76, h * 0.86, C.dark, C.accent, 16, EDGE_GLOW);
+  b.loft([-r * 0.65, r * 0.65, -r * 0.65, r * 0.65], [-r, r, -r, r], h * 0.86, h, C.metal, C.metal, EDGE_FURN);
+}
+
 export const GARDEN_FURNITURE_MODELS: Readonly<Record<string, FurnitureModelRenderer>> = {
   gas_grill: ({ b, w, d, h }) => (gasGrill(b, w, d, h), 0.5),
   lounge_set_outdoor: ({ b, w, d, h }) => (loungeSet(b, w, d, h), 0.5),
@@ -106,4 +198,14 @@ export const GARDEN_FURNITURE_MODELS: Readonly<Record<string, FurnitureModelRend
   hot_tub_outdoor: ({ b, w, d, h }) => (outdoorHotTub(b, w, d, h), 0.5),
   fire_bowl: ({ b, w, d, h }) => (fireBowl(b, w, d, h), 0.5),
   garden_torch: ({ b, w, d, h }) => (gardenTorch(b, w, d, h), 0.5),
+  play_tower_slide: ({ b, w, d, h }) => (playTower(b, w, d, h), 0.5),
+  garden_shed: ({ b, w, d, h }) => (gardenShed(b, w, d, h), 0.5),
+  trampoline: ({ b, w, d, h }) => (trampoline(b, w, d, h), 0.5),
+  flower_pots_3: ({ b, w, d, h }) => (flowerPots(b, w, d, h), 0.5),
+  lawn_sprinkler: ({ b, w, d, h }) => (lawnSprinkler(b, w, d, h), 0.5),
+  irrigation_valve_box: ({ b, w, d, h }) => (irrigationBox(b, w, d, h), 0.5),
+  rain_barrel: ({ b, w, d, h }) => (rainBarrel(b, w, d, h), 0.5),
+  garden_lantern: ({ b, w, d, h }) => (gardenLantern(b, w, d, h), 0.5),
+  outdoor_kitchen: ({ b, w, d, h }) => (outdoorKitchen(b, w, d, h), 0.5),
+  patio_heater: ({ b, w, d, h }) => (patioHeater(b, w, d, h), 0.5),
 };

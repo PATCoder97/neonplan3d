@@ -4,6 +4,17 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.22.3
+
+### Added
+
+- Added the second Garden & Patio batch: play tower with slide, garden shed, trampoline, three flower pots, lawn sprinkler, irrigation valve box, rain barrel, garden lantern, outdoor kitchen and patio heater.
+- Extended the dedicated Garden 2D/3D family with recognizable footprints and procedural utility geometry.
+
+### Changed
+
+- Expanded the reproducible catalog inventory to 290 declared types and 283 library items, with Garden coverage at 25 of 33.
+
 ## 1.22.2
 
 ### Added
