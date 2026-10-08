@@ -11,37 +11,21 @@
 //   fold = 48 + b    top face of the lower part at the cut height: visible while bucket b is cut
 
 import { Color, type BufferGeometry } from "three";
-import type { Floor, Opening, OutdoorArea, Room, SolarField, Vec2 } from "../model.ts";
-import { furnitureFootprint, groundLevel, isCoveredRoom, isLamp, outdoorFloorTop, pointInPolygon } from "../model.ts";
+import type { Floor, Opening, Room, SolarField, Vec2 } from "../model.ts";
+import { coveredFloorTop, furnitureFootprint, groundLevel, isCoveredRoom, isLamp, pointInPolygon } from "../model.ts";
 import { generateWalls, locateOpening, openingHost, type Wall } from "../geometry/walls.ts";
 import { holeInRoom, insetHole, mergeHoles } from "../geometry/holes.ts";
 import { pushFurniture } from "./furniture.ts";
 import { mountBase, packItem } from "../packs.ts";
-import { pushOutdoor, type OutdoorTriRange } from "./outdoor.ts";
+import { pushCovered, pushOutdoor, type CoveredRenderArea, type OutdoorTriRange } from "./outdoor.ts";
+import { FLOOR_LOOK, NEON } from "./palette.ts";
 import { pushModules } from "./roof.ts";
 import type { RoofFace } from "../solar.ts";
 import { cutAbove, cutLinesAbove, FURN_OFFSET, ALWAYS, CAP_OFFSET, CUT_OFFSET, EDGE_BASE, EDGE_CUT, EDGE_SOFT, EDGE_TOP, GeoBuffer, LineBuffer, LOWER_OFFSET, pushPrism, triangulate } from "./geo.ts";
 
 export { ALWAYS, CUT_OFFSET, GeoBuffer, LineBuffer, pushPrism, shade } from "./geo.ts";
 
-export const NEON = {
-  floor: 0x0e1629,
-  slab: 0x0a1120,
-  wall: 0x131d31,
-  wallTop: 0x14303f,
-  edge: 0x37e0ff,
-  edgeSoft: 0x5b7cff,
-};
-
-/** Floor tint and pattern tile (column, row in the pattern atlas) per floor material. */
-export const FLOOR_LOOK: Record<string, { color: number; tile: [number, number] }> = {
-  wood: { color: 0x111a2e, tile: [0, 0] },
-  oak: { color: 0x131b2d, tile: [1, 0] },
-  tiles: { color: 0x0e182f, tile: [2, 0] },
-  carpet: { color: 0x10152b, tile: [0, 1] },
-  stone: { color: 0x0f172b, tile: [1, 1] },
-  concrete: { color: 0x111827, tile: [2, 1] },
-};
+export { FLOOR_LOOK, NEON } from "./palette.ts";
 
 /** Opening resolved onto its wall, as needed for frames, sashes and blinds. */
 export interface OpeningInfo {
@@ -351,13 +335,10 @@ export function buildFloorGeometry(
 
   // ---------------------------------------------------------------- furniture and shadows
   const shadow = buildShadow(outline.edges, floor.rooms, spans);
-  const coveredAreas: OutdoorArea[] = floor.rooms.filter(isCoveredRoom).map((room) => ({
+  const coveredAreas: CoveredRenderArea[] = floor.rooms.filter(isCoveredRoom).map((room) => ({
     id: room.id,
     type: room.kind,
-    name: room.name,
     points: room.points,
-    floor_material: room.floor_material,
-    room_floor: true,
     roof_style: room.roof_style,
     railing: room.railing,
     columns: room.columns,
@@ -368,9 +349,9 @@ export function buildFloorGeometry(
     open: room.open ?? true,
     // Composite outdoor geometry normally starts at ground level. Move it so its finished floor is
     // exactly y=0 of this storey, matching normal rooms and every room-mounted device.
-    offset: -groundLevel(floor) - (outdoorFloorTop(room.kind) ?? 0),
+    offset: -groundLevel(floor) - coveredFloorTop(room.kind),
   }));
-  const coveredRoomTris = pushOutdoor(wallBuf, lines, { ...floor, outdoor: coveredAreas }, COVERED_ROOF_BUCKET);
+  const coveredRoomTris = pushCovered(wallBuf, lines, floor, coveredAreas, COVERED_ROOF_BUCKET);
   const outdoorTris = pushOutdoor(wallBuf, lines, floor);
   for (const s of solar) pushModules(wallBuf, lines, s.face, s.field, floor.elevation);
 

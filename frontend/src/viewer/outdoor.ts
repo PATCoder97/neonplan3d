@@ -1,13 +1,15 @@
 // Areas outside the house: lawn, terrace, path, driveway, pool, bed, wild patch, hedge, fence and
-// pergola, solid canopy and veranda, in the neon look. Flat areas lie at ground level (the underside of the ground floor slab),
+// pergola in the neon look. Covered rooms use the same geometry helpers through a separate internal type.
+// Flat areas lie at ground level (the underside of the ground floor slab),
 // the terrace a little higher, the pool water below; hedges are dark green blocks, fences posts with
 // rails along the outline, a pergola corner posts with beams, rafters and optional X-bracing. An area
 // can sit higher or lower (offset), fall along one direction (slope) and have patches cut out of it.
 
 import { Color } from "three";
-import type { Floor, OutdoorArea, OutdoorType, Vec2 } from "../model.ts";
-import { bounds, coveredFrontEdge, groundLevel, isAxisRect, OUTDOOR_TOP, outdoorDrop, outdoorFloorTop, outdoorStanding, pointInPolygon, signedArea } from "../model.ts";
+import type { CoveredRoomKind, Floor, OutdoorArea, OutdoorType, SlopeDir, Vec2 } from "../model.ts";
+import { bounds, coveredFloorTop, coveredFrontEdge, groundLevel, isAxisRect, OUTDOOR_TOP, outdoorDrop, outdoorStanding, pointInPolygon, signedArea } from "../model.ts";
 import { ALWAYS, type GeoBuffer, type LineBuffer, pushPrism, shade, triangulate } from "./geo.ts";
+import { NEON } from "./palette.ts";
 
 interface Look {
   color: number;
@@ -27,28 +29,43 @@ const LOOKS: Record<OutdoorType, Look> = {
   hedge: { color: 0x16402f, side: 0x103024, edge: 0x3de0a0, edgeAlpha: 0.35 },
   fence: { color: 0x1d2946, side: 0x1d2946, edge: 0x5b7cff, edgeAlpha: 0.45 },
   pergola: { color: 0x2a2238, side: 0x1f1a2c, edge: 0x5b7cff, edgeAlpha: 0.5 },
-  canopy: { color: 0x263451, side: 0x18223a, edge: 0x37e0ff, edgeAlpha: 0.5 },
-  veranda: { color: 0xd5d9e8, side: 0x67718a, edge: 0x37e0ff, edgeAlpha: 0.58 },
 };
 
-const SURFACE_COLORS: Record<string, number> = {
-  wood: 0x30251f,
-  oak: 0x4a3728,
-  tiles: 0x283149,
-  carpet: 0x25243a,
-  stone: 0x30384a,
-  concrete: 0x272d3a,
+const COVERED_LOOK: Record<CoveredRoomKind, Look> = {
+  canopy: { color: NEON.wallTop, side: NEON.wall, edge: NEON.edge, edgeAlpha: 0.5 },
+  veranda: { color: NEON.wallTop, side: NEON.wall, edge: NEON.edge, edgeAlpha: 0.58 },
 };
 
-function coveredLook(a: OutdoorArea, fallback: Look): { roof: number; under: number; floor: number } {
-  const roof = a.roof_style === "glass" ? 0x315a72 : a.roof_style === "tile" ? 0x26304a : fallback.color;
-  const under = a.roof_style === "glass" ? 0x203c50 : a.roof_style === "tile" ? 0x171d2d : fallback.side;
-  return { roof, under, floor: SURFACE_COLORS[a.floor_material ?? "tiles"] ?? SURFACE_COLORS.tiles };
+/** Room-only render input; canopy and veranda no longer belong to OutdoorArea or its editor. */
+export interface CoveredRenderArea {
+  id: string;
+  type: CoveredRoomKind;
+  points: Vec2[];
+  roof_style?: "solid" | "glass" | "tile" | null;
+  railing?: boolean | null;
+  columns?: number | null;
+  column_size?: number | null;
+  height?: number | null;
+  offset?: number | null;
+  slope?: number | null;
+  slope_dir?: SlopeDir;
+  open?: boolean;
+  outline?: boolean;
+}
+
+type RenderArea = OutdoorArea | CoveredRenderArea;
+
+const isCoveredArea = (area: RenderArea): area is CoveredRenderArea => area.type === "canopy" || area.type === "veranda";
+
+function coveredLook(a: CoveredRenderArea, fallback: Look): { roof: number; under: number } {
+  const roof = a.roof_style === "glass" ? 0x315a72 : fallback.color;
+  const under = a.roof_style === "glass" ? 0x203c50 : fallback.side;
+  return { roof, under };
 }
 
 /** Height of the visible surface of an area (for the lighting layer), at its high edge. */
 export function outdoorSurface(floor: Floor, a: OutdoorArea): number {
-  return groundLevel(floor) + (a.offset ?? 0) + (outdoorFloorTop(a.type) ?? (outdoorStanding(a.type) ? 0.01 : OUTDOOR_TOP[a.type]));
+  return groundLevel(floor) + (a.offset ?? 0) + (outdoorStanding(a.type) ? 0.01 : OUTDOOR_TOP[a.type]);
 }
 
 export interface OutdoorTriRange {
@@ -165,9 +182,8 @@ function pushCanopyPanel(buf: GeoBuffer, poly: Vec2[], topAt: (x: number, z: num
   }
 }
 
-export function pushOutdoor(buf: GeoBuffer, lines: LineBuffer, floor: Floor, roofFold = ALWAYS): OutdoorTriRange[] {
+function pushAreas(buf: GeoBuffer, lines: LineBuffer, floor: Floor, areas: RenderArea[], roofFold: number): OutdoorTriRange[] {
   const ground = groundLevel(floor);
-  const areas = floor.outdoor ?? [];
   const ranges: OutdoorTriRange[] = [];
   areas.forEach((a, index) => {
     if (a.points.length < 3) return;
@@ -179,12 +195,13 @@ export function pushOutdoor(buf: GeoBuffer, lines: LineBuffer, floor: Floor, roo
     const groundAt = (x: number, z: number) => g - outdoorDrop(a, x, z);
     const lowest = g - (a.type === "pool" ? 0 : (a.slope ?? 0));
     // standing structures take their own height; the outline can be switched off per area
-    const own = outdoorStanding(a.type) && a.height ? a.height : OUTDOOR_TOP[a.type];
-    const look = { ...LOOKS[a.type], top: own };
+    const covered = isCoveredArea(a);
+    const own = covered ? a.height ?? 2.4 : outdoorStanding(a.type) && a.height ? a.height : OUTDOOR_TOP[a.type];
+    const look = { ...(covered ? COVERED_LOOK[a.type] : LOOKS[a.type]), top: own };
     const poly = ccw(a.points);
     const edge = shade(look.edge, look.edgeAlpha);
-    // fences, pergolas, canopies and verandas may leave their closing edge out (leaning against the house)
-    const openEnd = a.open && (a.type === "fence" || a.type === "pergola" || a.type === "canopy" || a.type === "veranda") ? poly.length - 1 : -1;
+    // fences, pergolas and covered rooms may leave their closing edge out against the house
+    const openEnd = a.open && (a.type === "fence" || a.type === "pergola" || covered) ? poly.length - 1 : -1;
     const outline = (yAt: (x: number, z: number) => number, fold = ALWAYS) => {
       if (a.outline === false) return;
       for (let i = 0; i < poly.length; i++) {
@@ -282,10 +299,9 @@ export function pushOutdoor(buf: GeoBuffer, lines: LineBuffer, floor: Floor, roo
         // posts, beams and a solid sloping roof. The last edge may stay open against the house.
         const h = look.top;
         const finish = coveredLook(a, look);
-        const floorY = g + (outdoorFloorTop(a.type) ?? 0);
+        const floorY = g + coveredFloorTop(a.type);
         const roofAt = (x: number, z: number) => floorY + h - outdoorDrop(a, x, z);
         const columnHalf = Math.min(0.4, Math.max(0.04, (a.column_size ?? 0.12) / 2));
-        if (!a.room_floor) pushPrism(buf, poly, g - 0.06, floorY, look.side, finish.floor, { aoFrom: g - 0.06 });
         for (const [x, z] of poly) {
           const top = roofAt(x, z) - 0.08;
           pushPrism(buf, ccw([[x - columnHalf, z - columnHalf], [x + columnHalf, z - columnHalf], [x + columnHalf, z + columnHalf], [x - columnHalf, z + columnHalf]]), floorY, top, finish.under, finish.roof);
@@ -334,14 +350,13 @@ export function pushOutdoor(buf: GeoBuffer, lines: LineBuffer, floor: Floor, roo
         // substantial front columns, lintel and roof. Its closing edge joins the house.
         const h = look.top;
         const finish = coveredLook(a, look);
-        const floorY = g + (outdoorFloorTop(a.type) ?? 0);
+        const floorY = g + coveredFloorTop(a.type);
         const baseAt = (_x: number, _z: number) => floorY;
         const roofAt = (x: number, z: number) => floorY + h - outdoorDrop(a, x, z);
         const railH = Math.min(1.1, h * 0.48);
         const squarePost = (x: number, z: number, half: number, y0: number, y1: number, side = look.side, top = look.color) =>
           pushPrism(buf, ccw([[x - half, z - half], [x + half, z - half], [x + half, z + half], [x - half, z + half]]), y0, y1, side, top);
 
-        if (!a.room_floor) pushPrism(buf, poly, g - 0.12, floorY, look.side, finish.floor, { aoFrom: g - 0.12 });
 
         // Slim balusters and two horizontal rails around every free edge.
         if (a.railing !== false) {
@@ -363,7 +378,6 @@ export function pushOutdoor(buf: GeoBuffer, lines: LineBuffer, floor: Floor, roo
             }
           }
         }
-
         // The front is opposite and parallel to the omitted house edge. Without one, use the longest
         // edge as the facade. This keeps the two large columns correct on wide, shallow verandas too.
         const front = coveredFrontEdge(poly, openEnd);
@@ -393,7 +407,7 @@ export function pushOutdoor(buf: GeoBuffer, lines: LineBuffer, floor: Floor, roo
         // a flat area is a thin prism; terrace, bed and hedge are raised blocks. A slope tilts the top,
         // the block reaches down to the lowest point; patches marked "cut" inside it become holes
         const topAt = (x: number, z: number) => groundAt(x, z) + look.top;
-        const holes = outdoorHoles(areas, index);
+        const holes = outdoorHoles(areas as OutdoorArea[], index);
         pushPrism(buf, poly, lowest, a.slope ? topAt : g + look.top, look.side, look.color, { aoFrom: lowest, holes });
         outline((x, z) => topAt(x, z) + 0.004);
         if (a.type === "hedge") outline((x, z) => groundAt(x, z) + 0.004);
@@ -411,4 +425,14 @@ export function pushOutdoor(buf: GeoBuffer, lines: LineBuffer, floor: Floor, roo
     if (buf.count > start) ranges.push({ id: a.id, start, end: buf.count, ...(roofStart !== undefined && roofEnd !== undefined ? { roofStart, roofEnd } : {}) });
   });
   return ranges;
+}
+
+/** Render only actual Outdoor areas; covered structures now exist exclusively as Rooms. */
+export function pushOutdoor(buf: GeoBuffer, lines: LineBuffer, floor: Floor): OutdoorTriRange[] {
+  return pushAreas(buf, lines, floor, floor.outdoor ?? [], ALWAYS);
+}
+
+/** Render the structural shell of covered Rooms without exposing them as Outdoor area types. */
+export function pushCovered(buf: GeoBuffer, lines: LineBuffer, floor: Floor, areas: CoveredRenderArea[], roofFold = ALWAYS): OutdoorTriRange[] {
+  return pushAreas(buf, lines, floor, areas, roofFold);
 }

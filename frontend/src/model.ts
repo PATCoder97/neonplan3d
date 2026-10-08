@@ -5,6 +5,7 @@ import { packItem } from "./packs.ts";
 import type { LampModel } from "./viewer/viewer3d.ts";
 
 export type Vec2 = [number, number];
+export type CoveredRoomKind = "veranda" | "canopy";
 
 /** Sensors a room's climate is read from (null = automatic, "none" = no value). */
 export interface RoomClimate {
@@ -25,8 +26,8 @@ export interface Room {
   points: Vec2[];
   floor_material: string;
   /** A covered, open room keeps room/area/device behaviour but renders as a veranda or canopy. */
-  kind?: "room" | "veranda" | "canopy";
-  /** Covered-room roof finish and structural options (the same look as composite outdoor areas). */
+  kind?: "room" | CoveredRoomKind;
+  /** Covered-room roof finish and structural options, rendered with the canonical room palette. */
   roof_style?: "solid" | "glass" | "tile" | null;
   /** Veranda railing, or the high fence and front gate around a covered yard. */
   railing?: boolean | null;
@@ -60,7 +61,7 @@ export interface Room {
   wall_splits?: (number[] | null)[];
 }
 
-export function isCoveredRoom(room: Room): room is Room & { kind: "veranda" | "canopy" } {
+export function isCoveredRoom(room: Room): room is Room & { kind: CoveredRoomKind } {
   return room.kind === "veranda" || room.kind === "canopy";
 }
 
@@ -575,7 +576,7 @@ export type WeatherEffect = (typeof WEATHER_EFFECTS)[number];
 /** The effects shown when the plan does not say: everything but fog (fog greys the whole scene). */
 export const DEFAULT_WEATHER_EFFECTS: WeatherEffect[] = ["rain", "snow", "clouds", "lightning", "sky"];
 
-export const OUTDOOR_TYPES = ["lawn", "terrace", "path", "driveway", "pool", "bed", "wild", "hedge", "fence", "pergola", "canopy", "veranda"] as const;
+export const OUTDOOR_TYPES = ["lawn", "terrace", "path", "driveway", "pool", "bed", "wild", "hedge", "fence", "pergola"] as const;
 export type OutdoorType = (typeof OUTDOOR_TYPES)[number];
 
 /** Top of each kind of outdoor area above ground level (pool: its water, below). */
@@ -590,23 +591,21 @@ export const OUTDOOR_TOP: Record<OutdoorType, number> = {
   hedge: 1.2,
   fence: 1.0,
   pergola: 2.2,
-  canopy: 2.4,
-  veranda: 2.4,
 };
 
-/** Built-in floor/slab height of composite covered outdoor structures. */
-export const OUTDOOR_FLOOR_TOP: Partial<Record<OutdoorType, number>> = {
+/** Built-in floor/slab height of room-like covered structures. */
+export const COVERED_FLOOR_TOP: Record<CoveredRoomKind, number> = {
   canopy: 0.02,
   veranda: 0.12,
 };
 
-export function outdoorFloorTop(type: OutdoorType): number | null {
-  return OUTDOOR_FLOOR_TOP[type] ?? null;
+export function coveredFloorTop(type: CoveredRoomKind): number {
+  return COVERED_FLOOR_TOP[type];
 }
 
 /** Types that stand on the ground as structures (no surface to stand on, no light pool). */
 export function outdoorStanding(type: OutdoorType): boolean {
-  return type === "hedge" || type === "fence" || type === "pergola" || type === "canopy" || type === "veranda";
+  return type === "hedge" || type === "fence" || type === "pergola";
 }
 
 /** The directions an area can fall towards: +x (right in the plan), −x, +z (down in the plan), −z. */
@@ -617,7 +616,11 @@ export type SlopeDir = (typeof SLOPE_DIRS)[number];
  * How far the surface of an area has dropped at a point (m, ≥ 0): zero on the high edge, the full
  * slope on the low edge, along the slope direction across the extent of the polygon.
  */
-export function outdoorDrop(a: OutdoorArea, x: number, z: number): number {
+export function outdoorDrop(
+  a: { points: Vec2[]; slope?: number | null; slope_dir?: SlopeDir | null; type?: OutdoorType | CoveredRoomKind },
+  x: number,
+  z: number,
+): number {
   const slope = a.slope ?? 0;
   if (!slope || a.type === "pool") return 0;
   const dir = a.slope_dir ?? "x";
@@ -636,8 +639,7 @@ export function outdoorDrop(a: OutdoorArea, x: number, z: number): number {
 
 /** Height of the surface of an area at a point, in floor coordinates (offset and slope included). */
 export function outdoorTopAt(floor: Floor, a: OutdoorArea, x: number, z: number): number {
-  const floorTop = outdoorFloorTop(a.type);
-  return groundLevel(floor) + (a.offset ?? 0) + (floorTop ?? OUTDOOR_TOP[a.type]) - (floorTop === null ? outdoorDrop(a, x, z) : 0);
+  return groundLevel(floor) + (a.offset ?? 0) + OUTDOOR_TOP[a.type] - outdoorDrop(a, x, z);
 }
 
 /** Ground level in floor coordinates: below the ground floor slab (0.2 m), the floor itself further up. */
@@ -647,7 +649,7 @@ export function groundLevel(floor: Floor): number {
 
 /** Height outdoor lamps stand on at a point: ground level, or the top of a terrace or bed there. */
 export function outdoorGround(floor: Floor, x: number, z: number): number {
-  const inside = (floor.outdoor ?? []).filter((o) => (!outdoorStanding(o.type) || outdoorFloorTop(o.type) !== null) && o.type !== "pool" && pointInPolygon([x, z], o.points));
+  const inside = (floor.outdoor ?? []).filter((o) => !outdoorStanding(o.type) && o.type !== "pool" && pointInPolygon([x, z], o.points));
   // an area cut out of the one beneath it wins over that one
   const a = [...inside].reverse().find((o) => o.cut) ?? inside[0];
   return a ? outdoorTopAt(floor, a, x, z) : groundLevel(floor);
@@ -671,22 +673,8 @@ export interface CarLinks {
 export interface OutdoorArea {
   id: string;
   type: OutdoorType;
-  /** Optional user-facing name for room-like covered areas. */
-  name?: string | null;
   points: Vec2[];
-  /** Surface material of a composite covered area. */
-  floor_material?: string | null;
-  /** Internal renderer hint: a covered Room supplies its own patterned floor mesh. */
-  room_floor?: boolean;
-  /** Visual roof finish of a canopy or veranda. */
-  roof_style?: "solid" | "glass" | "tile" | null;
-  /** Veranda railing, or covered-yard fence and gate; undefined keeps the type default. */
-  railing?: boolean | null;
-  /** Number of substantial columns across a veranda's front edge. */
-  columns?: number | null;
-  /** Width of substantial columns in metres. */
-  column_size?: number | null;
-  /** Standing structures (hedge, fence, pergola, canopy, veranda): their height in m. */
+  /** Standing structures (hedge, fence, pergola): their height in m. */
   height?: number | null;
   /** False hides the neon outline (a plot of several lawns without lines crossing it). */
   outline?: boolean;
@@ -695,7 +683,7 @@ export interface OutdoorArea {
   /** Fall in m across the area along slope_dir (a driveway down to the garage, a sloping lawn); the high edge sits at the offset. */
   slope?: number | null;
   slope_dir?: SlopeDir;
-  /** Fences, pergolas, canopies and verandas: the closing edge is left out, so the structure can lean against the house. */
+  /** Fences and pergolas: the closing edge is left out, so the structure can lean against the house. */
   open?: boolean;
   /** Pergola: diagonal X-bracing on every side. */
   bracing?: boolean;

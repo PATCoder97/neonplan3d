@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { emptyBuilding, floorElevation, FURNITURE_GROUPS, furnitureCorner, furnitureRotationAt, newFloor, openingPreset, openingStyle, normalizeBuilding, outdoorDrop, outdoorGround, resizeFurniture, roomTiles, sidelightLayout, spotGrid, surfaceHeight, type Furniture } from "./model.ts";
+import { emptyBuilding, floorElevation, FURNITURE_GROUPS, furnitureCorner, furnitureRotationAt, newFloor, openingPreset, openingStyle, normalizeBuilding, OUTDOOR_TYPES, outdoorDrop, outdoorGround, resizeFurniture, roomTiles, sidelightLayout, spotGrid, surfaceHeight, type Furniture } from "./model.ts";
 
 test("furniture is grouped by function instead of a regional collection", () => {
   assert.equal(FURNITURE_GROUPS.vietnam, undefined);
@@ -111,11 +111,10 @@ test("outdoor lamps stand on the ground, or on a terrace", () => {
   assert.equal(outdoorGround({ ...newFloor("og", "OG", 2.75), outdoor: [] }, 1, 1), 0);
 });
 
-test("a covered veranda is one walkable outdoor object with its own slab", () => {
-  const floor = newFloor("og", "OG", 2.8);
-  floor.outdoor = [{ id: "v", type: "veranda", points: [[0, 0], [4, 0], [4, 2], [0, 2]], height: 2.4, open: true }];
-  assert.ok(Math.abs(outdoorGround(floor, 2, 1) - 0.12) < 1e-9);
-  assert.equal(outdoorGround(floor, 5, 1), 0);
+test("covered structures exist only as rooms, not as legacy outdoor types", () => {
+  const outdoorTypes = OUTDOOR_TYPES as readonly string[];
+  assert.equal(outdoorTypes.includes("veranda"), false);
+  assert.equal(outdoorTypes.includes("canopy"), false);
 });
 
 test("resizing drags one corner while the opposite corner stays", () => {

@@ -292,20 +292,13 @@ BACKGROUND_SCHEMA = vol.Schema(
     extra=vol.ALLOW_EXTRA,
 )
 
-OUTDOOR_TYPES = ["lawn", "terrace", "path", "driveway", "pool", "bed", "wild", "hedge", "fence", "pergola", "canopy", "veranda"]
+OUTDOOR_TYPES = ["lawn", "terrace", "path", "driveway", "pool", "bed", "wild", "hedge", "fence", "pergola"]
 
 OUTDOOR_SCHEMA = vol.Schema(
     {
         vol.Required("id"): _ID,
         vol.Required("type"): vol.In(OUTDOOR_TYPES),
-        vol.Optional("name", default=None): vol.Any(None, _NAME),
         vol.Required("points"): vol.All([_POINT], vol.Length(min=3, max=MAX_POINTS)),
-        vol.Optional("floor_material", default=None): vol.Any(None, vol.All(str, vol.Length(max=32))),
-        vol.Optional("roof_style", default=None): vol.Any(None, vol.In(["solid", "glass", "tile"])),
-        # veranda railing, or the high fence and gate around a covered yard
-        vol.Optional("railing", default=None): vol.Any(None, bool),
-        vol.Optional("columns", default=None): vol.Any(None, vol.All(vol.Coerce(int), vol.Range(min=0, max=12))),
-        vol.Optional("column_size", default=None): vol.Any(None, vol.All(vol.Coerce(float), vol.Range(min=0.08, max=0.8))),
         # hedges and fences: their height (None = default); outline False hides the neon line
         vol.Optional("height", default=None): vol.Any(None, vol.All(vol.Coerce(float), vol.Range(min=0.1, max=6))),
         vol.Optional("outline", default=True): bool,
@@ -314,7 +307,7 @@ OUTDOOR_SCHEMA = vol.Schema(
         # fall in m across the area along slope_dir (the high edge sits at the offset)
         vol.Optional("slope", default=0.0): vol.All(vol.Coerce(float), vol.Range(min=0, max=20)),
         vol.Optional("slope_dir", default="x"): vol.In(["x", "-x", "z", "-z"]),
-        # fences, pergolas, canopies and verandas: the closing edge is left out; pergola: X-bracing on the sides
+        # fences and pergolas: the closing edge is left out; pergola: X-bracing on the sides
         vol.Optional("open", default=False): bool,
         vol.Optional("bracing", default=False): bool,
         # cut out of every area beneath it that contains it
