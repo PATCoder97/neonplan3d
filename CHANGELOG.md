@@ -4,6 +4,17 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.22.2
+
+### Added
+
+- Added the first Garden & Patio batch: gas grill, outdoor lounge set, sun lounger, parasol, pergola, raised bed, greenhouse, outdoor hot tub, fire bowl and garden torch.
+- Added a dedicated Garden family with independent procedural 3D models, 2D plan symbols and Vietnamese, English and German names.
+
+### Changed
+
+- Expanded the reproducible catalog inventory to 280 declared types and 273 library items, with Garden coverage at 15 of 33.
+
 ## 1.22.1
 
 ### Added
