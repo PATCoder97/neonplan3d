@@ -92,16 +92,23 @@ function pushBeam(buf: GeoBuffer, p: Vec2, q: Vec2, w: number, y0: number, y1: n
 function pushYardPanel(buf: GeoBuffer, p: Vec2, q: Vec2, y: number, h: number, side: number, top: number, gate = false): void {
   const len = Math.hypot(q[0] - p[0], q[1] - p[1]);
   if (len < 0.04 || h < 0.2) return;
-  if (gate) pushBeam(buf, p, q, 0.08, y + 0.14, y + 0.23, side, top);
-  else pushBeam(buf, p, q, 0.14, y, y + Math.min(0.24, h * 0.24), side, top);
-  pushBeam(buf, p, q, 0.07, y + h * 0.55, y + h * 0.61, side, top);
-  pushBeam(buf, p, q, 0.09, y + h - 0.09, y + h, side, top);
-  const n = Math.max(1, Math.ceil(len / 0.22));
-  for (let k = 0; k <= n; k++) {
+  const bottom = gate ? y + 0.08 : y;
+  pushBeam(buf, p, q, gate ? 0.1 : 0.14, bottom, y + Math.min(gate ? 0.18 : 0.24, h * 0.24), side, top);
+  pushBeam(buf, p, q, gate ? 0.09 : 0.07, y + h * 0.5, y + h * 0.57, side, top);
+  pushBeam(buf, p, q, 0.1, y + h - 0.1, y + h, side, top);
+  const n = Math.max(2, Math.ceil(len / (gate ? 0.34 : 0.22)));
+  const first = gate ? 1 : 0;
+  const last = gate ? n - 1 : n;
+  for (let k = first; k <= last; k++) {
     const t = k / n;
     const x = p[0] + (q[0] - p[0]) * t;
     const z = p[1] + (q[1] - p[1]) * t;
     pushPrism(buf, ccw([[x - 0.018, z - 0.018], [x + 0.018, z - 0.018], [x + 0.018, z + 0.018], [x - 0.018, z + 0.018]]), y + 0.12, y + h - 0.07, side, top);
+  }
+  if (gate) {
+    for (const [x, z] of [p, q]) {
+      pushPrism(buf, ccw([[x - 0.035, z - 0.035], [x + 0.035, z - 0.035], [x + 0.035, z + 0.035], [x - 0.035, z + 0.035]]), y + 0.06, y + h, side, top);
+    }
   }
 }
 
@@ -286,10 +293,6 @@ export function pushOutdoor(buf: GeoBuffer, lines: LineBuffer, floor: Floor, roo
             pushYardPanel(buf, gateB, q, floorY, fenceH, finish.under, finish.roof);
             pushYardPanel(buf, gateA, middle, floorY, fenceH, finish.under, finish.roof, true);
             pushYardPanel(buf, middle, gateB, floorY, fenceH, finish.under, finish.roof, true);
-            // Diagonal braces and the centre seam distinguish the two gate leaves from the fence.
-            lines.seg([gateA[0], floorY + 0.24, gateA[1]], [middle[0], floorY + fenceH - 0.1, middle[1]], edge, ALWAYS);
-            lines.seg([gateB[0], floorY + 0.24, gateB[1]], [middle[0], floorY + fenceH - 0.1, middle[1]], edge, ALWAYS);
-            lines.seg([middle[0], floorY + 0.12, middle[1]], [middle[0], floorY + fenceH, middle[1]], edge, ALWAYS);
           }
         }
         for (let i = 0; i < poly.length; i++) {
