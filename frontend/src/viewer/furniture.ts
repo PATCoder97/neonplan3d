@@ -6,7 +6,7 @@
 import { Color } from "three";
 import type { Floor, Furniture, Vec2 } from "../model.ts";
 import { builtinBase } from "../model.ts";
-import { mountBase, packItem, packScreen, type PackItem } from "../packs.ts";
+import { mountBase, packItem, packScreen, packsVersion, type PackItem } from "../packs.ts";
 import { C, EDGE_FAINT, EDGE_FURN, FurnitureBuilder as Builder, flipWinding, transformMirrors, type FurnitureTransform as Tf } from "./furniture-builder.ts";
 import { AIR_CONDITIONER_Y, RADIATOR_Y } from "./furniture-models/climate.ts";
 import { registeredFurnitureScreen, renderRegisteredFurniture } from "./furniture-models/index.ts";
@@ -124,9 +124,82 @@ function contactShadow(shadow: GeoBuffer, tf: Tf, w: number, d: number, strength
 }
 
 export function pushFurniture(buf: GeoBuffer, lines: LineBuffer, shadow: GeoBuffer, f: Furniture, base = 0): void {
-  // a mirrored item needs no rewinding here: boxes, lofts and upright cylinders wind themselves (ccw),
-  // lying cylinders and the contact shadow rewind themselves when the transform mirrors (#159)
-  pushUpright(buf, lines, shadow, f, base);
+  const key = furnitureGeometryKey(f, base);
+  let cached = furnitureGeometryCache.get(key);
+  if (cached) {
+    furnitureGeometryCache.delete(key);
+    furnitureGeometryCache.set(key, cached);
+    furnitureCacheHits++;
+  } else {
+    const solid = new GeoBuffer();
+    const edges = new LineBuffer();
+    const shade = new GeoBuffer();
+    // Keep rotation/mirroring in the cached shape because the procedural palette bakes directional
+    // face lighting and winding. Position alone is translated when an instance is appended.
+    const local = { ...f, x: 0, z: 0 };
+    pushUpright(solid, edges, shade, local, base);
+    cached = { solid, edges, shade };
+    furnitureGeometryCache.set(key, cached);
+    furnitureCacheMisses++;
+    if (furnitureGeometryCache.size > FURNITURE_CACHE_LIMIT) furnitureGeometryCache.delete(furnitureGeometryCache.keys().next().value!);
+  }
+  appendFurnitureGeometry(buf, cached.solid, f);
+  appendFurnitureLines(lines, cached.edges, f);
+  appendFurnitureGeometry(shadow, cached.shade, f);
+}
+
+interface CachedFurnitureGeometry {
+  solid: GeoBuffer;
+  edges: LineBuffer;
+  shade: GeoBuffer;
+}
+
+const FURNITURE_CACHE_LIMIT = 256;
+const furnitureGeometryCache = new Map<string, CachedFurnitureGeometry>();
+let furnitureCacheHits = 0;
+let furnitureCacheMisses = 0;
+
+function furnitureGeometryKey(f: Furniture, base: number): string {
+  const n = (value: number) => Math.round(value * 10000) / 10000;
+  return `${packsVersion()}|${f.type}|${n(f.w)}|${n(f.d)}|${n(f.h)}|${f.variant ?? ""}|${n(base)}|${n(f.rotation)}|${f.mirror ? 1 : 0}`;
+}
+
+function appendFurnitureGeometry(target: GeoBuffer, source: GeoBuffer, f: Pick<Furniture, "x" | "z">): void {
+  for (let tri = 0; tri < source.p.length / 9; tri++) {
+    for (const k of [0, 1, 2]) {
+      const v = tri * 3 + k;
+      const x = source.p[v * 3];
+      const y = source.p[v * 3 + 1];
+      const z = source.p[v * 3 + 2];
+      target.p.push(f.x + x, y, f.z + z);
+      target.c.push(...source.c.slice(v * 3, v * 3 + 3));
+      target.f.push(source.f[v]);
+      if (target.uv) target.uv.push(...(source.uv?.slice(v * 2, v * 2 + 2) ?? [0.5, 0.5]));
+      if (target.tile) target.tile.push(...(source.tile?.slice(v * 2, v * 2 + 2) ?? [0, 1]));
+    }
+  }
+}
+
+function appendFurnitureLines(target: LineBuffer, source: LineBuffer, f: Pick<Furniture, "x" | "z">): void {
+  for (let v = 0; v < source.p.length / 3; v++) {
+    const x = source.p[v * 3];
+    const y = source.p[v * 3 + 1];
+    const z = source.p[v * 3 + 2];
+    target.p.push(f.x + x, y, f.z + z);
+    target.c.push(...source.c.slice(v * 3, v * 3 + 3));
+    target.f.push(source.f[v]);
+  }
+}
+
+/** Test/diagnostic hook: the cache is lazy, bounded and invalidated by the pack registry version. */
+export function furnitureGeometryCacheStats(): { size: number; hits: number; misses: number; limit: number } {
+  return { size: furnitureGeometryCache.size, hits: furnitureCacheHits, misses: furnitureCacheMisses, limit: FURNITURE_CACHE_LIMIT };
+}
+
+export function clearFurnitureGeometryCache(): void {
+  furnitureGeometryCache.clear();
+  furnitureCacheHits = 0;
+  furnitureCacheMisses = 0;
 }
 
 export { flipWinding } from "./furniture-builder.ts";

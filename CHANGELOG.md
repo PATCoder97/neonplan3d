@@ -4,6 +4,17 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.24.1
+
+### Added
+
+- Added a lazy, bounded 256-entry LRU cache for procedural furniture solids, outlines and contact shadows, keyed by exact shape, mount height, orientation and pack-registry version.
+- Added regression coverage proving repeated positioned instances hit the cache while preserving coordinates, colours, fold masks and mirrored winding.
+
+### Changed
+
+- Rebuilding a plan now reuses previously generated furniture geometry and only translates cached instances, avoiding repeated procedural construction as the catalog and placed-item count grow.
+
 ## 1.24.0
 
 ### Added

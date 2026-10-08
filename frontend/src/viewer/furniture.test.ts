@@ -4,7 +4,7 @@ import { STRUCTURAL_ONLY_FURNITURE_TYPES } from "../furniture/catalog.ts";
 import type { Furniture } from "../model.ts";
 import { mountBase, setPacks, type FurniturePack } from "../packs.ts";
 import { builtinBase, ELECTRIC_FURNITURE, FURNITURE_SIZE, FURNITURE_TYPES, LAMP_MODEL, newFloor } from "../model.ts";
-import { pushFanRotor, pushFurniture, screenRect } from "./furniture.ts";
+import { clearFurnitureGeometryCache, furnitureGeometryCacheStats, pushFanRotor, pushFurniture, screenRect } from "./furniture.ts";
 import { GeoBuffer, LineBuffer } from "./geo.ts";
 
 const PACK: FurniturePack = {
@@ -34,6 +34,32 @@ function build(type: string) {
   pushFurniture(buf, lines, new GeoBuffer(), f);
   return { buf, lines };
 }
+
+test("furniture geometry cache lazily reuses positioned instances without changing output", () => {
+  clearFurnitureGeometryCache();
+  const first = { id: "cache-a", type: "sofa_3", x: 1, z: 2, rotation: 90, w: 2.2, d: 0.9, h: 0.85, variant: null, mirror: true } as Furniture;
+  const second = { ...first, id: "cache-b", x: 5, z: 7 };
+  const a = { solid: new GeoBuffer(), lines: new LineBuffer(), shadow: new GeoBuffer() };
+  const b = { solid: new GeoBuffer(), lines: new LineBuffer(), shadow: new GeoBuffer() };
+  pushFurniture(a.solid, a.lines, a.shadow, first);
+  assert.deepEqual(furnitureGeometryCacheStats(), { size: 1, hits: 0, misses: 1, limit: 256 });
+  pushFurniture(b.solid, b.lines, b.shadow, second);
+  assert.deepEqual(furnitureGeometryCacheStats(), { size: 1, hits: 1, misses: 1, limit: 256 });
+  assert.deepEqual(b.solid.c, a.solid.c);
+  assert.deepEqual(b.solid.f, a.solid.f);
+  for (let i = 0; i < a.solid.p.length; i += 3) {
+    assert.ok(Math.abs(b.solid.p[i] - a.solid.p[i] - 4) < 1e-9, `solid x ${i / 3}`);
+    assert.equal(b.solid.p[i + 1], a.solid.p[i + 1]);
+    assert.ok(Math.abs(b.solid.p[i + 2] - a.solid.p[i + 2] - 5) < 1e-9, `solid z ${i / 3}`);
+  }
+  for (let i = 0; i < a.lines.p.length; i += 3) {
+    assert.ok(Math.abs(b.lines.p[i] - a.lines.p[i] - 4) < 1e-9, `line x ${i / 3}`);
+    assert.equal(b.lines.p[i + 1], a.lines.p[i + 1]);
+    assert.ok(Math.abs(b.lines.p[i + 2] - a.lines.p[i + 2] - 5) < 1e-9, `line z ${i / 3}`);
+  }
+  pushFurniture(new GeoBuffer(), new LineBuffer(), new GeoBuffer(), { ...second, w: 2.3 });
+  assert.deepEqual(furnitureGeometryCacheStats(), { size: 2, hits: 1, misses: 2, limit: 256 });
+});
 
 test("every non-lamp catalog item builds visible finite 3D geometry", () => {
   for (const type of FURNITURE_TYPES) {
