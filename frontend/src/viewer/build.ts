@@ -144,9 +144,8 @@ export function buildFloorGeometry(
   const holeLines = new LineBuffer();
   const cutHoles: Vec2[][] = [];
   for (const room of floor.rooms) {
-    if (isCoveredRoom(room)) continue;
     if (room.points.length < 3) continue;
-    const poly = ccw(room.points);
+    const poly = ccw(isCoveredRoom(room) ? coveredFloorPolygon(room) : room.points);
     const look = FLOOR_LOOK[room.floor_material] ?? FLOOR_LOOK.wood;
     const top = new Color(look.color);
     // an opening snapped to the room's edge is still cut, a few millimetres in from it
@@ -358,6 +357,7 @@ export function buildFloorGeometry(
     name: room.name,
     points: room.points,
     floor_material: room.floor_material,
+    room_floor: true,
     roof_style: room.roof_style,
     railing: room.railing,
     columns: room.columns,
@@ -635,4 +635,37 @@ function ccw(points: Vec2[]): Vec2[] {
     a += p[0] * q[1] - q[0] * p[1];
   }
   return a >= 0 ? points : [...points].reverse();
+}
+
+/**
+ * A covered room's stored outline runs through its columns. Grow every free edge to the columns'
+ * outer face, but keep the final house edge in place so the patterned floor never overlaps indoors.
+ */
+function coveredFloorPolygon(room: Room & { kind: "veranda" | "canopy" }): Vec2[] {
+  const points = room.points;
+  const n = points.length;
+  if (n < 3) return points;
+  let twiceArea = 0;
+  for (let i = 0; i < n; i++) twiceArea += points[i][0] * points[(i + 1) % n][1] - points[(i + 1) % n][0] * points[i][1];
+  const sign = twiceArea >= 0 ? 1 : -1;
+  const half = (room.column_size ?? (room.kind === "veranda" ? 0.32 : 0.12)) / 2;
+  const extent = room.kind === "veranda" ? half * 1.375 : half;
+  const openEnd = room.open !== false ? n - 1 : -1;
+  const shifted = points.map((a, i) => {
+    const b = points[(i + 1) % n];
+    const dx = b[0] - a[0];
+    const dz = b[1] - a[1];
+    const l = Math.hypot(dx, dz) || 1;
+    const d = i === openEnd ? 0 : extent;
+    const normal: Vec2 = [(dz / l) * sign, (-dx / l) * sign];
+    return { p: [a[0] + normal[0] * d, a[1] + normal[1] * d] as Vec2, d: [dx / l, dz / l] as Vec2, normal, offset: d };
+  });
+  return points.map((v, i) => {
+    const a = shifted[(i - 1 + n) % n];
+    const b = shifted[i];
+    const den = a.d[0] * b.d[1] - a.d[1] * b.d[0];
+    if (Math.abs(den) < 1e-6) return [v[0] + b.normal[0] * b.offset, v[1] + b.normal[1] * b.offset];
+    const t = ((b.p[0] - a.p[0]) * b.d[1] - (b.p[1] - a.p[1]) * b.d[0]) / den;
+    return [a.p[0] + a.d[0] * t, a.p[1] + a.d[1] * t];
+  });
 }

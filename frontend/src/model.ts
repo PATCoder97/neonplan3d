@@ -676,6 +676,8 @@ export interface OutdoorArea {
   points: Vec2[];
   /** Surface material of a composite covered area. */
   floor_material?: string | null;
+  /** Internal renderer hint: a covered Room supplies its own patterned floor mesh. */
+  room_floor?: boolean;
   /** Visual roof finish of a canopy or veranda. */
   roof_style?: "solid" | "glass" | "tile" | null;
   /** Veranda railing, or covered-yard fence and gate; undefined keeps the type default. */

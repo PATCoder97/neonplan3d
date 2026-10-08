@@ -285,7 +285,7 @@ export function pushOutdoor(buf: GeoBuffer, lines: LineBuffer, floor: Floor, roo
         const floorY = g + (outdoorFloorTop(a.type) ?? 0);
         const roofAt = (x: number, z: number) => floorY + h - outdoorDrop(a, x, z);
         const columnHalf = Math.min(0.4, Math.max(0.04, (a.column_size ?? 0.12) / 2));
-        pushPrism(buf, poly, g - 0.06, floorY, look.side, finish.floor, { aoFrom: g - 0.06 });
+        if (!a.room_floor) pushPrism(buf, poly, g - 0.06, floorY, look.side, finish.floor, { aoFrom: g - 0.06 });
         for (const [x, z] of poly) {
           const top = roofAt(x, z) - 0.08;
           pushPrism(buf, ccw([[x - columnHalf, z - columnHalf], [x + columnHalf, z - columnHalf], [x + columnHalf, z + columnHalf], [x - columnHalf, z + columnHalf]]), floorY, top, finish.under, finish.roof);
@@ -341,7 +341,7 @@ export function pushOutdoor(buf: GeoBuffer, lines: LineBuffer, floor: Floor, roo
         const squarePost = (x: number, z: number, half: number, y0: number, y1: number, side = look.side, top = look.color) =>
           pushPrism(buf, ccw([[x - half, z - half], [x + half, z - half], [x + half, z + half], [x - half, z + half]]), y0, y1, side, top);
 
-        pushPrism(buf, poly, g - 0.12, floorY, look.side, finish.floor, { aoFrom: g - 0.12 });
+        if (!a.room_floor) pushPrism(buf, poly, g - 0.12, floorY, look.side, finish.floor, { aoFrom: g - 0.12 });
 
         // Slim balusters and two horizontal rails around every free edge.
         if (a.railing !== false) {

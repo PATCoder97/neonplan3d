@@ -3,7 +3,7 @@ import { test } from "node:test";
 import type { BufferGeometry } from "three";
 import type { Floor, Furniture, Opening, Room } from "../model.ts";
 import { furnitureFootprint, newFloor } from "../model.ts";
-import { buildFloorGeometry, clipAlong, stairHoles } from "./build.ts";
+import { buildFloorGeometry, clipAlong, FLOOR_LOOK, stairHoles } from "./build.ts";
 
 const EXT = 0.24;
 const INT = 0.12;
@@ -65,10 +65,13 @@ test("a composite outdoor structure keeps one triangle range for 3D selection", 
   assert.ok(geo.outdoorTris[0].end > geo.outdoorTris[0].start);
 });
 
-test("a covered room renders as one selectable room structure without a normal floor slab", () => {
+test("a covered room uses the normal patterned room floor extended to the outside of its columns", () => {
   const covered: Room = { ...rect("porch", 0, 0, 4, 2), kind: "veranda", roof_style: "tile", railing: true, columns: 2, open: true };
   const geo = buildFloorGeometry(floorWith([covered]), EXT, INT);
-  assert.equal(geo.roomTris.length, 0);
+  assert.equal(geo.roomTris.length, 1);
+  assert.equal(geo.roomTris[0].roomId, "porch");
+  assert.equal(geo.roomTris[0].color, FLOOR_LOOK.wood.color, "the covered room keeps its chosen room-floor colour");
+  assert.ok(area(geo.floor) > 10.2 && area(geo.floor) < 10.4, "the floor reaches the outer face of the 32 cm veranda columns but does not grow into the house edge");
   assert.equal(geo.walls2d.length, 0);
   assert.equal(geo.coveredRoomTris.length, 1);
   assert.equal(geo.coveredRoomTris[0].id, "porch");
