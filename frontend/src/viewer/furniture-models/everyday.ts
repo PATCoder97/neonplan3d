@@ -513,6 +513,78 @@ function consoleTable(b: Builder, w: number, d: number, h: number): void {
   for (const x of [-w * 0.25, w * 0.25]) b.seg(x - 0.045, h - 0.077, d / 2 + 0.008, x + 0.045, h - 0.077, d / 2 + 0.008, EDGE_GLOW);
 }
 
+function chaiseLongue(b: Builder, w: number, d: number, h: number): void {
+  const seat = h * 0.42;
+  legs(b, w, d, 0.09, 0.04, 0.04, C.wood, true);
+  b.pad(-w / 2, w / 2, 0.09, seat, -d / 2 + d * 0.28, d / 2, C.fabric, C.fabricTop, 0.05, EDGE_FURN);
+  b.loft([-w / 2, w / 2, -d / 2, -d / 2 + d * 0.4], [-w * 0.44, w * 0.44, -d / 2, -d / 2 + d * 0.2], seat * 0.85, h, C.fabric, C.cushion, EDGE_FURN);
+  b.pad(-w / 2, -w / 2 + w * 0.13, seat, h * 0.62, -d / 2 + d * 0.22, d / 2 - 0.04, C.fabric, C.cushion, 0.035, EDGE_FAINT);
+}
+
+function cocktailChair(b: Builder, w: number, d: number, h: number): void {
+  const seat = h * 0.46;
+  b.cyl(0, 0, Math.min(w, d) * 0.42, 0.04, seat, C.fabric, C.cushion, 14, EDGE_FURN);
+  b.loft([-w / 2, w / 2, -d / 2, d * 0.08], [-w * 0.38, w * 0.38, -d * 0.44, -d * 0.18], seat * 0.7, h, C.fabric, C.cushion, EDGE_FURN);
+  b.pad(-w * 0.34, w * 0.34, seat, seat + h * 0.08, -d * 0.12, d * 0.34, C.cushion, C.fabricTop, 0.03, EDGE_FAINT);
+}
+
+function recliner(b: Builder, w: number, d: number, h: number): void {
+  const chairD = d * 0.58;
+  const seat = h * 0.43;
+  const rear = -d / 2;
+  b.pad(-w / 2, w / 2, 0.08, seat, rear, rear + chairD, C.fabric, C.cushion, 0.05, EDGE_FURN);
+  b.loft([-w * 0.46, w * 0.46, rear, rear + chairD * 0.32], [-w * 0.4, w * 0.4, rear, rear + chairD * 0.16], seat, h, C.fabric, C.cushion, EDGE_FURN);
+  for (const x of [-w / 2, w / 2 - w * 0.14]) b.pad(x, x + w * 0.14, seat, h * 0.64, rear + 0.03, rear + chairD, C.fabric, C.cushion, 0.04, EDGE_FURN);
+  const footZ = d * 0.31;
+  b.box(-w * 0.34, w * 0.34, 0, seat * 0.55, footZ - d * 0.14, footZ + d * 0.14, C.dark, C.dark);
+  b.pad(-w * 0.4, w * 0.4, seat * 0.5, seat * 0.72, footZ - d * 0.16, footZ + d * 0.16, C.fabric, C.cushion, 0.04, EDGE_FURN);
+}
+
+function beanBag(b: Builder, w: number, d: number, h: number): void {
+  const r = Math.min(w, d) / 2;
+  b.cyl(0, 0, r * 0.92, 0, h * 0.28, C.fabric, C.cushion, 16, EDGE_FURN);
+  b.loft([-r * 0.92, r * 0.92, -r * 0.92, r * 0.92], [-r * 0.58, r * 0.58, -r * 0.62, r * 0.62], h * 0.28, h * 0.78, C.fabric, C.cushion, EDGE_FAINT);
+  b.loft([-r * 0.58, r * 0.58, -r * 0.62, r * 0.62], [-r * 0.18, r * 0.18, -r * 0.2, r * 0.2], h * 0.78, h, C.cushion, C.cushion, EDGE_FURN);
+}
+
+function upholsteredChair(b: Builder, w: number, d: number, h: number): void {
+  chair(b, w, d, h);
+  const seat = Math.min(0.46, h * 0.52);
+  b.pad(-w / 2 + 0.035, w / 2 - 0.035, seat, seat + 0.055, -d / 2 + 0.08, d / 2 - 0.025, C.fabric, C.cushion, 0.018, EDGE_FAINT);
+  b.pad(-w / 2 + 0.04, w / 2 - 0.04, seat + 0.08, h - 0.04, -d / 2, -d / 2 + 0.065, C.fabric, C.cushion, 0.025, EDGE_FURN);
+}
+
+function shellChair(b: Builder, w: number, d: number, h: number): void {
+  const seat = h * 0.5;
+  b.cyl(0, 0, Math.min(w, d) * 0.34, 0, 0.025, C.metal, C.metal, 12);
+  b.cyl(0, 0, 0.035, 0.025, seat, C.metal, C.metal, 8);
+  b.loft([-w * 0.46, w * 0.46, -d * 0.38, d * 0.4], [-w * 0.4, w * 0.4, -d * 0.46, d * 0.2], seat, h * 0.66, C.body, C.bodyTop, EDGE_FURN);
+  b.loft([-w * 0.4, w * 0.4, -d * 0.46, -d * 0.18], [-w * 0.3, w * 0.3, -d * 0.42, -d * 0.28], h * 0.66, h, C.body, C.bodyTop, EDGE_FURN);
+}
+
+function lowboard(b: Builder, w: number, d: number, h: number): void {
+  const legH = Math.min(0.1, h * 0.2);
+  legs(b, w, d, legH, 0.025, 0.04, C.metal);
+  b.box(-w / 2, w / 2, legH, h, -d / 2, d / 2, C.wood, C.woodTop, EDGE_FURN);
+  const compartments = Math.max(2, Math.round(w / 0.55));
+  const front = d / 2 + 0.005;
+  for (let i = 1; i < compartments; i++) {
+    const x = -w / 2 + (w * i) / compartments;
+    b.seg(x, legH + 0.03, front, x, h - 0.03, front, EDGE_FAINT);
+  }
+  b.seg(-w / 2 + 0.03, legH + (h - legH) * 0.52, front, w / 2 - 0.03, legH + (h - legH) * 0.52, front, EDGE_FAINT);
+  for (let i = 0; i < compartments; i++) {
+    const x = -w / 2 + (w * (i + 0.5)) / compartments;
+    b.seg(x - 0.045, h * 0.58, front + 0.004, x + 0.045, h * 0.58, front + 0.004, EDGE_GLOW);
+  }
+}
+
+function highboard(b: Builder, w: number, d: number, h: number): void {
+  cabinet(b, w, d, h, 3, h * 0.58, true);
+  const front = d / 2 + 0.005;
+  for (const y of [h * 0.34, h * 0.68]) b.seg(-w / 2 + 0.03, y, front, w / 2 - 0.03, y, front, EDGE_FAINT);
+}
+
 function ottoman(b: Builder, w: number, d: number, h: number): void {
   b.box(-w * 0.42, w * 0.42, 0, h * 0.14, -d * 0.4, d * 0.4, C.dark, C.dark);
   b.pad(-w / 2, w / 2, h * 0.12, h, -d / 2, d / 2, C.fabric, C.cushion, 0.06, EDGE_FURN);
@@ -564,8 +636,14 @@ export const EVERYDAY_FURNITURE_MODELS: Readonly<Record<string, FurnitureModelRe
   altar_wall: ({ b, w, d, h }) => (wallAltar(b, w, d, h), false),
   armchair: ({ b, w, d, h }) => (sofa(b, w, d, h, 1), 0.5),
   club_chair: ({ b, w, d, h }) => (clubChair(b, w, d, h), 0.5),
+  cocktail_chair: ({ b, w, d, h }) => (cocktailChair(b, w, d, h), 0.5),
   wingback_chair: ({ b, w, d, h }) => (wingbackChair(b, w, d, h), 0.5),
+  recliner: ({ b, w, d, h }) => (recliner(b, w, d, h), 0.5),
   rocking_chair: ({ b, w, d, h }) => (rockingChair(b, w, d, h), 0.5),
+  chaise_longue: ({ b, w, d, h }) => (chaiseLongue(b, w, d, h), 0.5),
+  bean_bag: ({ b, w, d, h }) => (beanBag(b, w, d, h), 0.5),
+  chair_upholstered: ({ b, w, d, h }) => (upholsteredChair(b, w, d, h), 0.5),
+  chair_shell: ({ b, w, d, h }) => (shellChair(b, w, d, h), 0.5),
   bar_stool: ({ b, w, d, h }) => (barStool(b, w, d, h), 0.5),
   bed: ({ b, w, d, h }) => (bed(b, w, d, h), 0.5),
   bed_double: ({ b, w, d, h }) => (bed(b, w, d, h), 0.5),
@@ -580,6 +658,10 @@ export const EVERYDAY_FURNITURE_MODELS: Readonly<Record<string, FurnitureModelRe
   nesting_tables: ({ b, w, d, h }) => (nestingTables(b, w, d, h), 0.5),
   side_table_round: ({ b, w, d, h }) => (roundCoffeeTable(b, w, d, h), 0.5),
   console_table: ({ b, w, d, h }) => (consoleTable(b, w, d, h), 0.5),
+  lowboard_120: ({ b, w, d, h }) => (lowboard(b, w, d, h), 0.5),
+  lowboard_160: ({ b, w, d, h }) => (lowboard(b, w, d, h), 0.5),
+  lowboard_200: ({ b, w, d, h }) => (lowboard(b, w, d, h), 0.5),
+  highboard: ({ b, w, d, h }) => (highboard(b, w, d, h), 0.5),
   corner_bench: ({ b, w, d, h }) => (bench(b, w, d, h, true), 0.5),
   crib: ({ b, w, d, h }) => (crib(b, w, d, h), 0.5),
   desk: ({ b, w, d, h }) => (desk(b, w, d, h), 0.5),

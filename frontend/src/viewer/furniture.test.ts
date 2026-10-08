@@ -78,6 +78,16 @@ test("living-room sofa variants keep fixed seats and distinct corner footprints"
   assert.deepEqual(frontSides("sofa_u"), { left: true, right: true }, "the U sofa projects on both sides");
 });
 
+test("living-room lowboards add compartments with their fixed widths", () => {
+  const outlines = (["lowboard_120", "lowboard_160", "lowboard_200"] as const).map((type) => {
+    const [w, d, h] = FURNITURE_SIZE[type];
+    const lines = new LineBuffer();
+    pushFurniture(new GeoBuffer(), lines, new GeoBuffer(), { id: type, type, x: 0, z: 0, rotation: 0, w, d, h, variant: null } as Furniture);
+    return lines.p.length;
+  });
+  assert.ok(outlines[0] < outlines[1] && outlines[1] < outlines[2], "wider lowboards contain more outlined compartments");
+});
+
 test("a U-shaped stair builds two flights and a half-height landing", () => {
   const buf = new GeoBuffer();
   const lines = new LineBuffer();

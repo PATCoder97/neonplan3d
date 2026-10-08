@@ -4,6 +4,19 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.20.3
+
+### Added
+
+- Added a fourth Phase 2 living-room batch: chaise longue, cocktail chair, recliner with footstool, bean bag, upholstered and shell dining chairs, three fixed-width lowboards and a highboard.
+- Added dedicated 2D symbols, reusable low-poly 3D geometry, practical dimensions and German/English/Vietnamese names for all ten items.
+- Added regression coverage that verifies wider lowboards receive more storage compartments.
+
+### Changed
+
+- Expanded the reproducible catalog inventory to 173 declared types and 166 library items, with living-room reference coverage now at 53 items.
+- Made the three lowboards valid support surfaces for table lamps and other surface-mounted items.
+
 ## 1.20.2
 
 ### Added

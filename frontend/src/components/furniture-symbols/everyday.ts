@@ -3,7 +3,7 @@
 import { createSymbolRegistry, circle, ellipse, fronts, line, rect, seating, type SymbolPart as Part } from "./common.ts";
 import type { FurnitureSymbol } from "./types.ts";
 
-const TYPES = ["altar","altar_table","altar_cabinet","altar_wall","shoe_cabinet","shoe_bench","room_divider","vanity","crib","bed_single","bed_double","sofa_2","sofa_3","sofa_4","sofa_l","sofa_corner_left","sofa_corner_right","sofa_chesterfield","sofa_armless","sofa_chaise","sofa_u","sofa_bed","sofa","armchair","club_chair","wingback_chair","rocking_chair","ottoman","bench","corner_bench","chair","office_chair","bar_stool","table_round","stool","table","coffee_table","coffee_table_round","coffee_table_glass","nesting_tables","side_table_round","console_table","desk","bed","bunk_bed","nightstand","wardrobe","dresser","sideboard","display_cabinet","tall_cabinet","kitchen","kitchen_wall","kitchen_tall","shelf","bookshelf_wide","cube_shelf_2x2","cube_shelf_4x2","cube_shelf_4x4","room_divider_shelf","floating_shelf","coat_rack","tv_console","tv_board","tv_wall","plant","rug"] as const;
+const TYPES = ["altar","altar_table","altar_cabinet","altar_wall","shoe_cabinet","shoe_bench","room_divider","vanity","crib","bed_single","bed_double","sofa_2","sofa_3","sofa_4","sofa_l","sofa_corner_left","sofa_corner_right","sofa_chesterfield","sofa_armless","sofa_chaise","sofa_u","sofa_bed","sofa","chaise_longue","armchair","club_chair","cocktail_chair","wingback_chair","recliner","rocking_chair","bean_bag","ottoman","bench","corner_bench","chair","chair_upholstered","chair_shell","office_chair","bar_stool","table_round","stool","table","coffee_table","coffee_table_round","coffee_table_glass","nesting_tables","side_table_round","console_table","desk","bed","bunk_bed","nightstand","wardrobe","dresser","sideboard","highboard","display_cabinet","tall_cabinet","kitchen","kitchen_wall","kitchen_tall","shelf","bookshelf_wide","cube_shelf_2x2","cube_shelf_4x2","cube_shelf_4x4","room_divider_shelf","floating_shelf","coat_rack","tv_console","lowboard_120","lowboard_160","lowboard_200","tv_board","tv_wall","plant","rug"] as const;
 
 function renderSymbol(type: string, w: number, d: number): FurnitureSymbol {
   switch (type) {
@@ -66,10 +66,17 @@ function renderSymbol(type: string, w: number, d: number): FurnitureSymbol {
     }
     case "armchair":
     case "club_chair":
+    case "cocktail_chair":
     case "wingback_chair":
       return seating(w, d, 1, true);
+    case "chaise_longue":
+      return [rect(-w / 2, -d / 2, w / 2, d / 2), rect(-w / 2, -d / 2, w / 2, -d * 0.12, "fp3d-sym-fill"), line(-w / 2, d * 0.22, -w * 0.28, d * 0.22, "fp3d-sym-strong")];
+    case "recliner":
+      return [...seating(w, d * 0.58, 1, true), rect(-w * 0.4, d * 0.15, w * 0.4, d * 0.47, "fp3d-sym-fill")];
     case "rocking_chair":
       return [rect(-w * 0.36, -d * 0.28, w * 0.36, d * 0.28), line(-w * 0.42, -d / 2, -w * 0.42, d / 2, "fp3d-sym-strong"), line(w * 0.42, -d / 2, w * 0.42, d / 2, "fp3d-sym-strong")];
+    case "bean_bag":
+      return [circle(0, 0, Math.min(w, d) * 0.45), circle(0, 0, Math.min(w, d) * 0.2, "fp3d-sym-fill")];
     case "ottoman":
       return [rect(-w / 2, -d / 2, w / 2, d / 2, "fp3d-sym-fill"), line(0, -d / 2, 0, d / 2), line(-w / 2, 0, w / 2, 0)];
     case "bench":
@@ -85,6 +92,10 @@ function renderSymbol(type: string, w: number, d: number): FurnitureSymbol {
     }
     case "chair":
       return [rect(-w / 2, -d / 2, w / 2, -d / 2 + 0.06, "fp3d-sym-fill")];
+    case "chair_upholstered":
+      return [rect(-w / 2, -d / 2, w / 2, -d / 2 + 0.08, "fp3d-sym-fill"), rect(-w * 0.42, -d * 0.3, w * 0.42, d * 0.42)];
+    case "chair_shell":
+      return [ellipse(0, 0, w * 0.44, d * 0.43, "fp3d-sym-fill"), circle(0, 0, Math.min(w, d) * 0.1)];
     case "office_chair":
       return [circle(0, 0.03, Math.min(w, d) * 0.36), rect(-w * 0.35, -d / 2 + 0.02, w * 0.35, -d / 2 + 0.1, "fp3d-sym-fill")];
     case "bar_stool":
@@ -117,6 +128,7 @@ function renderSymbol(type: string, w: number, d: number): FurnitureSymbol {
     case "wardrobe":
     case "dresser":
     case "sideboard":
+    case "highboard":
     case "display_cabinet":
     case "tall_cabinet":
     case "kitchen":
@@ -140,6 +152,10 @@ function renderSymbol(type: string, w: number, d: number): FurnitureSymbol {
       return [rect(-w / 2, -d / 2, w / 2, -d / 2 + 0.03, "fp3d-sym-fill"), ...fronts(w, d, Math.max(2, Math.round(w / 0.5)))];
     case "tv_console":
       return [...fronts(w, d, 3), rect(-w * 0.19, d * 0.08, w * 0.19, d / 2, "fp3d-sym-fill")];
+    case "lowboard_120":
+    case "lowboard_160":
+    case "lowboard_200":
+      return fronts(w, d, Math.max(2, Math.round(w / 0.55)));
     case "tv_board":
       return [line(-Math.min(w * 0.4, 0.72), -d / 2 + 0.14, Math.min(w * 0.4, 0.72), -d / 2 + 0.14, "fp3d-sym-strong"), ...fronts(w, d, Math.max(2, Math.round(w / 0.6)))];
     case "tv_wall":
