@@ -88,6 +88,15 @@ test("living-room lowboards add compartments with their fixed widths", () => {
   assert.ok(outlines[0] < outlines[1] && outlines[1] < outlines[2], "wider lowboards contain more outlined compartments");
 });
 
+test("a TV on a stand exposes a screen inside its declared frame", () => {
+  const floor = newFloor("eg", "EG", 0);
+  const [w, d, h] = FURNITURE_SIZE.tv_stand;
+  const tv = { id: "tv", type: "tv_stand", x: 0, z: 0, w, d, h, rotation: 0, variant: null } as Furniture;
+  const screen = screenRect(tv, floor)!;
+  assert.ok(screen.x0 < 0 && screen.x1 > 0 && screen.y0 > 0 && screen.y1 < h);
+  assert.ok(screen.z > 0 && screen.z < d / 2);
+});
+
 test("a U-shaped stair builds two flights and a half-height landing", () => {
   const buf = new GeoBuffer();
   const lines = new LineBuffer();

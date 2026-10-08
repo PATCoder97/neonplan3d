@@ -4,6 +4,19 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.20.4
+
+### Added
+
+- Added a fifth Phase 2 living-room batch: velvet and five-part modular sofas, four fixed-size dining tables, a dining bench, a three-drawer chest, a TV on a stand and a wood stove.
+- Added dedicated 2D symbols, reusable low-poly 3D geometry, practical dimensions and German/English/Vietnamese names for all ten items.
+- Added a Live Screen and automatic media-player linking for the freestanding TV, with regression coverage for both behaviors.
+
+### Changed
+
+- Expanded the reproducible catalog inventory to 183 declared types and 176 library items, with living-room reference coverage now at 63 items.
+- Made all four fixed dining tables valid support surfaces and kept related variants on parameterized renderers.
+
 ## 1.20.3
 
 ### Added

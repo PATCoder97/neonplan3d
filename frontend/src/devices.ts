@@ -677,6 +677,7 @@ const FURNITURE_NAMES: Record<string, RegExp> = {
   robot_mower: /(mähroboter|robot(?:ic)? ?mower|lawn ?mower|robot cắt cỏ|robot cat co|máy cắt cỏ|may cat co)/i,
   tv_board: /\b(tv|fernseh|television|fire ?tv|apple ?tv|chromecast|shield)/i,
   tv_wall: /\b(tv|fernseh|television|fire ?tv|apple ?tv|chromecast|shield)/i,
+  tv_stand: /\b(tv|fernseh|television|fire ?tv|apple ?tv|chromecast|shield)/i,
   desk: /\b(pc|computer|rechner|desktop|monitor|workstation)/i,
   fridge: /(kühl|fridge|gefrier|freezer)/i,
   fridge_smart: /(kühl|fridge|gefrier|freezer)/i,
@@ -730,7 +731,7 @@ const FURNITURE_NAMES: Record<string, RegExp> = {
   video_doorbell: /(video ?doorbell|doorbell|klingel|chuông cửa|chuong cua)/i,
   kitchen_display: /(vitrine|display ?cabinet|cabinet ?light|schranklicht|tủ kính|tu kinh|tủ trưng bày|tu trung bay|đèn tủ|den tu|led tủ|led tu)/i,
 };
-const MEDIA_FURNITURE = new Set(["tv_board", "tv_wall", "smart_display"]);
+const MEDIA_FURNITURE = new Set(["tv_board", "tv_wall", "tv_stand", "smart_display"]);
 
 /** Whether a screen picture rule matches now: the state or attribute equals the value, or contains it (3+ chars); "*" always. */
 export function pictureRuleMatches(hass: HomeAssistant, rule: { entity: string; attribute?: string | null; state: string }): boolean {

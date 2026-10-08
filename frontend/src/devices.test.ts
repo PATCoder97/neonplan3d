@@ -13,7 +13,7 @@ test("a lamp switched by a relay takes colour and brightness from its colour ent
   // the bulb unavailable: the relay's own (plain) glow
   assert.deepEqual(lightGlow(relay as never, { ...bulb, state: "unavailable" } as never)!.color, [1, 0.71, 0.28]);
 });
-import { appColor, areaEntities, otherAreaEntities, roomClimateSensors, roomClimateValue, unassignedEntities, autoPlace, entityName, fridgeDoors, furnitureEntities, groupByDevice, isActive, kindOf, lightGlow, openingEntities, openingState, powerSensorsOf, primaryEntities, roomPanelEntities, windowPosition, confirmEntities, robotRoom, robotRoomSensor, roomKey, TOGGLE_KINDS } from "./devices.ts";
+import { appColor, areaEntities, otherAreaEntities, roomClimateSensors, roomClimateValue, unassignedEntities, autoPlace, entityName, fridgeDoors, furnitureEntities, groupByDevice, isActive, isMediaFurniture, kindOf, lightGlow, openingEntities, openingState, powerSensorsOf, primaryEntities, roomPanelEntities, windowPosition, confirmEntities, robotRoom, robotRoomSensor, roomKey, TOGGLE_KINDS } from "./devices.ts";
 import type { Floor, Opening, Room } from "./model.ts";
 import { centroid, FURNITURE_SIZE, newFloor, pointInPolygon } from "./model.ts";
 import type { HomeAssistant } from "./types.ts";
@@ -243,6 +243,11 @@ test("furniture finds its entities in the room's area: the TV, and power sensors
   assert.equal(links.get("desk"), undefined);
   assert.deepEqual(appColor(hass.states["media_player.fernseher"]), [0.9, 0.04, 0.08]);
   assert.equal(appColor({ entity_id: "media_player.x", state: "off", attributes: {} }), null);
+});
+
+test("a TV on a stand participates in media-player linking", () => {
+  assert.equal(isMediaFurniture("tv_stand"), true);
+  assert.equal(isMediaFurniture("wood_stove"), false);
 });
 
 test("lamps take a light of their room, preferring one whose name fits", () => {

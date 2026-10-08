@@ -2,7 +2,7 @@
 
 import { C, EDGE_FAINT, EDGE_FURN, EDGE_GLOW, type FurnitureBuilder as Builder } from "../furniture-builder.ts";
 import { cabinet, fronts, legs } from "./common.ts";
-import type { FurnitureModelRenderer } from "./types.ts";
+import type { FurnitureModelRenderer, FurnitureScreenRenderer } from "./types.ts";
 
 function sofa(b: Builder, w: number, d: number, h: number, seats: number): void {
   const x0 = -w / 2;
@@ -585,6 +585,71 @@ function highboard(b: Builder, w: number, d: number, h: number): void {
   for (const y of [h * 0.34, h * 0.68]) b.seg(-w / 2 + 0.03, y, front, w / 2 - 0.03, y, front, EDGE_FAINT);
 }
 
+function velvetSofa(b: Builder, w: number, d: number, h: number): void {
+  sofa(b, w, d, h, 3);
+  const back = -d / 2 + Math.min(0.24, d * 0.28) + 0.008;
+  for (let i = 1; i < 6; i++) {
+    const x = -w * 0.4 + (w * 0.8 * i) / 6;
+    b.seg(x, h * 0.56, back, x, h * 0.9, back, EDGE_FAINT);
+  }
+}
+
+function modularSofa(b: Builder, w: number, d: number, h: number): void {
+  const gap = Math.min(0.025, w * 0.01);
+  const mw = (w - gap * 2) / 3;
+  const rearD = d * 0.58;
+  const seat = h * 0.52;
+  for (let i = 0; i < 3; i++) {
+    const x0 = -w / 2 + i * (mw + gap);
+    const x1 = x0 + mw;
+    b.pad(x0, x1, 0.07, seat, -d / 2, -d / 2 + rearD, C.fabric, C.fabricTop, 0.045, EDGE_FURN);
+    b.pad(x0, x1, seat, h, -d / 2, -d / 2 + d * 0.14, C.fabric, C.cushion, 0.04, EDGE_FURN);
+  }
+  for (const i of [0, 2]) {
+    const x0 = -w / 2 + i * (mw + gap);
+    b.pad(x0, x0 + mw, 0.07, seat, -d / 2 + rearD + gap, d / 2, C.fabric, C.fabricTop, 0.045, EDGE_FURN);
+  }
+}
+
+function fixedDiningTable(b: Builder, w: number, d: number, h: number, solid: boolean): void {
+  const top = solid ? 0.075 : 0.045;
+  legs(b, w, d, h - top, solid ? 0.085 : 0.055, 0.05, C.wood, true);
+  b.box(-w / 2, w / 2, h - top, h, -d / 2, d / 2, C.wood, C.woodTop, EDGE_FURN);
+  if (solid) {
+    b.box(-w * 0.38, w * 0.38, h - top - 0.1, h - top, -d * 0.36, d * 0.36, C.wood, C.woodTop, EDGE_FAINT);
+    b.seg(-w * 0.38, h + 0.003, -d * 0.05, w * 0.38, h + 0.003, d * 0.04, EDGE_GLOW);
+  }
+}
+
+function diningBench(b: Builder, w: number, d: number, h: number): void {
+  legs(b, w, d, h - 0.08, 0.055, 0.045, C.wood, true);
+  b.pad(-w / 2, w / 2, h - 0.08, h, -d / 2, d / 2, C.fabric, C.cushion, 0.025, EDGE_FURN);
+}
+
+function tvStand(b: Builder, w: number, d: number, h: number): void {
+  const tw = w * 0.9;
+  const th = Math.min(h * 0.56, tw * 0.56);
+  const y0 = h - th;
+  b.box(-w * 0.32, w * 0.32, 0, 0.035, -d * 0.34, d * 0.34, C.metal, C.metal, EDGE_FURN);
+  b.box(-0.045, 0.045, 0.035, y0 + th * 0.45, -d * 0.08, d * 0.08, C.metal, C.metal);
+  b.box(-tw / 2, tw / 2, y0, h, -0.035, 0.035, C.dark, C.dark, EDGE_GLOW);
+}
+
+const tvStandScreen: FurnitureScreenRenderer = (w, _d, h) => {
+  const tw = w * 0.9;
+  const th = Math.min(h * 0.56, tw * 0.56);
+  return { x0: -tw / 2 + 0.02, x1: tw / 2 - 0.02, y0: h - th + 0.02, y1: h - 0.02, z: 0.039 };
+};
+
+function woodStove(b: Builder, w: number, d: number, h: number): void {
+  const bodyTop = h * 0.75;
+  legs(b, w, d, h * 0.1, 0.035, 0.035, C.dark);
+  b.box(-w / 2, w / 2, h * 0.1, bodyTop, -d / 2, d / 2, C.dark, C.metal, EDGE_FURN);
+  b.box(-w * 0.34, w * 0.34, h * 0.25, h * 0.62, d / 2, d / 2 + 0.012, C.glass, C.glass, EDGE_GLOW);
+  b.box(-w * 0.25, w * 0.25, h * 0.28, h * 0.35, d / 2 + 0.014, d / 2 + 0.02, C.accent, C.accent, EDGE_GLOW);
+  b.cyl(0, 0, Math.min(w, d) * 0.13, bodyTop, h, C.dark, C.dark, 12, EDGE_FAINT);
+}
+
 function ottoman(b: Builder, w: number, d: number, h: number): void {
   b.box(-w * 0.42, w * 0.42, 0, h * 0.14, -d * 0.4, d * 0.4, C.dark, C.dark);
   b.pad(-w / 2, w / 2, h * 0.12, h, -d / 2, d / 2, C.fabric, C.cushion, 0.06, EDGE_FURN);
@@ -662,6 +727,7 @@ export const EVERYDAY_FURNITURE_MODELS: Readonly<Record<string, FurnitureModelRe
   lowboard_160: ({ b, w, d, h }) => (lowboard(b, w, d, h), 0.5),
   lowboard_200: ({ b, w, d, h }) => (lowboard(b, w, d, h), 0.5),
   highboard: ({ b, w, d, h }) => (highboard(b, w, d, h), 0.5),
+  chest_drawers_3: ({ b, w, d, h }) => (dresser(b, w, d, h), 0.5),
   corner_bench: ({ b, w, d, h }) => (bench(b, w, d, h, true), 0.5),
   crib: ({ b, w, d, h }) => (crib(b, w, d, h), 0.5),
   desk: ({ b, w, d, h }) => (desk(b, w, d, h), 0.5),
@@ -695,6 +761,8 @@ export const EVERYDAY_FURNITURE_MODELS: Readonly<Record<string, FurnitureModelRe
   sofa_corner_left: ({ b, w, d, h }) => (cornerSofa(b, w, d, h, "left"), 0.5),
   sofa_corner_right: ({ b, w, d, h }) => (cornerSofa(b, w, d, h, "right"), 0.5),
   sofa_chesterfield: ({ b, w, d, h }) => (chesterfieldSofa(b, w, d, h), 0.5),
+  sofa_velvet_3: ({ b, w, d, h }) => (velvetSofa(b, w, d, h), 0.5),
+  sofa_modular_5: ({ b, w, d, h }) => (modularSofa(b, w, d, h), 0.5),
   sofa_armless: ({ b, w, d, h }) => (armlessSofa(b, w, d, h), 0.5),
   sofa_chaise: ({ b, w, d, h }) => (chaiseSofa(b, w, d, h), 0.5),
   sofa_u: ({ b, w, d, h }) => (uSofa(b, w, d, h), 0.5),
@@ -703,10 +771,21 @@ export const EVERYDAY_FURNITURE_MODELS: Readonly<Record<string, FurnitureModelRe
   display_cabinet: ({ b, w, d, h }) => (displayCabinet(b, w, d, h), 0.5),
   stool: ({ b, w, d, h }) => (stool(b, w, d, h), 0.5),
   table: ({ b, w, d, h }) => (table(b, w, d, h), 0.5),
+  table_120: ({ b, w, d, h }) => (fixedDiningTable(b, w, d, h, false), 0.5),
+  table_160: ({ b, w, d, h }) => (fixedDiningTable(b, w, d, h, false), 0.5),
+  table_200: ({ b, w, d, h }) => (fixedDiningTable(b, w, d, h, false), 0.5),
+  table_solid_220: ({ b, w, d, h }) => (fixedDiningTable(b, w, d, h, true), 0.5),
+  bench_dining_160: ({ b, w, d, h }) => (diningBench(b, w, d, h), 0.5),
   table_round: ({ b, w, d, h }) => (roundTable(b, w, d, h), 0.5),
   tall_cabinet: ({ b, w, d, h }) => (cabinet(b, w, d, h, 1, h * 0.5), 0.5),
   tv_board: ({ b, w, d, h }) => (tvBoard(b, w, d, h), 0.5),
+  tv_stand: ({ b, w, d, h }) => (tvStand(b, w, d, h), 0.5),
   tv_wall: ({ b, w, d, h }) => (tvWall(b, w, d, h), false),
+  wood_stove: ({ b, w, d, h }) => (woodStove(b, w, d, h), 0.5),
   vanity: ({ b, w, d, h }) => (vanity(b, w, d, h), 0.5),
   wardrobe: ({ b, w, d, h }) => (cabinet(b, w, d, h, Math.max(2, Math.round(w / 0.5)), h * 0.5), 0.5),
+};
+
+export const EVERYDAY_FURNITURE_SCREENS: Readonly<Record<string, FurnitureScreenRenderer>> = {
+  tv_stand: tvStandScreen,
 };
