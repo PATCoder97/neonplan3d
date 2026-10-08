@@ -4,9 +4,10 @@ import { newFloor } from "../model.ts";
 import { GeoBuffer, LineBuffer } from "./geo.ts";
 import { pushOutdoor } from "./outdoor.ts";
 
-test("an outdoor canopy draws posts, beams and a sloped solid roof", () => {
+test("an outdoor canopy draws a paved yard, high fence, front gate, posts, beams and a sloped solid roof", () => {
   const floor = newFloor("eg", "EG", 0);
-  floor.outdoor = [{ id: "cover", type: "canopy", points: [[0, 0], [4, 0], [4, 3], [0, 3]], height: 2.4, slope: 0.25, slope_dir: "x" }];
+  const canopy = { id: "cover", type: "canopy" as const, points: [[0, 0], [4, 0], [4, 3], [0, 3]] as [number, number][], height: 2.4, slope: 0.25, slope_dir: "x" as const, open: true };
+  floor.outdoor = [canopy];
   const solid = new GeoBuffer();
   const lines = new LineBuffer();
   pushOutdoor(solid, lines, floor);
@@ -15,6 +16,11 @@ test("an outdoor canopy draws posts, beams and a sloped solid roof", () => {
   const heights = solid.p.filter((_, i) => i % 3 === 1);
   assert.ok(Math.max(...heights) > 2.21 && Math.max(...heights) < 2.23, "high roof edge is measured from the paved surface");
   assert.ok(heights.some((y) => y > 1.96 && y < 1.98), "low roof edge follows the slope");
+  assert.ok(heights.some((y) => Math.abs(y - 1.27) < 1e-6), "the yard fence reaches 1.45 m above the paved surface");
+
+  const bare = new GeoBuffer();
+  pushOutdoor(bare, new LineBuffer(), { ...floor, outdoor: [{ ...canopy, railing: false }] });
+  assert.ok(solid.count > bare.count + 100, "the optional fence and two-leaf gate add substantial geometry");
 });
 
 test("an upper-floor veranda is one object with a slab, railings, front columns and roof", () => {

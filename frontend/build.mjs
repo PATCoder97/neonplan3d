@@ -74,8 +74,8 @@ function copyFonts() {
   }
 }
 
-// raised 2026-10-06 for the 1.12 round (outdoor round, hip-end solar, marker names): still small enough for old wall tablets
-const BUDGET = { "neonplan3d.js": 425 * 1024, "neonplan3d-3d.js": 740 * 1024, "neonplan3d-editor.js": 522 * 1024, "neonplan3d-card-editor.js": 165 * 1024 };
+// 3D gained 2 KB for the covered-yard fence and gate; still small enough for old wall tablets.
+const BUDGET = { "neonplan3d.js": 425 * 1024, "neonplan3d-3d.js": 742 * 1024, "neonplan3d-editor.js": 522 * 1024, "neonplan3d-card-editor.js": 165 * 1024 };
 
 copyFonts();
 if (watch) {

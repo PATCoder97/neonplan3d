@@ -88,6 +88,23 @@ function pushBeam(buf: GeoBuffer, p: Vec2, q: Vec2, w: number, y0: number, y1: n
   pushPrism(buf, ccw([[p[0] + nx, p[1] + nz], [q[0] + nx, q[1] + nz], [q[0] - nx, q[1] - nz], [p[0] - nx, p[1] - nz]]), y0, y1, side, top, { aoFrom: y0 - 1 });
 }
 
+/** A tall, see-through yard fence panel. Gate leaves omit the masonry curb. */
+function pushYardPanel(buf: GeoBuffer, p: Vec2, q: Vec2, y: number, h: number, side: number, top: number, gate = false): void {
+  const len = Math.hypot(q[0] - p[0], q[1] - p[1]);
+  if (len < 0.04 || h < 0.2) return;
+  if (gate) pushBeam(buf, p, q, 0.08, y + 0.14, y + 0.23, side, top);
+  else pushBeam(buf, p, q, 0.14, y, y + Math.min(0.24, h * 0.24), side, top);
+  pushBeam(buf, p, q, 0.07, y + h * 0.55, y + h * 0.61, side, top);
+  pushBeam(buf, p, q, 0.09, y + h - 0.09, y + h, side, top);
+  const n = Math.max(1, Math.ceil(len / 0.22));
+  for (let k = 0; k <= n; k++) {
+    const t = k / n;
+    const x = p[0] + (q[0] - p[0]) * t;
+    const z = p[1] + (q[1] - p[1]) * t;
+    pushPrism(buf, ccw([[x - 0.018, z - 0.018], [x + 0.018, z - 0.018], [x + 0.018, z + 0.018], [x - 0.018, z + 0.018]]), y + 0.12, y + h - 0.07, side, top);
+  }
+}
+
 /** A roof sheet of constant thickness whose top follows a slope. */
 function pushCanopyPanel(buf: GeoBuffer, poly: Vec2[], topAt: (x: number, z: number) => number, thickness: number, side: number, top: number, fold = ALWAYS): void {
   const topC = new Color(top);
@@ -231,7 +248,8 @@ export function pushOutdoor(buf: GeoBuffer, lines: LineBuffer, floor: Floor, roo
         break;
       }
       case "canopy": {
-        // A complete covered yard: its own paved surface, posts, beams and a solid sloping roof.
+        // A complete covered yard: its own paved surface, high perimeter fence with a front gate,
+        // posts, beams and a solid sloping roof. The last edge may stay open against the house.
         const h = look.top;
         const finish = coveredLook(a, look);
         const floorY = g + (outdoorFloorTop(a.type) ?? 0);
@@ -241,6 +259,38 @@ export function pushOutdoor(buf: GeoBuffer, lines: LineBuffer, floor: Floor, roo
         for (const [x, z] of poly) {
           const top = roofAt(x, z) - 0.08;
           pushPrism(buf, ccw([[x - columnHalf, z - columnHalf], [x + columnHalf, z - columnHalf], [x + columnHalf, z + columnHalf], [x - columnHalf, z + columnHalf]]), floorY, top, finish.under, finish.roof);
+        }
+        if (a.railing !== false && h >= 0.4) {
+          const fenceH = Math.min(1.45, h * 0.62);
+          const front = coveredFrontEdge(poly, openEnd);
+          for (let i = 0; i < poly.length; i++) {
+            if (i === openEnd) continue;
+            const p = poly[i];
+            const q = poly[(i + 1) % poly.length];
+            if (i !== front) {
+              pushYardPanel(buf, p, q, floorY, fenceH, finish.under, finish.roof);
+              continue;
+            }
+            const len = Math.hypot(q[0] - p[0], q[1] - p[1]);
+            if (len < 0.6) {
+              pushYardPanel(buf, p, q, floorY, fenceH, finish.under, finish.roof);
+              continue;
+            }
+            const gateW = Math.min(2.4, Math.max(0.9, len * 0.45), Math.max(0.3, len - 0.3));
+            const t0 = Math.max(0, (len - gateW) / (2 * len));
+            const t1 = Math.min(1, 1 - t0);
+            const gateA: Vec2 = [p[0] + (q[0] - p[0]) * t0, p[1] + (q[1] - p[1]) * t0];
+            const gateB: Vec2 = [p[0] + (q[0] - p[0]) * t1, p[1] + (q[1] - p[1]) * t1];
+            const middle: Vec2 = [(gateA[0] + gateB[0]) / 2, (gateA[1] + gateB[1]) / 2];
+            pushYardPanel(buf, p, gateA, floorY, fenceH, finish.under, finish.roof);
+            pushYardPanel(buf, gateB, q, floorY, fenceH, finish.under, finish.roof);
+            pushYardPanel(buf, gateA, middle, floorY, fenceH, finish.under, finish.roof, true);
+            pushYardPanel(buf, middle, gateB, floorY, fenceH, finish.under, finish.roof, true);
+            // Diagonal braces and the centre seam distinguish the two gate leaves from the fence.
+            lines.seg([gateA[0], floorY + 0.24, gateA[1]], [middle[0], floorY + fenceH - 0.1, middle[1]], edge, ALWAYS);
+            lines.seg([gateB[0], floorY + 0.24, gateB[1]], [middle[0], floorY + fenceH - 0.1, middle[1]], edge, ALWAYS);
+            lines.seg([middle[0], floorY + 0.12, middle[1]], [middle[0], floorY + fenceH, middle[1]], edge, ALWAYS);
+          }
         }
         for (let i = 0; i < poly.length; i++) {
           if (i === openEnd) continue;

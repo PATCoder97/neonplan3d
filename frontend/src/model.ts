@@ -28,6 +28,7 @@ export interface Room {
   kind?: "room" | "veranda" | "canopy";
   /** Covered-room roof finish and structural options (the same look as composite outdoor areas). */
   roof_style?: "solid" | "glass" | "tile" | null;
+  /** Veranda railing, or the high fence and front gate around a covered yard. */
   railing?: boolean | null;
   columns?: number | null;
   column_size?: number | null;
@@ -677,7 +678,7 @@ export interface OutdoorArea {
   floor_material?: string | null;
   /** Visual roof finish of a canopy or veranda. */
   roof_style?: "solid" | "glass" | "tile" | null;
-  /** Veranda railing; undefined keeps the type default. */
+  /** Veranda railing, or covered-yard fence and gate; undefined keeps the type default. */
   railing?: boolean | null;
   /** Number of substantial columns across a veranda's front edge. */
   columns?: number | null;

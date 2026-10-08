@@ -42,6 +42,7 @@ ROOM_SCHEMA = vol.Schema(
         # Open covered spaces remain rooms for areas/devices, but render without enclosing walls.
         vol.Optional("kind", default="room"): vol.In(["room", "veranda", "canopy"]),
         vol.Optional("roof_style", default=None): vol.Any(None, vol.In(["solid", "glass", "tile"])),
+        # veranda railing, or the high fence and gate around a covered yard
         vol.Optional("railing", default=None): vol.Any(None, bool),
         vol.Optional("columns", default=None): vol.Any(None, vol.All(vol.Coerce(int), vol.Range(min=0, max=12))),
         vol.Optional("column_size", default=None): vol.Any(None, vol.All(vol.Coerce(float), vol.Range(min=0.08, max=0.8))),
@@ -301,6 +302,7 @@ OUTDOOR_SCHEMA = vol.Schema(
         vol.Required("points"): vol.All([_POINT], vol.Length(min=3, max=MAX_POINTS)),
         vol.Optional("floor_material", default=None): vol.Any(None, vol.All(str, vol.Length(max=32))),
         vol.Optional("roof_style", default=None): vol.Any(None, vol.In(["solid", "glass", "tile"])),
+        # veranda railing, or the high fence and gate around a covered yard
         vol.Optional("railing", default=None): vol.Any(None, bool),
         vol.Optional("columns", default=None): vol.Any(None, vol.All(vol.Coerce(int), vol.Range(min=0, max=12))),
         vol.Optional("column_size", default=None): vol.Any(None, vol.All(vol.Coerce(float), vol.Range(min=0.08, max=0.8))),

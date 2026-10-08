@@ -4734,12 +4734,12 @@ export class Fp3dEditor extends LitElement {
               ${this.t("outdoor_bracing")}</label
             >`
           : nothing}
-        ${a.type === "veranda"
+        ${a.type === "veranda" || a.type === "canopy"
           ? html`<label class="fp3d-check fp3d-wide"
                 ><input type="checkbox" .checked=${a.railing !== false} ?disabled=${!admin} @change=${(ev: Event) => this.updateOutdoor({ railing: (ev.target as HTMLInputElement).checked })} />
-                ${this.t("outdoor_railing")}</label
+                ${this.t(a.type === "canopy" ? "outdoor_yard_enclosure" : "outdoor_railing")}</label
               >
-              ${this.num(this.t("outdoor_columns"), a.columns ?? 2, (v) => this.updateOutdoor({ columns: Math.min(12, Math.max(0, Math.round(v))) }), 1, 0)}`
+              ${a.type === "veranda" ? this.num(this.t("outdoor_columns"), a.columns ?? 2, (v) => this.updateOutdoor({ columns: Math.min(12, Math.max(0, Math.round(v))) }), 1, 0) : nothing}`
           : nothing}
         ${covered ? this.num(this.t("outdoor_column_size"), a.column_size ?? (a.type === "veranda" ? 0.32 : 0.12), (v) => this.updateOutdoor({ column_size: Math.min(0.8, Math.max(0.08, round(v))) }), 0.02, 0.08) : nothing}
         <label class="fp3d-check fp3d-wide" title=${this.t("outdoor_cut_hint")}
@@ -5402,12 +5402,12 @@ export class Fp3dEditor extends LitElement {
                 ><input type="checkbox" .checked=${room.open !== false} ?disabled=${!admin} @change=${(e: Event) => this.updateRoom({ open: (e.target as HTMLInputElement).checked })} />
                 ${this.t("outdoor_open")}</label
               >
-              ${room.kind === "veranda"
+              ${room.kind === "veranda" || room.kind === "canopy"
                 ? html`<label class="fp3d-check fp3d-wide"
                       ><input type="checkbox" .checked=${room.railing !== false} ?disabled=${!admin} @change=${(e: Event) => this.updateRoom({ railing: (e.target as HTMLInputElement).checked })} />
-                      ${this.t("outdoor_railing")}</label
+                      ${this.t(room.kind === "canopy" ? "outdoor_yard_enclosure" : "outdoor_railing")}</label
                     >
-                    ${this.num(this.t("outdoor_columns"), room.columns ?? 2, (v) => this.updateRoom({ columns: Math.min(12, Math.max(0, Math.round(v))) }), 1, 0)}`
+                    ${room.kind === "veranda" ? this.num(this.t("outdoor_columns"), room.columns ?? 2, (v) => this.updateRoom({ columns: Math.min(12, Math.max(0, Math.round(v))) }), 1, 0) : nothing}`
                 : nothing}
               ${this.num(this.t("outdoor_column_size"), room.column_size ?? (room.kind === "veranda" ? 0.32 : 0.12), (v) => this.updateRoom({ column_size: Math.min(0.8, Math.max(0.08, round(v))) }), 0.02, 0.08)}`
           : nothing}
