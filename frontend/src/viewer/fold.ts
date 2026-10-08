@@ -17,7 +17,7 @@ export interface FoldMasks {
   glass: FoldMask;
 }
 
-export type FoldRole = "plain" | "solid" | "glass";
+export type FoldRole = "plain" | "solid" | "glass" | "roof";
 
 export function makeFoldable<T extends Material>(material: T, masks: FoldMasks, role: FoldRole = "plain"): T {
   material.onBeforeCompile = (shader) => {
@@ -27,7 +27,7 @@ export function makeFoldable<T extends Material>(material: T, masks: FoldMasks, 
       "#include <project_vertex>",
       `#include <project_vertex>
       {
-        bool fp3dShow = ${role === "glass" ? "false" : "true"};
+        bool fp3dShow = ${role === "glass" || role === "roof" ? "false" : "true"};
         if (fold > -0.5) {
           int fp3dFold = int(fold + 0.5);
           int fp3dKind = fp3dFold / 16;
@@ -37,8 +37,9 @@ export function makeFoldable<T extends Material>(material: T, masks: FoldMasks, 
           // kinds: 0 upper part, 1 cut edge, 2 lower part, 3 cap at the cut height, 4 furniture above the cut
           fp3dShow = fp3dKind == 0 || fp3dKind == 4 ? fp3dStanding : fp3dKind == 1 || fp3dKind == 3 ? !fp3dStanding : true;
           bool fp3dWall = fp3dKind == 0 || fp3dKind == 2;
-          ${role === "solid" ? "if (fp3dGlass && fp3dWall) fp3dShow = false;" : ""}
+          ${role === "solid" ? "if ((fp3dGlass && fp3dWall) || (fp3dBucket == 15 && fp3dKind == 0)) fp3dShow = false;" : ""}
           ${role === "glass" ? "fp3dShow = fp3dShow && fp3dGlass && fp3dWall;" : ""}
+          ${role === "roof" ? "fp3dShow = fp3dShow && fp3dBucket == 15 && fp3dKind == 0;" : ""}
         }
         if (!fp3dShow) gl_Position = vec4(2.0, 2.0, 2.0, 1.0);
       }`,
@@ -51,6 +52,8 @@ export function makeFoldable<T extends Material>(material: T, masks: FoldMasks, 
         diffuseColor.rgb = diffuseColor.rgb * 1.7 + vec3(0.015, 0.05, 0.075);
         diffuseColor.a *= 0.2;`,
       );
+    } else if (role === "roof") {
+      shader.fragmentShader = shader.fragmentShader.replace("#include <color_fragment>", "#include <color_fragment>\ndiffuseColor.a *= 0.48;");
     }
   };
   material.customProgramCacheKey = () => `fp3d-fold-${role}`;

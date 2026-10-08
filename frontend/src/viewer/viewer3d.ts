@@ -50,7 +50,7 @@ import { roofUnderAt } from "../roof-sections.ts";
 import { buildFloorGeometry, COVERED_ROOF_BUCKET, SLAB, stairHoles, type FloorGeometry } from "./build.ts";
 import { OrbitControls, type OrbitView } from "./controls.ts";
 import { makeFoldable, type FoldMasks } from "./fold.ts";
-import { cameraFitPlacement, cameraFitView, coveredRoomViewTheta, framingBox, roomFramingBox, type CameraFrameInsets } from "./framing.ts";
+import { cameraFitPlacement, cameraFitView, framingBox, roomFramingBox, type CameraFrameInsets } from "./framing.ts";
 import { pushCameraModel, pushFanRotor, pushPackGlow, pushPackLamp, screenRect, pushFridgeDoors } from "./furniture.ts";
 import { mountBase, packItem, setPacks, type FurniturePack } from "../packs.ts";
 import { withVehicles } from "../parking.ts";
@@ -335,6 +335,8 @@ interface FloorMaterials {
   pattern: MeshBasicMaterial;
   wall: MeshBasicMaterial;
   glassWall: MeshBasicMaterial;
+  /** Slightly transparent covered-room roof, so devices remain visible before opening the room. */
+  coveredRoof: MeshBasicMaterial;
   shadow: MeshBasicMaterial;
   lines: LineBasicMaterial;
   glow: MeshBasicMaterial;
@@ -742,11 +744,10 @@ export class FloorplanViewer {
     const room = fv?.floor.rooms.find((r) => r.id === roomId);
     if (!fv || !room) return;
     const box = roomFramingBox(fv.floor, room, fv.ty);
-    const front = coveredRoomViewTheta(room);
-    const phi = front === null ? 0.72 : 1.02;
-    const theta = front ?? this.controls.view.theta;
+    const phi = 0.72;
+    const theta = this.controls.view.theta;
     const placement = cameraFitPlacement(box, theta, phi, this.camera.aspect, this.camera.fov * DEG, this.cameraFrame(), 4);
-    this.controls.flyTo({ target: box.getCenter(new Vector3()).add(placement.offset), radius: placement.radius, theta, phi });
+    this.controls.flyTo({ target: box.getCenter(new Vector3()).add(placement.offset), radius: placement.radius, phi });
   }
 
   setWallMode(mode: WallMode): void {
@@ -1607,6 +1608,7 @@ export class FloorplanViewer {
       pattern: patternMaterial(this.patternTexture),
       wall: themed(makeFoldable(new MeshBasicMaterial({ vertexColors: true }), mask, "solid"), this.themeUniform),
       glassWall: makeFoldable(new MeshBasicMaterial({ vertexColors: true, transparent: true, depthWrite: false }), mask, "glass"),
+      coveredRoof: themed(makeFoldable(new MeshBasicMaterial({ vertexColors: true, transparent: true, depthWrite: false, side: DoubleSide }), mask, "roof"), this.themeUniform),
       // result = floor colour * vertex colour (white leaves the floor untouched)
       shadow: new MeshBasicMaterial({
         vertexColors: true,
@@ -1738,8 +1740,10 @@ export class FloorplanViewer {
       for (const m of [framesMesh, blindsMesh, glassMesh]) m.frustumCulled = false;
       // glass walls are drawn after everything opaque in the room, so doors and furniture show through
       const glassWalls = new Mesh(geo.walls, materials.glassWall);
+      const coveredRoofs = new Mesh(geo.walls, materials.coveredRoof);
       const wallMesh = new Mesh(geo.walls, materials.wall);
       glassWalls.renderOrder = 6;
+      coveredRoofs.renderOrder = 5;
       group.add(
         floorMesh,
         shadowMesh,
@@ -1758,6 +1762,7 @@ export class FloorplanViewer {
         trailMesh,
         fridgeMesh,
         screenMesh,
+        coveredRoofs,
         glassWalls,
         ...(solarMesh ? [solarMesh] : []),
       );
@@ -2050,6 +2055,7 @@ export class FloorplanViewer {
     m.lines.opacity = fv.o;
     m.glass.opacity = fv.o;
     m.glassWall.opacity = fv.o;
+    m.coveredRoof.opacity = fv.o;
     m.flow.opacity = fv.o;
     m.solarLive.opacity = fv.o;
     m.lamps.opacity = fv.o;
