@@ -1,5 +1,5 @@
 // Areas outside the house: lawn, terrace, path, driveway, pool, bed, wild patch, hedge, fence and
-// pergola and solid canopy, in the neon look. Flat areas lie at ground level (the underside of the ground floor slab),
+// pergola, solid canopy and veranda, in the neon look. Flat areas lie at ground level (the underside of the ground floor slab),
 // the terrace a little higher, the pool water below; hedges are dark green blocks, fences posts with
 // rails along the outline, a pergola corner posts with beams, rafters and optional X-bracing. An area
 // can sit higher or lower (offset), fall along one direction (slope) and have patches cut out of it.
@@ -28,6 +28,7 @@ const LOOKS: Record<OutdoorType, Look> = {
   fence: { color: 0x1d2946, side: 0x1d2946, edge: 0x5b7cff, edgeAlpha: 0.45 },
   pergola: { color: 0x2a2238, side: 0x1f1a2c, edge: 0x5b7cff, edgeAlpha: 0.5 },
   canopy: { color: 0x263451, side: 0x18223a, edge: 0x37e0ff, edgeAlpha: 0.5 },
+  veranda: { color: 0xd5d9e8, side: 0x67718a, edge: 0x37e0ff, edgeAlpha: 0.58 },
 };
 
 /** Height of the visible surface of an area (for the lighting layer), at its high edge. */
@@ -107,8 +108,8 @@ export function pushOutdoor(buf: GeoBuffer, lines: LineBuffer, floor: Floor): vo
     const look = { ...LOOKS[a.type], top: own };
     const poly = ccw(a.points);
     const edge = shade(look.edge, look.edgeAlpha);
-    // fences, pergolas and canopies may leave their closing edge out (leaning against the house)
-    const openEnd = a.open && (a.type === "fence" || a.type === "pergola" || a.type === "canopy") ? poly.length - 1 : -1;
+    // fences, pergolas, canopies and verandas may leave their closing edge out (leaning against the house)
+    const openEnd = a.open && (a.type === "fence" || a.type === "pergola" || a.type === "canopy" || a.type === "veranda") ? poly.length - 1 : -1;
     const outline = (yAt: (x: number, z: number) => number) => {
       if (a.outline === false) return;
       for (let i = 0; i < poly.length; i++) {
@@ -219,6 +220,75 @@ export function pushOutdoor(buf: GeoBuffer, lines: LineBuffer, floor: Floor): vo
         }
         pushCanopyPanel(buf, poly, roofAt, 0.08, look.side, look.color);
         outline((x, z) => roofAt(x, z) + 0.004);
+        break;
+      }
+      case "veranda": {
+        // A Vietnamese upper-floor veranda: a railing around the three free edges, two substantial
+        // front columns and a deep lintel above them. The closing edge can be omitted where it joins
+        // the house; the terrace beneath remains a separate outdoor surface.
+        const h = look.top;
+        const railH = Math.min(1.1, h * 0.48);
+        const squarePost = (x: number, z: number, half: number, y0: number, y1: number, side = look.side, top = look.color) =>
+          pushPrism(buf, ccw([[x - half, z - half], [x + half, z - half], [x + half, z + half], [x - half, z + half]]), y0, y1, side, top);
+
+        // Slim balusters and two horizontal rails around every free edge.
+        for (let i = 0; i < poly.length; i++) {
+          if (i === openEnd) continue;
+          const p = poly[i];
+          const q = poly[(i + 1) % poly.length];
+          const len = Math.hypot(q[0] - p[0], q[1] - p[1]);
+          const n = Math.max(1, Math.ceil(len / 0.22));
+          const y = (groundAt(p[0], p[1]) + groundAt(q[0], q[1])) / 2;
+          pushBeam(buf, p, q, 0.07, y + 0.3, y + 0.38, look.side, look.color);
+          pushBeam(buf, p, q, 0.09, y + railH - 0.09, y + railH, look.side, look.color);
+          for (let k = 0; k <= n; k++) {
+            const t = k / n;
+            const x = p[0] + (q[0] - p[0]) * t;
+            const z = p[1] + (q[1] - p[1]) * t;
+            const gy = groundAt(x, z);
+            squarePost(x, z, 0.018, gy + 0.08, gy + railH - 0.07);
+          }
+        }
+
+        // The front is the edge farthest from the omitted wall edge. Without an omitted edge, use
+        // the longest edge as the facade. This keeps the two large columns reusable on any rectangle.
+        let front = 0;
+        if (openEnd >= 0) {
+          const wa = poly[openEnd];
+          const wb = poly[(openEnd + 1) % poly.length];
+          const wx = (wa[0] + wb[0]) / 2;
+          const wz = (wa[1] + wb[1]) / 2;
+          let farthest = -1;
+          for (let i = 0; i < poly.length; i++) {
+            if (i === openEnd) continue;
+            const p = poly[i];
+            const q = poly[(i + 1) % poly.length];
+            const dx = (p[0] + q[0]) / 2 - wx;
+            const dz = (p[1] + q[1]) / 2 - wz;
+            const d2 = dx * dx + dz * dz;
+            if (d2 > farthest) [front, farthest] = [i, d2];
+          }
+        } else {
+          let longest = -1;
+          for (let i = 0; i < poly.length; i++) {
+            const p = poly[i];
+            const q = poly[(i + 1) % poly.length];
+            const len = Math.hypot(q[0] - p[0], q[1] - p[1]);
+            if (len > longest) [front, longest] = [i, len];
+          }
+        }
+        const p = poly[front];
+        const q = poly[(front + 1) % poly.length];
+        for (const [x, z] of [p, q]) {
+          const gy = groundAt(x, z);
+          squarePost(x, z, 0.22, gy, gy + 0.28);
+          squarePost(x, z, 0.16, gy + 0.2, gy + h - 0.2);
+          squarePost(x, z, 0.22, gy + h - 0.28, gy + h);
+          lines.seg([x, gy + 0.28, z], [x, gy + h - 0.28, z], edge, ALWAYS);
+        }
+        const topY = (groundAt(p[0], p[1]) + groundAt(q[0], q[1])) / 2 + h;
+        pushBeam(buf, p, q, 0.42, topY - 0.28, topY, look.side, look.color);
+        outline((x, z) => groundAt(x, z) + railH + 0.004);
         break;
       }
       default: {

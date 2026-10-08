@@ -4663,7 +4663,7 @@ export class Fp3dEditor extends LitElement {
           ><input type="checkbox" .checked=${a.outline !== false} ?disabled=${!admin} @change=${(ev: Event) => this.updateOutdoor({ outline: (ev.target as HTMLInputElement).checked ? undefined : false })} />
           ${this.t("outdoor_outline")}</label
         >
-        ${a.type === "fence" || a.type === "pergola" || a.type === "canopy"
+        ${a.type === "fence" || a.type === "pergola" || a.type === "canopy" || a.type === "veranda"
           ? html`<label class="fp3d-check fp3d-wide" title=${this.t("outdoor_open_hint")}
               ><input type="checkbox" .checked=${!!a.open} ?disabled=${!admin} @change=${(ev: Event) => this.updateOutdoor({ open: (ev.target as HTMLInputElement).checked || undefined })} />
               ${this.t("outdoor_open")}</label

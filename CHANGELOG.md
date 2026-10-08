@@ -4,6 +4,12 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.18.16
+
+### Added
+
+- Added a dedicated outdoor veranda for upper floors, with railings around its free edges, two substantial front columns and a connecting lintel.
+
 ## 1.18.15
 
 ### Fixed

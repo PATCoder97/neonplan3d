@@ -520,7 +520,7 @@ export type WeatherEffect = (typeof WEATHER_EFFECTS)[number];
 /** The effects shown when the plan does not say: everything but fog (fog greys the whole scene). */
 export const DEFAULT_WEATHER_EFFECTS: WeatherEffect[] = ["rain", "snow", "clouds", "lightning", "sky"];
 
-export const OUTDOOR_TYPES = ["lawn", "terrace", "path", "driveway", "pool", "bed", "wild", "hedge", "fence", "pergola", "canopy"] as const;
+export const OUTDOOR_TYPES = ["lawn", "terrace", "path", "driveway", "pool", "bed", "wild", "hedge", "fence", "pergola", "canopy", "veranda"] as const;
 export type OutdoorType = (typeof OUTDOOR_TYPES)[number];
 
 /** Top of each kind of outdoor area above ground level (pool: its water, below). */
@@ -536,11 +536,12 @@ export const OUTDOOR_TOP: Record<OutdoorType, number> = {
   fence: 1.0,
   pergola: 2.2,
   canopy: 2.4,
+  veranda: 2.4,
 };
 
 /** Types that stand on the ground as structures (no surface to stand on, no light pool). */
 export function outdoorStanding(type: OutdoorType): boolean {
-  return type === "hedge" || type === "fence" || type === "pergola" || type === "canopy";
+  return type === "hedge" || type === "fence" || type === "pergola" || type === "canopy" || type === "veranda";
 }
 
 /** The directions an area can fall towards: +x (right in the plan), −x, +z (down in the plan), −z. */
@@ -605,7 +606,7 @@ export interface OutdoorArea {
   id: string;
   type: OutdoorType;
   points: Vec2[];
-  /** Standing structures (hedge, fence, pergola, canopy): their height in m. */
+  /** Standing structures (hedge, fence, pergola, canopy, veranda): their height in m. */
   height?: number | null;
   /** False hides the neon outline (a plot of several lawns without lines crossing it). */
   outline?: boolean;
@@ -614,7 +615,7 @@ export interface OutdoorArea {
   /** Fall in m across the area along slope_dir (a driveway down to the garage, a sloping lawn); the high edge sits at the offset. */
   slope?: number | null;
   slope_dir?: SlopeDir;
-  /** Fences, pergolas and canopies: the closing edge is left out, so the structure can lean against the house. */
+  /** Fences, pergolas, canopies and verandas: the closing edge is left out, so the structure can lean against the house. */
   open?: boolean;
   /** Pergola: diagonal X-bracing on every side. */
   bracing?: boolean;
