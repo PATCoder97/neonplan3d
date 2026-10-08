@@ -7,6 +7,7 @@ import { EVERYDAY_FURNITURE_SYMBOLS } from "./everyday.ts";
 import { GARDEN_FURNITURE_SYMBOLS } from "./garden.ts";
 import { GARAGE_FURNITURE_SYMBOLS } from "./garage.ts";
 import { KITCHEN_BATH_FURNITURE_SYMBOLS } from "./kitchen-bath.ts";
+import { KIDS_FURNITURE_SYMBOLS } from "./kids.ts";
 import { LIGHTING_FURNITURE_SYMBOLS } from "./lighting.ts";
 import { OFFICE_FURNITURE_SYMBOLS } from "./office.ts";
 import { LIVING_FURNITURE_SYMBOLS } from "./living.ts";
@@ -21,6 +22,7 @@ const BUILTIN_FURNITURE_SYMBOLS: Readonly<Record<string, FurnitureSymbolRenderer
   ...BEDROOM_FURNITURE_SYMBOLS,
   ...LIVING_FURNITURE_SYMBOLS,
   ...KITCHEN_BATH_FURNITURE_SYMBOLS,
+  ...KIDS_FURNITURE_SYMBOLS,
   ...BATHROOM_FURNITURE_SYMBOLS,
   ...ARCHITECTURE_OUTDOOR_FURNITURE_SYMBOLS,
   ...ARCHITECTURE_FURNITURE_SYMBOLS,

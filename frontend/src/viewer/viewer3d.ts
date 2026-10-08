@@ -190,7 +190,7 @@ export interface TrailSpot {
   age: number;
 }
 
-export type LampModel = "ceiling" | "downlight" | "spot" | "panel" | "pendant" | "floor" | "uplight" | "table" | "wall" | "strip" | "bollard" | "garden" | "fan" | "column" | "tv_bars" | "orb_table" | "portable" | "ambient" | "cube" | "round_panel" | "garden_set" | "wall_updown";
+export type LampModel = "ceiling" | "downlight" | "spot" | "panel" | "pendant" | "floor" | "uplight" | "table" | "wall" | "strip" | "bollard" | "garden" | "fan" | "column" | "tv_bars" | "orb_table" | "portable" | "ambient" | "cube" | "kids_moon" | "star_projector" | "round_panel" | "garden_set" | "wall_updown";
 
 /** Piece of energy cable (floor-local coordinates); the flow runs from a to b. */
 /** A ray from the camera through the pointer, in building coordinates (heights above the ground). */
@@ -337,6 +337,8 @@ const LAMP_SIZE: Record<LampModel, [number, number, number]> = {
   portable: [0.24, 0.24, 0.26],
   ambient: [0.2, 0.2, 0.2],
   cube: [0.26, 0.26, 0.24],
+  kids_moon: [0.22, 0.18, 0.42],
+  star_projector: [0.22, 0.22, 0.22],
   round_panel: [0.42, 0.42, 0.045],
   garden_set: [0.65, 0.18, 0.32],
   wall_updown: [0.14, 0.12, 0.32],
@@ -1563,6 +1565,8 @@ export class FloorplanViewer {
         portable: [base + h * 0.55, "omni"],
         ambient: [base + h, "up"],
         cube: [base + h * 0.55, "omni"],
+        kids_moon: [base + h * 0.62, "omni"],
+        star_projector: [base + h, "up"],
         round_panel: [H - 0.05, "ceiling"],
         garden_set: [base + h, "up"],
         wall_updown: [base + h / 2, "wall"],
@@ -2401,6 +2405,8 @@ export class FloorplanViewer {
         portable: base + h * 0.55,
         ambient: base + h,
         cube: base + h * 0.55,
+        kids_moon: base + h * 0.62,
+        star_projector: base + h,
         round_panel: H - 0.03,
         garden_set: base + h - 0.03,
         wall_updown: base + h / 2,
@@ -4089,6 +4095,17 @@ export function pushLampModel(
     case "cube":
       box(-w / 2, w / 2, -dd / 2, dd / 2, base, base + h * 0.08, LAMP_BODY);
       box(-w * 0.46, w * 0.46, -dd * 0.46, dd * 0.46, base + h * 0.08, base + h, shadeCol);
+      break;
+    case "kids_moon":
+      cyl(r * 0.62, base, base + h * 0.05, LAMP_BODY, LAMP_BODY, 12);
+      box(-w * 0.4, -w * 0.08, -dd * 0.22, dd * 0.22, base + h * 0.05, base + h, shadeCol);
+      box(-w * 0.08, w * 0.32, -dd * 0.22, dd * 0.22, base + h * 0.05, base + h * 0.28, shadeCol);
+      box(-w * 0.08, w * 0.32, -dd * 0.22, dd * 0.22, base + h * 0.72, base + h, shadeCol);
+      break;
+    case "star_projector":
+      cyl(r, base, base + h * 0.2, LAMP_BODY, LAMP_BODY, 14);
+      cyl(r * 0.88, base + h * 0.2, base + h * 0.68, shadeCol, shadeCol, 14);
+      cyl(r * 0.62, base + h * 0.68, base + h, shadeCol, shadeCol, 12);
       break;
     case "garden_set":
       for (const x of [-w * 0.34, 0, w * 0.34]) {

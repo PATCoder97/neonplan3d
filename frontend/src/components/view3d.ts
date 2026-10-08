@@ -1877,7 +1877,7 @@ export class Fp3dView3d extends LitElement {
     // a height above the floor set by hand wins (a table lamp on a shelf, a floor lamp on a platform);
     // an LED strip outside the house counts from the ground there (a path light flush with the lawn)
     const inRoom = floor.rooms.some((r) => r.points.length >= 3 && pointInPolygon([f.x, f.z], r.points));
-    const surfaceLamp = ["table", "orb_table", "portable", "ambient", "cube"].includes(model);
+    const surfaceLamp = ["table", "orb_table", "portable", "ambient", "cube", "kids_moon", "star_projector"].includes(model);
     const outdoorLamp = ["bollard", "garden", "garden_set"].includes(model);
     const base = model === "strip" && !inRoom
       ? outdoorGround(floor, f.x, f.z) + (f.mount_y ?? 0)
@@ -1917,6 +1917,8 @@ export class Fp3dView3d extends LitElement {
       portable: base + f.h + 0.16,
       ambient: base + f.h + 0.16,
       cube: base + f.h + 0.16,
+      kids_moon: base + f.h + 0.16,
+      star_projector: base + f.h + 0.16,
       round_panel: H - 0.25,
       garden_set: base + f.h + 0.2,
       wall_updown: base + f.h + 0.2,

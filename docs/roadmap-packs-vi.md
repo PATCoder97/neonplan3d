@@ -25,7 +25,7 @@ Nói ngắn gọn: ảnh của họ được dùng để trả lời “cần c�
 
 ## Hiện trạng ngày 09/10/2026
 
-- Thư viện tích hợp hiện có **357 mục** trong 10 nhóm giao diện, gồm các lô hoàn chỉnh cho Giai đoạn 1–4 và nhóm Văn phòng hoàn chỉnh của Giai đoạn 5; toàn bộ hình học tích hợp được dựng thủ tục trong repository.
+- Thư viện tích hợp hiện có **373 mục** trong 10 nhóm giao diện, gồm các lô hoàn chỉnh cho Giai đoạn 1–4 cùng nhóm Văn phòng và Phòng trẻ em của Giai đoạn 5; toàn bộ hình học tích hợp được dựng thủ tục trong repository.
 - Có 21 gói bố trí nhanh cho phòng, gồm ba mức nhỏ/vừa/lớn cho bếp, phòng tắm, phòng ngủ và phòng khách; gói mới bỏ qua vị trí đã có đồ thay vì xếp chồng.
 - Trình chỉnh sửa đã có tìm kiếm song ngữ, nhóm thu gọn, xem trước, đổi kích thước, xoay, lật, đặt lên sàn/tường/trần/bề mặt và liên kết entity.
 - Định dạng pack nhập ngoài đã hỗ trợ khối hộp, trụ, khối vát, đèn, màn hình, bề mặt đặt đồ, phương tiện và lỗ cầu thang.
@@ -47,7 +47,7 @@ Trang chính thức đang công bố gói đầy đủ gồm 474 mẫu/phương 
 | Garage & xưởng | 17 | Hoàn tất 17/17 mẫu chức năng | P1 |
 | Phương tiện | 15 | Hoàn tất 15/15 mẫu chức năng | P1 |
 | Văn phòng & gaming | 25 | Hoàn tất 25/25 mẫu chức năng | P2 |
-| Phòng trẻ em | 18 | Có giường/cũi và bố trí nhanh | P2 |
+| Phòng trẻ em | 18 | Hoàn tất 18/18 mẫu chức năng | P2 |
 | Thú cưng | 24 | Chưa có nhóm riêng | P2 |
 | Fitness | 17 | Chưa có nhóm riêng | P2 |
 | Home Cinema & Hi-Fi | 35 | Có TV và loa thông minh cơ bản | P2 |
@@ -149,6 +149,17 @@ Bảng kiểm kê làm việc nên có các cột: `nhóm`, `nguồn ảnh`, `t�
 | Trình bày và in ấn | Thiếu bảng, máy in văn phòng và máy in 3D | Thêm bảng trắng treo tường, máy in laser cùng máy in 3D khung mở/buồng kín; thiết bị để bàn tự nhận cao độ bề mặt. |
 | Bổ sung nơi làm việc | Chưa có ba màn hình, buồng gọi điện hoặc lưu trữ filament | Thêm cụm ba màn hình có Live Screens, buồng cách âm cỡ một người và kệ filament treo tường tám cuộn. |
 
+### Đợt đối chiếu: Phòng trẻ em
+
+Đã xem [trang sản phẩm Kids Room](https://mastershort.de/product/neonplan3d-kids-room/) và hai ảnh overview công khai ngày 09/10/2026. Hai mẫu `crib` và `bunk_bed` hiện có được giữ để tương thích; 16 mẫu mới bổ sung đủ các hoạt động ngủ, học, chơi, lưu trữ và theo dõi em bé bằng hình học riêng.
+
+| Họ công năng | Hiện trạng trước đợt | Hành động trong fork |
+|---|---|---|
+| Học và chơi giả lập | Chỉ có giường/cũi | Thêm bàn học, bộ bàn hai ghế và bếp đồ chơi với footprint phù hợp trẻ em. |
+| Góc chơi vận động | Chưa có | Thêm lều tipi, góc đệm, ngựa bập bênh, thảm đường phố và bể bóng với silhouette 2D/3D riêng. |
+| Ngủ và chiếu sáng | Có giường tầng và cũi | Thêm giường khung nhà, đèn ngủ mặt trăng và máy chiếu sao; hai đèn liên kết light entity và chiếu sáng thực trong 3D. |
+| Lưu trữ và chăm sóc | Dùng chung tủ người lớn | Thêm kệ sáu hộp, ba thùng đồ chơi, tủ quần áo trẻ em, tủ thay tã và baby monitor có Live Screens. |
+
 ### Đợt đối chiếu: Kiến trúc & hoàn thiện
 
 Đã xem [trang sản phẩm Architecture & Fit-out](https://mastershort.de/product/neonplan3d-architecture-fit-out/) và gallery công khai ngày 08/10/2026. Danh sách công khai xác nhận 17 cấu kiện; fork dùng model primitive và tỷ lệ riêng.
@@ -200,7 +211,7 @@ Các biến thể cùng họ, ví dụ sofa 2/3 chỗ, tủ bếp 40/60/80 cm ho
 Mục tiêu: biến hiện trạng thành đường cơ sở có thể đo được.
 
 - [x] Sinh báo cáo tự động từ `FURNITURE_TYPES`, `FURNITURE_GROUPS` và `FURNITURE_SIZE` để phát hiện ID trùng, thiếu tên hoặc thiếu kích thước (`cd frontend && npm run catalog`).
-- [x] Lập bảng ánh xạ các mục hiện tại vào 16 nhóm đích; catalog kiểm kê hiện khóa 364 type, 357 mục thư viện, 7 mục nội bộ và trường hợp `worktop` đang nằm trong hai nhóm. Mỗi mục chỉ được tính một lần trong `REFERENCE_PACK_ITEMS`.
+- [x] Lập bảng ánh xạ các mục hiện tại vào 16 nhóm đích; catalog kiểm kê hiện khóa 380 type, 373 mục thư viện, 7 mục nội bộ và trường hợp `worktop` đang nằm trong hai nhóm. Mỗi mục chỉ được tính một lần trong `REFERENCE_PACK_ITEMS`.
 - [ ] Duyệt toàn bộ ảnh gallery công khai của 16 trang sản phẩm, không chỉ ảnh đại diện ở trang Packs; lập bảng `đã phù hợp / cần sửa hình / cần thêm mới` kèm URL và ngày xem.
 - [ ] Chọn khoảng 10 mẫu hiện có cần sửa hình trước; `fan_ceiling` là mẫu thí điểm và phải giữ nguyên ID.
 - [ ] Chụp bộ ảnh chuẩn ở góc nhìn 2D, 3D và chế độ Day/Neon để so sánh hồi quy.
@@ -296,7 +307,8 @@ Mục tiêu: hoàn tất độ phủ cả 16 nhóm.
 - [x] Văn phòng & gaming: bàn chữ L, ghế công thái học, tủ hồ sơ, nhiều màn hình, case máy tính và phụ kiện.
   - Đợt 1 đã thêm 11 mẫu: ba loại bàn, hai loại ghế, ba loại lưu trữ, màn hình đơn/đôi và case PC; màn hình tự nhận cao độ của mặt bàn, độ phủ đạt 14/25.
   - Đợt 2 đã thêm 11 mẫu gaming, hạ tầng, trình bày và in ấn; monitor/arcade có Live Screens, máy in nhận mặt bàn và hai mẫu treo tường dùng cao độ riêng, hoàn tất 25/25.
-- [ ] Trẻ em: bàn học, giá đồ chơi, tủ thấp, thảm chơi, giường theo lứa tuổi và đèn ngủ.
+- [x] Trẻ em: bàn học, giá đồ chơi, tủ thấp, thảm chơi, giường theo lứa tuổi và đèn ngủ.
+  - Đã thêm 16 mẫu học/chơi/ngủ/lưu trữ và chăm sóc; hai đèn ngủ có light entity, baby monitor có Live Screens và đồ để bàn nhận đúng cao độ, hoàn tất 18/18 khi tính `crib`/`bunk_bed` hiện có.
 - [ ] Thú cưng: giường, nhà, lồng, khay vệ sinh, bát ăn, trụ mèo và bể cá.
 - [ ] Fitness: máy chạy, xe đạp, ghế tập, tạ, thảm yoga và giàn tập.
 - [ ] Cinema & Hi-Fi: TV/máy chiếu, màn chiếu, loa thanh, loa đứng, loa surround, ampli, subwoofer và ghế rạp.

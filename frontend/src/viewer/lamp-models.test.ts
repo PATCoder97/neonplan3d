@@ -20,3 +20,12 @@ test("every lamp catalog item builds visible finite 3D geometry", () => {
     assert.ok(buf.p.every(Number.isFinite) && buf.c.every(Number.isFinite), `${type} has finite geometry`);
   }
 });
+
+test("kids night lights use two distinct dedicated lamp silhouettes", () => {
+  const counts = (["lamp_night_moon", "lamp_star_projector"] as const).map((type) => {
+    const buf = new GeoBuffer();
+    pushLampModel(buf, { lamp: LAMP_MODEL[type], x: 0, z: 0, size: FURNITURE_SIZE[type], base: 0, rotation: 0 }, 2.6, SHADE_SENTINEL);
+    return buf.count;
+  });
+  assert.notEqual(counts[0], counts[1]);
+});

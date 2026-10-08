@@ -117,6 +117,29 @@ test("office fixtures have distinct geometry and monitors follow the supporting 
   assert.ok(arcadeScreen.y0 > 0 && arcadeScreen.y1 < arcadeH && arcadeScreen.z > arcadeD * 0.28, "the live screen sits on the recessed cabinet face");
 });
 
+test("kids-room fixtures keep playful silhouettes and tabletop devices follow the kids desk", () => {
+  const types = ["tipi_kids", "play_kitchen_kids", "desk_kids", "toy_shelf_boxes", "cushion_corner_kids", "rocking_horse", "play_rug_road", "table_chairs_kids", "ball_pit", "bed_house", "baby_monitor", "changing_dresser", "wardrobe_kids", "toy_boxes_3"] as const;
+  for (const type of types) {
+    const [w, d, h] = FURNITURE_SIZE[type];
+    const buf = new GeoBuffer();
+    const lines = new LineBuffer();
+    pushFurniture(buf, lines, new GeoBuffer(), { id: type, type, x: 0, z: 0, rotation: 0, w, d, h, variant: null } as Furniture);
+    assert.ok(buf.count > 0 && lines.p.length > 0, `${type}: solid and outline geometry`);
+    const ys = buf.p.filter((_, index) => index % 3 === 1);
+    assert.ok(Math.min(...ys) >= -1e-6 && Math.max(...ys) <= h + 1e-6, `${type}: geometry stays inside declared height`);
+  }
+
+  const floor = newFloor("kids", "Kids", 0);
+  const [deskW, deskD, deskH] = FURNITURE_SIZE.desk_kids;
+  floor.furniture.push({ id: "kids-desk", type: "desk_kids", x: 0, z: 0, rotation: 0, w: deskW, d: deskD, h: deskH, variant: null } as Furniture);
+  assert.equal(mountBase(floor, { type: "baby_monitor", x: 0, z: 0, h: FURNITURE_SIZE.baby_monitor[2] }), deskH);
+  assert.equal(mountBase(floor, { type: "lamp_night_moon", x: 0, z: 0, h: FURNITURE_SIZE.lamp_night_moon[2] }), deskH);
+  assert.equal(mountBase(floor, { type: "lamp_star_projector", x: 0, z: 0, h: FURNITURE_SIZE.lamp_star_projector[2] }), deskH);
+  const [monitorW, monitorD, monitorH] = FURNITURE_SIZE.baby_monitor;
+  const monitorScreen = screenRect({ id: "baby-monitor", type: "baby_monitor", x: 0, z: 0, rotation: 0, w: monitorW, d: monitorD, h: monitorH, variant: null } as Furniture, floor)!;
+  assert.ok(monitorScreen.y0 > deskH && monitorScreen.z > monitorD / 2, "the camera screen sits on the front of the desk-mounted monitor");
+});
+
 test("living-room sofa variants keep fixed seats and distinct corner footprints", () => {
   const geometry = (type: "sofa_2" | "sofa_3" | "sofa_4" | "sofa_corner_left" | "sofa_corner_right" | "sofa_chaise" | "sofa_u") => {
     const [w, d, h] = FURNITURE_SIZE[type];

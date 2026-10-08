@@ -4,6 +4,18 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.23.2
+
+### Added
+
+- Completed the 18-item Kids Room family with a teepee, play kitchen, desk, toy storage, cushion corner, rocking horse, road rug, table set, ball pit, house bed, video baby monitor, changing dresser and kids wardrobe alongside the existing crib and bunk bed.
+- Added dedicated controllable moon and star-projector night lights, procedural 3D models, plan symbols and English, German and Vietnamese names for all 16 new items.
+
+### Changed
+
+- Kids' desks, table sets and changing dressers now act as placement surfaces; the video baby monitor supports Live Screens and follows its supporting surface.
+- Expanded the reproducible inventory to 380 declared types and 373 library items, completing Kids Room coverage at 18 of 18.
+
 ## 1.23.1
 
 ### Added
