@@ -107,24 +107,40 @@ function pushBeam(buf: GeoBuffer, p: Vec2, q: Vec2, w: number, y0: number, y1: n
   pushPrism(buf, ccw([[p[0] + nx, p[1] + nz], [q[0] + nx, q[1] + nz], [q[0] - nx, q[1] - nz], [p[0] - nx, p[1] - nz]]), y0, y1, side, top, { aoFrom: y0 - 1 });
 }
 
+/** A restrained neon edge on a beam so wall-coloured structure remains legible on the dark canvas. */
+function outlineBeam(lines: LineBuffer, p: Vec2, q: Vec2, y: number, edge: Color): void {
+  lines.seg([p[0], y + 0.004, p[1]], [q[0], y + 0.004, q[1]], edge, ALWAYS);
+}
+
+/** Vertical corner edges make a square post read like the outlined room walls from every camera angle. */
+function outlinePost(lines: LineBuffer, x: number, z: number, half: number, y0: number, y1: number, edge: Color): void {
+  for (const [dx, dz] of [[-half, -half], [half, -half], [half, half], [-half, half]]) {
+    lines.seg([x + dx, y0, z + dz], [x + dx, y1, z + dz], edge, ALWAYS);
+  }
+}
+
 /** A tall, see-through yard fence panel. */
-function pushYardPanel(buf: GeoBuffer, p: Vec2, q: Vec2, y: number, h: number, side: number, top: number): void {
+function pushYardPanel(buf: GeoBuffer, lines: LineBuffer, p: Vec2, q: Vec2, y: number, h: number, side: number, top: number, edge: Color): void {
   const len = Math.hypot(q[0] - p[0], q[1] - p[1]);
   if (len < 0.04 || h < 0.2) return;
   pushBeam(buf, p, q, 0.14, y, y + Math.min(0.24, h * 0.24), side, top);
   pushBeam(buf, p, q, 0.07, y + h * 0.5, y + h * 0.57, side, top);
   pushBeam(buf, p, q, 0.1, y + h - 0.1, y + h, side, top);
+  outlineBeam(lines, p, q, y + Math.min(0.24, h * 0.24), edge);
+  outlineBeam(lines, p, q, y + h * 0.57, edge);
+  outlineBeam(lines, p, q, y + h, edge);
   const n = Math.max(2, Math.ceil(len / 0.22));
   for (let k = 0; k <= n; k++) {
     const t = k / n;
     const x = p[0] + (q[0] - p[0]) * t;
     const z = p[1] + (q[1] - p[1]) * t;
     pushPrism(buf, ccw([[x - 0.018, z - 0.018], [x + 0.018, z - 0.018], [x + 0.018, z + 0.018], [x - 0.018, z + 0.018]]), y + 0.12, y + h - 0.07, side, top);
+    lines.seg([x, y + 0.12, z], [x, y + h - 0.07, z], edge, ALWAYS);
   }
 }
 
 /** Clean two-leaf gate whose arch starts at fence height and rises above it in the centre. */
-function pushYardGate(buf: GeoBuffer, p: Vec2, q: Vec2, y: number, h: number, side: number, top: number): void {
+function pushYardGate(buf: GeoBuffer, lines: LineBuffer, p: Vec2, q: Vec2, y: number, h: number, side: number, top: number, edge: Color): void {
   const dx = q[0] - p[0];
   const dz = q[1] - p[1];
   const len = Math.hypot(dx, dz);
@@ -141,15 +157,20 @@ function pushYardGate(buf: GeoBuffer, p: Vec2, q: Vec2, y: number, h: number, si
   const bars = Math.max(8, Math.ceil(len / 0.18));
   pushBeam(buf, p, q, 0.11, y + 0.06, y + 0.16, side, top);
   pushBeam(buf, p, q, 0.08, y + h * 0.47, y + h * 0.54, side, top);
+  outlineBeam(lines, p, q, y + 0.16, edge);
+  outlineBeam(lines, p, q, y + h * 0.54, edge);
   for (let k = 0; k <= bars; k++) {
     const t = k / bars;
     const structural = k === 0 || k === bars || Math.abs(t - 0.5) < 0.5 / bars;
     post(len * t, structural ? 0.038 : 0.016, y + 0.08, arch(t) - 0.04);
+    const [x, z] = plan(len * t);
+    lines.seg([x, y + 0.08, z], [x, arch(t) - 0.04, z], edge, ALWAYS);
     if (k < bars) {
       const a = plan(len * t);
       const b = plan((len * (k + 1)) / bars);
       const crown = (arch(t) + arch((k + 1) / bars)) / 2;
       pushBeam(buf, a, b, 0.075, crown - 0.045, crown + 0.02, side, top);
+      outlineBeam(lines, a, b, crown + 0.02, edge);
     }
   }
 }
@@ -307,6 +328,7 @@ function pushAreas(buf: GeoBuffer, lines: LineBuffer, floor: Floor, areas: Rende
         for (const [x, z] of poly) {
           const top = roofAt(x, z) - 0.08;
           pushPrism(buf, ccw([[x - columnHalf, z - columnHalf], [x + columnHalf, z - columnHalf], [x + columnHalf, z + columnHalf], [x - columnHalf, z + columnHalf]]), floorY, top, finish.under, finish.roof);
+          outlinePost(lines, x, z, columnHalf, floorY, top, edge);
         }
         if (a.railing !== false && h >= 0.4) {
           const fenceH = Math.min(1.45, h * 0.62);
@@ -316,12 +338,12 @@ function pushAreas(buf: GeoBuffer, lines: LineBuffer, floor: Floor, areas: Rende
             const p = poly[i];
             const q = poly[(i + 1) % poly.length];
             if (i !== front) {
-              pushYardPanel(buf, p, q, floorY, fenceH, finish.under, finish.roof);
+              pushYardPanel(buf, lines, p, q, floorY, fenceH, finish.under, finish.roof, edge);
               continue;
             }
             const len = Math.hypot(q[0] - p[0], q[1] - p[1]);
             if (len < 0.6) {
-              pushYardPanel(buf, p, q, floorY, fenceH, finish.under, finish.roof);
+              pushYardPanel(buf, lines, p, q, floorY, fenceH, finish.under, finish.roof, edge);
               continue;
             }
             const gateW = Math.min(2.4, Math.max(0.9, len * 0.45), Math.max(0.3, len - 0.3));
@@ -329,9 +351,9 @@ function pushAreas(buf: GeoBuffer, lines: LineBuffer, floor: Floor, areas: Rende
             const t1 = Math.min(1, 1 - t0);
             const gateA: Vec2 = [p[0] + (q[0] - p[0]) * t0, p[1] + (q[1] - p[1]) * t0];
             const gateB: Vec2 = [p[0] + (q[0] - p[0]) * t1, p[1] + (q[1] - p[1]) * t1];
-            pushYardPanel(buf, p, gateA, floorY, fenceH, finish.under, finish.roof);
-            pushYardPanel(buf, gateB, q, floorY, fenceH, finish.under, finish.roof);
-            pushYardGate(buf, gateA, gateB, floorY, fenceH, finish.under, finish.roof);
+            pushYardPanel(buf, lines, p, gateA, floorY, fenceH, finish.under, finish.roof, edge);
+            pushYardPanel(buf, lines, gateB, q, floorY, fenceH, finish.under, finish.roof, edge);
+            pushYardGate(buf, lines, gateA, gateB, floorY, fenceH, finish.under, finish.roof, edge);
           }
         }
         for (let i = 0; i < poly.length; i++) {
@@ -340,6 +362,7 @@ function pushAreas(buf: GeoBuffer, lines: LineBuffer, floor: Floor, areas: Rende
           const q = poly[(i + 1) % poly.length];
           const y = (roofAt(p[0], p[1]) + roofAt(q[0], q[1])) / 2;
           pushBeam(buf, p, q, 0.12, y - 0.18, y - 0.08, finish.under, finish.roof);
+          outlineBeam(lines, p, q, y - 0.08, edge);
         }
         roofStart = buf.count;
         pushCanopyPanel(buf, poly, roofAt, 0.08, finish.under, finish.roof, roofFold);
@@ -356,8 +379,10 @@ function pushAreas(buf: GeoBuffer, lines: LineBuffer, floor: Floor, areas: Rende
         const baseAt = (_x: number, _z: number) => floorY;
         const roofAt = (x: number, z: number) => floorY + h - outdoorDrop(a, x, z);
         const railH = Math.min(1.1, h * 0.48);
-        const squarePost = (x: number, z: number, half: number, y0: number, y1: number, side = look.side, top = look.color) =>
+        const squarePost = (x: number, z: number, half: number, y0: number, y1: number, side = look.side, top = look.color) => {
           pushPrism(buf, ccw([[x - half, z - half], [x + half, z - half], [x + half, z + half], [x - half, z + half]]), y0, y1, side, top);
+          outlinePost(lines, x, z, half, y0, y1, edge);
+        };
 
 
         // Slim balusters and two horizontal rails around every free edge.
@@ -371,6 +396,8 @@ function pushAreas(buf: GeoBuffer, lines: LineBuffer, floor: Floor, areas: Rende
             const y = floorY;
             pushBeam(buf, p, q, 0.07, y + 0.3, y + 0.38, finish.under, finish.roof);
             pushBeam(buf, p, q, 0.09, y + railH - 0.09, y + railH, finish.under, finish.roof);
+            outlineBeam(lines, p, q, y + 0.38, edge);
+            outlineBeam(lines, p, q, y + railH, edge);
             for (let k = 0; k <= n; k++) {
               const t = k / n;
               const x = p[0] + (q[0] - p[0]) * t;
@@ -399,6 +426,7 @@ function pushAreas(buf: GeoBuffer, lines: LineBuffer, floor: Floor, areas: Rende
         }
         const topY = (roofAt(p[0], p[1]) + roofAt(q[0], q[1])) / 2;
         pushBeam(buf, p, q, Math.max(0.2, columnHalf * 2.6), topY - 0.28, topY, finish.under, finish.roof);
+        outlineBeam(lines, p, q, topY, edge);
         roofStart = buf.count;
         pushCanopyPanel(buf, poly, roofAt, 0.1, finish.under, finish.roof, roofFold);
         roofEnd = buf.count;

@@ -30,8 +30,10 @@ test("a canopy room draws a high fence, front gate, posts, beams and a sloped so
   assert.ok(heights.some((y) => y > 1.62 && y < 1.75), "the clean gate arch rises above the fence in the centre");
 
   const bare = new GeoBuffer();
-  pushCovered(bare, new LineBuffer(), floor, [{ ...canopy, railing: false }]);
+  const bareLines = new LineBuffer();
+  pushCovered(bare, bareLines, floor, [{ ...canopy, railing: false }]);
   assert.ok(solid.count > bare.count + 100, "the optional fence and two-leaf gate add substantial geometry");
+  assert.ok(lines.p.length > bareLines.p.length + 100, "fence, gate, posts and beams receive visible wall-style edges");
 });
 
 test("an upper-floor veranda room has railings, front columns and roof", () => {
@@ -51,5 +53,5 @@ test("an upper-floor veranda room has railings, front columns and roof", () => {
   assert.equal(ranges[0].start, 0);
   assert.equal(ranges[0].end, solid.count, "the whole structure has one 3D picking range");
   assert.ok(ranges[0].roofStart! < ranges[0].roofEnd!, "the roof has its own range so a selected room can reveal devices below it");
-  assert.ok(lines.p.length > 0, "veranda outlines");
+  assert.ok(lines.p.length > 300, "veranda columns, lintel and railing receive visible wall-style edges");
 });
