@@ -1554,7 +1554,7 @@ export class Fp3dView3d extends LitElement {
             const gap = typeof a.temperature === "number" && typeof a.current_temperature === "number" ? a.temperature - a.current_temperature : 1;
             screens.set(f.id, { color: [1, 0.42, 0.1], level: Math.min(1, 0.45 + 0.25 * Math.max(0, gap)) });
           }
-        } else if (f.type === "air_conditioner" && st && kindOf(st.entity_id) === "climate") {
+        } else if ((f.type === "air_conditioner" || f.type === "wall_thermostat") && st && kindOf(st.entity_id) === "climate") {
           const action = String(st.attributes.hvac_action ?? st.state);
           if (!["off", "idle", "unavailable", "unknown"].includes(action)) {
             const heating = action === "heating" || action === "heat";
@@ -1570,6 +1570,12 @@ export class Fp3dView3d extends LitElement {
           screens.set(f.id, { color: [0.2, 0.9, 0.72], level: 0.85, plain: true });
         } else if (f.type === "robot_mower" && running) {
           screens.set(f.id, { color: st?.state === "returning" ? [1, 0.7, 0.25] : [0.2, 0.9, 0.72], level: 0.9, plain: true });
+        } else if (["network_cabinet", "nas_server", "access_point"].includes(f.type) && st && !["off", "disconnected", "unavailable", "unknown"].includes(st.state)) {
+          screens.set(f.id, { color: [0.2, 0.86, 1], level: 0.75, plain: true });
+        } else if (f.type === "smoke_detector" && running) {
+          screens.set(f.id, { color: [1, 0.18, 0.12], level: 1, plain: true });
+        } else if (f.type === "siren_alarm" && running) {
+          screens.set(f.id, { color: [1, 0.12, 0.22], level: 1, plain: true });
         } else if (f.type === "smart_speaker" && st && ["playing", "on", "paused"].includes(st.state)) {
           screens.set(f.id, { color: appColor(st) ?? [0.22, 0.88, 1], level: st.state === "playing" ? 1 : 0.55, ring: true, plain: true });
         } else if (f.type === "security_camera" && st && !["off", "idle", "unavailable", "unknown"].includes(st.state)) {

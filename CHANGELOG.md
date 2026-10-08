@@ -4,6 +4,13 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.19.6
+
+### Added
+
+- Added a six-item Smart Home infrastructure and safety family based on the public gallery: network cabinet, NAS server, ceiling Wi-Fi access point, wall thermostat, ceiling smoke detector and wall siren with strobe light.
+- Added distinct 2D/3D geometry, correct floor/wall/ceiling mounting, automatic Home Assistant entity matching, live network/climate/alarm indicators, German/English/Vietnamese names and demo placements for the complete family.
+
 ## 1.19.5
 
 ### Added

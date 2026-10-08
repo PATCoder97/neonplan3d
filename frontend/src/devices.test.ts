@@ -15,7 +15,7 @@ test("a lamp switched by a relay takes colour and brightness from its colour ent
 });
 import { appColor, areaEntities, otherAreaEntities, roomClimateSensors, roomClimateValue, unassignedEntities, autoPlace, entityName, fridgeDoors, furnitureEntities, groupByDevice, isActive, kindOf, lightGlow, openingEntities, openingState, powerSensorsOf, primaryEntities, roomPanelEntities, windowPosition, confirmEntities, robotRoom, robotRoomSensor, roomKey, TOGGLE_KINDS } from "./devices.ts";
 import type { Floor, Opening, Room } from "./model.ts";
-import { centroid, newFloor, pointInPolygon } from "./model.ts";
+import { centroid, FURNITURE_SIZE, newFloor, pointInPolygon } from "./model.ts";
 import type { HomeAssistant } from "./types.ts";
 
 /** Opening state without the "sensed" flag (tested on its own below). */
@@ -707,4 +707,29 @@ test("an outdoor robot mower finds its lawn mower entity and reports mowing stat
   assert.equal(links.get("mower")?.entity, mowerState.entity_id);
   assert.equal(isActive(mowerState as never), true);
   assert.equal(isActive({ ...mowerState, state: "docked" } as never), false);
+});
+
+test("smart infrastructure resolves climate, smoke, network, NAS, access point and siren entities", () => {
+  const st = (entity_id: string, state: string, attributes: Record<string, unknown> = {}) => ({ entity_id, state, attributes });
+  const states = {
+    "climate.bo_dieu_nhiet": st("climate.bo_dieu_nhiet", "heat", { friendly_name: "Bộ điều nhiệt gắn tường", hvac_action: "heating" }),
+    "binary_sensor.bao_khoi": st("binary_sensor.bao_khoi", "on", { friendly_name: "Đầu báo khói", device_class: "smoke" }),
+    "switch.tu_mang": st("switch.tu_mang", "on", { friendly_name: "Tủ mạng" }),
+    "sensor.may_chu_nas": st("sensor.may_chu_nas", "online", { friendly_name: "Máy chủ NAS", device_class: "enum" }),
+    "binary_sensor.bo_phat_wifi": st("binary_sensor.bo_phat_wifi", "on", { friendly_name: "Bộ phát Wi-Fi", device_class: "connectivity" }),
+    "siren.coi_bao_dong": st("siren.coi_bao_dong", "on", { friendly_name: "Còi báo động" }),
+  };
+  const entities = Object.fromEntries(Object.keys(states).map((entity_id) => [entity_id, { entity_id, area_id: "office" }]));
+  const hass = { language: "vi", states, entities, devices: {}, areas: { office: { area_id: "office", name: "Phòng kỹ thuật" } } } as unknown as HomeAssistant;
+  const room: Room = { id: "office", name: "Phòng kỹ thuật", area_id: "office", points: [[0, 0], [5, 0], [5, 4], [0, 4]], floor_material: "concrete" };
+  const types = ["wall_thermostat", "smoke_detector", "network_cabinet", "nas_server", "access_point", "siren_alarm"] as const;
+  const furniture = types.map((type, i) => ({ id: type, type, x: 0.5 + i * 0.6, z: 1, w: FURNITURE_SIZE[type][0], d: FURNITURE_SIZE[type][1], h: FURNITURE_SIZE[type][2], rotation: 0, variant: null }));
+  const links = furnitureEntities(hass, [{ ...newFloor("eg", "Tầng trệt", 0), rooms: [room], furniture }]);
+  assert.equal(links.get("wall_thermostat")?.entity, "climate.bo_dieu_nhiet");
+  assert.equal(links.get("smoke_detector")?.entity, "binary_sensor.bao_khoi");
+  assert.equal(links.get("network_cabinet")?.entity, "switch.tu_mang");
+  assert.equal(links.get("nas_server")?.entity, "sensor.may_chu_nas");
+  assert.equal(links.get("access_point")?.entity, "binary_sensor.bo_phat_wifi");
+  assert.equal(links.get("siren_alarm")?.entity, "siren.coi_bao_dong");
+  assert.equal(isActive(states["siren.coi_bao_dong"] as never), true);
 });

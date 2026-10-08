@@ -179,6 +179,12 @@ const DEVICES = [
   entity("sensor.wohnzimmer_feuchte", "wohnzimmer", "48", { friendly_name: "Wohnzimmer Luftfeuchtigkeit", device_class: "humidity", unit_of_measurement: "%" }),
   entity("binary_sensor.kueche_fenster", "kueche", "on", { friendly_name: "Küche Fenster", device_class: "window" }),
   entity("binary_sensor.kueche_rauch", "kueche", "off", { friendly_name: "Küche Rauchmelder", device_class: "smoke" }),
+  entity("switch.tu_mang_demo", "arbeitszimmer", "on", { friendly_name: "Tủ mạng", device_class: "outlet" }),
+  entity("sensor.nas_demo", "arbeitszimmer", "online", { friendly_name: "Máy chủ NAS", device_class: "enum", options: ["online", "offline"] }),
+  entity("binary_sensor.wifi_ap_demo", "arbeitszimmer", "on", { friendly_name: "Bộ phát Wi-Fi", device_class: "connectivity" }),
+  entity("climate.wall_thermostat_demo", "arbeitszimmer", "heat", { friendly_name: "Bộ điều nhiệt gắn tường", current_temperature: 20.8, temperature: 22, hvac_action: "heating" }),
+  entity("binary_sensor.smoke_demo", "arbeitszimmer", "off", { friendly_name: "Đầu báo khói", device_class: "smoke" }),
+  entity("siren.alarm_demo", "arbeitszimmer", "on", { friendly_name: "Còi báo động có đèn chớp" }),
   entity("binary_sensor.garage_auto", "garage", "on", { friendly_name: "Auto in der Garage", device_class: "occupancy" }),
   entity("sensor.van_ladestand", "garage", "78", { friendly_name: "Van Ladestand", device_class: "battery", unit_of_measurement: "%" }),
   // helpers standing in for a car without an integration (Auto Pro with input_number / input_boolean)
@@ -457,6 +463,12 @@ DEMO_BUILDING.floors[1].furniture = [
   item("wardrobe", 3.72, 5.4, 1.4, 0.6, 2.1, 270),
   item("bathtub", 0.45, 6.1, 1.7, 0.75, 0.58, 90),
   item("washbasin", 2.1, 4.5, 0.6, 0.46, 0.85),
+  { ...item("network_cabinet", 9.65, 0.45, 0.6, 0.65, 1.35), entity: "switch.tu_mang_demo" },
+  { ...item("nas_server", 8.95, 0.35, 0.42, 0.45, 0.34), entity: "sensor.nas_demo" },
+  { ...item("access_point", 7.3, 2.0, 0.24, 0.24, 0.055), entity: "binary_sensor.wifi_ap_demo" },
+  { ...item("wall_thermostat", 4.48, 2.0, 0.18, 0.065, 0.24, 270), entity: "climate.wall_thermostat_demo" },
+  { ...item("smoke_detector", 5.6, 2.0, 0.15, 0.15, 0.055), entity: "binary_sensor.smoke_demo" },
+  { ...item("siren_alarm", 9.88, 3.2, 0.22, 0.085, 0.28, 90), entity: "siren.alarm_demo" },
 ];
 
 // Invented garden and roof.

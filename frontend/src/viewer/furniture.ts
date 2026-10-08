@@ -1281,6 +1281,64 @@ function smartCurtain(b: Builder, w: number, d: number, h: number): void {
   }
 }
 
+/** Smart-home infrastructure family, redrawn as compact low-poly equipment from the public gallery. */
+function networkCabinet(b: Builder, w: number, d: number, h: number): void {
+  b.box(-w / 2, w / 2, 0, h, -d / 2, d / 2, C.dark, C.bodyTop, EDGE_FURN);
+  b.box(-w * 0.42, w * 0.42, h * 0.06, h * 0.94, d * 0.48, d * 0.515, C.glass, C.glass, EDGE_FAINT);
+  for (let i = 0; i < 7; i++) {
+    const y = h * (0.16 + i * 0.105);
+    b.box(-w * 0.34, w * 0.34, y, y + h * 0.035, d * 0.505, d * 0.535, i % 3 === 1 ? C.metal : C.bodyTop, C.bodyTop, EDGE_FAINT);
+  }
+  b.box(-w * 0.22, w * 0.22, h * 0.82, h * 0.86, d * 0.525, d * 0.545, C.accent, C.accent, EDGE_GLOW);
+  b.cyl(w * 0.38, d * 0.525, w * 0.018, h * 0.48, h * 0.5, C.metal, C.metal, 8, EDGE_FAINT);
+}
+
+function nasServer(b: Builder, w: number, d: number, h: number): void {
+  b.box(-w / 2, w / 2, 0, h, -d / 2, d / 2, C.dark, C.bodyTop, EDGE_FURN);
+  const gap = w * 0.035;
+  const bayW = (w * 0.72 - gap * 3) / 4;
+  for (let i = 0; i < 4; i++) {
+    const x0 = -w * 0.36 + i * (bayW + gap);
+    b.box(x0, x0 + bayW, h * 0.13, h * 0.86, d * 0.49, d * 0.525, C.body, C.metal, EDGE_FAINT);
+    b.box(x0 + bayW * 0.18, x0 + bayW * 0.82, h * 0.18, h * 0.205, d * 0.52, d * 0.54, C.accent, C.accent, EDGE_GLOW);
+  }
+  b.cyl(w * 0.41, d * 0.52, w * 0.025, h * 0.7, h * 0.73, C.accent, C.accent, 10, EDGE_GLOW);
+}
+
+function ceilingAccessPoint(b: Builder, w: number, d: number, h: number): void {
+  const r = Math.min(w, d) * 0.47;
+  b.cyl(0, 0, r, 0, h * 0.58, C.white, C.whiteTop, 16, EDGE_FURN);
+  b.cyl(0, 0, r * 0.82, h * 0.58, h, C.white, C.whiteTop, 16, EDGE_FAINT);
+  b.seg(-w * 0.16, h * 0.18, d * 0.455, w * 0.16, h * 0.18, d * 0.455, EDGE_GLOW);
+}
+
+function wallThermostat(b: Builder, w: number, d: number, h: number): void {
+  const y0 = 1.35;
+  b.pad(-w / 2, w / 2, y0, y0 + h, -d / 2, d / 2, C.body, C.bodyTop, Math.min(0.018, w * 0.1), EDGE_FURN);
+  b.box(-w * 0.37, w * 0.37, y0 + h * 0.34, y0 + h * 0.82, d * 0.48, d * 0.54, C.glass, C.glass, EDGE_GLOW);
+  b.box(-w * 0.28, w * 0.28, y0 + h * 0.12, y0 + h * 0.22, d * 0.5, d * 0.55, C.metal, C.metal, EDGE_FAINT);
+}
+
+function smokeDetector(b: Builder, w: number, d: number, h: number): void {
+  const r = Math.min(w, d) * 0.47;
+  b.cyl(0, 0, r, 0, h * 0.7, C.white, C.whiteTop, 16, EDGE_FURN);
+  b.cyl(0, 0, r * 0.78, h * 0.7, h, C.white, C.whiteTop, 16, EDGE_FAINT);
+  for (let i = 0; i < 8; i++) {
+    const a = (i / 8) * Math.PI * 2;
+    const x = Math.cos(a) * r * 0.62;
+    const z = Math.sin(a) * r * 0.62;
+    b.cyl(x, z, r * 0.055, h * 0.12, h * 0.16, C.dark, C.dark, 6);
+  }
+  b.seg(-w * 0.1, h * 0.12, d * 0.46, w * 0.1, h * 0.12, d * 0.46, EDGE_GLOW);
+}
+
+function sirenAlarm(b: Builder, w: number, d: number, h: number): void {
+  const y0 = 1.85;
+  b.box(-w / 2, w / 2, y0, y0 + h, -d / 2, d / 2, C.body, C.bodyTop, EDGE_FURN);
+  b.loft([-w * 0.32, w * 0.32, d * 0.42, d * 0.56], [-w * 0.25, w * 0.25, d * 0.45, d * 0.58], y0 + h * 0.48, y0 + h * 0.82, 0x7a2034, 0xff3658, EDGE_GLOW);
+  b.box(-w * 0.23, w * 0.23, y0 + h * 0.13, y0 + h * 0.25, d * 0.48, d * 0.56, C.accent, C.accent, EDGE_FAINT);
+}
+
 function kitchenCorner(b: Builder, w: number, d: number, h: number): void {
   const arm = Math.max(0.42, Math.min(w, d) * 0.46);
   b.box(-w / 2, w / 2, 0, h - 0.04, -d / 2, -d / 2 + arm, C.body, C.bodyTop, EDGE_FURN);
@@ -1573,6 +1631,12 @@ function builtInScreen(f: Furniture, w: number, d: number, h: number, floor?: Fl
   if (f.type === "smart_speaker") return { x0: -w * 0.42, x1: w * 0.42, y0: h * 0.9, y1: h + 0.008, z: d * 0.05 };
   if (f.type === "security_camera") return { x0: -w * 0.12, x1: w * 0.12, y0: 1.85 + h * 0.37, y1: 1.85 + h * 0.58, z: d * 0.53 };
   if (f.type === "smart_lock") return { x0: -w * 0.36, x1: w * 0.36, y0: 0.95 + h * 0.43, y1: 0.95 + h * 0.78, z: d / 2 + 0.006 };
+  if (f.type === "network_cabinet") return { x0: -w * 0.22, x1: w * 0.22, y0: h * 0.82, y1: h * 0.86, z: d * 0.545 };
+  if (f.type === "nas_server") return { x0: -w * 0.34, x1: w * 0.34, y0: h * 0.18, y1: h * 0.205, z: d * 0.54 };
+  if (f.type === "access_point") return { x0: -w * 0.16, x1: w * 0.16, y0: h * 0.12, y1: h * 0.24, z: d * 0.47 };
+  if (f.type === "wall_thermostat") return { x0: -w * 0.37, x1: w * 0.37, y0: 1.35 + h * 0.34, y1: 1.35 + h * 0.82, z: d * 0.54 };
+  if (f.type === "smoke_detector") return { x0: -w * 0.1, x1: w * 0.1, y0: h * 0.05, y1: h * 0.22, z: d * 0.47 };
+  if (f.type === "siren_alarm") return { x0: -w * 0.32, x1: w * 0.32, y0: 1.85 + h * 0.48, y1: 1.85 + h * 0.82, z: d * 0.58 };
   if (f.type === "washer" || f.type === "dryer") {
     const cy = (h - 0.14) / 2 + 0.04;
     const r = Math.min(w * 0.36, (h - 0.2) * 0.42) * 0.8;
@@ -1715,6 +1779,24 @@ function buildFurniture(buf: GeoBuffer, lines: LineBuffer, shadow: GeoBuffer, f:
       return;
     case "smart_curtain":
       smartCurtain(b, w, d, h);
+      return;
+    case "network_cabinet":
+      networkCabinet(b, w, d, h);
+      break;
+    case "nas_server":
+      nasServer(b, w, d, h);
+      break;
+    case "access_point":
+      ceilingAccessPoint(b, w, d, h);
+      return;
+    case "wall_thermostat":
+      wallThermostat(b, w, d, h);
+      return;
+    case "smoke_detector":
+      smokeDetector(b, w, d, h);
+      return;
+    case "siren_alarm":
+      sirenAlarm(b, w, d, h);
       return;
     case "kitchen_corner":
       kitchenCorner(b, w, d, h);

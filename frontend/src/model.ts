@@ -859,6 +859,12 @@ export const FURNITURE_TYPES = [
   "security_camera",
   "smart_lock",
   "smart_curtain",
+  "network_cabinet",
+  "nas_server",
+  "access_point",
+  "wall_thermostat",
+  "smoke_detector",
+  "siren_alarm",
   "kitchen_corner",
   "kitchen_display",
   "vanity",
@@ -936,9 +942,9 @@ export const FURNITURE_GROUPS: Record<string, FurnitureType[]> = {
   kitchen: ["kitchen", "kitchen_corner", "kitchen_wall", "kitchen_tall", "kitchen_display", "island", "worktop", "sink", "stove", "range_hood", "microwave", "water_purifier", "dishwasher", "fridge"],
   sleeping: ["bed", "bed_single", "bed_double", "bunk_bed", "crib", "nightstand", "wardrobe", "dresser", "vanity"],
   bath: ["bathtub", "shower", "shower_screen", "wc", "washbasin", "water_heater", "washer", "dryer", "drying_rack"],
-  climate: ["air_conditioner", "air_purifier", "radiator", "fan_ceiling", "fan_ceiling_light", "fan_wall", "fan_floor"],
+  climate: ["air_conditioner", "air_purifier", "radiator", "wall_thermostat", "fan_ceiling", "fan_ceiling_light", "fan_wall", "fan_floor"],
   outdoor: ["security_camera", "smart_lock", "water_pump", "robot_mower", "hammock", "stone_table_set", "planter_large", "water_tank", "gate", "fence"],
-  work: ["desk", "worktop", "office_chair", "tall_cabinet", "coat_rack", "shoe_cabinet", "shoe_bench", "stairs", "stairs_landing", "robot_vacuum"],
+  work: ["desk", "worktop", "office_chair", "tall_cabinet", "coat_rack", "shoe_cabinet", "shoe_bench", "network_cabinet", "nas_server", "access_point", "smoke_detector", "siren_alarm", "stairs", "stairs_landing", "robot_vacuum"],
   vehicles: ["motorbike", "parking"],
 };
 
@@ -967,7 +973,7 @@ export const WALL_LAMP_Y = 1.75;
 
 /** Items that can be lifted off the floor (a wall cabinet, a shelf, a wall light, an LED strip): everything but lamps hung from the ceiling and the ceiling-mounted pack items. */
 export function canLift(f: Pick<Furniture, "type">): boolean {
-  if (["lamp_ceiling", "lamp_downlight", "lamp_spot", "lamp_panel", "lamp_pendant", "fan_ceiling", "fan_ceiling_light", "stairs", "stairs_landing", "stairwell", "parking"].includes(f.type)) return false;
+  if (["lamp_ceiling", "lamp_downlight", "lamp_spot", "lamp_panel", "lamp_pendant", "fan_ceiling", "fan_ceiling_light", "access_point", "smoke_detector", "stairs", "stairs_landing", "stairwell", "parking"].includes(f.type)) return false;
   return packItem(f.type)?.mount !== "ceiling";
 }
 
@@ -1048,6 +1054,10 @@ export function builtinBase(f: Pick<Furniture, "type" | "h"> & { variant?: strin
       return 1.85;
     case "smart_lock":
       return 0.95;
+    case "wall_thermostat":
+      return 1.35;
+    case "siren_alarm":
+      return 1.85;
     default:
       return 0;
   }
@@ -1080,6 +1090,12 @@ export const ELECTRIC_FURNITURE = new Set<string>([
   "security_camera",
   "smart_lock",
   "smart_curtain",
+  "network_cabinet",
+  "nas_server",
+  "access_point",
+  "wall_thermostat",
+  "smoke_detector",
+  "siren_alarm",
   "robot_vacuum",
   "robot_mower",
   "inverter",
@@ -1171,6 +1187,12 @@ export const FURNITURE_SIZE: Record<FurnitureType, [number, number, number]> = {
   security_camera: [0.2, 0.24, 0.22],
   smart_lock: [0.1, 0.08, 0.32],
   smart_curtain: [2.0, 0.16, 2.2],
+  network_cabinet: [0.6, 0.65, 1.35],
+  nas_server: [0.42, 0.45, 0.34],
+  access_point: [0.24, 0.24, 0.055],
+  wall_thermostat: [0.18, 0.065, 0.24],
+  smoke_detector: [0.15, 0.15, 0.055],
+  siren_alarm: [0.22, 0.085, 0.28],
   kitchen_corner: [1.25, 1.25, 0.92],
   kitchen_display: [0.8, 0.42, 2.1],
   vanity: [1.0, 0.45, 1.55],

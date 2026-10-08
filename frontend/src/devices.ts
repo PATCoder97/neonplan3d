@@ -308,6 +308,8 @@ export function isStatusSensor(st: HassEntity | undefined): boolean {
 export function isActive(st: HassEntity | undefined): boolean {
   if (!st) return false;
   if (domainOf(st.entity_id) === "lawn_mower") return ["mowing", "starting", "returning"].includes(st.state);
+  if (domainOf(st.entity_id) === "siren") return st.state === "on";
+  if (domainOf(st.entity_id) === "alarm_control_panel") return ["triggered", "pending", "arming"].includes(st.state);
   switch (kindOf(st.entity_id)) {
     case "light":
     case "switch":
@@ -701,6 +703,12 @@ const FURNITURE_NAMES: Record<string, RegExp> = {
   security_camera: /(security ?camera|surveillance|überwachung|camera|kamera|cctv|cam an ninh)/i,
   smart_lock: /(smart ?lock|türschloss|door ?lock|khóa cửa|khoa cua)/i,
   smart_curtain: /(curtain|blind|shade|vorhang|rollladen|rèm|rem)/i,
+  network_cabinet: /(netzwerkschrank|network ?(cabinet|rack)|server ?rack|tủ mạng|tu mang)/i,
+  nas_server: /\b(nas|network attached storage|homeserver|home server|server lưu trữ|may chu luu tru|máy chủ lưu trữ)\b/i,
+  access_point: /(wlan|wi-?fi|access ?point|wireless ?ap|điểm truy cập|diem truy cap|bộ phát wifi|bo phat wifi)/i,
+  wall_thermostat: /(wandthermostat|wall ?thermostat|thermostat|bộ điều nhiệt|bo dieu nhiet)/i,
+  smoke_detector: /(rauchmelder|smoke ?(detector|alarm)|báo khói|bao khoi|cảm biến khói|cam bien khoi)/i,
+  siren_alarm: /(sirene|siren|alarm|còi báo động|coi bao dong|đèn chớp|den chop)/i,
   kitchen_display: /(vitrine|display ?cabinet|cabinet ?light|schranklicht|tủ kính|tu kinh|tủ trưng bày|tu trung bay|đèn tủ|den tu|led tủ|led tu)/i,
 };
 const MEDIA_FURNITURE = new Set(["tv_board", "tv_wall"]);
@@ -824,9 +832,25 @@ export function furnitureEntities(hass: HomeAssistant, floors: readonly Floor[])
           const candidates = Object.keys(hass.states ?? {}).filter((id) => id.startsWith("lawn_mower.") && !used.has(id));
           const matches = candidates.filter((id) => pattern.test(name(id)));
           entity = matches.length === 1 ? matches[0] : candidates.length === 1 ? candidates[0] : null;
-        } else if (f.type === "radiator" || f.type === "air_conditioner") {
+        } else if (f.type === "radiator" || f.type === "air_conditioner" || f.type === "wall_thermostat") {
           const climates = free.filter((id) => kindOf(id) === "climate");
           entity = climates.find((id) => pattern.test(name(id))) ?? climates[0] ?? null;
+        } else if (["network_cabinet", "nas_server", "access_point", "smoke_detector", "siren_alarm"].includes(f.type)) {
+          const area = room?.area_id ?? null;
+          const domains: Record<string, string[]> = {
+            network_cabinet: ["switch", "sensor", "binary_sensor"],
+            nas_server: ["switch", "sensor", "binary_sensor"],
+            access_point: ["switch", "sensor", "binary_sensor", "device_tracker"],
+            smoke_detector: ["binary_sensor"],
+            siren_alarm: ["siren", "alarm_control_panel", "switch", "binary_sensor"],
+          };
+          const candidates = Object.keys(hass.states ?? {}).filter((id) => {
+            if (used.has(id) || !domains[f.type].includes(domainOf(id))) return false;
+            if (area && entityAreaId(hass, id) !== area) return false;
+            if (f.type === "smoke_detector" && hass.states[id]?.attributes.device_class !== "smoke") return false;
+            return pattern.test(name(id));
+          });
+          entity = room ? (candidates[0] ?? null) : candidates.length === 1 ? candidates[0] : null;
         } else if (["air_purifier", "smart_speaker", "security_camera", "smart_lock", "smart_curtain"].includes(f.type)) {
           const expected = { air_purifier: "fan", smart_speaker: "media", security_camera: "camera", smart_lock: "lock", smart_curtain: "cover" }[f.type];
           const candidates = free.filter((id) => kindOf(id) === expected);

@@ -110,6 +110,23 @@ export function furnitureSymbol(type: string, w: number, d: number): Part[] | ty
       }
       return out;
     }
+    case "network_cabinet": {
+      const out: Part[] = [rect(-w / 2, -d / 2, w / 2, d / 2, "fp3d-sym-fill")];
+      for (let i = 1; i < 6; i++) out.push(line(-w * 0.34, -d / 2 + (d * i) / 6, w * 0.34, -d / 2 + (d * i) / 6));
+      return out;
+    }
+    case "nas_server":
+      return [rect(-w / 2, -d / 2, w / 2, d / 2, "fp3d-sym-fill"), ...[-0.27, -0.09, 0.09, 0.27].map((x) => rect(x * w - w * 0.065, -d * 0.38, x * w + w * 0.065, d * 0.35))];
+    case "access_point":
+      return [circle(0, 0, Math.min(w, d) * 0.47, "fp3d-sym-fill"), circle(0, 0, Math.min(w, d) * 0.3), line(-w * 0.16, d * 0.42, w * 0.16, d * 0.42, "fp3d-sym-strong")];
+    case "wall_thermostat":
+      return [rect(-w / 2, -d / 2, w / 2, d / 2, "fp3d-sym-fill"), rect(-w * 0.36, d * 0.05, w * 0.36, d / 2, "fp3d-sym-strong")];
+    case "smoke_detector": {
+      const r = Math.min(w, d) * 0.47;
+      return [circle(0, 0, r, "fp3d-sym-fill"), circle(0, 0, r * 0.72), ...Array.from({ length: 6 }, (_, i) => circle(Math.cos((i * Math.PI) / 3) * r * 0.58, Math.sin((i * Math.PI) / 3) * r * 0.58, r * 0.055))];
+    }
+    case "siren_alarm":
+      return [rect(-w / 2, -d / 2, w / 2, d / 2, "fp3d-sym-fill"), rect(-w * 0.3, d * 0.02, w * 0.3, d / 2, "fp3d-sym-strong")];
     case "kitchen_corner":
       return [
         rect(-w / 2, -d / 2, w / 2, -d * 0.05),
