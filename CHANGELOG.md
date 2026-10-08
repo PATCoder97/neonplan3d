@@ -4,6 +4,19 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.20.5
+
+### Added
+
+- Completed the living-room reference milestone at 69/69 with a media wall and TV, upright piano with bench, pampas floor vase, large monstera, round rug and electric fireplace.
+- Added dedicated 2D symbols, low-poly 3D geometry and German/English/Vietnamese names for all six feature pieces.
+- Added Live Screen and media-player behavior to the media wall, including registry and front-face regression checks.
+
+### Changed
+
+- Expanded the reproducible catalog inventory to 189 declared types and 182 library items.
+- Started a focused Living renderer and symbol family so feature pieces no longer increase the already broad everyday modules.
+
 ## 1.20.4
 
 ### Added

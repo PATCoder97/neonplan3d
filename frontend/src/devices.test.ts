@@ -247,6 +247,7 @@ test("furniture finds its entities in the room's area: the TV, and power sensors
 
 test("a TV on a stand participates in media-player linking", () => {
   assert.equal(isMediaFurniture("tv_stand"), true);
+  assert.equal(isMediaFurniture("media_wall_tv"), true);
   assert.equal(isMediaFurniture("wood_stove"), false);
 });
 

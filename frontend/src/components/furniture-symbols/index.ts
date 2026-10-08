@@ -3,12 +3,14 @@ import { CLIMATE_FURNITURE_SYMBOLS } from "./climate.ts";
 import { EVERYDAY_FURNITURE_SYMBOLS } from "./everyday.ts";
 import { KITCHEN_BATH_FURNITURE_SYMBOLS } from "./kitchen-bath.ts";
 import { LIGHTING_FURNITURE_SYMBOLS } from "./lighting.ts";
+import { LIVING_FURNITURE_SYMBOLS } from "./living.ts";
 import { SMART_HOME_FURNITURE_SYMBOLS } from "./smart-home.ts";
 import { UTILITY_FURNITURE_SYMBOLS } from "./utility.ts";
 import type { FurnitureSymbol, FurnitureSymbolRenderer } from "./types.ts";
 
 const BUILTIN_FURNITURE_SYMBOLS: Readonly<Record<string, FurnitureSymbolRenderer>> = {
   ...EVERYDAY_FURNITURE_SYMBOLS,
+  ...LIVING_FURNITURE_SYMBOLS,
   ...KITCHEN_BATH_FURNITURE_SYMBOLS,
   ...ARCHITECTURE_OUTDOOR_FURNITURE_SYMBOLS,
   ...CLIMATE_FURNITURE_SYMBOLS,

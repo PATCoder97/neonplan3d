@@ -97,6 +97,15 @@ test("a TV on a stand exposes a screen inside its declared frame", () => {
   assert.ok(screen.z > 0 && screen.z < d / 2);
 });
 
+test("the media wall keeps its live screen on the front face", () => {
+  const floor = newFloor("eg", "EG", 0);
+  const [w, d, h] = FURNITURE_SIZE.media_wall_tv;
+  const wall = { id: "media", type: "media_wall_tv", x: 0, z: 0, w, d, h, rotation: 0, variant: null } as Furniture;
+  const screen = screenRect(wall, floor)!;
+  assert.ok(screen.x0 < 0 && screen.x1 > 0 && screen.y0 > h * 0.3 && screen.y1 < h);
+  assert.ok(screen.z > d / 2, "screen sits in front of the wall cabinetry");
+});
+
 test("a U-shaped stair builds two flights and a half-height landing", () => {
   const buf = new GeoBuffer();
   const lines = new LineBuffer();

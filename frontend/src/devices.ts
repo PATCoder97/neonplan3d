@@ -730,8 +730,10 @@ const FURNITURE_NAMES: Record<string, RegExp> = {
   temperature_humidity_sensor: /(temperature|humidity|thermo|hygro|temperatur|feuchte|nhiệt độ|nhiet do|độ ẩm|do am)/i,
   video_doorbell: /(video ?doorbell|doorbell|klingel|chuông cửa|chuong cua)/i,
   kitchen_display: /(vitrine|display ?cabinet|cabinet ?light|schranklicht|tủ kính|tu kinh|tủ trưng bày|tu trung bay|đèn tủ|den tu|led tủ|led tu)/i,
+  media_wall_tv: /\b(tv|fernseh|television|fire ?tv|apple ?tv|chromecast|shield)/i,
+  fireplace_wall_electric: /(fireplace|kamin|lò sưởi|lo suoi)/i,
 };
-const MEDIA_FURNITURE = new Set(["tv_board", "tv_wall", "tv_stand", "smart_display"]);
+const MEDIA_FURNITURE = new Set(["tv_board", "tv_wall", "tv_stand", "media_wall_tv", "smart_display"]);
 
 /** Whether a screen picture rule matches now: the state or attribute equals the value, or contains it (3+ chars); "*" always. */
 export function pictureRuleMatches(hass: HomeAssistant, rule: { entity: string; attribute?: string | null; state: string }): boolean {
