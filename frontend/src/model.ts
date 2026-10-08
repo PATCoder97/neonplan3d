@@ -194,6 +194,8 @@ export interface Furniture {
   icon?: string | null;
   /** Linked entity, e.g. the TV's media player (null = automatic, "none" = none). */
   entity?: EntityRef;
+  /** Combined ceiling fan: its independently controlled light (the main entity remains the fan). */
+  light_entity?: EntityRef;
   /** Power sensor (null = automatic: the linked entity's device or a matching name). */
   power?: EntityRef;
   /** Smart fridge: door sensors of the left (freezer) and right (fridge) door; the doors open in 3D while they report open. */
@@ -842,6 +844,7 @@ export const FURNITURE_TYPES = [
   "shoe_cabinet",
   "motorbike",
   "fan_ceiling",
+  "fan_ceiling_light",
   "fan_floor",
   "water_heater",
   "drying_rack",
@@ -931,7 +934,7 @@ export const FURNITURE_GROUPS: Record<string, FurnitureType[]> = {
   kitchen: ["kitchen", "kitchen_corner", "kitchen_wall", "kitchen_tall", "kitchen_display", "island", "worktop", "sink", "stove", "range_hood", "microwave", "water_purifier", "dishwasher", "fridge"],
   sleeping: ["bed", "bed_single", "bed_double", "bunk_bed", "crib", "nightstand", "wardrobe", "dresser", "vanity"],
   bath: ["bathtub", "shower", "shower_screen", "wc", "washbasin", "water_heater", "washer", "dryer", "drying_rack"],
-  climate: ["air_conditioner", "air_purifier", "radiator", "fan_ceiling", "fan_floor"],
+  climate: ["air_conditioner", "air_purifier", "radiator", "fan_ceiling", "fan_ceiling_light", "fan_floor"],
   outdoor: ["security_camera", "smart_lock", "water_pump", "hammock", "stone_table_set", "planter_large", "water_tank", "gate", "fence"],
   work: ["desk", "worktop", "office_chair", "tall_cabinet", "coat_rack", "shoe_cabinet", "shoe_bench", "stairs", "stairs_landing", "robot_vacuum"],
   vehicles: ["motorbike", "parking"],
@@ -962,7 +965,7 @@ export const WALL_LAMP_Y = 1.75;
 
 /** Items that can be lifted off the floor (a wall cabinet, a shelf, a wall light, an LED strip): everything but lamps hung from the ceiling and the ceiling-mounted pack items. */
 export function canLift(f: Pick<Furniture, "type">): boolean {
-  if (["lamp_ceiling", "lamp_downlight", "lamp_spot", "lamp_panel", "lamp_pendant", "fan_ceiling", "stairs", "stairs_landing", "stairwell", "parking"].includes(f.type)) return false;
+  if (["lamp_ceiling", "lamp_downlight", "lamp_spot", "lamp_panel", "lamp_pendant", "fan_ceiling", "fan_ceiling_light", "stairs", "stairs_landing", "stairwell", "parking"].includes(f.type)) return false;
   return packItem(f.type)?.mount !== "ceiling";
 }
 
@@ -1063,6 +1066,7 @@ export const ELECTRIC_FURNITURE = new Set<string>([
   "air_conditioner",
   "water_pump",
   "fan_ceiling",
+  "fan_ceiling_light",
   "fan_floor",
   "water_heater",
   "range_hood",
@@ -1148,6 +1152,7 @@ export const FURNITURE_SIZE: Record<FurnitureType, [number, number, number]> = {
   shoe_cabinet: [1.0, 0.35, 1.0],
   motorbike: [0.72, 1.9, 1.15],
   fan_ceiling: [1.4, 1.4, 0.32],
+  fan_ceiling_light: [1.4, 1.4, 0.4],
   fan_floor: [0.45, 0.45, 1.25],
   water_heater: [0.75, 0.35, 0.45],
   drying_rack: [1.6, 0.6, 1.7],

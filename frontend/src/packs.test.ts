@@ -28,6 +28,7 @@ test("pack furniture resolves by type, with size, name and power link", () => {
   assert.equal(isElectric("air_conditioner"), true);
   assert.equal(isElectric("water_pump"), true);
   assert.equal(isElectric("fan_ceiling"), true);
+  assert.equal(isElectric("fan_ceiling_light"), true);
   assert.equal(isElectric("fan_floor"), true);
   assert.equal(isElectric("water_heater"), true);
   assert.equal(isElectric("range_hood"), true);

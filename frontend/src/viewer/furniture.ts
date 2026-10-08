@@ -1043,8 +1043,8 @@ function floorFan(b: Builder, w: number, d: number, h: number): void {
 }
 
 /** Moving blades of a built-in fan, centred on its rotation axis for the viewer to spin as one group. */
-export function pushFanRotor(buf: GeoBuffer, lines: LineBuffer, type: "fan_ceiling" | "fan_floor", w: number, d: number, h: number): void {
-  if (type === "fan_ceiling") {
+export function pushFanRotor(buf: GeoBuffer, lines: LineBuffer, type: "fan_ceiling" | "fan_ceiling_light" | "fan_floor", w: number, d: number, h: number): void {
+  if (type === "fan_ceiling" || type === "fan_ceiling_light") {
     const b = new Builder(buf, lines, (x, z) => [x, z]);
     const bladeW = Math.min(w, d) * 0.13;
     // Three tapered blades have a natural silhouette while remaining light enough for live animation.
@@ -1638,6 +1638,7 @@ function buildFurniture(buf: GeoBuffer, lines: LineBuffer, shadow: GeoBuffer, f:
       motorbike(b, w, d, h);
       break;
     case "fan_ceiling":
+    case "fan_ceiling_light":
       ceilingFan(b, w, d, h);
       return;
     case "fan_floor":

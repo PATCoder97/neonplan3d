@@ -4,6 +4,13 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.19.1
+
+### Added
+
+- Added a ceiling fan with an integrated light, distinct 2D/3D geometry and independently assigned fan and light entities.
+- Made the fan rotor follow only its fan entity while the light kit keeps its own colour, brightness, tap target and room-light behaviour.
+
 ## 1.19.0
 
 ### Added

@@ -643,6 +643,20 @@ test("Vietnamese fans and water heater automatically take matching room entities
   assert.equal(links.get("purifier")?.entity, "switch.may_loc_nuoc");
 });
 
+test("a ceiling fan with light resolves its fan and light independently", () => {
+  const st = (entity_id: string, state: string, attributes: Record<string, unknown> = {}) => ({ entity_id, state, attributes });
+  const states = {
+    "fan.quat_tran_co_den": st("fan.quat_tran_co_den", "on", { friendly_name: "Quạt trần có đèn" }),
+    "light.den_quat_tran": st("light.den_quat_tran", "on", { friendly_name: "Đèn quạt trần" }),
+  };
+  const entities = Object.fromEntries(Object.keys(states).map((entity_id) => [entity_id, { entity_id, area_id: "phong_khach" }]));
+  const hass = { language: "vi", states, entities, devices: {}, areas: { phong_khach: { area_id: "phong_khach", name: "Phòng khách" } } } as unknown as HomeAssistant;
+  const room = { id: "r", name: "Phòng khách", area_id: "phong_khach", points: [[0, 0], [4, 0], [4, 4], [0, 4]] as [number, number][], floor_material: "wood" as const };
+  const fan = { id: "combo", type: "fan_ceiling_light", x: 2, z: 2, w: 1.4, d: 1.4, h: 0.4, rotation: 0, variant: null };
+  const links = furnitureEntities(hass, [{ ...newFloor("eg", "Tầng trệt", 0), rooms: [room], furniture: [fan] }]);
+  assert.deepEqual(links.get("combo"), { entity: "fan.quat_tran_co_den", light: "light.den_quat_tran", power: null });
+});
+
 test("the LED display cabinet automatically takes its matching room light", () => {
   const st = (entity_id: string, state: string, attributes: Record<string, unknown> = {}) => ({ entity_id, state, attributes });
   const hass = {

@@ -79,7 +79,7 @@ import { furnitureFootprint, isLamp, LAMP_MODEL, outdoorGround, pointInPolygon, 
 import { floorCounts, floorInfoText, personsInRooms } from "../presence.ts";
 import { controls, tokens } from "../styles.ts";
 import type { HassEntity, HomeAssistant } from "../types.ts";
-import type { DeviceMarker, FloorplanViewer, FloorStack, RobotInfo, Quality, ScreenState, SoundSource, SurfaceGrab, ViewerStats, WallMode } from "../viewer/viewer3d.ts";
+import type { DeviceMarker, FloorplanViewer, FloorStack, LampModel, RobotInfo, Quality, ScreenState, SoundSource, SurfaceGrab, ViewerStats, WallMode } from "../viewer/viewer3d.ts";
 
 /** Which HTML markers are shown: none, only what has no 3D object or shows a value, or all. */
 export type MarkerMode = "none" | "important" | "all";
@@ -597,7 +597,7 @@ export class Fp3dView3d extends LitElement {
       const e = b.energy;
       const presence = b.presence.flatMap((p) => [p.person, p.sensor]);
       const lights = b.floors.flatMap((f) => f.rooms.flatMap((r) => areaEntities(hass, r.area_id).filter((id) => kindOf(id) === "light")));
-      const furniture = [...this.furnitureLinks.values()].flatMap((l) => [l.entity, l.power]);
+      const furniture = [...this.furnitureLinks.values()].flatMap((l) => [l.entity, l.light, l.power]);
       const states = b.floors.flatMap((f) => f.furniture.flatMap((m) => [m.state_entity ?? null, m.state_entity2 ?? null, m.color_entity ?? null]));
       const doors = b.floors.flatMap((f) => f.furniture.flatMap((m) => [m.door_left ?? null, m.door_right ?? null, m.soc ?? null, m.status ?? null, m.charge ?? null, m.export ?? null]));
       const roofWindowIds = (b.settings.roof?.windows ?? []).flatMap((w) => [w.cover, w.contact, w.tilt]).filter((x): x is string => !!x && x !== "none");
@@ -1398,6 +1398,8 @@ export class Fp3dView3d extends LitElement {
     for (const f of floor.furniture) {
       const e = this.furnitureLinks.get(f.id)?.entity;
       if (e && isLamp(f.type) && pointInPolygon([f.x, f.z], room.points)) ids.add(e);
+      const light = this.furnitureLinks.get(f.id)?.light;
+      if (light && pointInPolygon([f.x, f.z], room.points)) ids.add(light);
     }
     // devices that ask before switching stay out of the all-at-once toggle
     const lights = [...ids].filter((id) => !this.confirmSet.has(id));
@@ -1491,6 +1493,10 @@ export class Fp3dView3d extends LitElement {
         // two entities light the halves (left/right of a bed, bottom/top of a bunk bed)
         const faces = this.stateFaces(hass, f);
         if (faces.length) screens.set(f.id, { color: faces[0].color, level: faces[0].level, faces });
+        if (f.type === "fan_ceiling_light") {
+          const light = linked?.light ?? null;
+          markers.push({ ...this.lampMarker(hass, floor, f, light, "fan"), id: light ?? `fan-light:${f.id}`, fanMotor: false });
+        }
         if (isLamp(f.type)) {
           markers.push(this.lampMarker(hass, floor, f, linked?.entity ?? null));
           continue;
@@ -1508,7 +1514,10 @@ export class Fp3dView3d extends LitElement {
         const link = linked ?? (extra ? { entity: null, power: null } : undefined);
         if (!link) continue;
         // a battery goes by its charge first: its power sensor is often placed on its own as well
-        const id = (f.type === "home_battery" ? (extra ?? link.entity ?? link.power) : (link.entity ?? link.power ?? extra))!;
+        const id = f.type === "home_battery" ? (extra ?? link.entity ?? link.power) : (link.entity ?? link.power ?? extra);
+        // A combined fan may have only its light linked; its lamp marker above remains usable while
+        // the absent fan role stays off and does not create an invalid marker id.
+        if (!id) continue;
         targets.set(f.id, id);
         const st = link.entity ? hass.states[link.entity] : undefined;
         // the meter's sensor is the grid (+ = import), the battery's can point the other way as well
@@ -1840,10 +1849,10 @@ export class Fp3dView3d extends LitElement {
   }
 
   /** A lamp: its 3D model glows with the linked light and is tapped directly. */
-  private lampMarker(hass: HomeAssistant, floor: Building["floors"][number], f: Furniture, entity: string | null): DeviceMarker & { fromFurniture: boolean } {
+  private lampMarker(hass: HomeAssistant, floor: Building["floors"][number], f: Furniture, entity: string | null, modelOverride?: LampModel): DeviceMarker & { fromFurniture: boolean } {
     const st = entity ? hass.states[entity] : undefined;
     const item = packItem(f.type);
-    const model = LAMP_MODEL[f.type] ?? item?.light ?? "floor";
+    const model = modelOverride ?? LAMP_MODEL[f.type] ?? item?.light ?? "floor";
     // a height above the floor set by hand wins (a table lamp on a shelf, a floor lamp on a platform);
     // an LED strip outside the house counts from the ground there (a path light flush with the lawn)
     const inRoom = floor.rooms.some((r) => r.points.length >= 3 && pointInPolygon([f.x, f.z], r.points));
@@ -1851,7 +1860,7 @@ export class Fp3dView3d extends LitElement {
       ? outdoorGround(floor, f.x, f.z) + (f.mount_y ?? 0)
       : f.mount_y != null && !item
       ? f.mount_y
-      : item || model === "wall" || model === "strip"
+      : item || model === "wall" || model === "strip" || model === "fan"
       ? mountBase(floor, f)
       : model === "table"
         ? surfaceHeight(floor, f.x, f.z)
@@ -1878,6 +1887,7 @@ export class Fp3dView3d extends LitElement {
       strip: f.upright ? base + f.w + 0.15 : Math.max(0.3, base - 0.2),
       bollard: base + f.h + 0.25,
       garden: base + f.h + 0.25,
+      fan: Math.max(0.3, base + f.h * 0.2),
     }[model];
     return {
       // a lamp without a light keeps a key of its own (it is drawn, but not tappable)
@@ -1903,7 +1913,7 @@ export class Fp3dView3d extends LitElement {
       pickable: !!entity,
       furnitureId: f.id,
       pack: item ? f.type : null,
-      lightY: item ? (item.mount === "ceiling" ? base : base + f.h * 0.85) : undefined,
+      lightY: item ? (item.mount === "ceiling" ? base : base + f.h * 0.85) : model === "fan" ? base + f.h * 0.08 : undefined,
       effect: !!st && st.state === "on" && typeof st.attributes.effect === "string" && !/^(none|off|solid|static|normal)$/i.test(st.attributes.effect),
       variant: f.variant,
       show: f.marker ?? undefined,

@@ -158,6 +158,8 @@ export interface DeviceMarker {
   pickable?: boolean;
   /** Furniture item this lamp is (for moving it in 3D). */
   furnitureId?: string;
+  /** False for the light role of a combined fan, so switching its lamp never spins the blades. */
+  fanMotor?: boolean;
   /** Lamp from a furniture pack (its type): drawn from the pack's parts. */
   pack?: string | null;
   /** Height its light comes from (pack lamps). */
@@ -188,7 +190,7 @@ export interface TrailSpot {
   age: number;
 }
 
-export type LampModel = "ceiling" | "downlight" | "spot" | "panel" | "pendant" | "floor" | "uplight" | "table" | "wall" | "strip" | "bollard" | "garden";
+export type LampModel = "ceiling" | "downlight" | "spot" | "panel" | "pendant" | "floor" | "uplight" | "table" | "wall" | "strip" | "bollard" | "garden" | "fan";
 
 /** Piece of energy cable (floor-local coordinates); the flow runs from a to b. */
 /** A ray from the camera through the pointer, in building coordinates (heights above the ground). */
@@ -310,7 +312,7 @@ const LAMP_SHADE = 0x1d2946;
 /** Lamps that hang from the ceiling (hidden in the cut view). */
 /** LED strips mounted below this height (metres) light upwards instead of down. */
 const LOW_STRIP = 1.0;
-const HANGING = new Set<LampModel>(["ceiling", "downlight", "spot", "panel", "pendant", "strip"]);
+const HANGING = new Set<LampModel>(["ceiling", "downlight", "spot", "panel", "pendant", "strip", "fan"]);
 const FLASH_MS = 450;
 const EFFECT_MS = 125;
 /** Turns of the colour wheel per second while a colour effect runs. */
@@ -328,6 +330,7 @@ const LAMP_SIZE: Record<LampModel, [number, number, number]> = {
   table: [0.26, 0.26, 0.45],
   wall: [0.22, 0.12, 0.2],
   strip: [2, 0.04, 0.03],
+  fan: [1.4, 1.4, 0.4],
 };
 
 interface FloorMaterials {
@@ -430,7 +433,7 @@ interface FloorView {
 
 interface FanRotor {
   rotor: Group;
-  type: "fan_ceiling" | "fan_floor";
+  type: "fan_ceiling" | "fan_ceiling_light" | "fan_floor";
   active: boolean;
 }
 
@@ -760,7 +763,7 @@ export class FloorplanViewer {
   /** Replace the device markers; pins are reused per entity, light cones rebuilt per floor. */
   setDevices(devices: DeviceMarker[]): void {
     this.devices = devices;
-    const activeFans = new Set(devices.filter((d) => d.active && d.furnitureId && this.fanRotors.has(d.furnitureId)).map((d) => d.furnitureId!));
+    const activeFans = new Set(devices.filter((d) => d.active && d.fanMotor !== false && d.furnitureId && this.fanRotors.has(d.furnitureId)).map((d) => d.furnitureId!));
     for (const [id, fan] of this.fanRotors) fan.active = activeFans.has(id);
     this.labelsDirty = true;
     this.effectFloors = new Set(devices.filter((d) => d.effect && d.glow).map((d) => d.floorId));
@@ -1270,8 +1273,9 @@ export class FloorplanViewer {
     let moving = false;
     for (const fan of this.fanRotors.values()) {
       if (!fan.active) continue;
-      const step = dt * (fan.type === "fan_ceiling" ? 0.0048 : 0.009);
-      if (fan.type === "fan_ceiling") fan.rotor.rotation.y = (fan.rotor.rotation.y - step) % (Math.PI * 2);
+      const ceiling = fan.type === "fan_ceiling" || fan.type === "fan_ceiling_light";
+      const step = dt * (ceiling ? 0.0048 : 0.009);
+      if (ceiling) fan.rotor.rotation.y = (fan.rotor.rotation.y - step) % (Math.PI * 2);
       else fan.rotor.rotation.z = (fan.rotor.rotation.z - step) % (Math.PI * 2);
       moving = true;
     }
@@ -1543,6 +1547,7 @@ export class FloorplanViewer {
         strip: [base + Math.max(0.02, h) - 0.01, base < LOW_STRIP ? "up" : "ceiling"],
         bollard: [base + h - 0.08, "ceiling"],
         garden: [base + h, "up"],
+        fan: [base + h * 0.08, "ceiling"],
       };
       const [y0, kind] = d.lamp ? kinds[d.lamp] : [d.y, "omni" as LightKind];
       const y = d.lightY ?? y0;
@@ -1769,7 +1774,7 @@ export class FloorplanViewer {
       // Fan rotors are separate groups: their bodies and cages stay in the merged furniture mesh,
       // while these blades can rotate cheaply without rebuilding the floor geometry every frame.
       for (const f of floor.furniture) {
-        if (f.type !== "fan_ceiling" && f.type !== "fan_floor") continue;
+        if (f.type !== "fan_ceiling" && f.type !== "fan_ceiling_light" && f.type !== "fan_floor") continue;
         const solid = new GeoBuffer();
         const edges = new LineBuffer();
         pushFanRotor(solid, edges, f.type, f.w, f.d, f.h);
@@ -1779,7 +1784,7 @@ export class FloorplanViewer {
         const a = f.rotation * DEG;
         holder.position.set(f.x, mountBase(floor, f), f.z);
         holder.rotation.y = -a;
-        rotor.position.set(0, f.type === "fan_ceiling" ? f.h * 0.18 : f.h * 0.78, 0);
+        rotor.position.set(0, f.type === "fan_ceiling" || f.type === "fan_ceiling_light" ? f.h * 0.18 : f.h * 0.78, 0);
         holder.add(rotor);
         group.add(holder);
         const active = this.devices.some((d) => d.furnitureId === f.id && d.active);
@@ -2371,6 +2376,7 @@ export class FloorplanViewer {
         strip: base + Math.max(0.02, h) - 0.01,
         bollard: base + h - 0.08,
         garden: base + h - 0.03,
+        fan: base + h * 0.08,
       }[d.lamp];
       // a wall light glows in front of the wall
       const push = (x: number, z: number, k = 1) => {
@@ -3946,6 +3952,13 @@ export function pushLampModel(
       cyl(r * 0.25, H - 0.04, H, LAMP_BODY, LAMP_BODY, 8);
       cyl(r, H - Math.max(0.04, h) - 0.035, H - 0.04, shadeCol, shadeCol);
       break;
+    case "fan": {
+      // Light kit below a combined ceiling fan; its body and moving blades are built separately.
+      const lens = Math.min(w, dd) * 0.13;
+      cyl(lens * 1.16, base, base + h * 0.055, LAMP_BODY, LAMP_BODY, 18);
+      cyl(lens, base - h * 0.045, base, shadeCol, shadeCol, 18);
+      break;
+    }
     case "pendant": {
       const bottom = Math.max(0.4, H - h);
       cyl(0.06, H - 0.02, H, LAMP_BODY, LAMP_BODY, 8);

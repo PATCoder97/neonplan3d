@@ -43,16 +43,17 @@ export function furniturePreview(item: PreviewItem, size = 180, packs?: Furnitur
   } else {
     const f: Furniture = { id: "preview", type: item.type, x: 0, z: 0, rotation: 0, w: item.w, d: item.d, h: item.h, variant: item.variant ?? null, entity: null, power: null };
     pushFurniture(buf, lines, new GeoBuffer(), f);
-    if (item.type === "fan_ceiling" || item.type === "fan_floor") {
+    if (item.type === "fan_ceiling" || item.type === "fan_ceiling_light" || item.type === "fan_floor") {
       const p0 = buf.p.length;
       const l0 = lines.p.length;
       pushFanRotor(buf, lines, item.type, item.w, item.d, item.h);
-      const y = item.type === "fan_ceiling" ? item.h * 0.18 : item.h * 0.78;
+      const y = item.type === "fan_ceiling" || item.type === "fan_ceiling_light" ? item.h * 0.18 : item.h * 0.78;
       const z = 0;
       for (let i = p0 + 1; i < buf.p.length; i += 3) buf.p[i] += y;
       for (let i = p0 + 2; i < buf.p.length; i += 3) buf.p[i] += z;
       for (let i = l0 + 1; i < lines.p.length; i += 3) lines.p[i] += y;
       for (let i = l0 + 2; i < lines.p.length; i += 3) lines.p[i] += z;
+      if (item.type === "fan_ceiling_light") pushLampModel(buf, { x: 0, z: 0, size: [item.w, item.d, item.h], base: 0, rotation: 0, variant: null, lamp: "fan" }, item.h, 0xffb547);
     }
   }
   const scene = new Scene();

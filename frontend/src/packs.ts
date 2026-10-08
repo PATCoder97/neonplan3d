@@ -155,7 +155,7 @@ export function mountBase(floor: Floor, f: Pick<Furniture, "type" | "x" | "z" | 
   // wall lights at the usual height, LED strips just under the ceiling
   if (f.type === "lamp_wall") return WALL_LAMP_Y;
   if (f.type === "led_strip") return Math.max(0, floor.height - 0.04 - Math.max(0.02, f.h));
-  if (f.type === "fan_ceiling") return Math.max(0, floor.height - Math.max(0.05, f.h));
+  if (f.type === "fan_ceiling" || f.type === "fan_ceiling_light") return Math.max(0, floor.height - Math.max(0.05, f.h));
   if (f.type === "altar_wall") return 1.45;
   if (f.type === "water_heater") return 1.7;
   if (f.type === "range_hood") return 1.35;

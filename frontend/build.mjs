@@ -74,8 +74,9 @@ function copyFonts() {
   }
 }
 
-// 3D includes the covered-yard structure, corrugated metal roof and lit glass cabinet; still suitable for old wall tablets.
-const BUDGET = { "neonplan3d.js": 425 * 1024, "neonplan3d-3d.js": 746 * 1024, "neonplan3d-editor.js": 523 * 1024, "neonplan3d-card-editor.js": 165 * 1024 };
+// 3D includes the covered-yard structure, corrugated roof and independently controlled fan light;
+// the small explicit budgets still catch accidental dependency or geometry growth on old wall tablets.
+const BUDGET = { "neonplan3d.js": 425 * 1024, "neonplan3d-3d.js": 747 * 1024, "neonplan3d-editor.js": 525 * 1024, "neonplan3d-card-editor.js": 165 * 1024 };
 
 copyFonts();
 if (watch) {

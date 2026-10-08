@@ -56,11 +56,15 @@ export function furnitureSymbol(type: string, w: number, d: number): Part[] | ty
         line(-w * 0.32, d * 0.23, w * 0.32, d * 0.23),
       ];
     case "fan_ceiling":
-      return [
+    case "fan_ceiling_light": {
+      const out: Part[] = [
         circle(0, 0, Math.min(w, d) * 0.09, "fp3d-sym-fill"),
         rect(-w / 2, -d * 0.055, w / 2, d * 0.055),
         rect(-w * 0.055, -d / 2, w * 0.055, d / 2),
       ];
+      if (type === "fan_ceiling_light") out.push(circle(0, 0, Math.min(w, d) * 0.16), circle(0, 0, Math.min(w, d) * 0.11, "fp3d-sym-fill"));
+      return out;
+    }
     case "fan_floor":
       return [circle(0, 0, Math.min(w, d) * 0.46), circle(0, 0, Math.min(w, d) * 0.12, "fp3d-sym-fill")];
     case "water_heater":

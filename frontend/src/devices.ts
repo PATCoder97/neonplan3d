@@ -687,6 +687,7 @@ const FURNITURE_NAMES: Record<string, RegExp> = {
   air_conditioner: /(klima|air ?condition|aircon|airco|split|điều hòa|dieu hoa|máy lạnh|may lanh)/i,
   water_pump: /(wasserpumpe|gartenpumpe|brunnenpumpe|water ?pump|garden ?pump|well ?pump|pool ?pump|irrigation|máy bơm|may bom|bơm nước|bom nuoc|bơm giếng|bom gieng|bơm tưới|bom tuoi)/i,
   fan_ceiling: /(deckenventilator|ceiling ?fan|quạt trần|quat tran)/i,
+  fan_ceiling_light: /(deckenventilator|ceiling ?fan|quạt trần|quat tran)/i,
   fan_floor: /(standventilator|standing ?fan|floor ?fan|quạt đứng|quat dung)/i,
   water_heater: /(warmwasser|water ?heater|boiler|bình nóng lạnh|binh nong lanh|máy nước nóng|may nuoc nong)/i,
   range_hood: /(dunstabzug|range ?hood|extractor|hút mùi|hut mui)/i,
@@ -734,8 +735,9 @@ export function confirmEntities(hass: HomeAssistant, floors: readonly Floor[]): 
       if (cover && cover !== "none") out.add(cover);
     }
     for (const f of floor.furniture) {
-      const e = f.confirm ? links.get(f.id)?.entity : null;
-      if (e && e !== "none") out.add(e);
+      const link = f.confirm ? links.get(f.id) : null;
+      if (link?.entity && link.entity !== "none") out.add(link.entity);
+      if (link?.light && link.light !== "none") out.add(link.light);
     }
   }
   return out;
@@ -770,6 +772,8 @@ const LAMP_NAMES: Record<string, RegExp> = {
 
 export interface FurnitureLinks {
   entity: string | null;
+  /** Independently controlled lamp of a combined ceiling fan. */
+  light?: string | null;
   power: string | null;
 }
 
@@ -794,11 +798,11 @@ export function furnitureEntities(hass: HomeAssistant, floors: readonly Floor[])
   const out = new Map<string, FurnitureLinks>();
   for (const floor of floors) {
     // entities set by hand and devices placed in the plan (an Echo Show in the corner) are taken
-    const used = new Set<string>([...floor.furniture.flatMap((f) => [f.entity, f.power]), ...floor.placements.map((p) => p.entity_id)].filter((v): v is string => !!v && v !== "none"));
+    const used = new Set<string>([...floor.furniture.flatMap((f) => [f.entity, f.light_entity, f.power]), ...floor.placements.map((p) => p.entity_id)].filter((v): v is string => !!v && v !== "none"));
     for (const f of floor.furniture) {
       const lamp = f.type in LAMP_NAMES;
       const pattern = lamp ? LAMP_NAMES[f.type] : FURNITURE_NAMES[f.type];
-      if (!pattern && f.entity == null && f.power == null) continue;
+      if (!pattern && f.entity == null && f.light_entity == null && f.power == null) continue;
       const room = floor.rooms.find((r) => r.points.length >= 3 && pointInPolygon([f.x, f.z], r.points));
       const ids = room ? primaryEntities(hass, areaEntities(hass, room.area_id)) : [];
       const name = (id: string) => `${id} ${entityName(hass, id)}`;
@@ -839,6 +843,14 @@ export function furnitureEntities(hass: HomeAssistant, floors: readonly Floor[])
         }
         if (entity) used.add(entity);
       }
+      let light: string | null = f.light_entity === "none" ? null : (f.light_entity ?? null);
+      if (f.type === "fan_ceiling_light" && f.light_entity == null) {
+        // The fan and light commonly belong to one HA device, so inspect all area entities rather
+        // than only primaryEntities(), which intentionally collapses siblings of the same device.
+        const freeLights = (room ? areaEntities(hass, room.area_id) : []).filter((id) => !used.has(id) && kindOf(id) === "light");
+        light = freeLights.find((id) => /(fan|ceiling|decken|quạt|quat)/i.test(name(id))) ?? freeLights[0] ?? null;
+        if (light) used.add(light);
+      }
       let power: string | null = f.power === "none" ? null : (f.power ?? null);
       if (f.power == null) {
         power = entity ? devicePower(hass, entity) : null;
@@ -848,7 +860,7 @@ export function furnitureEntities(hass: HomeAssistant, floors: readonly Floor[])
         }
         if (power) used.add(power);
       }
-      if (entity || power) out.set(f.id, { entity, power });
+      if (entity || light || power) out.set(f.id, { entity, power, ...(f.type === "fan_ceiling_light" || f.light_entity != null ? { light } : {}) });
     }
   }
   return out;
@@ -879,7 +891,7 @@ export function roomPanelEntities(hass: HomeAssistant, floor: Floor, room: Room)
   const openings = openingEntities(hass, [floor]);
   const shown = [
     ...floor.placements.filter((p) => inRoom(p.x, p.z)).map((p) => p.entity_id),
-    ...floor.furniture.filter((f) => inRoom(f.x, f.z)).flatMap((f) => [furniture.get(f.id)?.entity, furniture.get(f.id)?.power]),
+    ...floor.furniture.filter((f) => inRoom(f.x, f.z)).flatMap((f) => [furniture.get(f.id)?.entity, furniture.get(f.id)?.light, furniture.get(f.id)?.power]),
     ...floor.openings.filter((o) => o.room_id === room.id).flatMap((o) => {
       const e = openings.get(o.id);
       return e ? [e.cover, e.contact, e.tilt, e.contact2] : [];

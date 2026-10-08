@@ -156,7 +156,7 @@ test("an outdoor water pump sits on the terrace with its shadow and live status 
 test("Vietnamese home furniture builds finite dedicated geometry at the correct mount", () => {
   const floor = newFloor("eg", "EG", 0);
   const types = [
-    "altar", "altar_wall", "shoe_cabinet", "motorbike", "fan_ceiling", "fan_floor", "water_heater", "drying_rack",
+    "altar", "altar_wall", "shoe_cabinet", "motorbike", "fan_ceiling", "fan_ceiling_light", "fan_floor", "water_heater", "drying_rack",
     "shoe_bench", "room_divider", "range_hood", "microwave", "water_purifier", "kitchen_corner", "kitchen_display", "vanity", "crib",
     "bed_single", "bed_double", "sofa_l", "sofa_bed", "shower_screen", "hammock", "stone_table_set", "planter_large",
     "water_tank", "gate", "fence",
@@ -179,6 +179,7 @@ test("Vietnamese home furniture builds finite dedicated geometry at the correct 
   assert.equal(mountBase(floor, { type: "water_heater", x: 0, z: 0, h: FURNITURE_SIZE.water_heater[2] }), 1.7);
   assert.equal(mountBase(floor, { type: "range_hood", x: 0, z: 0, h: FURNITURE_SIZE.range_hood[2] }), 1.35);
   assert.equal(mountBase(floor, { type: "fan_ceiling", x: 0, z: 0, h: FURNITURE_SIZE.fan_ceiling[2] }), floor.height - FURNITURE_SIZE.fan_ceiling[2]);
+  assert.equal(mountBase(floor, { type: "fan_ceiling_light", x: 0, z: 0, h: FURNITURE_SIZE.fan_ceiling_light[2] }), floor.height - FURNITURE_SIZE.fan_ceiling_light[2]);
   const heater = { id: "heater", type: "water_heater", x: 0, z: 0, w: 0.75, d: 0.35, h: 0.45, rotation: 0, variant: null } as Furniture;
   const indicator = screenRect(heater, floor)!;
   assert.ok(indicator.y0 > 1.7 && indicator.y1 < 2.15, "the water heater exposes its live status lamp");
@@ -219,8 +220,8 @@ test("smart-home furniture builds recognisable finite geometry at its declared m
   assert.equal(mountBase(floor, { type: "smart_lock", x: 0, z: 0, h: FURNITURE_SIZE.smart_lock[2] }), 0.95);
 });
 
-test("ceiling and floor fans have separate finite rotors for live animation", () => {
-  for (const type of ["fan_ceiling", "fan_floor"] as const) {
+test("ceiling, ceiling-light and floor fans have separate finite rotors for live animation", () => {
+  for (const type of ["fan_ceiling", "fan_ceiling_light", "fan_floor"] as const) {
     const [w, d, h] = FURNITURE_SIZE[type];
     const buf = new GeoBuffer();
     const lines = new LineBuffer();

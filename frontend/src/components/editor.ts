@@ -6188,16 +6188,18 @@ export class Fp3dEditor extends LitElement {
     if (!this.hass) return nothing;
     const hass = this.hass;
     // what "automatic" would choose: resolve with this item's own links cleared
-    const autoPick = (key: "entity" | "power") => {
+    const autoPick = (key: "entity" | "light" | "power") => {
       const probe = structuredClone(this._doc.floors);
-      for (const fl of probe) for (const x of fl.furniture) if (x.id === f.id) x[key] = null;
+      for (const fl of probe) for (const x of fl.furniture) if (x.id === f.id) (key === "light" ? (x.light_entity = null) : (x[key] = null));
       return furnitureEntities(hass, probe).get(f.id)?.[key] ?? null;
     };
     const media = isMediaFurniture(f.type);
     const lamp = isLamp(f.type);
     const cabinetLight = f.type === "kitchen_display";
     const entities = this.entityOptions((id) =>
-      lamp || cabinetLight
+      f.type === "fan_ceiling_light"
+        ? /^(fan|switch|input_boolean)\./.test(id)
+        : lamp || cabinetLight
         ? // a lamp can follow a light or a plain switch (e.g. a relay that switches the ceiling light)
           /^(light|switch|input_boolean)\./.test(id)
         : media
@@ -6225,9 +6227,12 @@ export class Fp3dEditor extends LitElement {
     return html`<div class="fp3d-form fp3d-links">
         ${f.type === "grid_point"
           ? html`<p class="fp3d-sub fp3d-wide">${this.t("grid_point_hint")}</p>`
-          : this.entitySelect(this.t(lamp || cabinetLight ? "furn_entity_light" : media ? "furn_entity_tv" : f.type === "radiator" || f.type === "air_conditioner" ? "furn_entity_climate" : f.type === "robot_vacuum" ? "furn_entity_vacuum" : "furn_entity"), f.entity ?? null, autoPick("entity"), entities, (v) =>
+          : this.entitySelect(this.t(f.type === "fan_ceiling_light" ? "furn_entity_fan" : lamp || cabinetLight ? "furn_entity_light" : media ? "furn_entity_tv" : f.type === "radiator" || f.type === "air_conditioner" ? "furn_entity_climate" : f.type === "robot_vacuum" ? "furn_entity_vacuum" : "furn_entity"), f.entity ?? null, autoPick("entity"), entities, (v) =>
               this.updateFurniture({ entity: v }),
             )}
+        ${f.type === "fan_ceiling_light"
+          ? this.entitySelect(this.t("furn_entity_light"), f.light_entity ?? null, autoPick("light"), this.entityOptions((id) => id.startsWith("light.")), (v) => this.updateFurniture({ light_entity: v }))
+          : nothing}
         ${!lamp && !(ENERGY_DEVICES as readonly string[]).includes(f.type) && !hasScreen(f.type)
           ? html`${this.entitySelect(this.t("furn_state_entity"), f.state_entity ?? null, undefined, this.entityOptions((id) => /^(binary_sensor|switch|input_boolean|light|fan|person|device_tracker|sensor)\./.test(id)), (v) => this.updateFurniture({ state_entity: v === "none" ? null : v }))}
               ${f.state_entity && f.state_entity !== "none"

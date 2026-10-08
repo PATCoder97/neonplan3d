@@ -196,6 +196,8 @@ FURNITURE_SCHEMA = vol.Schema(
         vol.Optional("show_name", default=False): bool,
         # linked entities (e.g. the TV's media player, a power sensor): None = automatic, "none" = no entity
         vol.Optional("entity", default=None): vol.Any(None, vol.All(str, vol.Length(max=255))),
+        # combined ceiling fan: the light is controlled separately from the main fan entity
+        vol.Optional("light_entity", default=None): vol.Any(None, vol.All(str, vol.Length(max=255))),
         vol.Optional("power", default=None): vol.Any(None, vol.All(str, vol.Length(max=255))),
         # smart fridge: door sensors of the left and the right door
         vol.Optional("door_left", default=None): vol.Any(None, vol.All(str, vol.Length(max=255))),
