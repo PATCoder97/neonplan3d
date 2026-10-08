@@ -190,7 +190,7 @@ export interface TrailSpot {
   age: number;
 }
 
-export type LampModel = "ceiling" | "downlight" | "spot" | "panel" | "pendant" | "floor" | "uplight" | "table" | "wall" | "strip" | "bollard" | "garden" | "fan";
+export type LampModel = "ceiling" | "downlight" | "spot" | "panel" | "pendant" | "floor" | "uplight" | "table" | "wall" | "strip" | "bollard" | "garden" | "fan" | "column" | "tv_bars" | "orb_table" | "portable" | "ambient" | "cube" | "round_panel" | "garden_set" | "wall_updown";
 
 /** Piece of energy cable (floor-local coordinates); the flow runs from a to b. */
 /** A ray from the camera through the pointer, in building coordinates (heights above the ground). */
@@ -312,7 +312,7 @@ const LAMP_SHADE = 0x1d2946;
 /** Lamps that hang from the ceiling (hidden in the cut view). */
 /** LED strips mounted below this height (metres) light upwards instead of down. */
 const LOW_STRIP = 1.0;
-const HANGING = new Set<LampModel>(["ceiling", "downlight", "spot", "panel", "pendant", "strip", "fan"]);
+const HANGING = new Set<LampModel>(["ceiling", "downlight", "spot", "panel", "round_panel", "pendant", "strip", "fan"]);
 const FLASH_MS = 450;
 const EFFECT_MS = 125;
 /** Turns of the colour wheel per second while a colour effect runs. */
@@ -331,6 +331,15 @@ const LAMP_SIZE: Record<LampModel, [number, number, number]> = {
   wall: [0.22, 0.12, 0.2],
   strip: [2, 0.04, 0.03],
   fan: [1.4, 1.4, 0.4],
+  column: [0.12, 0.12, 1.45],
+  tv_bars: [0.65, 0.16, 0.38],
+  orb_table: [0.28, 0.28, 0.24],
+  portable: [0.24, 0.24, 0.26],
+  ambient: [0.2, 0.2, 0.2],
+  cube: [0.26, 0.26, 0.24],
+  round_panel: [0.42, 0.42, 0.045],
+  garden_set: [0.65, 0.18, 0.32],
+  wall_updown: [0.14, 0.12, 0.32],
 };
 
 interface FloorMaterials {
@@ -1548,6 +1557,15 @@ export class FloorplanViewer {
         bollard: [base + h - 0.08, "ceiling"],
         garden: [base + h, "up"],
         fan: [base + h * 0.08, "ceiling"],
+        column: [base + h * 0.55, "omni"],
+        tv_bars: [base + h * 0.55, "omni"],
+        orb_table: [base + h * 0.55, "omni"],
+        portable: [base + h * 0.55, "omni"],
+        ambient: [base + h, "up"],
+        cube: [base + h * 0.55, "omni"],
+        round_panel: [H - 0.05, "ceiling"],
+        garden_set: [base + h, "up"],
+        wall_updown: [base + h / 2, "wall"],
       };
       const [y0, kind] = d.lamp ? kinds[d.lamp] : [d.y, "omni" as LightKind];
       const y = d.lightY ?? y0;
@@ -2377,6 +2395,15 @@ export class FloorplanViewer {
         bollard: base + h - 0.08,
         garden: base + h - 0.03,
         fan: base + h * 0.08,
+        column: base + h * 0.55,
+        tv_bars: base + h * 0.55,
+        orb_table: base + h * 0.55,
+        portable: base + h * 0.55,
+        ambient: base + h,
+        cube: base + h * 0.55,
+        round_panel: H - 0.03,
+        garden_set: base + h - 0.03,
+        wall_updown: base + h / 2,
       }[d.lamp];
       // a wall light glows in front of the wall
       const push = (x: number, z: number, k = 1) => {
@@ -2391,7 +2418,7 @@ export class FloorplanViewer {
             hc.push(...glow.color.map((c) => c * glow.level * 0.7 * 0.6));
           } else push(d.x + Math.cos(ang) * w * t, d.z + Math.sin(ang) * w * t, 0.6);
         }
-      else if (d.lamp === "wall") push(d.x - Math.sin(ang) * (dd / 2 + 0.05), d.z + Math.cos(ang) * (dd / 2 + 0.05));
+      else if (d.lamp === "wall" || d.lamp === "wall_updown") push(d.x - Math.sin(ang) * (dd / 2 + 0.05), d.z + Math.cos(ang) * (dd / 2 + 0.05));
       else push(d.x, d.z);
       if (this.highQuality && (d.lamp === "downlight" || d.lamp === "spot")) {
         // soft cone from the lamp to the floor, fading towards the floor
@@ -3997,6 +4024,10 @@ export function pushLampModel(
       box(-w / 2, w / 2, -dd / 2, dd / 2, H - Math.max(0.015, h), H, LAMP_BODY, LAMP_BODY);
       box(-w / 2 + 0.02, w / 2 - 0.02, -dd / 2 + 0.02, dd / 2 - 0.02, H - Math.max(0.015, h) - 0.004, H - Math.max(0.015, h), shadeCol);
       break;
+    case "round_panel":
+      cyl(r, H - Math.max(0.025, h), H, LAMP_BODY, LAMP_BODY, 18);
+      cyl(r * 0.92, H - Math.max(0.025, h) - 0.006, H - Math.max(0.025, h), shadeCol, shadeCol, 18);
+      break;
     case "uplight":
       cyl(Math.max(0.1, r * 0.6), base, base + 0.03, LAMP_BODY, LAMP_BODY);
       cyl(0.014, base + 0.03, base + h - 0.12, LAMP_BODY, LAMP_BODY, 6);
@@ -4026,11 +4057,58 @@ export function pushLampModel(
       cyl(0.012, base + 0.03, base + h - 0.16, LAMP_BODY, LAMP_BODY, 6);
       cyl(r, base + h - 0.18, base + h, shadeCol, shadeCol);
       break;
+    case "column":
+      box(-w * 0.42, w * 0.42, -dd * 0.42, dd * 0.42, base, base + h * 0.035, LAMP_BODY);
+      box(-w * 0.18, w * 0.18, -dd * 0.18, dd * 0.18, base + h * 0.035, base + h, shadeCol);
+      break;
+    case "tv_bars":
+      for (const x of [-w * 0.31, w * 0.31]) {
+        box(x - w * 0.13, x + w * 0.13, -dd * 0.42, dd * 0.42, base, base + h * 0.06, LAMP_BODY);
+        box(x - w * 0.065, x + w * 0.065, -dd * 0.18, dd * 0.18, base + h * 0.06, base + h, shadeCol);
+      }
+      break;
+    case "orb_table": {
+      cyl(r * 0.52, base, base + h * 0.08, LAMP_BODY, LAMP_BODY, 14);
+      const rings = [0.55, 0.82, 1, 0.92, 0.66];
+      for (let i = 0; i < rings.length; i++) cyl(r * rings[i], base + h * (0.08 + i * 0.18), base + h * (0.08 + (i + 1) * 0.18), shadeCol, shadeCol, 12);
+      break;
+    }
+    case "portable": {
+      box(-w * 0.42, w * 0.42, -dd * 0.42, dd * 0.42, base, base + h * 0.06, LAMP_BODY);
+      for (let i = 0; i < 4; i++) {
+        const k = 0.48 - i * 0.07;
+        box(-w * k, w * k, -dd * k, dd * k, base + h * (0.06 + i * 0.2), base + h * (0.06 + (i + 1) * 0.2), shadeCol);
+      }
+      box(-w * 0.18, w * 0.18, -dd * 0.18, dd * 0.18, base + h * 0.86, base + h, LAMP_BODY);
+      break;
+    }
+    case "ambient":
+      cyl(r * 0.92, base, base + h * 0.22, LAMP_BODY, LAMP_BODY, 14);
+      box(-w * 0.42, w * 0.42, -dd * 0.42, dd * 0.42, base + h * 0.22, base + h, shadeCol);
+      break;
+    case "cube":
+      box(-w / 2, w / 2, -dd / 2, dd / 2, base, base + h * 0.08, LAMP_BODY);
+      box(-w * 0.46, w * 0.46, -dd * 0.46, dd * 0.46, base + h * 0.08, base + h, shadeCol);
+      break;
+    case "garden_set":
+      for (const x of [-w * 0.34, 0, w * 0.34]) {
+        box(x - w * 0.012, x + w * 0.012, -dd * 0.06, dd * 0.06, base, base + h * 0.68, LAMP_BODY);
+        box(x - w * 0.065, x + w * 0.065, -dd * 0.25, dd * 0.25, base + h * 0.68, base + h * 0.92, LAMP_BODY);
+        box(x - w * 0.052, x + w * 0.052, -dd * 0.2, dd * 0.2, base + h * 0.92, base + h, shadeCol);
+      }
+      break;
     case "wall": {
       // plate on the wall (back at -z) and a glowing shade in front of it
       const y0 = d.base ?? WALL_LAMP_Y;
       box(-w / 2 + 0.03, w / 2 - 0.03, -dd / 2, -dd / 2 + 0.02, y0, y0 + h, LAMP_BODY);
       box(-w / 2, w / 2, -dd / 2 + 0.02, dd / 2, y0 + h * 0.15, y0 + h * 0.85, shadeCol);
+      break;
+    }
+    case "wall_updown": {
+      const y0 = d.base ?? WALL_LAMP_Y;
+      box(-w * 0.42, w * 0.42, -dd / 2, -dd * 0.25, y0 + h * 0.08, y0 + h * 0.92, LAMP_BODY);
+      box(-w / 2, w / 2, -dd * 0.24, dd / 2, y0, y0 + h * 0.18, shadeCol);
+      box(-w / 2, w / 2, -dd * 0.24, dd / 2, y0 + h * 0.82, y0 + h, shadeCol);
       break;
     }
     case "strip": {

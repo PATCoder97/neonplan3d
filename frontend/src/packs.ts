@@ -153,7 +153,7 @@ export function mountBase(floor: Floor, f: Pick<Furniture, "type" | "x" | "z" | 
   const item = packItem(f.type);
   if (f.mount_y != null) return f.mount_y;
   // wall lights at the usual height, LED strips just under the ceiling
-  if (f.type === "lamp_wall") return WALL_LAMP_Y;
+  if (f.type === "lamp_wall" || f.type === "lamp_wall_updown") return WALL_LAMP_Y;
   if (f.type === "led_strip") return Math.max(0, floor.height - 0.04 - Math.max(0.02, f.h));
   if (f.type === "fan_ceiling" || f.type === "fan_ceiling_light") return Math.max(0, floor.height - Math.max(0.05, f.h));
   if (f.type === "access_point" || f.type === "smoke_detector") return Math.max(0, floor.height - Math.max(0.02, f.h));

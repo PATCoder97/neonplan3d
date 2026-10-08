@@ -836,6 +836,15 @@ export const FURNITURE_TYPES = [
   "lamp_uplight",
   "lamp_bollard",
   "lamp_garden",
+  "lamp_column",
+  "lamp_tv_bars",
+  "lamp_orb_table",
+  "lamp_portable",
+  "lamp_ambient_spot",
+  "lamp_cube",
+  "lamp_panel_round",
+  "lamp_garden_spots",
+  "lamp_wall_updown",
   "radiator",
   "air_conditioner",
   "water_pump",
@@ -952,7 +961,7 @@ export const FURNITURE_TYPES = [
 
 /** Furniture library sections (the editor lists them in this order). */
 export const FURNITURE_GROUPS: Record<string, FurnitureType[]> = {
-  lights: ["lamp_ceiling", "lamp_downlight", "lamp_spot", "lamp_panel", "lamp_pendant", "lamp_floor", "lamp_uplight", "lamp_table", "lamp_wall", "led_strip", "lamp_bollard", "lamp_garden"],
+  lights: ["lamp_ceiling", "lamp_downlight", "lamp_spot", "lamp_panel", "lamp_panel_round", "lamp_pendant", "lamp_floor", "lamp_uplight", "lamp_column", "lamp_tv_bars", "lamp_table", "lamp_orb_table", "lamp_portable", "lamp_ambient_spot", "lamp_cube", "lamp_wall", "lamp_wall_updown", "led_strip", "lamp_bollard", "lamp_garden", "lamp_garden_spots"],
   living: ["sofa", "sofa_l", "sofa_bed", "armchair", "stool", "coffee_table", "tv_board", "tv_wall", "smart_display", "smart_speaker", "smart_curtain", "sideboard", "shelf", "room_divider", "altar", "altar_wall", "plant", "rug"],
   dining: ["table", "table_round", "chair", "bench", "corner_bench", "bar_stool"],
   kitchen: ["kitchen", "kitchen_corner", "kitchen_wall", "kitchen_tall", "kitchen_display", "island", "worktop", "sink", "stove", "range_hood", "microwave", "water_purifier", "dishwasher", "fridge"],
@@ -982,6 +991,15 @@ export const LAMP_TYPES = new Set<string>([
   "led_strip",
   "lamp_bollard",
   "lamp_garden",
+  "lamp_column",
+  "lamp_tv_bars",
+  "lamp_orb_table",
+  "lamp_portable",
+  "lamp_ambient_spot",
+  "lamp_cube",
+  "lamp_panel_round",
+  "lamp_garden_spots",
+  "lamp_wall_updown",
 ]);
 
 /** Default height of the bottom of a wall light above the floor (metres). */
@@ -989,7 +1007,7 @@ export const WALL_LAMP_Y = 1.75;
 
 /** Items that can be lifted off the floor (a wall cabinet, a shelf, a wall light, an LED strip): everything but lamps hung from the ceiling and the ceiling-mounted pack items. */
 export function canLift(f: Pick<Furniture, "type">): boolean {
-  if (["lamp_ceiling", "lamp_downlight", "lamp_spot", "lamp_panel", "lamp_pendant", "fan_ceiling", "fan_ceiling_light", "access_point", "smoke_detector", "stairs", "stairs_landing", "stairwell", "parking"].includes(f.type)) return false;
+  if (["lamp_ceiling", "lamp_downlight", "lamp_spot", "lamp_panel", "lamp_panel_round", "lamp_pendant", "fan_ceiling", "fan_ceiling_light", "access_point", "smoke_detector", "stairs", "stairs_landing", "stairwell", "parking"].includes(f.type)) return false;
   return packItem(f.type)?.mount !== "ceiling";
 }
 
@@ -1213,6 +1231,15 @@ export const FURNITURE_SIZE: Record<FurnitureType, [number, number, number]> = {
   lamp_uplight: [0.35, 0.35, 1.8],
   lamp_bollard: [0.16, 0.16, 0.8],
   lamp_garden: [0.12, 0.12, 0.3],
+  lamp_column: [0.12, 0.12, 1.45],
+  lamp_tv_bars: [0.65, 0.16, 0.38],
+  lamp_orb_table: [0.28, 0.28, 0.24],
+  lamp_portable: [0.24, 0.24, 0.26],
+  lamp_ambient_spot: [0.2, 0.2, 0.2],
+  lamp_cube: [0.26, 0.26, 0.24],
+  lamp_panel_round: [0.42, 0.42, 0.045],
+  lamp_garden_spots: [0.65, 0.18, 0.32],
+  lamp_wall_updown: [0.14, 0.12, 0.32],
   radiator: [1.0, 0.1, 0.6],
   air_conditioner: [1.0, 0.22, 0.3],
   water_pump: [0.55, 0.4, 0.45],
@@ -1528,6 +1555,15 @@ export const LAMP_MODEL: Record<string, LampModel> = {
   lamp_uplight: "uplight",
   lamp_bollard: "bollard",
   lamp_garden: "garden",
+  lamp_column: "column",
+  lamp_tv_bars: "tv_bars",
+  lamp_orb_table: "orb_table",
+  lamp_portable: "portable",
+  lamp_ambient_spot: "ambient",
+  lamp_cube: "cube",
+  lamp_panel_round: "round_panel",
+  lamp_garden_spots: "garden_set",
+  lamp_wall_updown: "wall_updown",
   lamp_pendant: "pendant",
   lamp_floor: "floor",
   lamp_table: "table",

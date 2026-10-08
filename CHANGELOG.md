@@ -4,6 +4,13 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.19.10
+
+### Added
+
+- Added nine built-in lights inspired by the public Smart Home gallery: light column, TV light bars, orb table lamp, portable lamp, ambient spot, light cube, round ceiling panel, garden spots and up/down wall light.
+- Added a distinct 2D symbol and low-poly 3D model for every light, with suitable mounting, live Home Assistant colour/brightness glow, automatic Vietnamese/German/English entity-name matching and demo placements.
+
 ## 1.19.9
 
 ### Added

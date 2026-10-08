@@ -25,7 +25,7 @@ Nói ngắn gọn: ảnh của họ được dùng để trả lời “cần c�
 
 ## Hiện trạng ngày 08/10/2026
 
-- Thư viện tích hợp hiện có **117 mục** trong 10 nhóm giao diện, gồm nhiều đồ dùng đặc trưng tại Việt Nam như bàn thờ, xe máy, bồn nước, võng, tủ giày, giàn phơi, quạt trần có đèn, quạt treo tường, robot cắt cỏ, cụm hạ tầng mạng/an toàn, cụm thiết bị kỹ thuật và bộ điều khiển/cảm biến nhà thông minh.
+- Thư viện tích hợp hiện có **126 mục** trong 10 nhóm giao diện, gồm nhiều đồ dùng đặc trưng tại Việt Nam như bàn thờ, xe máy, bồn nước, võng, tủ giày, giàn phơi, quạt trần có đèn, quạt treo tường, robot cắt cỏ, cụm hạ tầng mạng/an toàn, cụm thiết bị kỹ thuật, bộ điều khiển/cảm biến nhà thông minh và chín kiểu đèn theo gallery công khai.
 - Có 9 gói bố trí nhanh cho phòng: hai kiểu bếp, phòng tắm, phòng ngủ, phòng khách, phòng ăn, văn phòng, phòng trẻ em và sảnh.
 - Trình chỉnh sửa đã có tìm kiếm song ngữ, nhóm thu gọn, xem trước, đổi kích thước, xoay, lật, đặt lên sàn/tường/trần/bề mặt và liên kết entity.
 - Định dạng pack nhập ngoài đã hỗ trợ khối hộp, trụ, khối vát, đèn, màn hình, bề mặt đặt đồ, phương tiện và lỗ cầu thang.
@@ -109,7 +109,7 @@ Các biến thể cùng họ, ví dụ sofa 2/3 chỗ, tủ bếp 40/60/80 cm ho
 Mục tiêu: biến hiện trạng thành đường cơ sở có thể đo được.
 
 - [x] Sinh báo cáo tự động từ `FURNITURE_TYPES`, `FURNITURE_GROUPS` và `FURNITURE_SIZE` để phát hiện ID trùng, thiếu tên hoặc thiếu kích thước (`cd frontend && npm run catalog`).
-- [x] Lập bảng ánh xạ các mục hiện tại vào 16 nhóm đích; catalog kiểm kê hiện khóa 124 type, 117 mục thư viện, 7 mục nội bộ và trường hợp `worktop` đang nằm trong hai nhóm. Mỗi mục chỉ được tính một lần trong `REFERENCE_PACK_ITEMS`.
+- [x] Lập bảng ánh xạ các mục hiện tại vào 16 nhóm đích; catalog kiểm kê hiện khóa 133 type, 126 mục thư viện, 7 mục nội bộ và trường hợp `worktop` đang nằm trong hai nhóm. Mỗi mục chỉ được tính một lần trong `REFERENCE_PACK_ITEMS`.
 - [ ] Duyệt toàn bộ ảnh gallery công khai của 16 trang sản phẩm, không chỉ ảnh đại diện ở trang Packs; lập bảng `đã phù hợp / cần sửa hình / cần thêm mới` kèm URL và ngày xem.
 - [ ] Chọn khoảng 10 mẫu hiện có cần sửa hình trước; `fan_ceiling` là mẫu thí điểm và phải giữ nguyên ID.
 - [ ] Chụp bộ ảnh chuẩn ở góc nhìn 2D, 3D và chế độ Day/Neon để so sánh hồi quy.
@@ -138,7 +138,8 @@ Mục tiêu: hoàn thiện bốn nhóm được dùng nhiều nhất trước, k
 - [ ] Phòng ngủ: giường đơn/đôi, giường tầng, tủ áo cánh mở/cửa lùa, bàn trang điểm, nôi và tủ đầu giường.
 - [ ] Phòng tắm/giặt: lavabo bàn/treo, bồn cầu, khu tắm kính, bình nóng lạnh, máy giặt cửa trên/cửa trước và giàn phơi.
 - [ ] Đèn và làm mát: sửa hình `fan_ceiling`, thêm `fan_ceiling_light`, quạt treo tường và các kiểu đèn phổ biến; quạt có đèn phải điều khiển riêng phần quạt và phần sáng.
-  - Đã hoàn thành `fan_ceiling`, biến thể 3/4/5 cánh, `fan_ceiling_light` với entity quạt/đèn riêng và `fan_wall`; còn các kiểu đèn mới.
+  - Đã hoàn thành `fan_ceiling`, biến thể 3/4/5 cánh, `fan_ceiling_light` với entity quạt/đèn riêng và `fan_wall`.
+  - Đã thêm chín kiểu đèn theo gallery Smart Home: cột đèn, cặp thanh sáng TV, đèn bàn cầu, đèn xách tay, đèn ambient, khối đèn, panel tròn, cụm đèn sân vườn và đèn tường hắt hai đầu; mỗi kiểu có symbol 2D, hình học 3D và hiệu ứng sáng riêng.
 - [ ] Mở rộng gói bố trí nhanh theo diện tích phòng nhỏ, vừa và lớn; không tự ghi đè đồ đã đặt.
 
 Điều kiện hoàn thành: có thể dựng hoàn chỉnh một căn hộ Việt Nam thông dụng mà không cần pack ngoài.

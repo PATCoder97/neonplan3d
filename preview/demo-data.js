@@ -201,6 +201,15 @@ const DEVICES = [
   entity("binary_sensor.water_leak_demo", "arbeitszimmer", "off", { friendly_name: "Cảm biến rò nước", device_class: "moisture" }),
   entity("sensor.environment_demo", "arbeitszimmer", "22.6", { friendly_name: "Cảm biến nhiệt độ", device_class: "temperature", unit_of_measurement: "°C" }),
   entity("camera.video_doorbell_demo", "flur", "streaming", { friendly_name: "Chuông cửa có hình", entity_picture: CAMERA_STILL }),
+  entity("light.lamp_column_demo", "arbeitszimmer", "on", { friendly_name: "Cột đèn đổi màu", brightness: 220, rgb_color: [70, 160, 255] }),
+  entity("light.lamp_tv_bars_demo", "arbeitszimmer", "on", { friendly_name: "Cặp thanh đèn TV", brightness: 190, rgb_color: [255, 110, 45] }),
+  entity("light.lamp_orb_demo", "arbeitszimmer", "on", { friendly_name: "Đèn cầu để bàn", brightness: 210, color_temp_kelvin: 3000 }),
+  entity("light.lamp_portable_demo", "arbeitszimmer", "on", { friendly_name: "Đèn sạc xách tay", brightness: 180, color_temp_kelvin: 2700 }),
+  entity("light.lamp_ambient_demo", "arbeitszimmer", "on", { friendly_name: "Đèn ambient để bàn", brightness: 200, rgb_color: [100, 80, 255] }),
+  entity("light.lamp_cube_demo", "arbeitszimmer", "on", { friendly_name: "Đèn khối lập phương", brightness: 230, rgb_color: [255, 185, 65] }),
+  entity("light.lamp_panel_round_demo", "arbeitszimmer", "on", { friendly_name: "Đèn panel tròn ốp trần", brightness: 200, color_temp_kelvin: 4000 }),
+  entity("light.lamp_garden_spots_demo", null, "on", { friendly_name: "Bộ đèn rọi sân vườn", brightness: 190, color_temp_kelvin: 3000 }),
+  entity("light.lamp_wall_updown_demo", "flur", "on", { friendly_name: "Đèn tường hai hướng up down", brightness: 205, color_temp_kelvin: 3200 }),
   entity("binary_sensor.garage_auto", "garage", "on", { friendly_name: "Auto in der Garage", device_class: "occupancy" }),
   entity("sensor.van_ladestand", "garage", "78", { friendly_name: "Van Ladestand", device_class: "battery", unit_of_measurement: "%" }),
   // helpers standing in for a car without an integration (Auto Pro with input_number / input_boolean)
@@ -498,10 +507,21 @@ DEMO_BUILDING.floors[1].furniture = [
   { ...item("contact_sensor", 9.88, 2.75, 0.11, 0.04, 0.05, 90), entity: "binary_sensor.contact_demo" },
   { ...item("water_leak_sensor", 9.35, 2.55, 0.09, 0.09, 0.035), entity: "binary_sensor.water_leak_demo" },
   { ...item("temperature_humidity_sensor", 9.88, 3.55, 0.1, 0.045, 0.1, 90), entity: "sensor.environment_demo" },
+  { ...item("lamp_column", 7.0, 1.25, 0.12, 0.12, 1.45), entity: "light.lamp_column_demo" },
+  { ...item("lamp_tv_bars", 6.3, 0.5, 0.65, 0.16, 0.38), entity: "light.lamp_tv_bars_demo" },
+  { ...item("lamp_orb_table", 8.0, 0.35, 0.28, 0.28, 0.24), entity: "light.lamp_orb_demo" },
+  { ...item("lamp_portable", 8.35, 0.35, 0.24, 0.24, 0.26), entity: "light.lamp_portable_demo" },
+  { ...item("lamp_ambient_spot", 8.7, 0.35, 0.2, 0.2, 0.2), entity: "light.lamp_ambient_demo" },
+  { ...item("lamp_cube", 9.05, 0.35, 0.26, 0.26, 0.24), entity: "light.lamp_cube_demo" },
+  { ...item("lamp_panel_round", 8.4, 2.35, 0.42, 0.42, 0.045), entity: "light.lamp_panel_round_demo" },
   { ...item("hot_water_tank", 3.05, 5.2, 0.55, 0.55, 1.3, 270), entity: "water_heater.hot_water_tank_demo" },
   { ...item("ventilation_fan", 3.32, 6.8, 0.32, 0.14, 0.32, 90), entity: "fan.ventilation_demo" },
 ];
 DEMO_BUILDING.floors[0].furniture.push({ ...item("video_doorbell", 6.92, 5.0, 0.055, 0.045, 0.14, 90), entity: "camera.video_doorbell_demo" });
+DEMO_BUILDING.floors[0].furniture.push(
+  { ...item("lamp_garden_spots", 4.5, -1.5, 0.65, 0.18, 0.32), entity: "light.lamp_garden_spots_demo" },
+  { ...item("lamp_wall_updown", 6.92, 5.35, 0.14, 0.12, 0.32, 90), entity: "light.lamp_wall_updown_demo" },
+);
 
 // Invented garden and roof.
 const area = (id, type, x0, z0, x1, z1) => ({ id, type, points: [[x0, z0], [x1, z0], [x1, z1], [x0, z1]] });

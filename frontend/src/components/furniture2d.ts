@@ -300,6 +300,26 @@ export function furnitureSymbol(type: string, w: number, d: number): Part[] | ty
     case "lamp_bollard":
     case "lamp_garden":
       return [circle(0, 0, Math.min(w, d) * 0.5, "fp3d-sym-fill"), circle(0, 0, Math.min(w, d) * 1.6)];
+    case "lamp_column":
+      return [rect(-w * 0.42, -d * 0.42, w * 0.42, d * 0.42, "fp3d-sym-fill"), rect(-w * 0.18, -d * 0.18, w * 0.18, d * 0.18), line(-w, 0, w, 0), line(0, -d, 0, d)];
+    case "lamp_tv_bars":
+      return [rect(-w * 0.44, -d * 0.42, -w * 0.18, d * 0.42, "fp3d-sym-fill"), rect(w * 0.18, -d * 0.42, w * 0.44, d * 0.42, "fp3d-sym-fill")];
+    case "lamp_orb_table":
+      return [circle(0, 0, Math.min(w, d) * 0.47, "fp3d-sym-fill"), circle(0, 0, Math.min(w, d) * 0.24)];
+    case "lamp_portable":
+      return [svg`<polygon class="fp3d-sym-fill" points=${`${-w * 0.42},${d * 0.42} ${w * 0.42},${d * 0.42} ${w * 0.28},${-d * 0.42} ${-w * 0.28},${-d * 0.42}`} />`, rect(-w * 0.13, -d * 0.14, w * 0.13, d * 0.14)];
+    case "lamp_ambient_spot":
+      return [circle(0, 0, Math.min(w, d) * 0.47, "fp3d-sym-fill"), rect(-w * 0.26, -d * 0.26, w * 0.26, d * 0.26, "fp3d-sym-strong")];
+    case "lamp_cube":
+      return [rect(-w * 0.46, -d * 0.46, w * 0.46, d * 0.46, "fp3d-sym-fill"), rect(-w * 0.3, -d * 0.3, w * 0.3, d * 0.3)];
+    case "lamp_panel_round": {
+      const r = Math.min(w, d) * 0.46;
+      return [circle(0, 0, r, "fp3d-sym-fill"), ...Array.from({ length: 8 }, (_, i) => { const a = (i * Math.PI) / 4; return line(Math.cos(a) * r * 1.12, Math.sin(a) * r * 1.12, Math.cos(a) * r * 1.42, Math.sin(a) * r * 1.42); })];
+    }
+    case "lamp_garden_spots":
+      return [-0.34, 0, 0.34].flatMap((x) => [circle(x * w, 0, d * 0.28, "fp3d-sym-fill"), line(x * w, -d * 0.2, x * w, d * 0.46)]);
+    case "lamp_wall_updown":
+      return [rect(-w / 2, -d / 2, w / 2, -d * 0.28, "fp3d-sym-fill"), rect(-w * 0.34, -d * 0.28, w * 0.34, d * 0.3), line(-w * 0.46, d * 0.42, w * 0.46, d * 0.42, "fp3d-sym-strong")];
     case "parking":
       // the spot's marking with an arrow head at the front
       return [rect(-w / 2 + 0.08, -d / 2 + 0.08, w / 2 - 0.08, d / 2 - 0.08), line(-w * 0.15, d / 2 - 0.5, 0, d / 2 - 0.22, "fp3d-sym-strong"), line(0, d / 2 - 0.22, w * 0.15, d / 2 - 0.5, "fp3d-sym-strong")];

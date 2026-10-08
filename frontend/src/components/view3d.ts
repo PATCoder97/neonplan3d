@@ -1875,15 +1875,17 @@ export class Fp3dView3d extends LitElement {
     // a height above the floor set by hand wins (a table lamp on a shelf, a floor lamp on a platform);
     // an LED strip outside the house counts from the ground there (a path light flush with the lawn)
     const inRoom = floor.rooms.some((r) => r.points.length >= 3 && pointInPolygon([f.x, f.z], r.points));
+    const surfaceLamp = ["table", "orb_table", "portable", "ambient", "cube"].includes(model);
+    const outdoorLamp = ["bollard", "garden", "garden_set"].includes(model);
     const base = model === "strip" && !inRoom
       ? outdoorGround(floor, f.x, f.z) + (f.mount_y ?? 0)
       : f.mount_y != null && !item
       ? f.mount_y
       : item || model === "wall" || model === "strip" || model === "fan"
       ? mountBase(floor, f)
-      : model === "table"
+      : surfaceLamp
         ? surfaceHeight(floor, f.x, f.z)
-        : model === "bollard" || model === "garden"
+        : outdoorLamp
           ? outdoorGround(floor, f.x, f.z)
           : 0;
     const room = floor.rooms.find((r) => r.points.length >= 3 && pointInPolygon([f.x, f.z], r.points));
@@ -1907,6 +1909,15 @@ export class Fp3dView3d extends LitElement {
       bollard: base + f.h + 0.25,
       garden: base + f.h + 0.25,
       fan: Math.max(0.3, base + f.h * 0.2),
+      column: base + f.h + 0.2,
+      tv_bars: base + f.h + 0.2,
+      orb_table: base + f.h + 0.16,
+      portable: base + f.h + 0.16,
+      ambient: base + f.h + 0.16,
+      cube: base + f.h + 0.16,
+      round_panel: H - 0.25,
+      garden_set: base + f.h + 0.2,
+      wall_updown: base + f.h + 0.2,
     }[model];
     return {
       // a lamp without a light keeps a key of its own (it is drawn, but not tappable)

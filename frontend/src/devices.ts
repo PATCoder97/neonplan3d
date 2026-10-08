@@ -796,6 +796,15 @@ const LAMP_NAMES: Record<string, RegExp> = {
   lamp_table: /(tisch|nacht|table|bedside|lese|reading)/i,
   lamp_wall: /(wand|wall)/i,
   led_strip: /(led|strip|streifen|leiste|band)/i,
+  lamp_column: /(lichtsäule|light ?column|cột đèn|cot den)/i,
+  lamp_tv_bars: /(tv.*(light|licht|đèn|den)|light ?bar|lichtleiste|thanh đèn|thanh den)/i,
+  lamp_orb_table: /(kugel|orb|sphere|cầu|cau)/i,
+  lamp_portable: /(akku|battery|portable|tragbar|xách tay|xac tay|đèn sạc|den sac)/i,
+  lamp_ambient_spot: /(ambient|ambiente|mood|không gian|khong gian)/i,
+  lamp_cube: /(würfel|cube|khối|khoi)/i,
+  lamp_panel_round: /((rund|round|tròn|tron).*(panel|decke|ceiling|ốp trần|op tran)|(panel|decke|ceiling|ốp trần|op tran).*(rund|round|tròn|tron))/i,
+  lamp_garden_spots: /((garten|garden|outdoor|sân vườn|san vuon).*(spot|rọi|roi)|(spot|rọi|roi).*(garten|garden|outdoor|sân vườn|san vuon))/i,
+  lamp_wall_updown: /(up.*down|außenwand|outdoor wall|tường.*hai hướng|tuong.*hai huong)/i,
 };
 
 export interface FurnitureLinks {

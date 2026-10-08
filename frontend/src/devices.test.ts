@@ -261,6 +261,27 @@ test("lamps take a light of their room, preferring one whose name fits", () => {
   assert.equal(links.get("c"), undefined);
 });
 
+test("the gallery light family resolves its own named light entities", () => {
+  const names: Record<string, string> = {
+    lamp_column: "Cột đèn đổi màu",
+    lamp_tv_bars: "Cặp thanh đèn TV",
+    lamp_orb_table: "Đèn cầu để bàn",
+    lamp_portable: "Đèn sạc xách tay",
+    lamp_ambient_spot: "Đèn ambient để bàn",
+    lamp_cube: "Đèn khối lập phương",
+    lamp_panel_round: "Đèn panel tròn ốp trần",
+    lamp_garden_spots: "Đèn rọi sân vườn",
+    lamp_wall_updown: "Đèn tường hai hướng up down",
+  };
+  const states = Object.fromEntries(Object.entries(names).map(([type, friendly_name]) => [`light.${type}`, { entity_id: `light.${type}`, state: "on", attributes: { friendly_name } }]));
+  const entities = Object.fromEntries(Object.keys(states).map((entity_id) => [entity_id, { entity_id, area_id: "living" }]));
+  const hass = { language: "vi", states, entities, devices: {}, areas: { living: { area_id: "living", name: "Phòng khách" } } } as unknown as HomeAssistant;
+  const room: Room = { id: "living", name: "Phòng khách", area_id: "living", points: [[0, 0], [12, 0], [12, 4], [0, 4]], floor_material: "wood" };
+  const furniture = Object.keys(names).map((type, i) => ({ id: type, type, x: 0.5 + i, z: 1, rotation: 0, w: 0.3, d: 0.3, h: 0.4, variant: null, entity: null, power: null }));
+  const links = furnitureEntities(hass, [{ ...newFloor("eg", "Tầng trệt", 0), rooms: [room], furniture }]);
+  for (const type of Object.keys(names)) assert.equal(links.get(type)?.entity, `light.${type}`, type);
+});
+
 test("double doors and French windows: the second leaf follows a contact of its own", () => {
   const hass = hassWith();
   hass.states["binary_sensor.a"] = { entity_id: "binary_sensor.a", state: "off", attributes: { device_class: "door" } };
