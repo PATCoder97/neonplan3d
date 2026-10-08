@@ -1,4 +1,5 @@
 import { ARCHITECTURE_OUTDOOR_FURNITURE_MODELS } from "./architecture-outdoor.ts";
+import { BEDROOM_FURNITURE_MODELS } from "./bedroom.ts";
 import { CLIMATE_FURNITURE_MODELS } from "./climate.ts";
 import { ENERGY_FURNITURE_MODELS } from "./energy.ts";
 import { EVERYDAY_FURNITURE_MODELS, EVERYDAY_FURNITURE_SCREENS } from "./everyday.ts";
@@ -12,6 +13,7 @@ import type { FurnitureModelContext, FurnitureModelRenderer, FurnitureScreenRect
 /** Built-in renderers split by functional family. Add new families to this one composition point. */
 const BUILTIN_FURNITURE_MODELS: Readonly<Record<string, FurnitureModelRenderer>> = {
   ...EVERYDAY_FURNITURE_MODELS,
+  ...BEDROOM_FURNITURE_MODELS,
   ...LIVING_FURNITURE_MODELS,
   ...KITCHEN_BATH_FURNITURE_MODELS,
   ...ARCHITECTURE_OUTDOOR_FURNITURE_MODELS,

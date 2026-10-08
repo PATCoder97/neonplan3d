@@ -1,4 +1,5 @@
 import { ARCHITECTURE_OUTDOOR_FURNITURE_SYMBOLS } from "./architecture-outdoor.ts";
+import { BEDROOM_FURNITURE_SYMBOLS } from "./bedroom.ts";
 import { CLIMATE_FURNITURE_SYMBOLS } from "./climate.ts";
 import { EVERYDAY_FURNITURE_SYMBOLS } from "./everyday.ts";
 import { KITCHEN_BATH_FURNITURE_SYMBOLS } from "./kitchen-bath.ts";
@@ -10,6 +11,7 @@ import type { FurnitureSymbol, FurnitureSymbolRenderer } from "./types.ts";
 
 const BUILTIN_FURNITURE_SYMBOLS: Readonly<Record<string, FurnitureSymbolRenderer>> = {
   ...EVERYDAY_FURNITURE_SYMBOLS,
+  ...BEDROOM_FURNITURE_SYMBOLS,
   ...LIVING_FURNITURE_SYMBOLS,
   ...KITCHEN_BATH_FURNITURE_SYMBOLS,
   ...ARCHITECTURE_OUTDOOR_FURNITURE_SYMBOLS,

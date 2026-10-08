@@ -88,6 +88,16 @@ test("living-room lowboards add compartments with their fixed widths", () => {
   assert.ok(outlines[0] < outlines[1] && outlines[1] < outlines[2], "wider lowboards contain more outlined compartments");
 });
 
+test("fixed bedroom wardrobes preserve their declared door count", () => {
+  const outlines = (["wardrobe_2door", "wardrobe_3door"] as const).map((type) => {
+    const [w, d, h] = FURNITURE_SIZE[type];
+    const lines = new LineBuffer();
+    pushFurniture(new GeoBuffer(), lines, new GeoBuffer(), { id: type, type, x: 0, z: 0, rotation: 0, w, d, h, variant: null } as Furniture);
+    return lines.p.length;
+  });
+  assert.ok(outlines[1] > outlines[0], "a three-door wardrobe has an extra divider and handle");
+});
+
 test("a TV on a stand exposes a screen inside its declared frame", () => {
   const floor = newFloor("eg", "EG", 0);
   const [w, d, h] = FURNITURE_SIZE.tv_stand;

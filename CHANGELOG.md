@@ -4,6 +4,19 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.20.6
+
+### Added
+
+- Started the Phase 2 bedroom expansion with fixed 90/140/160/180/200 cm bed widths, upholstered, box-spring and futon styles, plus two- and three-door wardrobes.
+- Added dedicated parameterized 2D symbols and low-poly 3D models with German/English/Vietnamese names for all ten items.
+- Added regression coverage that locks wardrobe door dividers and handles to the selected variant.
+
+### Changed
+
+- Expanded the reproducible catalog inventory to 199 declared types and 192 library items, with bedroom reference coverage now at 17 of 41.
+- Kept the new family in focused Bedroom renderer and symbol modules instead of growing the generic everyday files.
+
 ## 1.20.5
 
 ### Added

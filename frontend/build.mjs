@@ -76,7 +76,7 @@ function copyFonts() {
 
 // 3D/editor include the procedural Smart Home infrastructure, controls and sensor families; the
 // small explicit budgets still catch accidental dependency or geometry growth on old wall tablets.
-const BUDGET = { "neonplan3d.js": 440 * 1024, "neonplan3d-3d.js": 778 * 1024, "neonplan3d-editor.js": 559 * 1024, "neonplan3d-card-editor.js": 169 * 1024 };
+const BUDGET = { "neonplan3d.js": 441 * 1024, "neonplan3d-3d.js": 780 * 1024, "neonplan3d-editor.js": 561 * 1024, "neonplan3d-card-editor.js": 170 * 1024 };
 
 copyFonts();
 if (watch) {
