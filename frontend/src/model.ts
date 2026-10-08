@@ -861,6 +861,9 @@ const SURFACES = new Set<string>([
   "tv_console",
   "desk",
   "nightstand",
+  "nightstand_drawer",
+  "nightstand_slim",
+  "nightstand_floating",
   "sideboard",
   "dresser",
   "kitchen",
@@ -913,6 +916,8 @@ export function builtinBase(f: Pick<Furniture, "type" | "h"> & { variant?: strin
       return 1.45;
     case "floating_shelf":
       return 1.35;
+    case "nightstand_floating":
+      return 0.48;
     case "tv_wall":
       return Math.max(0, 1.3 - f.h / 2);
     case "radiator":

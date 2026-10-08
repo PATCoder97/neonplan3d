@@ -98,6 +98,19 @@ test("fixed bedroom wardrobes preserve their declared door count", () => {
   assert.ok(outlines[1] > outlines[0], "a three-door wardrobe has an extra divider and handle");
 });
 
+test("the floating nightstand uses wall height and casts no floor shadow", () => {
+  const floor = newFloor("eg", "EG", 0);
+  const [w, d, h] = FURNITURE_SIZE.nightstand_floating;
+  const item = { id: "floating-nightstand", type: "nightstand_floating", x: 0, z: 0, rotation: 0, w, d, h, variant: null } as Furniture;
+  const buf = new GeoBuffer();
+  const shadow = new GeoBuffer();
+  const base = mountBase(floor, item);
+  pushFurniture(buf, new LineBuffer(), shadow, item, base);
+  assert.equal(base, 0.48);
+  assert.equal(shadow.p.length, 0);
+  assert.ok(Math.abs(Math.min(...buf.p.filter((_, i) => i % 3 === 1)) - base) < 1e-6);
+});
+
 test("a TV on a stand exposes a screen inside its declared frame", () => {
   const floor = newFloor("eg", "EG", 0);
   const [w, d, h] = FURNITURE_SIZE.tv_stand;

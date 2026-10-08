@@ -4,6 +4,19 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.20.7
+
+### Added
+
+- Added a second bedroom batch: four- and six-door wardrobes, mirrored and corner wardrobes, drawer/slim/floating nightstands, and three fixed drawer-chest layouts.
+- Added dedicated parameterized 2D symbols, low-poly 3D models and German/English/Vietnamese names for all ten items.
+- Added a mount-height regression test for the floating nightstand, including its absence of a floor contact shadow.
+
+### Changed
+
+- Expanded the reproducible catalog inventory to 209 declared types and 202 library items, with bedroom reference coverage now at 27 of 41.
+- Made the new floor nightstands valid support surfaces while preserving an absolute 48 cm wall mount for the floating variant.
+
 ## 1.20.6
 
 ### Added

@@ -27,7 +27,7 @@ function fixedBed(b: Builder, w: number, d: number, h: number, style: BedStyle):
   }
 }
 
-function wardrobe(b: Builder, w: number, d: number, h: number, doors: number): void {
+function wardrobe(b: Builder, w: number, d: number, h: number, doors: number, mirror = false): void {
   b.box(-w / 2, w / 2, 0, h, -d / 2, d / 2, C.wood, C.woodTop, EDGE_FURN);
   const front = d / 2 + 0.004;
   for (let i = 1; i < doors; i++) {
@@ -39,6 +39,37 @@ function wardrobe(b: Builder, w: number, d: number, h: number, doors: number): v
     const side = i < doors / 2 ? 1 : -1;
     b.seg(centre + side * w / doors * 0.3, h * 0.45, front, centre + side * w / doors * 0.3, h * 0.58, front, EDGE_GLOW);
   }
+  if (mirror) b.box(-w * 0.14, w * 0.14, h * 0.08, h * 0.92, d / 2 + 0.006, d / 2 + 0.012, C.glass, C.glass, EDGE_GLOW);
+}
+
+function cornerWardrobe(b: Builder, w: number, d: number, h: number): void {
+  const wing = Math.min(w, d) * 0.48;
+  b.box(-w / 2, -w / 2 + wing, 0, h, -d / 2, d / 2, C.wood, C.woodTop, EDGE_FURN);
+  b.box(-w / 2 + wing, w / 2, 0, h, -d / 2, -d / 2 + wing, C.wood, C.woodTop, EDGE_FURN);
+  b.seg(-w / 2 + wing, 0.04, d / 2, -w / 2 + wing, h - 0.04, d / 2, EDGE_FAINT);
+  b.seg(w / 2, 0.04, -d / 2 + wing, w / 2, h - 0.04, -d / 2 + wing, EDGE_FAINT);
+}
+
+function drawerCabinet(b: Builder, w: number, d: number, h: number, rows: number, cols = 1): void {
+  b.box(-w / 2, w / 2, 0, h, -d / 2, d / 2, C.wood, C.woodTop, EDGE_FURN);
+  const front = d / 2 + 0.004;
+  for (let row = 1; row < rows; row++) b.seg(-w / 2 + 0.025, (h * row) / rows, front, w / 2 - 0.025, (h * row) / rows, front, EDGE_FAINT);
+  for (let col = 1; col < cols; col++) b.seg(-w / 2 + (w * col) / cols, 0.03, front, -w / 2 + (w * col) / cols, h - 0.03, front, EDGE_FAINT);
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
+      const x = -w / 2 + (w * (col + 0.5)) / cols;
+      const y = (h * (row + 0.5)) / rows;
+      b.seg(x - Math.min(0.06, w / cols * 0.16), y, front, x + Math.min(0.06, w / cols * 0.16), y, front, EDGE_GLOW);
+    }
+  }
+  for (const x of [-w * 0.4, w * 0.4]) b.box(x - 0.02, x + 0.02, 0, 0.06, -d * 0.4, d * 0.4, C.dark, C.dark);
+}
+
+function floatingNightstand(b: Builder, w: number, d: number, h: number): void {
+  const y = 0.48;
+  b.box(-w / 2, w / 2, y, y + h, -d / 2, d / 2, C.wood, C.woodTop, EDGE_FURN);
+  b.seg(-w / 2 + 0.025, y + h * 0.55, d / 2 + 0.004, w / 2 - 0.025, y + h * 0.55, d / 2 + 0.004, EDGE_FAINT);
+  b.seg(-w * 0.08, y + h * 0.28, d / 2 + 0.006, w * 0.08, y + h * 0.28, d / 2 + 0.006, EDGE_GLOW);
 }
 
 export const BEDROOM_FURNITURE_MODELS: Readonly<Record<string, FurnitureModelRenderer>> = {
@@ -52,4 +83,14 @@ export const BEDROOM_FURNITURE_MODELS: Readonly<Record<string, FurnitureModelRen
   bed_futon_160: ({ b, w, d, h }) => (fixedBed(b, w, d, h, "futon"), 0.5),
   wardrobe_2door: ({ b, w, d, h }) => (wardrobe(b, w, d, h, 2), 0.5),
   wardrobe_3door: ({ b, w, d, h }) => (wardrobe(b, w, d, h, 3), 0.5),
+  wardrobe_4door: ({ b, w, d, h }) => (wardrobe(b, w, d, h, 4), 0.5),
+  wardrobe_6door: ({ b, w, d, h }) => (wardrobe(b, w, d, h, 6), 0.5),
+  wardrobe_mirror: ({ b, w, d, h }) => (wardrobe(b, w, d, h, 3, true), 0.5),
+  wardrobe_corner: ({ b, w, d, h }) => (cornerWardrobe(b, w, d, h), 0.5),
+  nightstand_drawer: ({ b, w, d, h }) => (drawerCabinet(b, w, d, h, 1), 0.5),
+  nightstand_slim: ({ b, w, d, h }) => (drawerCabinet(b, w, d, h, 2), 0.5),
+  nightstand_floating: ({ b, w, d, h }) => (floatingNightstand(b, w, d, h), false),
+  dresser_80_3: ({ b, w, d, h }) => (drawerCabinet(b, w, d, h, 3), 0.5),
+  dresser_140_6: ({ b, w, d, h }) => (drawerCabinet(b, w, d, h, 3, 2), 0.5),
+  chest_tall_5: ({ b, w, d, h }) => (drawerCabinet(b, w, d, h, 5), 0.5),
 };

@@ -35,21 +35,21 @@ test("built-in furniture catalog has stable complete metadata", () => {
 
 test("catalog inventory locks the Phase 0 baseline", () => {
   const summary = furnitureCatalogSummary();
-  assert.equal(summary.total, 199);
-  assert.equal(summary.library, 192);
+  assert.equal(summary.total, 209);
+  assert.equal(summary.library, 202);
   assert.equal(summary.hidden, 7);
-  assert.equal(summary.memberships, 193);
+  assert.equal(summary.memberships, 203);
   assert.deepEqual(summary.ungrouped, [...HIDDEN_FURNITURE_TYPES]);
   assert.deepEqual(summary.multiGroup, { worktop: ["kitchen", "work"] });
   assert.deepEqual(summary.groups, Object.fromEntries(Object.entries(FURNITURE_GROUPS).map(([group, types]) => [group, types.length])));
   assert.equal(Object.keys(summary.referencePacks).length, 16);
   assert.equal(Object.values(REFERENCE_PACK_TARGETS).reduce((sum, count) => sum + count, 0), 474);
-  assert.equal(Object.values(REFERENCE_PACK_ITEMS).flat().length, 192);
+  assert.equal(Object.values(REFERENCE_PACK_ITEMS).flat().length, 202);
   assert.deepEqual(summary.referencePacks.pets, { current: 0, target: 24 });
   assert.deepEqual(summary.referencePacks.utility, { current: 18, target: 18 });
   assert.deepEqual(summary.referencePacks.smart_home, { current: 46, target: 30 });
   assert.deepEqual(summary.referencePacks.living, { current: 69, target: 69 });
-  assert.deepEqual(summary.referencePacks.bedroom, { current: 17, target: 41 });
+  assert.deepEqual(summary.referencePacks.bedroom, { current: 27, target: 41 });
 });
 
 test("every built-in furniture type has English, German and Vietnamese names", () => {
