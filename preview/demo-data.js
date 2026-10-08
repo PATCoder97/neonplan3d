@@ -210,6 +210,8 @@ const DEVICES = [
   entity("light.lamp_panel_round_demo", "arbeitszimmer", "on", { friendly_name: "Đèn panel tròn ốp trần", brightness: 200, color_temp_kelvin: 4000 }),
   entity("light.lamp_garden_spots_demo", null, "on", { friendly_name: "Bộ đèn rọi sân vườn", brightness: 190, color_temp_kelvin: 3000 }),
   entity("light.lamp_wall_updown_demo", "flur", "on", { friendly_name: "Đèn tường hai hướng up down", brightness: 205, color_temp_kelvin: 3200 }),
+  entity("switch.washer_dryer_tower_demo", "bad", "on", { friendly_name: "Tháp giặt sấy" }),
+  entity("sensor.balcony_solar_demo", null, "540", { friendly_name: "Pin mặt trời ban công", device_class: "power", unit_of_measurement: "W" }),
   entity("binary_sensor.garage_auto", "garage", "on", { friendly_name: "Auto in der Garage", device_class: "occupancy" }),
   entity("sensor.van_ladestand", "garage", "78", { friendly_name: "Van Ladestand", device_class: "battery", unit_of_measurement: "%" }),
   // helpers standing in for a car without an integration (Auto Pro with input_number / input_boolean)
@@ -521,6 +523,8 @@ DEMO_BUILDING.floors[0].furniture.push({ ...item("video_doorbell", 6.92, 5.0, 0.
 DEMO_BUILDING.floors[0].furniture.push(
   { ...item("lamp_garden_spots", 4.5, -1.5, 0.65, 0.18, 0.32), entity: "light.lamp_garden_spots_demo" },
   { ...item("lamp_wall_updown", 6.92, 5.35, 0.14, 0.12, 0.32, 90), entity: "light.lamp_wall_updown_demo" },
+  { ...item("washer_dryer_tower", 3.15, 4.75, 0.66, 0.68, 1.75), entity: "switch.washer_dryer_tower_demo" },
+  { ...item("balcony_solar", 8.2, 7.4, 1.65, 0.72, 1.05), entity: "sensor.balcony_solar_demo" },
 );
 
 // Invented garden and roof.

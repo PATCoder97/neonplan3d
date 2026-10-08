@@ -205,7 +205,7 @@ test("the upright water purifier has a cabinet, top faucet and front status mark
 
 test("smart-home furniture builds recognisable finite geometry at its declared mount", () => {
   const floor = newFloor("eg", "EG", 0);
-  for (const type of ["air_purifier", "smart_speaker", "security_camera", "smart_lock", "smart_curtain", "robot_vacuum", "robot_mower", "network_cabinet", "nas_server", "access_point", "wall_thermostat", "smoke_detector", "siren_alarm", "electrical_panel", "ups_unit", "modem_router", "heat_pump_outdoor", "hot_water_tank", "ventilation_fan", "humidifier", "smart_display", "wall_switch", "wall_outlet", "smart_plug", "motion_sensor", "contact_sensor", "water_leak_sensor", "temperature_humidity_sensor", "video_doorbell"] as const) {
+  for (const type of ["air_purifier", "smart_speaker", "security_camera", "smart_lock", "smart_curtain", "robot_vacuum", "robot_mower", "network_cabinet", "nas_server", "access_point", "wall_thermostat", "smoke_detector", "siren_alarm", "electrical_panel", "ups_unit", "modem_router", "heat_pump_outdoor", "hot_water_tank", "ventilation_fan", "humidifier", "smart_display", "wall_switch", "wall_outlet", "smart_plug", "motion_sensor", "contact_sensor", "water_leak_sensor", "temperature_humidity_sensor", "video_doorbell", "washer_dryer_tower", "balcony_solar"] as const) {
     const [w, d, h] = FURNITURE_SIZE[type];
     const item = { id: type, type, x: 0, z: 0, w, d, h, rotation: 0, variant: null } as Furniture;
     const base = mountBase(floor, item);
@@ -229,7 +229,7 @@ test("smart-home furniture builds recognisable finite geometry at its declared m
   assert.equal(mountBase(floor, { type: "wall_outlet", x: 0, z: 0, h: FURNITURE_SIZE.wall_outlet[2] }), 0.3);
   assert.equal(mountBase(floor, { type: "motion_sensor", x: 0, z: 0, h: FURNITURE_SIZE.motion_sensor[2] }), 1.9);
   assert.equal(mountBase(floor, { type: "video_doorbell", x: 0, z: 0, h: FURNITURE_SIZE.video_doorbell[2] }), 1.25);
-  for (const type of ["network_cabinet", "nas_server", "access_point", "wall_thermostat", "smoke_detector", "siren_alarm", "electrical_panel", "ups_unit", "modem_router", "heat_pump_outdoor", "hot_water_tank", "ventilation_fan", "humidifier", "smart_display", "wall_switch", "wall_outlet", "smart_plug", "motion_sensor", "contact_sensor", "water_leak_sensor", "temperature_humidity_sensor", "video_doorbell"] as const) {
+  for (const type of ["network_cabinet", "nas_server", "access_point", "wall_thermostat", "smoke_detector", "siren_alarm", "electrical_panel", "ups_unit", "modem_router", "heat_pump_outdoor", "hot_water_tank", "ventilation_fan", "humidifier", "smart_display", "wall_switch", "wall_outlet", "smart_plug", "motion_sensor", "contact_sensor", "water_leak_sensor", "temperature_humidity_sensor", "video_doorbell", "washer_dryer_tower", "balcony_solar"] as const) {
     const [w, d, h] = FURNITURE_SIZE[type];
     assert.ok(screenRect({ id: type, type, x: 0, z: 0, w, d, h, rotation: 0, variant: null } as Furniture, floor), `${type}: live indicator`);
   }

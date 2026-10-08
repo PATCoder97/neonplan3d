@@ -282,6 +282,14 @@ export function furnitureSymbol(type: string, w: number, d: number): Part[] | ty
     case "washer":
     case "dryer":
       return [circle(0, 0.05, Math.min(w, d) * 0.3), line(-w / 2, -d / 2 + 0.1, w / 2, -d / 2 + 0.1)];
+    case "washer_dryer_tower":
+      return [rect(-w / 2, -d / 2, w / 2, d / 2, "fp3d-sym-fill"), circle(0, d * 0.08, Math.min(w, d) * 0.27), line(-w / 2, -d * 0.27, w / 2, -d * 0.27, "fp3d-sym-strong")];
+    case "balcony_solar": {
+      const out: Part[] = [rect(-w / 2, -d * 0.34, w / 2, d * 0.34, "fp3d-sym-fill")];
+      for (let i = 1; i < 6; i++) out.push(line(-w / 2 + (w * i) / 6, -d * 0.34, -w / 2 + (w * i) / 6, d * 0.34));
+      for (let i = 1; i < 3; i++) out.push(line(-w / 2, -d * 0.34 + (d * 0.68 * i) / 3, w / 2, -d * 0.34 + (d * 0.68 * i) / 3));
+      return out;
+    }
     case "bathtub":
       return [rect(-w / 2 + 0.07, -d / 2 + 0.07, w / 2 - 0.07, d / 2 - 0.07), circle(-w / 2 + 0.14, 0, 0.03, "fp3d-sym-fill")];
     case "shower":

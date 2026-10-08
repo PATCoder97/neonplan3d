@@ -1594,8 +1594,10 @@ export class Fp3dView3d extends LitElement {
           screens.set(f.id, { color: [0.25, 0.82, 1], level: 0.75, plain: true });
         } else if (f.type === "smart_lock" && st) {
           screens.set(f.id, { color: st.state === "locked" ? [0.25, 0.9, 0.55] : [1, 0.45, 0.2], level: 0.8, plain: true });
-        } else if ((f.type === "washer" || f.type === "dryer" || f.type === "dishwasher") && running) {
+        } else if ((f.type === "washer" || f.type === "dryer" || f.type === "washer_dryer_tower" || f.type === "dishwasher") && running) {
           screens.set(f.id, { color: [0.3, 0.85, 1], level: 0.8 });
+        } else if (f.type === "balcony_solar" && st && (isActive(st) || Number(st.state) > 0)) {
+          screens.set(f.id, { color: [0.25, 0.95, 0.62], level: 0.9, plain: true });
         }
         const packed = packItem(f.type);
         const ringed = !!packed && !packed.light && packed.parts.some((p) => p.glow);

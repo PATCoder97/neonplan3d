@@ -4,6 +4,13 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.19.11
+
+### Added
+
+- Added the two remaining utility models from the first public Smart Home gallery overview: a stacked washer-dryer tower and a plug-in balcony solar kit.
+- Added distinct 2D symbols and low-poly 3D geometry, live status/power indicators, automatic Vietnamese/German/English entity matching and demo placements for both models.
+
 ## 1.19.10
 
 ### Added

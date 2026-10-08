@@ -22,6 +22,7 @@ test("furniture is grouped by function instead of a regional collection", () => 
   assert.ok(FURNITURE_GROUPS.work.includes("motion_sensor") && FURNITURE_GROUPS.work.includes("contact_sensor") && FURNITURE_GROUPS.work.includes("water_leak_sensor"));
   assert.ok(FURNITURE_GROUPS.climate.includes("temperature_humidity_sensor") && FURNITURE_GROUPS.outdoor.includes("video_doorbell"));
   for (const type of ["lamp_column", "lamp_tv_bars", "lamp_orb_table", "lamp_portable", "lamp_ambient_spot", "lamp_cube", "lamp_panel_round", "lamp_garden_spots", "lamp_wall_updown"] as const) assert.ok(FURNITURE_GROUPS.lights.includes(type), type);
+  assert.ok(FURNITURE_GROUPS.bath.includes("washer_dryer_tower") && FURNITURE_GROUPS.outdoor.includes("balcony_solar"));
 });
 
 test("a sidelight sits opposite the hinge, on the hinge side when asked, and keeps the leaf at least half a metre", () => {

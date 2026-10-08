@@ -45,7 +45,7 @@ export type ReferencePack = keyof typeof REFERENCE_PACK_TARGETS;
  */
 export const REFERENCE_PACK_ITEMS: Record<ReferencePack, readonly FurnitureType[]> = {
   home_cinema: ["tv_board", "tv_wall", "smart_speaker"],
-  utility: ["radiator", "air_conditioner", "water_pump", "water_heater", "drying_rack", "water_purifier", "air_purifier", "water_tank", "washer", "dryer", "electrical_panel", "ups_unit", "heat_pump_outdoor", "hot_water_tank", "ventilation_fan", "humidifier"],
+  utility: ["radiator", "air_conditioner", "water_pump", "water_heater", "drying_rack", "water_purifier", "air_purifier", "water_tank", "washer", "dryer", "washer_dryer_tower", "balcony_solar", "electrical_panel", "ups_unit", "heat_pump_outdoor", "hot_water_tank", "ventilation_fan", "humidifier"],
   pets: [],
   architecture: ["room_divider", "gate", "fence", "parking"],
   living: ["altar", "altar_wall", "shoe_cabinet", "shoe_bench", "sofa", "sofa_l", "sofa_bed", "armchair", "stool", "coffee_table", "sideboard", "shelf", "plant", "rug", "coat_rack"],

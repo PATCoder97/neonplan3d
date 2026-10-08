@@ -25,7 +25,7 @@ Nói ngắn gọn: ảnh của họ được dùng để trả lời “cần c�
 
 ## Hiện trạng ngày 08/10/2026
 
-- Thư viện tích hợp hiện có **126 mục** trong 10 nhóm giao diện, gồm nhiều đồ dùng đặc trưng tại Việt Nam như bàn thờ, xe máy, bồn nước, võng, tủ giày, giàn phơi, quạt trần có đèn, quạt treo tường, robot cắt cỏ, cụm hạ tầng mạng/an toàn, cụm thiết bị kỹ thuật, bộ điều khiển/cảm biến nhà thông minh và chín kiểu đèn theo gallery công khai.
+- Thư viện tích hợp hiện có **128 mục** trong 10 nhóm giao diện, gồm nhiều đồ dùng đặc trưng tại Việt Nam như bàn thờ, xe máy, bồn nước, võng, tủ giày, giàn phơi, quạt trần có đèn, quạt treo tường, robot cắt cỏ, cụm hạ tầng mạng/an toàn, cụm thiết bị kỹ thuật, bộ điều khiển/cảm biến nhà thông minh và chín kiểu đèn theo gallery công khai.
 - Có 9 gói bố trí nhanh cho phòng: hai kiểu bếp, phòng tắm, phòng ngủ, phòng khách, phòng ăn, văn phòng, phòng trẻ em và sảnh.
 - Trình chỉnh sửa đã có tìm kiếm song ngữ, nhóm thu gọn, xem trước, đổi kích thước, xoay, lật, đặt lên sàn/tường/trần/bề mặt và liên kết entity.
 - Định dạng pack nhập ngoài đã hỗ trợ khối hộp, trụ, khối vát, đèn, màn hình, bề mặt đặt đồ, phương tiện và lỗ cầu thang.
@@ -109,7 +109,7 @@ Các biến thể cùng họ, ví dụ sofa 2/3 chỗ, tủ bếp 40/60/80 cm ho
 Mục tiêu: biến hiện trạng thành đường cơ sở có thể đo được.
 
 - [x] Sinh báo cáo tự động từ `FURNITURE_TYPES`, `FURNITURE_GROUPS` và `FURNITURE_SIZE` để phát hiện ID trùng, thiếu tên hoặc thiếu kích thước (`cd frontend && npm run catalog`).
-- [x] Lập bảng ánh xạ các mục hiện tại vào 16 nhóm đích; catalog kiểm kê hiện khóa 133 type, 126 mục thư viện, 7 mục nội bộ và trường hợp `worktop` đang nằm trong hai nhóm. Mỗi mục chỉ được tính một lần trong `REFERENCE_PACK_ITEMS`.
+- [x] Lập bảng ánh xạ các mục hiện tại vào 16 nhóm đích; catalog kiểm kê hiện khóa 135 type, 128 mục thư viện, 7 mục nội bộ và trường hợp `worktop` đang nằm trong hai nhóm. Mỗi mục chỉ được tính một lần trong `REFERENCE_PACK_ITEMS`.
 - [ ] Duyệt toàn bộ ảnh gallery công khai của 16 trang sản phẩm, không chỉ ảnh đại diện ở trang Packs; lập bảng `đã phù hợp / cần sửa hình / cần thêm mới` kèm URL và ngày xem.
 - [ ] Chọn khoảng 10 mẫu hiện có cần sửa hình trước; `fan_ceiling` là mẫu thí điểm và phải giữ nguyên ID.
 - [ ] Chụp bộ ảnh chuẩn ở góc nhìn 2D, 3D và chế độ Day/Neon để so sánh hồi quy.
@@ -152,7 +152,7 @@ Mục tiêu: đồ vật không chỉ đẹp mà còn phản ánh đúng trạng
   - Đã hoàn thành robot hút bụi với trạm sạc dạng tháp, robot cắt cỏ có garage, màn hình điều khiển Live Screen và lô 8 mẫu công tắc/ổ cắm/cảm biến/chuông cửa có lọc entity theo domain/device class.
 - [x] Hạ tầng mạng và an toàn theo ảnh kiểm kê: tủ mạng, NAS, access point trần, thermostat, báo khói và còi có đèn chớp.
 - [ ] Kỹ thuật: tủ điện, UPS, modem/router, bơm, bồn nước, bình nước nóng, điều hòa, quạt thông gió và thiết bị năng lượng.
-  - Đã hoàn thành tủ điện, UPS, modem/router, dàn nóng bơm nhiệt, bình tích nước nóng, quạt thông gió và máy tạo ẩm; nhóm Utility đạt 16/18 mẫu tham chiếu, còn mở rộng thiết bị năng lượng và các biến thể bơm/bồn.
+  - Đã hoàn thành tủ điện, UPS, modem/router, dàn nóng bơm nhiệt, bình tích nước nóng, quạt thông gió, máy tạo ẩm, tháp máy giặt–sấy và bộ pin mặt trời ban công; nhóm Utility đạt 18/18 mẫu tham chiếu, còn mở rộng thiết bị năng lượng và các biến thể bơm/bồn.
 - [ ] Chuẩn hóa ánh xạ entity theo domain/device class và trạng thái `on`, `open`, `occupied`, `playing`, công suất hoặc mức pin.
 - [ ] Thêm badge trong thư viện để phân biệt mẫu có đèn, màn hình, chuyển động hoặc liên kết công suất.
 

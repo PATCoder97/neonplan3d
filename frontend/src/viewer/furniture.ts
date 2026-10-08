@@ -819,6 +819,41 @@ function laundry(b: Builder, w: number, d: number, h: number, dryer: boolean): v
   }
 }
 
+/** A washer and dryer in one stable cabinet, with two independently recognisable front doors. */
+function laundryTower(b: Builder, w: number, d: number, h: number): void {
+  const gap = Math.min(0.035, h * 0.025);
+  const unit = (h - gap) / 2;
+  const z = d / 2 - 0.012;
+  for (let k = 0; k < 2; k++) {
+    const y0 = k * (unit + gap);
+    b.box(-w / 2, w / 2, y0, y0 + unit, -d / 2, d / 2 - 0.02, C.white, C.whiteTop, EDGE_FURN);
+    b.seg(-w / 2, y0 + unit - 0.14, z, w / 2, y0 + unit - 0.14, z, EDGE_FAINT);
+    b.seg(w / 2 - 0.16, y0 + unit - 0.07, z, w / 2 - 0.08, y0 + unit - 0.07, z, EDGE_GLOW);
+    const cy = y0 + (unit - 0.14) / 2 + 0.04;
+    const r = Math.min(w * 0.34, (unit - 0.2) * 0.42);
+    ring(b, 0, cy, r, z, 20);
+    if (k === 0) ring(b, 0, cy, r * 0.72, z + 0.002, 20);
+  }
+  b.box(-w * 0.46, w * 0.46, unit, unit + gap, -d * 0.46, d * 0.46, C.dark, C.metal, EDGE_FAINT);
+}
+
+/** Compact plug-in photovoltaic kit on its own balcony/terrace frame. */
+function balconySolar(b: Builder, w: number, d: number, h: number): void {
+  const post = Math.min(0.045, w * 0.035);
+  for (const x of [-w * 0.4, w * 0.4]) {
+    b.box(x - post, x + post, 0, h * 0.88, -d * 0.32, -d * 0.23, C.metal, C.metal, EDGE_FURN);
+    b.box(x - post, x + post, 0, h * 0.62, d * 0.23, d * 0.32, C.metal, C.metal, EDGE_FURN);
+  }
+  // A broad, shallow panel and its cell grid; the unequal supports suggest the usual balcony tilt.
+  b.loft([-w / 2, w / 2, -d * 0.43, d * 0.43], [-w / 2, w / 2, -d * 0.38, d * 0.48], h * 0.88, h * 0.98, C.dark, C.glass, EDGE_GLOW);
+  const y = h * 0.985;
+  for (let i = 1; i < 6; i++) b.seg(-w / 2 + (w * i) / 6, y, -d * 0.37, -w / 2 + (w * i) / 6, y, d * 0.47, EDGE_FAINT);
+  for (let i = 1; i < 3; i++) b.seg(-w / 2, y, -d * 0.37 + (d * 0.84 * i) / 3, w / 2, y, -d * 0.37 + (d * 0.84 * i) / 3, EDGE_FAINT);
+  // A small micro-inverter below the panel provides a live power indicator.
+  b.box(-w * 0.16, w * 0.16, h * 0.34, h * 0.48, d * 0.2, d * 0.34, C.body, C.bodyTop, EDGE_FURN);
+  b.seg(-w * 0.1, h * 0.43, d * 0.345, w * 0.1, h * 0.43, d * 0.345, EDGE_GLOW);
+}
+
 function bunkBed(b: Builder, w: number, d: number, h: number): void {
   const t = 0.05;
   for (const sx of [-1, 1]) for (const sz of [-1, 1]) b.box(sx * (w / 2) - (sx > 0 ? t : 0), sx * (w / 2) + (sx < 0 ? t : 0), 0, h, sz * (d / 2) - (sz > 0 ? t : 0), sz * (d / 2) + (sz < 0 ? t : 0), C.wood, C.woodTop);
@@ -1786,6 +1821,8 @@ function builtInScreen(f: Furniture, w: number, d: number, h: number, floor?: Fl
     const r = Math.min(w * 0.36, (h - 0.2) * 0.42) * 0.8;
     return { x0: -r, x1: r, y0: cy - r, y1: cy + r, z: d / 2 - 0.004 };
   }
+  if (f.type === "washer_dryer_tower") return { x0: w * 0.22, x1: w * 0.39, y0: h * 0.91, y1: h * 0.96, z: d / 2 - 0.004 };
+  if (f.type === "balcony_solar") return { x0: -w * 0.1, x1: w * 0.1, y0: h * 0.4, y1: h * 0.46, z: d * 0.35 };
   if (f.type === "dishwasher") return { x0: -w / 2 + 0.06, x1: w / 2 - 0.06, y0: h - 0.16, y1: h - 0.08, z: d / 2 - 0.004 };
   return null;
 }
@@ -2155,6 +2192,12 @@ function buildFurniture(buf: GeoBuffer, lines: LineBuffer, shadow: GeoBuffer, f:
       break;
     case "dryer":
       laundry(b, w, d, h, true);
+      break;
+    case "washer_dryer_tower":
+      laundryTower(b, w, d, h);
+      break;
+    case "balcony_solar":
+      balconySolar(b, w, d, h);
       break;
     case "bunk_bed":
       bunkBed(b, w, d, h);

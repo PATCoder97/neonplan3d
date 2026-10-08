@@ -35,6 +35,7 @@ test("pack furniture resolves by type, with size, name and power link", () => {
   for (const type of ["network_cabinet", "nas_server", "access_point", "wall_thermostat", "smoke_detector", "siren_alarm"]) assert.equal(isElectric(type), true, type);
   for (const type of ["electrical_panel", "ups_unit", "modem_router", "heat_pump_outdoor", "hot_water_tank", "ventilation_fan", "humidifier", "smart_display"]) assert.equal(isElectric(type), true, type);
   for (const type of ["wall_switch", "wall_outlet", "smart_plug", "motion_sensor", "contact_sensor", "water_leak_sensor", "temperature_humidity_sensor", "video_doorbell"]) assert.equal(isElectric(type), true, type);
+  for (const type of ["washer_dryer_tower", "balcony_solar"]) assert.equal(isElectric(type), true, type);
   for (const type of ["lamp_column", "lamp_tv_bars", "lamp_orb_table", "lamp_portable", "lamp_ambient_spot", "lamp_cube", "lamp_panel_round", "lamp_garden_spots", "lamp_wall_updown"]) {
     assert.equal(isLamp(type), true, type);
     assert.equal(isElectric(type), true, type);

@@ -685,6 +685,8 @@ const FURNITURE_NAMES: Record<string, RegExp> = {
   dishwasher: /(spülmaschine|geschirrspül|dishwasher)/i,
   washer: /(waschmaschine|washer|washing)/i,
   dryer: /(trockner|dryer)/i,
+  washer_dryer_tower: /(wasch.*trock|trock.*wasch|washer.*dryer|dryer.*washer|giặt.*sấy|giat.*say)/i,
+  balcony_solar: /(balkonkraftwerk|balcony.*solar|solar.*balcony|pin.*mặt trời.*ban công|pin.*mat troi.*ban cong)/i,
   kitchen: /(kaffee|coffee|wasserkocher|kettle)/i,
   island: /(kochfeld|herd|induktion|cooktop)/i,
   sink: /(spülmaschine|geschirrspül|dishwasher)/i,
@@ -861,7 +863,7 @@ export function furnitureEntities(hass: HomeAssistant, floors: readonly Floor[])
         } else if (f.type === "radiator" || f.type === "air_conditioner" || f.type === "wall_thermostat" || f.type === "heat_pump_outdoor") {
           const climates = free.filter((id) => kindOf(id) === "climate");
           entity = climates.find((id) => pattern.test(name(id))) ?? climates[0] ?? null;
-        } else if (["network_cabinet", "nas_server", "access_point", "smoke_detector", "siren_alarm", "electrical_panel", "ups_unit", "modem_router", "hot_water_tank", "ventilation_fan", "humidifier", "wall_switch", "wall_outlet", "smart_plug", "motion_sensor", "contact_sensor", "water_leak_sensor", "temperature_humidity_sensor", "video_doorbell"].includes(f.type)) {
+        } else if (["network_cabinet", "nas_server", "access_point", "smoke_detector", "siren_alarm", "electrical_panel", "ups_unit", "modem_router", "hot_water_tank", "ventilation_fan", "humidifier", "wall_switch", "wall_outlet", "smart_plug", "motion_sensor", "contact_sensor", "water_leak_sensor", "temperature_humidity_sensor", "video_doorbell", "washer_dryer_tower", "balcony_solar"].includes(f.type)) {
           const area = room?.area_id ?? null;
           const domains: Record<string, string[]> = {
             network_cabinet: ["switch", "sensor", "binary_sensor"],
@@ -883,6 +885,8 @@ export function furnitureEntities(hass: HomeAssistant, floors: readonly Floor[])
             water_leak_sensor: ["binary_sensor"],
             temperature_humidity_sensor: ["sensor"],
             video_doorbell: ["camera", "binary_sensor"],
+            washer_dryer_tower: ["switch", "sensor"],
+            balcony_solar: ["sensor"],
           };
           const candidates = Object.keys(hass.states ?? {}).filter((id) => {
             if (used.has(id) || !domains[f.type].includes(domainOf(id))) return false;
@@ -893,6 +897,7 @@ export function furnitureEntities(hass: HomeAssistant, floors: readonly Floor[])
             if (f.type === "contact_sensor" && !["door", "window", "opening"].includes(deviceClass)) return false;
             if (f.type === "water_leak_sensor" && deviceClass !== "moisture") return false;
             if (f.type === "temperature_humidity_sensor" && !["temperature", "humidity"].includes(deviceClass)) return false;
+            if (f.type === "balcony_solar" && deviceClass !== "power") return false;
             return pattern.test(name(id));
           });
           entity = room ? (candidates[0] ?? null) : candidates.length === 1 ? candidates[0] : null;

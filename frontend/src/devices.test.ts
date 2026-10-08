@@ -799,3 +799,26 @@ test("smart controls and sensors resolve only their matching Home Assistant devi
   assert.equal(links.get("temperature_humidity_sensor")?.entity, "sensor.nhiet_do");
   assert.equal(links.get("video_doorbell")?.entity, "camera.chuong_cua");
 });
+
+test("the washer-dryer tower and balcony solar kit resolve their matching entities", () => {
+  const st = (entity_id: string, state: string, attributes: Record<string, unknown> = {}) => ({ entity_id, state, attributes });
+  const states = {
+    "switch.thap_giat_say": st("switch.thap_giat_say", "on", { friendly_name: "Tháp giặt sấy" }),
+    "sensor.pin_mat_troi_ban_cong": st("sensor.pin_mat_troi_ban_cong", "420", { friendly_name: "Pin mặt trời ban công", device_class: "power", unit_of_measurement: "W" }),
+    "sensor.pin_mat_troi_nang_luong": st("sensor.pin_mat_troi_nang_luong", "2.1", { friendly_name: "Pin mặt trời ban công năng lượng", device_class: "energy", unit_of_measurement: "kWh" }),
+  };
+  const entities = {
+    "switch.thap_giat_say": { entity_id: "switch.thap_giat_say", area_id: "giat" },
+    "sensor.pin_mat_troi_ban_cong": { entity_id: "sensor.pin_mat_troi_ban_cong", area_id: null },
+    "sensor.pin_mat_troi_nang_luong": { entity_id: "sensor.pin_mat_troi_nang_luong", area_id: null },
+  };
+  const hass = { language: "vi", states, entities, devices: {}, areas: { giat: { area_id: "giat", name: "Phòng giặt" } } } as unknown as HomeAssistant;
+  const room = { id: "r", name: "Phòng giặt", area_id: "giat", points: [[0, 0], [3, 0], [3, 3], [0, 3]] as [number, number][], floor_material: "tiles" as const };
+  const furniture = [
+    { id: "tower", type: "washer_dryer_tower", x: 1, z: 1, w: 0.66, d: 0.68, h: 1.75, rotation: 0, variant: null },
+    { id: "solar", type: "balcony_solar", x: 5, z: 1, w: 1.65, d: 0.72, h: 1.05, rotation: 0, variant: null },
+  ];
+  const links = furnitureEntities(hass, [{ ...newFloor("eg", "Tầng trệt", 0), rooms: [room], furniture }]);
+  assert.equal(links.get("tower")?.entity, "switch.thap_giat_say");
+  assert.equal(links.get("solar")?.entity, "sensor.pin_mat_troi_ban_cong");
+});
