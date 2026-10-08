@@ -2,11 +2,11 @@
 // Units are metres; x grows to the right, z grows downwards (as in the 2D editor).
 
 import { packItem } from "./packs.ts";
-import { ELECTRIC_FURNITURE, ENERGY_DEVICES, FURNITURE_GROUPS, FURNITURE_SIZE, FURNITURE_TYPES, LAMP_TYPES, type FurnitureType } from "./furniture/metadata.ts";
+import { ELECTRIC_FURNITURE, ENERGY_DEVICES, FURNITURE_GROUPS, FURNITURE_SIZE, FURNITURE_TYPES, LAMP_TYPES, STAIR_TYPES, type FurnitureType } from "./furniture/metadata.ts";
 import type { LampModel } from "./viewer/viewer3d.ts";
 
 // Compatibility facade: existing callers can keep importing furniture metadata from model.ts.
-export { ELECTRIC_FURNITURE, ENERGY_DEVICES, FURNITURE_GROUPS, FURNITURE_SIZE, FURNITURE_TYPES, LAMP_TYPES };
+export { ELECTRIC_FURNITURE, ENERGY_DEVICES, FURNITURE_GROUPS, FURNITURE_SIZE, FURNITURE_TYPES, LAMP_TYPES, STAIR_TYPES };
 export type { FurnitureType };
 
 export type Vec2 = [number, number];
@@ -833,7 +833,7 @@ export const WALL_LAMP_Y = 1.75;
 
 /** Items that can be lifted off the floor (a wall cabinet, a shelf, a wall light, an LED strip): everything but lamps hung from the ceiling and the ceiling-mounted pack items. */
 export function canLift(f: Pick<Furniture, "type">): boolean {
-  if (["lamp_ceiling", "lamp_downlight", "lamp_spot", "lamp_panel", "lamp_panel_round", "lamp_pendant", "fan_ceiling", "fan_ceiling_light", "access_point", "smoke_detector", "stairs", "stairs_landing", "stairwell", "parking"].includes(f.type)) return false;
+  if (["lamp_ceiling", "lamp_downlight", "lamp_spot", "lamp_panel", "lamp_panel_round", "lamp_pendant", "fan_ceiling", "fan_ceiling_light", "access_point", "smoke_detector", "stairwell", "parking"].includes(f.type) || STAIR_TYPES.has(f.type)) return false;
   return packItem(f.type)?.mount !== "ceiling";
 }
 

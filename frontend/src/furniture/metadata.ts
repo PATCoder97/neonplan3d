@@ -294,6 +294,16 @@ export const FURNITURE_TYPES = [
   "coat_rack",
   "stairs",
   "stairs_landing",
+  "stairs_landing_l",
+  "stairs_winder_l",
+  "stairs_spiral",
+  "stairs_open",
+  "stairs_concrete",
+  "stairs_compact",
+  "railing_glass",
+  "railing_metal",
+  "railing_wood",
+  "railing_cable",
   "robot_vacuum",
   "robot_mower",
   "inverter",
@@ -308,6 +318,9 @@ export const FURNITURE_TYPES = [
 
 export type FurnitureType = (typeof FURNITURE_TYPES)[number];
 
+/** Built-in stairs that reach the next floor and automatically cut its slab. */
+export const STAIR_TYPES = new Set<string>(["stairs", "stairs_landing", "stairs_landing_l", "stairs_winder_l", "stairs_spiral", "stairs_open", "stairs_concrete", "stairs_compact"]);
+
 /** Furniture library sections (the editor lists them in this order). */
 export const FURNITURE_GROUPS: Record<string, FurnitureType[]> = {
   lights: ["lamp_ceiling", "lamp_downlight", "lamp_spot", "lamp_panel", "lamp_panel_round", "lamp_pendant", "lamp_floor", "lamp_uplight", "lamp_column", "lamp_tv_bars", "lamp_table", "lamp_orb_table", "lamp_portable", "lamp_ambient_spot", "lamp_cube", "lamp_wall", "lamp_wall_updown", "led_strip", "lamp_bollard", "lamp_garden", "lamp_garden_spots"],
@@ -318,7 +331,7 @@ export const FURNITURE_GROUPS: Record<string, FurnitureType[]> = {
   bath: ["bathtub", "bathtub_builtin", "bathtub_corner", "bathtub_freestanding", "whirlpool_indoor", "shower", "shower_corner_90", "shower_niche_120", "shower_walkin_140", "rain_shower_led", "shower_screen", "wc", "toilet_close_coupled", "toilet_wall_hung", "bidet", "washbasin", "vanity_60", "vanity_80", "vanity_100", "double_vanity_120", "pedestal_basin", "bathroom_cabinet_tall", "bathroom_cabinet_mid", "mirror_round_light", "mirror_80_light", "mirror_cabinet_light", "mirror_led_clock", "bathroom_wall_shelf", "towel_rail", "towel_radiator", "electric_towel_heater", "ladder_shelf_towels", "sauna", "bathroom_fan", "washing_machine_cabinet", "washer_vanity", "laundry_basket", "laundry_cabinet_basket", "water_heater", "hot_water_tank", "washer", "dryer", "washer_dryer_tower", "drying_rack"],
   climate: ["air_conditioner", "heat_pump_outdoor", "air_purifier", "humidifier", "radiator", "wall_thermostat", "temperature_humidity_sensor", "ventilation_fan", "fan_ceiling", "fan_ceiling_light", "fan_wall", "fan_floor"],
   outdoor: ["security_camera", "video_doorbell", "smart_lock", "water_pump", "robot_mower", "balcony_solar", "hammock", "stone_table_set", "planter_large", "water_tank", "gate", "fence", "gas_grill", "lounge_set_outdoor", "sun_lounger", "parasol", "pergola", "raised_bed", "greenhouse", "hot_tub_outdoor", "fire_bowl", "garden_torch", "play_tower_slide", "garden_shed", "trampoline", "flower_pots_3", "lawn_sprinkler", "irrigation_valve_box", "rain_barrel", "garden_lantern", "outdoor_kitchen", "patio_heater", "tree_oak", "tree_lime", "tree_birch", "tree_maple", "tree_fruit", "tree_spruce", "tree_pine", "tree_thuja", "shrub", "shrub_flowering", "brush_wild", "trees_group_3"],
-  work: ["desk", "worktop", "office_chair", "tall_cabinet", "coat_rack", "shoe_cabinet", "shoe_bench", "wall_switch", "wall_outlet", "smart_plug", "motion_sensor", "contact_sensor", "water_leak_sensor", "network_cabinet", "nas_server", "modem_router", "electrical_panel", "ups_unit", "access_point", "smoke_detector", "siren_alarm", "stairs", "stairs_landing", "robot_vacuum", "column_round", "column_square", "column_steel", "ceiling_beams", "downstand_beam", "chimney_inside", "led_niche", "light_cove", "platform_steps", "gallery_railing_glass"],
+  work: ["desk", "worktop", "office_chair", "tall_cabinet", "coat_rack", "shoe_cabinet", "shoe_bench", "wall_switch", "wall_outlet", "smart_plug", "motion_sensor", "contact_sensor", "water_leak_sensor", "network_cabinet", "nas_server", "modem_router", "electrical_panel", "ups_unit", "access_point", "smoke_detector", "siren_alarm", "stairs", "stairs_landing", "stairs_landing_l", "stairs_winder_l", "stairs_spiral", "stairs_open", "stairs_concrete", "stairs_compact", "railing_glass", "railing_metal", "railing_wood", "railing_cable", "robot_vacuum", "column_round", "column_square", "column_steel", "ceiling_beams", "downstand_beam", "chimney_inside", "led_niche", "light_cove", "platform_steps", "gallery_railing_glass"],
   vehicles: ["motorbike", "parking"],
 };
 
@@ -515,6 +528,16 @@ export const FURNITURE_SIZE: Record<FurnitureType, [number, number, number]> = {
   rug: [2.0, 1.4, 0.01],
   stairs: [1.0, 3.2, 2.75],
   stairs_landing: [2.1, 3.2, 2.75],
+  stairs_landing_l: [2.8, 2.8, 2.75],
+  stairs_winder_l: [2.4, 2.4, 2.75],
+  stairs_spiral: [1.8, 1.8, 2.75],
+  stairs_open: [1.0, 3.2, 2.75],
+  stairs_concrete: [1.1, 3.4, 2.75],
+  stairs_compact: [0.8, 2.2, 2.75],
+  railing_glass: [2.0, 0.1, 1.05],
+  railing_metal: [2.0, 0.1, 1.05],
+  railing_wood: [2.0, 0.12, 1.0],
+  railing_cable: [2.0, 0.1, 1.05],
   stool: [0.55, 0.55, 0.42],
   lamp_ceiling: [0.4, 0.4, 0.08],
   lamp_downlight: [0.1, 0.1, 0.02],

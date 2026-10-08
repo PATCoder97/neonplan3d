@@ -177,6 +177,16 @@ test("U-shaped stairs with a landing cut their full stairwell into the floor abo
   assert.deepEqual(holes[0], furnitureFootprint(stair));
 });
 
+test("every built-in stair family cuts its declared footprint into the floor above", () => {
+  const types = ["stairs_landing_l", "stairs_winder_l", "stairs_spiral", "stairs_open", "stairs_concrete", "stairs_compact"] as const;
+  for (const type of types) {
+    const stair: Furniture = { id: type, type, x: 2, z: 2, rotation: 0, w: 1.6, d: 1.8, h: 2.75, variant: null };
+    const lower = floorWith([rect("a", 0, 0, 5, 4)], [], [stair]);
+    const upper = { ...floorWith([rect("b", 0, 0, 5, 4)]), elevation: 2.75 };
+    assert.deepEqual(stairHoles([lower, upper], upper), [furnitureFootprint(stair)], `${type}: automatic opening`);
+  }
+});
+
 test("clipping a wall footprint along its axis", () => {
   const poly: [number, number][] = [
     [0, 0],

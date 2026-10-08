@@ -4,6 +4,18 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.22.5
+
+### Added
+
+- Completed the 12-item Stairs & Railings family with L-shaped landing and winder stairs, spiral, open-riser, concrete and compact stairs, plus glass, metal, wood and cable railings.
+- Added dedicated procedural 3D models, readable plan symbols and English, German and Vietnamese names for every new item.
+
+### Changed
+
+- Centralised built-in stair detection so every stair family automatically follows the next-floor height, stays floor-mounted and cuts its full footprint from the slab above.
+- Expanded the reproducible inventory to 312 declared types and 305 library items, with regression coverage for every new automatic stair opening.
+
 ## 1.22.4
 
 ### Added

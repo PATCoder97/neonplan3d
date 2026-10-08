@@ -12,7 +12,7 @@
 
 import { Color, type BufferGeometry } from "three";
 import type { CoveredRoomKind, Floor, Opening, Room, SolarField, Vec2 } from "../model.ts";
-import { coveredFloorTop, furnitureFootprint, groundLevel, isCoveredRoom, isLamp, pointInPolygon } from "../model.ts";
+import { coveredFloorTop, furnitureFootprint, groundLevel, isCoveredRoom, isLamp, pointInPolygon, STAIR_TYPES } from "../model.ts";
 import { generateWalls, locateOpening, openingHost, type Wall } from "../geometry/walls.ts";
 import { holeInRoom, insetHole, mergeHoles } from "../geometry/holes.ts";
 import { pushFurniture } from "./furniture.ts";
@@ -598,7 +598,7 @@ export function stairHoles(floors: readonly Floor[], floor: Floor): Vec2[][] {
   const below = floors.filter((f) => f.elevation < floor.elevation).sort((p, q) => q.elevation - p.elevation)[0];
   if (!below) return mergeHoles(own);
   const stairs = below.furniture
-    .filter((f) => ((f.type === "stairs" || f.type === "stairs_landing") || packItem(f.type)?.hole) && below.elevation + f.h >= floor.elevation - 0.3)
+    .filter((f) => (STAIR_TYPES.has(f.type) || packItem(f.type)?.hole) && below.elevation + f.h >= floor.elevation - 0.3)
     .map(furnitureFootprint);
   // overlapping openings become one outline (an L-shaped stairwell made of two)
   return mergeHoles([...own, ...stairs]);
