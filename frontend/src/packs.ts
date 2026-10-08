@@ -164,7 +164,10 @@ export function mountBase(floor: Floor, f: Pick<Furniture, "type" | "x" | "z" | 
   if (f.type === "water_heater") return 1.7;
   if (f.type === "range_hood") return 1.35;
   if (f.type === "microwave") return surfaceHeight(floor, f.x, f.z);
-  if (["modem_router", "smart_display", "monitor_single", "monitor_dual", "monitor_triple", "printer_3d_open", "printer_3d_enclosed", "laser_printer", "baby_monitor", "lamp_night_moon", "lamp_star_projector", "cinema_projector_table", "cinema_speaker_bookshelf", "cinema_speaker_center", "cinema_soundbar", "cinema_av_receiver", "cinema_projector_ust", "cinema_turntable", "cinema_media_streamer", "cinema_bluray_player", "cinema_stereo_amplifier", "cinema_headphone_stand"].includes(f.type)) return surfaceHeight(floor, f.x, f.z);
+  if (f.type === "kitchen_open_shelf") return 1.25;
+  if (f.type === "kitchen_spice_rack_wall") return 1.3;
+  if (f.type === "kitchen_plate_rack_wall") return 1.25;
+  if (["modem_router", "smart_display", "monitor_single", "monitor_dual", "monitor_triple", "printer_3d_open", "printer_3d_enclosed", "laser_printer", "baby_monitor", "lamp_night_moon", "lamp_star_projector", "kitchen_coffee_machine", "cinema_projector_table", "cinema_speaker_bookshelf", "cinema_speaker_center", "cinema_soundbar", "cinema_av_receiver", "cinema_projector_ust", "cinema_turntable", "cinema_media_streamer", "cinema_bluray_player", "cinema_stereo_amplifier", "cinema_headphone_stand"].includes(f.type)) return surfaceHeight(floor, f.x, f.z);
   // An outdoor pump follows the lawn/terrace below it; inside a room it stays on that floor.
   if ((f.type === "water_pump" || f.type === "heat_pump_outdoor") && !floor.rooms.some((r) => r.points.length >= 3 && pointInPolygon([f.x, f.z], r.points))) return outdoorGround(floor, f.x, f.z);
   switch (item?.mount) {

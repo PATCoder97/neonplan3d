@@ -185,6 +185,32 @@ test("home-cinema batch one has bounded AV geometry, correct mounts and live dis
   assert.equal(screenRect({ id: "soundbar", type: "cinema_soundbar", x: 0, z: 0, rotation: 0, w: soundbarW, d: soundbarD, h: soundbarH, variant: null } as Furniture, floor), null);
 });
 
+test("kitchen expansion has distinct functional geometry, powered appliances and correct mounts", () => {
+  const types = ["kitchen_coffee_machine", "kitchen_wine_fridge", "kitchen_island_bar", "kitchen_recycling_station", "kitchen_pantry_pullout", "kitchen_corner_carousel", "kitchen_oven_tower", "kitchen_open_shelf", "kitchen_spice_rack_wall", "kitchen_cart", "kitchen_plate_rack_wall", "kitchen_freezer"] as const;
+  const signatures = new Set<string>();
+  for (const type of types) {
+    const [w, d, h] = FURNITURE_SIZE[type];
+    const buf = new GeoBuffer();
+    const lines = new LineBuffer();
+    const item = { id: type, type, x: 0, z: 0, rotation: 0, w, d, h, variant: null } as Furniture;
+    pushFurniture(buf, lines, new GeoBuffer(), item, builtinBase(item));
+    assert.ok(buf.count > 0 && lines.p.length > 0, `${type}: solid and outline geometry`);
+    assert.ok(buf.p.every(Number.isFinite) && lines.p.every(Number.isFinite), `${type}: finite geometry`);
+    const ys = buf.p.filter((_, index) => index % 3 === 1);
+    assert.ok(Math.min(...ys) >= -1e-6 && Math.max(...ys) <= h + 1e-6, `${type}: geometry stays inside declared height`);
+    signatures.add(`${buf.count}:${lines.p.length}`);
+  }
+  assert.ok(signatures.size >= 9, "kitchen models keep varied geometric complexity");
+  for (const type of ["kitchen_coffee_machine", "kitchen_wine_fridge", "kitchen_oven_tower", "kitchen_freezer"]) assert.ok(ELECTRIC_FURNITURE.has(type), `${type}: powered capability`);
+
+  const floor = newFloor("kitchen", "Kitchen", 0);
+  floor.furniture.push({ id: "island", type: "kitchen_island_bar", x: 0, z: 0, rotation: 0, w: 2.2, d: 1.05, h: 1.05, variant: null } as Furniture);
+  assert.equal(mountBase(floor, { type: "kitchen_coffee_machine", x: 0, z: 0, h: FURNITURE_SIZE.kitchen_coffee_machine[2] }), 1.05);
+  assert.equal(mountBase(floor, { type: "kitchen_open_shelf", x: 2, z: 2, h: FURNITURE_SIZE.kitchen_open_shelf[2] }), 1.25);
+  assert.equal(mountBase(floor, { type: "kitchen_spice_rack_wall", x: 2, z: 2, h: FURNITURE_SIZE.kitchen_spice_rack_wall[2] }), 1.3);
+  assert.equal(mountBase(floor, { type: "kitchen_plate_rack_wall", x: 2, z: 2, h: FURNITURE_SIZE.kitchen_plate_rack_wall[2] }), 1.25);
+});
+
 test("home-cinema batch two completes seating, acoustics and hi-fi with correct capabilities", () => {
   const types = ["cinema_turntable", "cinema_vinyl_shelf", "cinema_game_console", "cinema_hifi_rack", "cinema_chair", "cinema_chair_row_3", "cinema_acoustic_panel", "cinema_bass_trap_corner", "cinema_popcorn_machine", "cinema_surround_speaker_stand", "cinema_speaker_inwall", "cinema_media_streamer", "cinema_bluray_player", "cinema_stereo_amplifier", "cinema_headphone_stand"] as const;
   const signatures = new Set<string>();

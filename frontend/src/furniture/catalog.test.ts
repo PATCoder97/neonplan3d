@@ -35,16 +35,16 @@ test("built-in furniture catalog has stable complete metadata", () => {
 
 test("catalog inventory locks the Phase 0 baseline", () => {
   const summary = furnitureCatalogSummary();
-  assert.equal(summary.total, 453);
-  assert.equal(summary.library, 446);
+  assert.equal(summary.total, 465);
+  assert.equal(summary.library, 458);
   assert.equal(summary.hidden, 7);
-  assert.equal(summary.memberships, 447);
+  assert.equal(summary.memberships, 459);
   assert.deepEqual(summary.ungrouped, [...HIDDEN_FURNITURE_TYPES]);
   assert.deepEqual(summary.multiGroup, { worktop: ["kitchen", "work"] });
   assert.deepEqual(summary.groups, Object.fromEntries(Object.entries(FURNITURE_GROUPS).map(([group, types]) => [group, types.length])));
   assert.equal(Object.keys(summary.referencePacks).length, 16);
   assert.equal(Object.values(REFERENCE_PACK_TARGETS).reduce((sum, count) => sum + count, 0), 474);
-  assert.equal(Object.values(REFERENCE_PACK_ITEMS).flat().length, 446);
+  assert.equal(Object.values(REFERENCE_PACK_ITEMS).flat().length, 458);
   assert.deepEqual(summary.referencePacks.kids, { current: 18, target: 18 });
   assert.deepEqual(summary.referencePacks.office, { current: 25, target: 25 });
   assert.deepEqual(summary.referencePacks.vehicles, { current: 15, target: 15 });
@@ -58,6 +58,7 @@ test("catalog inventory locks the Phase 0 baseline", () => {
   assert.deepEqual(summary.referencePacks.living, { current: 69, target: 69 });
   assert.deepEqual(summary.referencePacks.bedroom, { current: 41, target: 41 });
   assert.deepEqual(summary.referencePacks.bathroom, { current: 37, target: 37 });
+  assert.deepEqual(summary.referencePacks.kitchen, { current: 31, target: 66 });
 });
 
 test("every built-in furniture type has English, German and Vietnamese names", () => {

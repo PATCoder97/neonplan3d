@@ -3,7 +3,7 @@
 import { createSymbolRegistry, circle, line, rect } from "./common.ts";
 import type { FurnitureSymbol } from "./types.ts";
 
-const TYPES = ["range_hood","microwave","water_purifier","kitchen_corner","kitchen_display","island","fridge","stove","sink"] as const;
+const TYPES = ["range_hood","microwave","water_purifier","kitchen_corner","kitchen_display","island","fridge","stove","sink","kitchen_coffee_machine","kitchen_wine_fridge","kitchen_island_bar","kitchen_recycling_station","kitchen_pantry_pullout","kitchen_corner_carousel","kitchen_oven_tower","kitchen_open_shelf","kitchen_spice_rack_wall","kitchen_cart","kitchen_plate_rack_wall","kitchen_freezer"] as const;
 
 function renderSymbol(type: string, w: number, d: number): FurnitureSymbol {
   switch (type) {
@@ -45,6 +45,26 @@ function renderSymbol(type: string, w: number, d: number): FurnitureSymbol {
       const bw = Math.min(0.5, w - 0.2);
       return [rect(-bw / 2, -d / 2 + 0.1, bw / 2, d / 2 - 0.08), circle(0, -d / 2 + 0.06, 0.025, "fp3d-sym-fill")];
     }
+    case "kitchen_coffee_machine":
+      return [rect(-w / 2, -d / 2, w / 2, d / 2, "fp3d-sym-fill"), circle(-w * 0.16, d * 0.18, Math.min(w, d) * 0.08), circle(w * 0.16, d * 0.18, Math.min(w, d) * 0.08)];
+    case "kitchen_wine_fridge":
+    case "kitchen_freezer":
+      return [rect(-w / 2, -d / 2, w / 2, d / 2), line(-w * 0.34, 0, w * 0.34, 0, "fp3d-sym-strong")];
+    case "kitchen_island_bar":
+      return [rect(-w / 2, -d / 2, w / 2, d * 0.12, "fp3d-sym-fill"), line(-w / 2, d * 0.2, w / 2, d * 0.2, "fp3d-sym-strong")];
+    case "kitchen_recycling_station":
+      return [rect(-w / 2, -d / 2, w / 2, d / 2), line(-w / 6, -d / 2, -w / 6, d / 2), line(w / 6, -d / 2, w / 6, d / 2)];
+    case "kitchen_pantry_pullout":
+    case "kitchen_oven_tower":
+      return [rect(-w / 2, -d / 2, w / 2, d / 2, "fp3d-sym-fill"), line(w * 0.3, -d * 0.3, w * 0.3, d * 0.3, "fp3d-sym-strong")];
+    case "kitchen_corner_carousel":
+      return [rect(-w / 2, -d / 2, w / 2, -d * 0.05), rect(-w / 2, -d * 0.05, -w * 0.05, d / 2), circle(-w * 0.05, -d * 0.05, Math.min(w, d) * 0.32, "fp3d-sym-fill")];
+    case "kitchen_open_shelf":
+    case "kitchen_spice_rack_wall":
+    case "kitchen_plate_rack_wall":
+      return [rect(-w / 2, -d / 2, w / 2, d / 2), line(-w * 0.3, 0, w * 0.3, 0, "fp3d-sym-strong")];
+    case "kitchen_cart":
+      return [rect(-w / 2, -d / 2, w / 2, d / 2, "fp3d-sym-fill"), circle(-w * 0.38, d * 0.38, Math.min(w, d) * 0.08), circle(w * 0.38, d * 0.38, Math.min(w, d) * 0.08)];
     default:
       return [];
   }

@@ -4,6 +4,18 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.23.9
+
+### Added
+
+- Added 12 functionally distinct Kitchen items: coffee machine, wine fridge, bar island, recycling station, pull-out pantry, corner carousel, double-oven tower, open/spice/plate shelving, kitchen cart and upright freezer.
+- Added dedicated procedural 3D models, recognisable 2D symbols, English/German/Vietnamese names, powered-device capabilities and appropriate surface/wall mounts for the new family.
+
+### Changed
+
+- Closed the functional-coverage comparison against the public 474-item reference at 458 useful library items: all 16 groups are functionally aligned without padding the catalog with size- or colour-only variants.
+- Expanded Kitchen coverage from 19 to 31 useful primary items and the complete inventory to 465 declared types and 458 library items.
+
 ## 1.23.8
 
 ### Added

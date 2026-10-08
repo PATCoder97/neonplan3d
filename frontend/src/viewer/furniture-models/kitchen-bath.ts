@@ -248,6 +248,97 @@ function kitchenCorner(b: Builder, w: number, d: number, h: number): void {
   b.seg(xFront + 0.004, h * 0.72, -d / 2 + arm + 0.08, xFront + 0.004, h * 0.72, -d / 2 + arm + 0.22, EDGE_GLOW);
 }
 
+function coffeeMachine(b: Builder, w: number, d: number, h: number): void {
+  b.box(-w / 2, w / 2, 0, h, -d / 2, d / 2, C.dark, C.bodyTop, EDGE_FURN);
+  const front = d / 2 + 0.006;
+  b.box(-w * 0.34, w * 0.34, h * 0.34, h * 0.76, front, front + 0.012, C.body, C.bodyTop, EDGE_GLOW);
+  b.box(-w * 0.36, w * 0.36, h * 0.08, h * 0.17, d * 0.12, d / 2 + 0.03, C.metal, C.metal, EDGE_FAINT);
+  b.cyl(-w * 0.13, d * 0.37, w * 0.025, h * 0.28, h * 0.48, C.metal, C.metal, 8, EDGE_GLOW);
+  b.cyl(w * 0.13, d * 0.37, w * 0.025, h * 0.28, h * 0.48, C.metal, C.metal, 8, EDGE_GLOW);
+  b.cyl(w * 0.3, d / 2 + 0.014, w * 0.035, h * 0.83, h * 0.9, C.accent, C.accent, 10, EDGE_GLOW);
+}
+
+function glassCooler(b: Builder, w: number, d: number, h: number, shelves: number): void {
+  b.box(-w / 2, w / 2, 0, h, -d / 2, d / 2, C.body, C.bodyTop, EDGE_FURN);
+  const front = d / 2 + 0.006;
+  b.box(-w * 0.42, w * 0.42, h * 0.08, h * 0.92, front, front + 0.012, C.glass, C.dark, EDGE_GLOW);
+  for (let i = 1; i < shelves; i++) {
+    const y = h * (0.08 + (0.84 * i) / shelves);
+    b.seg(-w * 0.38, y, front + 0.014, w * 0.38, y, front + 0.014, EDGE_FAINT);
+  }
+  b.seg(w * 0.34, h * 0.55, front + 0.018, w * 0.34, h * 0.82, front + 0.018, EDGE_GLOW);
+}
+
+function islandBar(b: Builder, w: number, d: number, h: number): void {
+  const workH = h * 0.86;
+  b.box(-w * 0.46, w * 0.46, 0.06, workH, -d / 2, d * 0.12, C.body, C.bodyTop, EDGE_FURN);
+  fronts(b, -w * 0.46, w * 0.46, 0.08, workH, d * 0.12, 4, workH * 0.72);
+  b.box(-w / 2, w / 2, workH, workH + 0.05, -d / 2, d / 2, C.whiteTop, C.whiteTop, EDGE_GLOW);
+  b.box(-w / 2, w / 2, h - 0.05, h, d * 0.1, d / 2, C.whiteTop, C.whiteTop, EDGE_GLOW);
+  for (const x of [-w * 0.43, w * 0.43]) b.box(x - 0.035, x + 0.035, workH, h, d * 0.34, d * 0.43, C.metal, C.metal, EDGE_FURN);
+}
+
+function recyclingStation(b: Builder, w: number, d: number, h: number): void {
+  b.box(-w / 2, w / 2, 0, h, -d / 2, d / 2, C.body, C.bodyTop, EDGE_FURN);
+  const front = d / 2 + 0.008;
+  for (let i = 0; i < 3; i++) {
+    const x0 = -w / 2 + (w * i) / 3 + 0.02;
+    const x1 = -w / 2 + (w * (i + 1)) / 3 - 0.02;
+    b.box(x0, x1, h * 0.12, h * 0.76, front, front + 0.012, i === 0 ? C.accent : i === 1 ? C.metal : C.dark, C.bodyTop, EDGE_FAINT);
+    b.seg(x0 + w * 0.04, h * 0.68, front + 0.016, x1 - w * 0.04, h * 0.68, front + 0.016, EDGE_GLOW);
+  }
+}
+
+function pantryPullout(b: Builder, w: number, d: number, h: number): void {
+  b.box(-w / 2, w / 2, 0, h, -d / 2, d / 2, C.body, C.bodyTop, EDGE_FURN);
+  const front = d / 2 + 0.008;
+  b.box(-w * 0.43, w * 0.43, h * 0.03, h * 0.97, front, front + 0.012, C.white, C.whiteTop, EDGE_FAINT);
+  for (let i = 1; i < 6; i++) b.seg(-w * 0.34, (h * i) / 6, front + 0.016, w * 0.34, (h * i) / 6, front + 0.016, EDGE_FAINT);
+  b.seg(w * 0.32, h * 0.38, front + 0.02, w * 0.32, h * 0.64, front + 0.02, EDGE_GLOW);
+}
+
+function cornerCarousel(b: Builder, w: number, d: number, h: number): void {
+  const r = Math.min(w, d) * 0.43;
+  b.box(-w / 2, w / 2, 0, h, -d / 2, -d * 0.06, C.body, C.bodyTop, EDGE_FURN);
+  b.box(-w / 2, -w * 0.06, 0, h, -d * 0.06, d / 2, C.body, C.bodyTop, EDGE_FURN);
+  b.cyl(-w * 0.06, -d * 0.06, r, h * 0.08, h * 0.12, C.metal, C.whiteTop, 24, EDGE_GLOW);
+  b.cyl(-w * 0.06, -d * 0.06, r * 0.94, h * 0.47, h * 0.51, C.metal, C.whiteTop, 24, EDGE_GLOW);
+  b.cyl(-w * 0.06, -d * 0.06, 0.025, h * 0.08, h * 0.84, C.metal, C.metal, 10, EDGE_FAINT);
+  b.box(-w / 2, w / 2, h - 0.04, h, -d / 2, -d * 0.06, C.whiteTop, C.whiteTop, EDGE_FURN);
+  b.box(-w / 2, -w * 0.06, h - 0.04, h, -d * 0.06, d / 2, C.whiteTop, C.whiteTop, EDGE_FURN);
+}
+
+function ovenTower(b: Builder, w: number, d: number, h: number): void {
+  b.box(-w / 2, w / 2, 0, h, -d / 2, d / 2, C.body, C.bodyTop, EDGE_FURN);
+  const front = d / 2 + 0.006;
+  for (const [y0, y1] of [[h * 0.18, h * 0.45], [h * 0.5, h * 0.76]] as const) {
+    b.box(-w * 0.43, w * 0.43, y0, y1, front, front + 0.012, C.dark, C.glass, EDGE_GLOW);
+    b.seg(-w * 0.34, y1 - h * 0.045, front + 0.017, w * 0.34, y1 - h * 0.045, front + 0.017, EDGE_GLOW);
+  }
+}
+
+function openShelf(b: Builder, w: number, d: number, h: number, plateRack = false): void {
+  const side = Math.min(0.045, w * 0.06);
+  b.box(-w / 2, -w / 2 + side, 0, h, -d / 2, d / 2, C.body, C.bodyTop, EDGE_FURN);
+  b.box(w / 2 - side, w / 2, 0, h, -d / 2, d / 2, C.body, C.bodyTop, EDGE_FURN);
+  for (let i = 0; i <= 3; i++) {
+    const y = (h * i) / 3;
+    b.box(-w / 2, w / 2, Math.max(0, y - 0.018), Math.min(h, y + 0.018), -d / 2, d / 2, C.whiteTop, C.whiteTop, EDGE_FAINT);
+  }
+  if (plateRack) for (let i = -3; i <= 3; i++) b.seg((w * i) / 9, h * 0.1, d * 0.15, (w * i) / 9, h * 0.48, d * 0.15, EDGE_GLOW);
+}
+
+function spiceRack(b: Builder, w: number, d: number, h: number): void {
+  openShelf(b, w, d, h);
+  for (const y of [h * 0.22, h * 0.52, h * 0.82]) for (const x of [-w * 0.28, 0, w * 0.28]) b.cyl(x, d * 0.08, w * 0.055, y - h * 0.1, y, C.accent, C.whiteTop, 10, EDGE_FAINT);
+}
+
+function kitchenCart(b: Builder, w: number, d: number, h: number): void {
+  for (const y of [h * 0.18, h * 0.5, h * 0.84]) b.box(-w * 0.46, w * 0.46, y, y + 0.045, -d * 0.43, d * 0.43, C.whiteTop, C.whiteTop, EDGE_FURN);
+  for (const x of [-w * 0.42, w * 0.42]) for (const z of [-d * 0.38, d * 0.38]) b.box(x - 0.025, x + 0.025, h * 0.08, h * 0.86, z - 0.025, z + 0.025, C.metal, C.metal, EDGE_FAINT);
+  for (const x of [-w * 0.42, w * 0.42]) for (const z of [-d * 0.38, d * 0.38]) b.cyl(x, z, Math.min(w, d) * 0.07, 0, h * 0.1, C.dark, C.dark, 10, EDGE_FURN);
+}
+
 export const KITCHEN_BATH_FURNITURE_MODELS: Readonly<Record<string, FurnitureModelRenderer>> = {
   fridge: ({ b, w, d, h }) => (fridge(b, w, d, h), 0.5),
   fridge_smart: ({ b, w, d, h }) => (fridgeSmart(b, w, d, h), 0.5),
@@ -255,6 +346,18 @@ export const KITCHEN_BATH_FURNITURE_MODELS: Readonly<Record<string, FurnitureMod
   kitchen: ({ b, w, d, h }) => (kitchen(b, w, d, h), 0.5),
   kitchen_corner: ({ b, w, d, h }) => (kitchenCorner(b, w, d, h), 0.5),
   kitchen_display: ({ b, w, d, h }) => (kitchenDisplay(b, w, d, h), 0.5),
+  kitchen_coffee_machine: ({ b, w, d, h }) => (coffeeMachine(b, w, d, h), false),
+  kitchen_wine_fridge: ({ b, w, d, h }) => (glassCooler(b, w, d, h, 5), 0.5),
+  kitchen_island_bar: ({ b, w, d, h }) => (islandBar(b, w, d, h), 0.5),
+  kitchen_recycling_station: ({ b, w, d, h }) => (recyclingStation(b, w, d, h), 0.5),
+  kitchen_pantry_pullout: ({ b, w, d, h }) => (pantryPullout(b, w, d, h), 0.5),
+  kitchen_corner_carousel: ({ b, w, d, h }) => (cornerCarousel(b, w, d, h), 0.5),
+  kitchen_oven_tower: ({ b, w, d, h }) => (ovenTower(b, w, d, h), 0.5),
+  kitchen_open_shelf: ({ b, w, d, h }) => (openShelf(b, w, d, h), false),
+  kitchen_spice_rack_wall: ({ b, w, d, h }) => (spiceRack(b, w, d, h), false),
+  kitchen_cart: ({ b, w, d, h }) => (kitchenCart(b, w, d, h), 0.5),
+  kitchen_plate_rack_wall: ({ b, w, d, h }) => (openShelf(b, w, d, h, true), false),
+  kitchen_freezer: ({ b, w, d, h }) => (glassCooler(b, w, d, h, 4), 0.5),
   kitchen_tall: ({ b, w, d, h }) => (kitchenTall(b, w, d, h), 0.5),
   kitchen_wall: ({ b, w, d, h }) => (kitchenWall(b, w, d, h), false),
   microwave: ({ b, w, d, h, base }) => (microwave(b, w, d, h), base > 0.05 ? false : 0.5),

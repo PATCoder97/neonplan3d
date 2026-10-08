@@ -11,7 +11,7 @@ Trạng thái có nghĩa:
 | Nhóm | Nguồn chính thức | Ảnh gallery | Độ phủ catalog | Trạng thái/kết luận |
 |---|---|---:|---:|---|
 | Phòng khách | [Living Room](https://mastershort.de/product/neonplan3d-living-room/) | 12 | 69/69 | Đã phù hợp; sofa, bàn, tủ, TV/media, đèn và trang trí đều có họ chức năng tương ứng. |
-| Nhà bếp | [Kitchen](https://mastershort.de/product/neonplan3d-kitchen/) | 11 | 19/66 | Cần thêm mới; giữ module tủ tổng quát nhưng bổ sung các thiết bị/kiểu lưu trữ có công năng riêng trong Giai đoạn 6. |
+| Nhà bếp | [Kitchen](https://mastershort.de/product/neonplan3d-kitchen/) | 11 | 31/66 | Đã phù hợp về công năng; bổ sung thiết bị pha/làm lạnh/nướng, đảo bar, phân loại rác, lưu trữ kéo–xoay và phụ kiện tường thay vì nhân bản màu/kích thước. |
 | Phòng ngủ | [Bedroom](https://mastershort.de/product/neonplan3d-bedroom/) | 9 | 41/41 | Đã phù hợp; kích thước giường, tủ áo, tủ đầu giường và đồ có đèn đã tách rõ. |
 | Phòng tắm | [Bathroom](https://mastershort.de/product/neonplan3d-bathroom/) | 9 | 37/37 | Đã phù hợp; vanity, bồn, khu tắm, lưu trữ, wellness và thiết bị điện đều có model riêng. |
 | Smart Home & công nghệ | [Smart Home & Tech](https://mastershort.de/product/neonplan3d-smart-home-tech/) | 8 | 45/30 | Đã phù hợp và vượt mốc; `fan_ceiling` cùng `robot_vacuum` là hai ID cũ đã sửa hình. |
@@ -44,6 +44,8 @@ Mười ID cũ sau được chọn để kiểm tra trước vì xuất hiện n
 | `stairs` | Giữ ID/hình thẳng, bổ sung cơ chế cắt sàn chung cho mọi họ cầu thang. |
 | `tv_board` | Giữ TV liền kệ và liên kết media; thêm TV/kệ độc lập bằng ID mới. |
 
-## Kết luận cho lô nội dung tiếp theo
+## Kết luận đối chiếu độ phủ chức năng
 
-Không cần sao chép đủ từng biến thể thương mại. Khoảng trống chức năng còn đáng làm là Kitchen: tủ rượu, máy pha cà phê, đảo bar, thùng rác phân loại và một số module tủ có mục đích bố trí khác nhau. Các nhóm khác chuyển sang kiểm thử, lọc catalog và tối ưu tải ở Giai đoạn 6.
+Catalog đạt **458 mẫu hữu dụng so với mốc công khai 474**. Chênh lệch số học còn lại không phải là khoảng trống công năng: một số pack công khai đếm nhiều biến thể màu, kích thước hoặc cùng loại tủ, trong khi NeonPlan 3D cho phép resize/mirror trên một ID ổn định; ngược lại các nhóm Smart Home và Garden đã vượt mốc nhờ thiết bị có hành vi riêng.
+
+Lô Kitchen cuối bổ sung đúng các khoảng trống nhận diện từ gallery: tủ rượu, máy pha cà phê, đảo bar, phân loại rác, tủ kho kéo, tủ góc mâm xoay, tủ lò nướng, tủ đông, xe đẩy và ba kiểu kệ. Vì vậy cả 16 nhóm hiện đã phù hợp về chức năng mà không cần sao chép biến thể thương mại chỉ để đạt 474.

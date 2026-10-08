@@ -364,7 +364,8 @@ Mục tiêu: hoàn tất độ phủ cả 16 nhóm.
 
 ### Giai đoạn 6 — Hoàn thiện và phát hành ổn định (`v1.24.0`)
 
-- [ ] Đối chiếu độ phủ chức năng với mốc 474 mẫu/phương tiện công khai; không ép đủ số lượng bằng các biến thể vô nghĩa.
+- [x] Đối chiếu độ phủ chức năng với mốc 474 mẫu/phương tiện công khai; không ép đủ số lượng bằng các biến thể vô nghĩa.
+  - Audit 16 gallery chốt 458 mẫu thư viện hữu dụng; lô Kitchen bổ sung 12 công năng còn thiếu để đạt 31/66 mà không nhân bản màu/kích thước. Xem `docs/furniture-gallery-audit-vi.md`.
 - [ ] Thêm bộ lọc theo phòng, kiểu gắn, khả năng tương tác và phong cách; giữ tìm kiếm không dấu tiếng Việt.
 - [ ] Lazy-build hoặc chia cache hình học để thời gian mở editor và dung lượng bundle không tăng tuyến tính theo số mẫu.
 - [ ] Kiểm thử trên desktop, tablet, điện thoại và chất lượng Low/Tablet/High.
