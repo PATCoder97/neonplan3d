@@ -25,7 +25,7 @@ Nói ngắn gọn: ảnh của họ được dùng để trả lời “cần c�
 
 ## Hiện trạng ngày 08/10/2026
 
-- Thư viện tích hợp hiện có **202 mục** trong 10 nhóm giao diện, gồm nhiều đồ dùng đặc trưng tại Việt Nam như bàn thờ, xe máy, bồn nước, võng, tủ giày, giàn phơi, quạt trần có đèn, quạt treo tường, robot cắt cỏ, cụm hạ tầng mạng/an toàn, cụm thiết bị kỹ thuật, bộ điều khiển/cảm biến nhà thông minh, chín kiểu đèn, sáu lô phòng khách và hai lô phòng ngủ theo gallery công khai.
+- Thư viện tích hợp hiện có **216 mục** trong 10 nhóm giao diện, gồm nhiều đồ dùng đặc trưng tại Việt Nam như bàn thờ, xe máy, bồn nước, võng, tủ giày, giàn phơi, quạt trần có đèn, quạt treo tường, robot cắt cỏ, cụm hạ tầng mạng/an toàn, cụm thiết bị kỹ thuật, bộ điều khiển/cảm biến nhà thông minh, chín kiểu đèn, sáu lô phòng khách và ba lô phòng ngủ theo gallery công khai.
 - Có 9 gói bố trí nhanh cho phòng: hai kiểu bếp, phòng tắm, phòng ngủ, phòng khách, phòng ăn, văn phòng, phòng trẻ em và sảnh.
 - Trình chỉnh sửa đã có tìm kiếm song ngữ, nhóm thu gọn, xem trước, đổi kích thước, xoay, lật, đặt lên sàn/tường/trần/bề mặt và liên kết entity.
 - Định dạng pack nhập ngoài đã hỗ trợ khối hộp, trụ, khối vát, đèn, màn hình, bề mặt đặt đồ, phương tiện và lỗ cầu thang.
@@ -118,6 +118,8 @@ Bảng kiểm kê làm việc nên có các cột: `nhóm`, `nguồn ảnh`, `t�
 | Tủ áo cánh mở | `wardrobe` đổi cỡ tự do | Thêm tủ áo 2 và 3 cánh; test khóa số đường chia cánh tăng đúng theo biến thể. |
 | Tủ áo mở rộng | Thiếu tủ lớn, tủ gương và module góc | Thêm tủ 4/6 cánh, tủ có cánh gương và tủ áo góc chữ L bằng renderer tham số hóa. |
 | Tủ đầu giường và tủ ngăn kéo | Chỉ có `nightstand`/`dresser` tổng quát | Thêm tủ đầu giường có ngăn, loại mỏng, loại treo đúng cao độ cùng tủ 3/6/5 ngăn có số hàng/cột cố định. |
+| Tủ mở, cửa lùa và phụ kiện | Thiếu tủ walk-in, giá treo, gương đứng và bàn thay tã | Thêm tủ áo cửa lùa, tủ walk-in chữ L, giá treo, gương đứng, ghế cuối giường, bàn thay tã và góc đọc sách. |
+| Nội thất phòng ngủ có đèn | Chưa có trạng thái đèn tích hợp | Thêm giường ambient, tủ áo có đèn, đồng hồ bình minh và bàn trang điểm có đèn gương; mỗi mẫu có vùng trạng thái riêng và bộ lọc tên entity. |
 
 ## Kiến trúc cần làm trước
 
@@ -143,7 +145,7 @@ Các biến thể cùng họ, ví dụ sofa 2/3 chỗ, tủ bếp 40/60/80 cm ho
 Mục tiêu: biến hiện trạng thành đường cơ sở có thể đo được.
 
 - [x] Sinh báo cáo tự động từ `FURNITURE_TYPES`, `FURNITURE_GROUPS` và `FURNITURE_SIZE` để phát hiện ID trùng, thiếu tên hoặc thiếu kích thước (`cd frontend && npm run catalog`).
-- [x] Lập bảng ánh xạ các mục hiện tại vào 16 nhóm đích; catalog kiểm kê hiện khóa 209 type, 202 mục thư viện, 7 mục nội bộ và trường hợp `worktop` đang nằm trong hai nhóm. Mỗi mục chỉ được tính một lần trong `REFERENCE_PACK_ITEMS`.
+- [x] Lập bảng ánh xạ các mục hiện tại vào 16 nhóm đích; catalog kiểm kê hiện khóa 223 type, 216 mục thư viện, 7 mục nội bộ và trường hợp `worktop` đang nằm trong hai nhóm. Mỗi mục chỉ được tính một lần trong `REFERENCE_PACK_ITEMS`.
 - [ ] Duyệt toàn bộ ảnh gallery công khai của 16 trang sản phẩm, không chỉ ảnh đại diện ở trang Packs; lập bảng `đã phù hợp / cần sửa hình / cần thêm mới` kèm URL và ngày xem.
 - [ ] Chọn khoảng 10 mẫu hiện có cần sửa hình trước; `fan_ceiling` là mẫu thí điểm và phải giữ nguyên ID.
 - [ ] Chụp bộ ảnh chuẩn ở góc nhìn 2D, 3D và chế độ Day/Neon để so sánh hồi quy.
@@ -180,9 +182,10 @@ Mục tiêu: hoàn thiện bốn nhóm được dùng nhiều nhất trước, k
   - Đợt 4 đã thêm sáu mẫu ghế thư giãn/ghế ăn, ba lowboard cố định và highboard; test khóa số khoang lowboard tăng theo chiều rộng.
   - Đợt 5 đã thêm sofa nhung ba chỗ, sofa module năm khối, bốn bàn ăn kích thước cố định, băng ghế ăn, tủ ba ngăn kéo, TV chân đứng và lò sưởi củi; TV hỗ trợ Live Screen và tự liên kết media player.
   - Đợt 6 đã thêm vách media có TV, piano đứng kèm ghế, bình pampas, monstera lớn, thảm tròn và lò sưởi điện; độ phủ phòng khách đạt mốc tham chiếu 69/69 và model/symbol mới nằm trong module Living riêng.
-- [ ] Phòng ngủ: giường đơn/đôi, giường tầng, tủ áo cánh mở/cửa lùa, bàn trang điểm, nôi và tủ đầu giường.
+- [x] Phòng ngủ: giường đơn/đôi, giường tầng, tủ áo cánh mở/cửa lùa, bàn trang điểm, nôi và tủ đầu giường.
   - Đợt 1 đã thêm năm cỡ giường cố định, ba kiểu giường bọc/box-spring/futon và tủ áo 2/3 cánh; renderer và symbol nằm trong module Bedroom riêng.
   - Đợt 2 đã thêm tủ áo 4/6 cánh, tủ gương, tủ góc, ba kiểu tủ đầu giường và ba tủ ngăn kéo; tủ đầu giường treo có cao độ 48 cm và không tạo bóng tiếp xúc sàn.
+  - Đợt 3 đã thêm 14 mẫu tủ mở/phụ kiện/nội thất có đèn; độ phủ phòng ngủ đạt mốc tham chiếu 41/41, bốn mẫu có đèn có vùng trạng thái entity riêng.
 - [ ] Phòng tắm/giặt: lavabo bàn/treo, bồn cầu, khu tắm kính, bình nóng lạnh, máy giặt cửa trên/cửa trước và giàn phơi.
 - [ ] Đèn và làm mát: sửa hình `fan_ceiling`, thêm `fan_ceiling_light`, quạt treo tường và các kiểu đèn phổ biến; quạt có đèn phải điều khiển riêng phần quạt và phần sáng.
   - Đã hoàn thành `fan_ceiling`, biến thể 3/4/5 cánh, `fan_ceiling_light` với entity quạt/đèn riêng và `fan_wall`.

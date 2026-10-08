@@ -4,6 +4,19 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.20.8
+
+### Added
+
+- Completed the bedroom reference milestone at 41/41 with a clothes rail, canopy bed, sliding and walk-in wardrobes, mirrored and lit vanities, a bed bench, changing table, floor mirror, tall chest and reading nook.
+- Added an ambient-lit bed, internally lit wardrobe and sunrise alarm with dedicated state surfaces and automatic entity-name matching.
+- Added distinct parameterized 2D symbols, low-poly 3D models and German/English/Vietnamese names for all fourteen items.
+
+### Changed
+
+- Expanded the reproducible catalog inventory to 223 declared types and 216 library items.
+- Kept all additions in the focused Bedroom renderer and symbol family and reused shared bed, wardrobe and drawer primitives.
+
 ## 1.20.7
 
 ### Added

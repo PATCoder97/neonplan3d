@@ -1,7 +1,7 @@
 // Parameterized bedroom furniture: fixed mattress widths and wardrobe door counts.
 
 import { C, EDGE_FAINT, EDGE_FURN, EDGE_GLOW, type FurnitureBuilder as Builder } from "../furniture-builder.ts";
-import type { FurnitureModelRenderer } from "./types.ts";
+import type { FurnitureModelRenderer, FurnitureScreenRenderer } from "./types.ts";
 
 type BedStyle = "frame" | "upholstered" | "boxspring" | "futon";
 
@@ -72,6 +72,76 @@ function floatingNightstand(b: Builder, w: number, d: number, h: number): void {
   b.seg(-w * 0.08, y + h * 0.28, d / 2 + 0.006, w * 0.08, y + h * 0.28, d / 2 + 0.006, EDGE_GLOW);
 }
 
+function clothesRail(b: Builder, w: number, d: number, h: number): void {
+  for (const x of [-w * 0.44, w * 0.44]) b.box(x - 0.025, x + 0.025, 0, h, -0.025, 0.025, C.metal, C.metal, EDGE_FURN);
+  b.box(-w * 0.46, w * 0.46, h * 0.82, h * 0.86, -0.025, 0.025, C.metal, C.metal, EDGE_GLOW);
+  b.box(-w / 2, w / 2, 0, 0.045, -d / 2, d / 2, C.wood, C.woodTop, EDGE_FAINT);
+}
+
+function canopyBed(b: Builder, w: number, d: number, h: number): void {
+  fixedBed(b, w, d, h * 0.46, "frame");
+  for (const x of [-w * 0.47, w * 0.47]) for (const z of [-d * 0.47, d * 0.47]) b.box(x - 0.025, x + 0.025, 0, h, z - 0.025, z + 0.025, C.wood, C.wood, EDGE_FURN);
+  b.box(-w * 0.48, w * 0.48, h * 0.94, h, -d * 0.48, -d * 0.45, C.wood, C.wood, EDGE_FAINT);
+  b.box(-w * 0.48, w * 0.48, h * 0.94, h, d * 0.45, d * 0.48, C.wood, C.wood, EDGE_FAINT);
+}
+
+function slidingWardrobe(b: Builder, w: number, d: number, h: number, lit = false): void {
+  b.box(-w / 2, w / 2, 0, h, -d / 2, d / 2, C.wood, C.woodTop, EDGE_FURN);
+  const front = d / 2 + 0.005;
+  b.seg(0, 0.04, front, 0, h - 0.04, front, EDGE_FURN);
+  b.seg(-w * 0.46, h * 0.04, front, w * 0.46, h * 0.04, front, EDGE_FAINT);
+  b.seg(-w * 0.46, h * 0.96, front, w * 0.46, h * 0.96, front, EDGE_FAINT);
+  if (lit) b.box(-w * 0.42, w * 0.42, h * 0.86, h * 0.89, front, front + 0.012, C.accent, C.accent, EDGE_GLOW);
+}
+
+function walkinCloset(b: Builder, w: number, d: number, h: number): void {
+  const t = Math.min(0.38, Math.min(w, d) * 0.24);
+  b.box(-w / 2, -w / 2 + t, 0, h, -d / 2, d / 2, C.wood, C.woodTop, EDGE_FURN);
+  b.box(-w / 2 + t, w / 2, 0, h, -d / 2, -d / 2 + t, C.wood, C.woodTop, EDGE_FURN);
+  for (const y of [h * 0.32, h * 0.65]) {
+    b.seg(-w / 2, y, d / 2, -w / 2 + t, y, d / 2, EDGE_FAINT);
+    b.seg(w / 2, y, -d / 2, w / 2, y, -d / 2 + t, EDGE_FAINT);
+  }
+}
+
+function vanityUnit(b: Builder, w: number, d: number, h: number, lit: boolean): void {
+  const top = h * 0.48;
+  b.box(-w / 2, w / 2, top - 0.06, top, -d / 2, d / 2, C.wood, C.woodTop, EDGE_FURN);
+  for (const x of [-w * 0.43, w * 0.43]) b.box(x - 0.025, x + 0.025, 0, top, -d * 0.38, d * 0.38, C.wood, C.wood);
+  b.box(-w * 0.32, w * 0.32, top + 0.08, h, -d / 2, -d / 2 + 0.035, C.glass, C.glass, lit ? EDGE_GLOW : EDGE_FURN);
+}
+
+function paddedBench(b: Builder, w: number, d: number, h: number): void {
+  for (const x of [-w * 0.4, w * 0.4]) b.box(x - 0.025, x + 0.025, 0, h * 0.72, -d * 0.35, d * 0.35, C.wood, C.wood);
+  b.pad(-w / 2, w / 2, h * 0.68, h, -d / 2, d / 2, C.fabric, C.cushion, 0.035, EDGE_FURN);
+}
+
+function changingTable(b: Builder, w: number, d: number, h: number): void {
+  drawerCabinet(b, w, d, h * 0.78, 3);
+  b.pad(-w / 2, w / 2, h * 0.78, h, -d / 2, d / 2, C.white, C.whiteTop, 0.04, EDGE_FURN);
+}
+
+function floorMirror(b: Builder, w: number, d: number, h: number): void {
+  b.box(-w * 0.46, w * 0.46, 0.08, h, -0.035, 0.035, C.glass, C.glass, EDGE_GLOW);
+  b.box(-w / 2, w / 2, 0, 0.06, -d / 2, d / 2, C.wood, C.woodTop, EDGE_FURN);
+}
+
+function readingNook(b: Builder, w: number, d: number, h: number): void {
+  b.pad(-w * 0.42, w * 0.42, 0.12, h * 0.45, -d * 0.3, d * 0.42, C.fabric, C.fabricTop, 0.05, EDGE_FURN);
+  b.pad(-w * 0.38, w * 0.38, h * 0.42, h, -d * 0.42, -d * 0.25, C.fabric, C.cushion, 0.04, EDGE_FURN);
+  b.box(w * 0.38, w / 2, 0, h * 0.52, -d / 2, d / 2, C.wood, C.woodTop, EDGE_FAINT);
+}
+
+function sunriseAlarm(b: Builder, w: number, d: number, h: number): void {
+  b.box(-w / 2, w / 2, 0, h * 0.28, -d / 2, d / 2, C.dark, C.dark, EDGE_FURN);
+  b.cyl(0, 0, Math.min(w, d) * 0.42, h * 0.28, h, C.white, C.whiteTop, 18, EDGE_GLOW);
+}
+
+const ambientBedScreen: FurnitureScreenRenderer = (w, d, h) => ({ x0: -w * 0.44, x1: w * 0.44, y0: h * 0.22, y1: h * 0.27, z: d / 2 + 0.006 });
+const wardrobeLightScreen: FurnitureScreenRenderer = (w, d, h) => ({ x0: -w * 0.42, x1: w * 0.42, y0: h * 0.86, y1: h * 0.89, z: d / 2 + 0.018 });
+const alarmScreen: FurnitureScreenRenderer = (w, d, h) => ({ x0: -w * 0.3, x1: w * 0.3, y0: h * 0.42, y1: h * 0.8, z: d * 0.43 });
+const vanityLightScreen: FurnitureScreenRenderer = (w, d, h) => ({ x0: -w * 0.33, x1: w * 0.33, y0: h * 0.55, y1: h * 0.96, z: -d / 2 - 0.004 });
+
 export const BEDROOM_FURNITURE_MODELS: Readonly<Record<string, FurnitureModelRenderer>> = {
   bed_90: ({ b, w, d, h }) => (fixedBed(b, w, d, h, "frame"), 0.5),
   bed_140: ({ b, w, d, h }) => (fixedBed(b, w, d, h, "frame"), 0.5),
@@ -93,4 +163,25 @@ export const BEDROOM_FURNITURE_MODELS: Readonly<Record<string, FurnitureModelRen
   dresser_80_3: ({ b, w, d, h }) => (drawerCabinet(b, w, d, h, 3), 0.5),
   dresser_140_6: ({ b, w, d, h }) => (drawerCabinet(b, w, d, h, 3, 2), 0.5),
   chest_tall_5: ({ b, w, d, h }) => (drawerCabinet(b, w, d, h, 5), 0.5),
+  clothes_rail: ({ b, w, d, h }) => (clothesRail(b, w, d, h), 0.35),
+  bed_canopy: ({ b, w, d, h }) => (canopyBed(b, w, d, h), 0.5),
+  wardrobe_sliding: ({ b, w, d, h }) => (slidingWardrobe(b, w, d, h), 0.5),
+  closet_walkin: ({ b, w, d, h }) => (walkinCloset(b, w, d, h), 0.5),
+  vanity_mirror: ({ b, w, d, h }) => (vanityUnit(b, w, d, h, false), 0.5),
+  bed_bench: ({ b, w, d, h }) => (paddedBench(b, w, d, h), 0.5),
+  changing_table: ({ b, w, d, h }) => (changingTable(b, w, d, h), 0.5),
+  mirror_floor: ({ b, w, d, h }) => (floorMirror(b, w, d, h), 0.35),
+  chest_tall: ({ b, w, d, h }) => (drawerCabinet(b, w, d, h, 4), 0.5),
+  reading_nook: ({ b, w, d, h }) => (readingNook(b, w, d, h), 0.5),
+  bed_ambient_180: ({ b, w, d, h }) => (fixedBed(b, w, d, h, "upholstered"), 0.5),
+  wardrobe_light: ({ b, w, d, h }) => (slidingWardrobe(b, w, d, h, true), 0.5),
+  alarm_sunrise: ({ b, w, d, h }) => (sunriseAlarm(b, w, d, h), 0.35),
+  vanity_light: ({ b, w, d, h }) => (vanityUnit(b, w, d, h, true), 0.5),
+};
+
+export const BEDROOM_FURNITURE_SCREENS: Readonly<Record<string, FurnitureScreenRenderer>> = {
+  bed_ambient_180: ambientBedScreen,
+  wardrobe_light: wardrobeLightScreen,
+  alarm_sunrise: alarmScreen,
+  vanity_light: vanityLightScreen,
 };

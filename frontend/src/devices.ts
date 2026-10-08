@@ -732,6 +732,10 @@ const FURNITURE_NAMES: Record<string, RegExp> = {
   kitchen_display: /(vitrine|display ?cabinet|cabinet ?light|schranklicht|tủ kính|tu kinh|tủ trưng bày|tu trung bay|đèn tủ|den tu|led tủ|led tu)/i,
   media_wall_tv: /\b(tv|fernseh|television|fire ?tv|apple ?tv|chromecast|shield)/i,
   fireplace_wall_electric: /(fireplace|kamin|lò sưởi|lo suoi)/i,
+  bed_ambient_180: /(bed|bett|giường|giuong).*(light|licht|đèn|den)|ambient/i,
+  wardrobe_light: /(wardrobe|closet|kleiderschrank|tủ áo|tu ao).*(light|licht|đèn|den)/i,
+  alarm_sunrise: /(sunrise|wake.?up|lichtwecker|báo thức|bao thuc)/i,
+  vanity_light: /(vanity|dressing|schmink|trang điểm|trang diem).*(light|licht|đèn|den)/i,
 };
 const MEDIA_FURNITURE = new Set(["tv_board", "tv_wall", "tv_stand", "media_wall_tv", "smart_display"]);
 
