@@ -384,15 +384,16 @@ function pushAreas(buf: GeoBuffer, lines: LineBuffer, floor: Floor, areas: Rende
           outlinePost(lines, x, z, half, y0, y1, edge);
         };
 
-
-        // Slim balusters and two horizontal rails around every free edge.
+        // Slim balusters and two horizontal rails around every free edge. Keep the balusters sparse
+        // and give each only one neon centre line: outlining all four corners turns a long balcony
+        // into a dense cyan wall and hides the rooms behind it.
         if (a.railing !== false) {
           for (let i = 0; i < poly.length; i++) {
             if (i === openEnd) continue;
             const p = poly[i];
             const q = poly[(i + 1) % poly.length];
             const len = Math.hypot(q[0] - p[0], q[1] - p[1]);
-            const n = Math.max(1, Math.ceil(len / 0.22));
+            const n = Math.max(1, Math.ceil(len / 0.36));
             const y = floorY;
             pushBeam(buf, p, q, 0.07, y + 0.3, y + 0.38, finish.under, finish.roof);
             pushBeam(buf, p, q, 0.09, y + railH - 0.09, y + railH, finish.under, finish.roof);
@@ -403,7 +404,9 @@ function pushAreas(buf: GeoBuffer, lines: LineBuffer, floor: Floor, areas: Rende
               const x = p[0] + (q[0] - p[0]) * t;
               const z = p[1] + (q[1] - p[1]) * t;
               const gy = baseAt(x, z);
-              squarePost(x, z, 0.018, gy + 0.08, gy + railH - 0.07, finish.under, finish.roof);
+              const half = 0.012;
+              pushPrism(buf, ccw([[x - half, z - half], [x + half, z - half], [x + half, z + half], [x - half, z + half]]), gy + 0.08, gy + railH - 0.07, finish.under, finish.roof);
+              lines.seg([x, gy + 0.08, z], [x, gy + railH - 0.07, z], edge, ALWAYS);
             }
           }
         }
@@ -430,6 +433,7 @@ function pushAreas(buf: GeoBuffer, lines: LineBuffer, floor: Floor, areas: Rende
         roofStart = buf.count;
         pushCanopyPanel(buf, poly, roofAt, 0.1, finish.under, finish.roof, roofFold);
         roofEnd = buf.count;
+        outline((x, z) => roofAt(x, z) + 0.004, roofFold);
         outline((x, z) => baseAt(x, z) + (a.railing === false ? 0.004 : railH + 0.004));
         break;
       }

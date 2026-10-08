@@ -41,7 +41,8 @@ test("an upper-floor veranda room has railings, front columns and roof", () => {
   const veranda: CoveredRenderArea = { id: "veranda", type: "veranda", points: [[0, 0], [0, 1.5], [5.5, 1.5], [5.5, 0]], height: 2.4, slope: 0.12, slope_dir: "z", open: true, railing: true, columns: 2 };
   const solid = new GeoBuffer();
   const lines = new LineBuffer();
-  const ranges = pushCovered(solid, lines, floor, [veranda]);
+  const roofFold = 91;
+  const ranges = pushCovered(solid, lines, floor, [veranda], roofFold);
   const heights = solid.p.filter((_, i) => i % 3 === 1);
   assert.ok(solid.count > 150, "railing, balusters, columns and lintel geometry");
   assert.ok(hasColor(solid, NEON.wall) && hasColor(solid, NEON.wallTop), "veranda structure uses the canonical room wall palette");
@@ -53,5 +54,6 @@ test("an upper-floor veranda room has railings, front columns and roof", () => {
   assert.equal(ranges[0].start, 0);
   assert.equal(ranges[0].end, solid.count, "the whole structure has one 3D picking range");
   assert.ok(ranges[0].roofStart! < ranges[0].roofEnd!, "the roof has its own range so a selected room can reveal devices below it");
-  assert.ok(lines.p.length > 300, "veranda columns, lintel and railing receive visible wall-style edges");
+  assert.equal(lines.f.filter((fold) => fold === roofFold).length, 6, "the three free roof edges keep their neon outline while the room roof folds away");
+  assert.ok(lines.p.length > 300 && lines.p.length < 500, "veranda edges stay visible without a dense four-line outline around every baluster");
 });
