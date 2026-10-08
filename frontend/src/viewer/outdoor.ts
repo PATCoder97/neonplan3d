@@ -104,21 +104,21 @@ function pushYardPanel(buf: GeoBuffer, p: Vec2, q: Vec2, y: number, h: number, s
   }
 }
 
-/** Ornamental two-leaf gate: arched crown, vertical stainless bars and a round centre medallion. */
-function pushYardGate(buf: GeoBuffer, lines: LineBuffer, p: Vec2, q: Vec2, y: number, h: number, side: number, top: number, edge: Color): void {
+/** Clean two-leaf gate whose arch starts at fence height and rises above it in the centre. */
+function pushYardGate(buf: GeoBuffer, p: Vec2, q: Vec2, y: number, h: number, side: number, top: number): void {
   const dx = q[0] - p[0];
   const dz = q[1] - p[1];
   const len = Math.hypot(dx, dz);
   if (len < 0.3) return;
   const ux = dx / len;
   const uz = dz / len;
-  const at = (s: number, yy: number): [number, number, number] => [p[0] + ux * s, yy, p[1] + uz * s];
   const plan = (s: number): Vec2 => [p[0] + ux * s, p[1] + uz * s];
   const post = (s: number, half: number, y0: number, y1: number) => {
     const [x, z] = plan(s);
     pushPrism(buf, ccw([[x - half, z - half], [x + half, z - half], [x + half, z + half], [x - half, z + half]]), y0, y1, side, top);
   };
-  const arch = (t: number) => y + h * (0.78 + 0.22 * Math.sin(Math.PI * t));
+  const rise = Math.min(0.45, h * 0.32);
+  const arch = (t: number) => y + h + rise * Math.sin(Math.PI * t);
   const bars = Math.max(8, Math.ceil(len / 0.18));
   pushBeam(buf, p, q, 0.11, y + 0.06, y + 0.16, side, top);
   pushBeam(buf, p, q, 0.08, y + h * 0.47, y + h * 0.54, side, top);
@@ -132,42 +132,6 @@ function pushYardGate(buf: GeoBuffer, lines: LineBuffer, p: Vec2, q: Vec2, y: nu
       const crown = (arch(t) + arch((k + 1) / bars)) / 2;
       pushBeam(buf, a, b, 0.075, crown - 0.045, crown + 0.02, side, top);
     }
-  }
-  for (let k = 1; k < bars; k += 2) {
-    const t = k / bars;
-    const s = len * t;
-    const crown = arch(t) + 0.015;
-    const spread = Math.min(0.045, len / bars / 3);
-    lines.seg(at(s - spread, crown), at(s, crown + 0.085), edge, ALWAYS);
-    lines.seg(at(s, crown + 0.085), at(s + spread, crown), edge, ALWAYS);
-  }
-
-  const curve = (cx: number, cy: number, rx: number, ry: number, turns = 1, phase = 0, steps = 24) => {
-    let prev = at(cx + Math.cos(phase) * rx, cy + Math.sin(phase) * ry);
-    for (let i = 1; i <= steps; i++) {
-      const a = phase + (Math.PI * 2 * turns * i) / steps;
-      const next = at(cx + Math.cos(a) * rx, cy + Math.sin(a) * ry);
-      lines.seg(prev, next, edge, ALWAYS);
-      prev = next;
-    }
-  };
-  const centre = len / 2;
-  const radius = Math.min(len * 0.21, h * 0.28);
-  const medallionY = y + h * 0.42;
-  curve(centre, medallionY, radius, radius, 1, 0, 28);
-  curve(centre, medallionY, radius * 0.82, radius * 0.82, 1, 0, 24);
-  // A restrained geometric motif inside the medallion, mirrored over the leaf seam.
-  const r = radius * 0.55;
-  lines.seg(at(centre - r, medallionY), at(centre + r, medallionY), edge, ALWAYS);
-  lines.seg(at(centre - r, medallionY), at(centre - r, medallionY + r * 0.48), edge, ALWAYS);
-  lines.seg(at(centre + r, medallionY), at(centre + r, medallionY - r * 0.48), edge, ALWAYS);
-  lines.seg(at(centre - r * 0.52, medallionY + r * 0.48), at(centre + r * 0.25, medallionY + r * 0.48), edge, ALWAYS);
-  lines.seg(at(centre - r * 0.25, medallionY - r * 0.48), at(centre + r * 0.52, medallionY - r * 0.48), edge, ALWAYS);
-
-  // Symmetric scrolls fill the space below the arch without the old harsh diagonal braces.
-  for (const mirror of [-1, 1]) {
-    const scrollX = centre + mirror * len * 0.23;
-    curve(scrollX, y + h * 0.68, len * 0.085, h * 0.085, mirror, mirror < 0 ? Math.PI : 0, 14);
   }
 }
 
@@ -349,7 +313,7 @@ export function pushOutdoor(buf: GeoBuffer, lines: LineBuffer, floor: Floor, roo
             const gateB: Vec2 = [p[0] + (q[0] - p[0]) * t1, p[1] + (q[1] - p[1]) * t1];
             pushYardPanel(buf, p, gateA, floorY, fenceH, finish.under, finish.roof);
             pushYardPanel(buf, gateB, q, floorY, fenceH, finish.under, finish.roof);
-            pushYardGate(buf, lines, gateA, gateB, floorY, fenceH, finish.under, finish.roof, edge);
+            pushYardGate(buf, gateA, gateB, floorY, fenceH, finish.under, finish.roof);
           }
         }
         for (let i = 0; i < poly.length; i++) {
