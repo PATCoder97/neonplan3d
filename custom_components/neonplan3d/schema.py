@@ -287,7 +287,13 @@ OUTDOOR_SCHEMA = vol.Schema(
     {
         vol.Required("id"): _ID,
         vol.Required("type"): vol.In(OUTDOOR_TYPES),
+        vol.Optional("name", default=None): vol.Any(None, _NAME),
         vol.Required("points"): vol.All([_POINT], vol.Length(min=3, max=MAX_POINTS)),
+        vol.Optional("floor_material", default=None): vol.Any(None, vol.All(str, vol.Length(max=32))),
+        vol.Optional("roof_style", default=None): vol.Any(None, vol.In(["solid", "glass", "tile"])),
+        vol.Optional("railing", default=None): vol.Any(None, bool),
+        vol.Optional("columns", default=None): vol.Any(None, vol.All(vol.Coerce(int), vol.Range(min=0, max=12))),
+        vol.Optional("column_size", default=None): vol.Any(None, vol.All(vol.Coerce(float), vol.Range(min=0.08, max=0.8))),
         # hedges and fences: their height (None = default); outline False hides the neon line
         vol.Optional("height", default=None): vol.Any(None, vol.All(vol.Coerce(float), vol.Range(min=0.1, max=6))),
         vol.Optional("outline", default=True): bool,

@@ -80,6 +80,8 @@ export interface ViewerOptions {
   /** Pull floors apart in the house view (default true). */
   explode?: boolean;
   onRoomTap?: (floorId: string, roomId: string | null) => void;
+  /** A composite outdoor structure was tapped directly in 3D. */
+  onOutdoorTap?: (floorId: string, outdoorId: string) => void;
   onFloorTap?: (floorId: string) => void;
   onBack?: () => void;
   /** Short tap on a device marker. */
@@ -1375,7 +1377,7 @@ export class FloorplanViewer {
       drop: () => this.dropFurniture(),
       doubleTap: (x, y) => {
         const hit = this.floorId && this.options.onRoomDoubleTap ? this.pick(x, y) : null;
-        if (hit && !("entity" in hit) && hit.roomId) this.options.onRoomDoubleTap!(hit.floorId, hit.roomId);
+        if (hit && "roomId" in hit && hit.roomId) this.options.onRoomDoubleTap!(hit.floorId, hit.roomId);
         else this.options.onBack?.();
       },
     });
@@ -2783,7 +2785,7 @@ export class FloorplanViewer {
     return ray;
   }
 
-  private pick(x: number, y: number): { entity: string } | { floorId: string; roomId: string | null } | null {
+  private pick(x: number, y: number): { entity: string } | { floorId: string; roomId: string | null } | { floorId: string; outdoorId: string } | null {
     const ray = this.rayAt(x, y);
     const floors = this.activeFloors();
     const meshes = floors.flatMap((f) => [f.lampMesh, f.coneMesh, f.framesMesh, f.glassMesh, f.blindsMesh, f.wallMesh, f.floorMesh].filter((m) => m.visible));
@@ -2807,6 +2809,8 @@ export class FloorplanViewer {
         const entity = id ? this.pickOpenings.get(id) : undefined;
         if (entity) return { entity };
       } else if (hit.object === fv.wallMesh) {
+        const outdoorId = inRange(fv.geo.outdoorTris, tri);
+        if (outdoorId) return { floorId: fv.floor.id, outdoorId };
         const id = inRange(fv.geo.furnitureTris, tri);
         const entity = id ? this.pickFurniture.get(id) : undefined;
         if (entity) return { entity };
@@ -2847,6 +2851,11 @@ export class FloorplanViewer {
       this.flashes.set(hit.entity, performance.now() + FLASH_MS);
       this.invalidate();
       this.options.onDeviceTap?.(hit.entity, x, y);
+      return;
+    }
+    if (hit && "outdoorId" in hit) {
+      if (this.options.onOutdoorTap) this.options.onOutdoorTap(hit.floorId, hit.outdoorId);
+      else this.options.onRoomTap?.(hit.floorId, null);
       return;
     }
     this.options.onRoomTap?.(hit?.floorId ?? this.floorId ?? "", hit?.roomId ?? null);

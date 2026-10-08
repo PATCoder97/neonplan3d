@@ -4,6 +4,13 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.18.17
+
+### Added
+
+- Turned covered verandas and yards into self-contained, room-like outdoor structures with their own floor, roof and direct 3D selection.
+- Added editable names, polygon corners, floor and roof finishes, railings, front-column count and column dimensions for covered outdoor structures.
+
 ## 1.18.16
 
 ### Added

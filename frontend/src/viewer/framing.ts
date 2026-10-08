@@ -1,5 +1,5 @@
 import { Box3, Vector3 } from "three";
-import { groundLevel, OUTDOOR_TOP, outdoorStanding, type Floor, type Room } from "../model.ts";
+import { groundLevel, OUTDOOR_TOP, outdoorFloorTop, outdoorStanding, type Floor, type Room } from "../model.ts";
 
 export interface FramingFloor {
   floor: Floor;
@@ -22,9 +22,9 @@ export function framingBox(floors: readonly FramingFloor[]): Box3 {
     }
     for (const area of floor.outdoor ?? []) {
       const ground = floorY + groundLevel(floor) + (area.offset ?? 0);
-      const low = ground - (area.type === "pool" ? 0 : (area.slope ?? 0));
+      const low = ground - (area.type === "pool" || outdoorFloorTop(area.type) !== null ? 0 : (area.slope ?? 0));
       const ownHeight = outdoorStanding(area.type) && area.height ? area.height : OUTDOOR_TOP[area.type];
-      const high = ground + (area.type === "pool" ? 0.06 : ownHeight);
+      const high = ground + (area.type === "pool" ? 0.06 : (outdoorFloorTop(area.type) ?? 0) + ownHeight);
       for (const [x, z] of area.points) expandColumn(box, x, z, low, high);
     }
     for (const wall of floor.walls ?? []) {

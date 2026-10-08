@@ -465,6 +465,7 @@ export class Fp3dView3d extends LitElement {
         quality: this.quality,
         explode: this.explode,
         onRoomTap: (floorId, roomId) => this.fire("room-tap", { floorId, roomId }),
+        onOutdoorTap: (floorId, outdoorId) => this.fire("outdoor-tap", { floorId, outdoorId }),
         onFloorTap: (floorId) => this.fire("floor-tap", { floorId }),
         floorInfo: (floor) =>
           floor.rooms.length === 1 ? translate(this.hass, "floor_rooms_one") : translate(this.hass, "floor_rooms", { n: floor.rooms.length }),

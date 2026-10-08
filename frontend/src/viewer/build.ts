@@ -85,6 +85,8 @@ export interface FloorGeometry {
   wallBuckets: number[];
   /** Triangle ranges of furniture in `walls`, for tapping furniture in 3D. */
   furnitureTris: { id: string; start: number; end: number }[];
+  /** Composite outdoor structures in `walls`, so they can be selected directly in 3D. */
+  outdoorTris: { id: string; start: number; end: number }[];
 }
 
 export const SLAB = 0.2;
@@ -345,7 +347,7 @@ export function buildFloorGeometry(
 
   // ---------------------------------------------------------------- furniture and shadows
   const shadow = buildShadow(outline.edges, floor.rooms, spans);
-  pushOutdoor(wallBuf, lines, floor);
+  const outdoorTris = pushOutdoor(wallBuf, lines, floor);
   for (const s of solar) pushModules(wallBuf, lines, s.face, s.field, floor.elevation);
 
   // lamps are drawn live by the viewer (they glow with their light)
@@ -377,6 +379,7 @@ export function buildFloorGeometry(
     openRooms,
     wallBuckets: walls.map((w) => wallBucket.get(w)!),
     furnitureTris,
+    outdoorTris,
   };
 }
 

@@ -726,6 +726,10 @@ export class Fp3dEditor extends LitElement {
           if (e.detail.roomId) this.selectFrom3d("room", e.detail.roomId);
           else this._sideOpen = false;
         }}
+        @outdoor-tap=${(e: CustomEvent<{ floorId: string; outdoorId: string }>) => {
+          if (e.detail.floorId) this._floorId = e.detail.floorId;
+          this.selectFrom3d("outdoor", e.detail.outdoorId);
+        }}
       ></fp3d-view3d>
     </div>`;
   }
@@ -2031,6 +2035,30 @@ export class Fp3dEditor extends LitElement {
   private updateOutdoor(patch: Partial<OutdoorArea>): void {
     const id = this._outdoorId;
     this.change((_, floor) => Object.assign(floor.outdoor.find((o) => o.id === id)!, patch));
+  }
+
+  private setOutdoorPoint(index: number, axis: 0 | 1, value: number): void {
+    const area = this.outdoorArea;
+    if (!area || !Number.isFinite(value)) return;
+    const points = area.points.map((p) => [...p] as Vec2);
+    points[index][axis] = round(value);
+    this.updateOutdoor({ points });
+  }
+
+  private insertOutdoorPoint(index: number): void {
+    const area = this.outdoorArea;
+    if (!area || !this.isAdmin || area.points.length >= 200) return;
+    const points = area.points.map((p) => [...p] as Vec2);
+    const a = points[index];
+    const b = points[(index + 1) % points.length];
+    points.splice(index + 1, 0, [round((a[0] + b[0]) / 2), round((a[1] + b[1]) / 2)]);
+    this.updateOutdoor({ points });
+  }
+
+  private deleteOutdoorPoint(index: number): void {
+    const area = this.outdoorArea;
+    if (!area || !this.isAdmin || area.points.length <= 3) return;
+    this.updateOutdoor({ points: area.points.filter((_, i) => i !== index) });
   }
 
   private deleteOutdoor(): void {
@@ -4616,7 +4644,7 @@ export class Fp3dEditor extends LitElement {
       const big = Math.min(b.x1 - b.x0, b.z1 - b.z0) * this._view.scale > 40;
       return svg`<g data-outdoor=${a.id} class=${`fp3d-out fp3d-out-${a.type}${a.id === this._outdoorId ? " fp3d-out-sel" : ""}`}>
         <polygon points=${pts} />
-        ${big ? svg`<text x=${cx} y=${cy + 4}>${this.t(`out_${a.type}` as I18nKey)}</text>` : nothing}
+        ${big ? svg`<text x=${cx} y=${cy + 4}>${a.name || this.t(`out_${a.type}` as I18nKey)}</text>` : nothing}
       </g>`;
     })}</g>`;
   }
@@ -4624,6 +4652,7 @@ export class Fp3dEditor extends LitElement {
   private renderOutdoorForm(a: OutdoorArea) {
     const admin = this.isAdmin;
     const rect = isAxisRect(a.points);
+    const covered = a.type === "canopy" || a.type === "veranda";
     const b = bounds(a.points);
     const setRect = (field: "x" | "z" | "w" | "d", v: number) => {
       let { x0, z0, x1, z1 } = b;
@@ -4636,6 +4665,12 @@ export class Fp3dEditor extends LitElement {
     return html`<section>
       <div class="fp3d-h3row"><h3>${this.t("outdoor")}</h3>${this.fixButton("outdoor", a.id)}</div>
       <div class="fp3d-form">
+        ${covered
+          ? html`<label class="fp3d-field fp3d-wide"
+              >${this.t("outdoor_name")}
+              <input .value=${a.name ?? this.t(`out_${a.type}` as I18nKey)} ?disabled=${!admin} @change=${(e: Event) => this.updateOutdoor({ name: (e.target as HTMLInputElement).value.trim() || null })}
+            /></label>`
+          : nothing}
         <label class="fp3d-field fp3d-wide"
           >${this.t("outdoor_type")}
           <select ?disabled=${!admin} @change=${(e: Event) => this.updateOutdoor({ type: (e.target as HTMLSelectElement).value as OutdoorType })}>
@@ -4645,6 +4680,20 @@ export class Fp3dEditor extends LitElement {
         ${rect
           ? html`${this.num(this.t("x"), b.x0, (v) => setRect("x", v))} ${this.num(this.t("z"), b.z0, (v) => setRect("z", v))}
             ${this.num(this.t("width"), b.x1 - b.x0, (v) => setRect("w", v), 0.01, 0.1)} ${this.num(this.t("depth"), b.z1 - b.z0, (v) => setRect("d", v), 0.01, 0.1)}`
+          : nothing}
+        ${covered
+          ? html`<label class="fp3d-field fp3d-wide"
+                >${this.t("material")}
+                <select ?disabled=${!admin} @change=${(e: Event) => this.updateOutdoor({ floor_material: (e.target as HTMLSelectElement).value })}>
+                  ${FLOOR_MATERIALS.map((m) => html`<option value=${m} ?selected=${m === (a.floor_material ?? "tiles")}>${this.t(`mat_${m}` as I18nKey)}</option>`)}
+                </select></label
+              >
+              <label class="fp3d-field fp3d-wide"
+                >${this.t("outdoor_roof_style")}
+                <select ?disabled=${!admin} @change=${(e: Event) => this.updateOutdoor({ roof_style: (e.target as HTMLSelectElement).value as "solid" | "glass" | "tile" })}>
+                  ${(["solid", "glass", "tile"] as const).map((style) => html`<option value=${style} ?selected=${style === (a.roof_style ?? "solid")}>${this.t(`outdoor_roof_${style}` as I18nKey)}</option>`)}
+                </select></label
+              >`
           : nothing}
         ${outdoorStanding(a.type)
           ? this.num(this.t("outdoor_height"), a.height ?? OUTDOOR_TOP[a.type], (v) => this.updateOutdoor({ height: Math.min(6, Math.max(0.1, round(v))) }), 0.05, 0.1)
@@ -4675,12 +4724,33 @@ export class Fp3dEditor extends LitElement {
               ${this.t("outdoor_bracing")}</label
             >`
           : nothing}
+        ${a.type === "veranda"
+          ? html`<label class="fp3d-check fp3d-wide"
+                ><input type="checkbox" .checked=${a.railing !== false} ?disabled=${!admin} @change=${(ev: Event) => this.updateOutdoor({ railing: (ev.target as HTMLInputElement).checked })} />
+                ${this.t("outdoor_railing")}</label
+              >
+              ${this.num(this.t("outdoor_columns"), a.columns ?? 2, (v) => this.updateOutdoor({ columns: Math.min(12, Math.max(0, Math.round(v))) }), 1, 0)}`
+          : nothing}
+        ${covered ? this.num(this.t("outdoor_column_size"), a.column_size ?? (a.type === "veranda" ? 0.32 : 0.12), (v) => this.updateOutdoor({ column_size: Math.min(0.8, Math.max(0.08, round(v))) }), 0.02, 0.08) : nothing}
         <label class="fp3d-check fp3d-wide" title=${this.t("outdoor_cut_hint")}
           ><input type="checkbox" .checked=${!!a.cut} ?disabled=${!admin} @change=${(ev: Event) => this.updateOutdoor({ cut: (ev.target as HTMLInputElement).checked || undefined })} />
           ${this.t("outdoor_cut")}</label
         >
       </div>
       ${a.slope ? html`<p class="fp3d-sub">${this.t("outdoor_slope_hint")}</p>` : nothing}
+      <details class="fp3d-points" ?open=${!rect}>
+        <summary>${this.t("points")} (${a.points.length})</summary>
+        ${a.points.map(
+          (p, i) => html`<div class="fp3d-point">
+            <span class="fp3d-muted">${i + 1}</span>
+            ${this.num(this.t("x"), p[0], (v) => this.setOutdoorPoint(i, 0, v))} ${this.num(this.t("z"), p[1], (v) => this.setOutdoorPoint(i, 1, v))}
+            ${admin
+              ? html`<button class="fp3d-btn" title=${this.t("insert_point")} @click=${() => this.insertOutdoorPoint(i)}>＋</button>
+                  <button class="fp3d-btn" title=${this.t("delete_point")} ?disabled=${a.points.length <= 3} @click=${() => this.deleteOutdoorPoint(i)}>×</button>`
+              : nothing}
+          </div>`,
+        )}
+      </details>
       <p class="fp3d-sub">${this.t("outdoor_hint")}</p>
       ${admin
         ? html`<div class="fp3d-actions">
@@ -5018,7 +5088,7 @@ export class Fp3dEditor extends LitElement {
   }
 
   /** A tap in the 3D pane: select there, and fold the sidebar away (the bar under the pane has the essentials). */
-  private selectFrom3d(kind: "room" | "furniture" | "device", id: string | null): void {
+  private selectFrom3d(kind: "room" | "furniture" | "device" | "outdoor", id: string | null): void {
     this.selectItem(kind, id);
     this._sideOpen = false;
   }

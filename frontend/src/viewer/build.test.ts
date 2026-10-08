@@ -56,6 +56,15 @@ test("a single room has corner lines at its four inner and four outer corners", 
   assert.equal(segs.filter((s) => atY(s, 0.004)).length, 8);
 });
 
+test("a composite outdoor structure keeps one triangle range for 3D selection", () => {
+  const floor = floorWith([]);
+  floor.outdoor = [{ id: "covered", type: "canopy", points: [[0, 0], [3, 0], [3, 2], [0, 2]], height: 2.4 }];
+  const geo = buildFloorGeometry(floor, EXT, INT);
+  assert.equal(geo.outdoorTris.length, 1);
+  assert.equal(geo.outdoorTris[0].id, "covered");
+  assert.ok(geo.outdoorTris[0].end > geo.outdoorTris[0].start);
+});
+
 test("a straight outer face across a T-joint gets no corner line", () => {
   const geo = buildFloorGeometry(floorWith([rect("a", 0, 0, 4, 3), rect("b", 4, 0, 7, 3)]), EXT, INT);
   const corners = segments(geo.lines).filter((s) => vertical(s) && s[6] === -1);

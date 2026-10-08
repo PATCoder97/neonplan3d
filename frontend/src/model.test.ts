@@ -111,6 +111,13 @@ test("outdoor lamps stand on the ground, or on a terrace", () => {
   assert.equal(outdoorGround({ ...newFloor("og", "OG", 2.75), outdoor: [] }, 1, 1), 0);
 });
 
+test("a covered veranda is one walkable outdoor object with its own slab", () => {
+  const floor = newFloor("og", "OG", 2.8);
+  floor.outdoor = [{ id: "v", type: "veranda", points: [[0, 0], [4, 0], [4, 2], [0, 2]], height: 2.4, open: true }];
+  assert.ok(Math.abs(outdoorGround(floor, 2, 1) - 0.12) < 1e-9);
+  assert.equal(outdoorGround(floor, 5, 1), 0);
+});
+
 test("resizing drags one corner while the opposite corner stays", () => {
   const f: Furniture = { id: "f", type: "table", x: 1, z: 1, rotation: 0, w: 1, d: 1, h: 0.75, variant: null, entity: null, power: null };
   // pull the front-right corner from (1.5, 1.5) to (2.5, 2)

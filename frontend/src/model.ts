@@ -539,6 +539,16 @@ export const OUTDOOR_TOP: Record<OutdoorType, number> = {
   veranda: 2.4,
 };
 
+/** Built-in floor/slab height of composite covered outdoor structures. */
+export const OUTDOOR_FLOOR_TOP: Partial<Record<OutdoorType, number>> = {
+  canopy: 0.02,
+  veranda: 0.12,
+};
+
+export function outdoorFloorTop(type: OutdoorType): number | null {
+  return OUTDOOR_FLOOR_TOP[type] ?? null;
+}
+
 /** Types that stand on the ground as structures (no surface to stand on, no light pool). */
 export function outdoorStanding(type: OutdoorType): boolean {
   return type === "hedge" || type === "fence" || type === "pergola" || type === "canopy" || type === "veranda";
@@ -571,7 +581,8 @@ export function outdoorDrop(a: OutdoorArea, x: number, z: number): number {
 
 /** Height of the surface of an area at a point, in floor coordinates (offset and slope included). */
 export function outdoorTopAt(floor: Floor, a: OutdoorArea, x: number, z: number): number {
-  return groundLevel(floor) + (a.offset ?? 0) + OUTDOOR_TOP[a.type] - outdoorDrop(a, x, z);
+  const floorTop = outdoorFloorTop(a.type);
+  return groundLevel(floor) + (a.offset ?? 0) + (floorTop ?? OUTDOOR_TOP[a.type]) - (floorTop === null ? outdoorDrop(a, x, z) : 0);
 }
 
 /** Ground level in floor coordinates: below the ground floor slab (0.2 m), the floor itself further up. */
@@ -581,7 +592,7 @@ export function groundLevel(floor: Floor): number {
 
 /** Height outdoor lamps stand on at a point: ground level, or the top of a terrace or bed there. */
 export function outdoorGround(floor: Floor, x: number, z: number): number {
-  const inside = (floor.outdoor ?? []).filter((o) => !outdoorStanding(o.type) && o.type !== "pool" && pointInPolygon([x, z], o.points));
+  const inside = (floor.outdoor ?? []).filter((o) => (!outdoorStanding(o.type) || outdoorFloorTop(o.type) !== null) && o.type !== "pool" && pointInPolygon([x, z], o.points));
   // an area cut out of the one beneath it wins over that one
   const a = [...inside].reverse().find((o) => o.cut) ?? inside[0];
   return a ? outdoorTopAt(floor, a, x, z) : groundLevel(floor);
@@ -605,7 +616,19 @@ export interface CarLinks {
 export interface OutdoorArea {
   id: string;
   type: OutdoorType;
+  /** Optional user-facing name for room-like covered areas. */
+  name?: string | null;
   points: Vec2[];
+  /** Surface material of a composite covered area. */
+  floor_material?: string | null;
+  /** Visual roof finish of a canopy or veranda. */
+  roof_style?: "solid" | "glass" | "tile" | null;
+  /** Veranda railing; undefined keeps the type default. */
+  railing?: boolean | null;
+  /** Number of substantial columns across a veranda's front edge. */
+  columns?: number | null;
+  /** Width of substantial columns in metres. */
+  column_size?: number | null;
   /** Standing structures (hedge, fence, pergola, canopy, veranda): their height in m. */
   height?: number | null;
   /** False hides the neon outline (a plot of several lawns without lines crossing it). */

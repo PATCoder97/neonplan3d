@@ -290,7 +290,16 @@
   "ext_teaser_title": "Gói nội thất tùy chọn",
   "ext_teaser_text": "Các tính năng tích hợp đã được bật. Mở Tiện ích mở rộng để cài thêm nội thất nếu cần.",
   "ext_open": "Mở tiện ích mở rộng",
-  "out_canopy": "Mái che",
-  "out_veranda": "Hiên có lan can và cột",
+  "out_canopy": "Sân có mái che",
+  "out_veranda": "Hiên có mái, lan can và cột",
+  "outdoor_name": "Tên",
+  "outdoor_roof_style": "Vật liệu mái",
+  "outdoor_roof_solid": "Mái đặc",
+  "outdoor_roof_glass": "Kính / polycarbonate",
+  "outdoor_roof_tile": "Mái ngói",
+  "outdoor_railing": "Lan can quanh các cạnh ngoài",
+  "outdoor_columns": "Số cột phía trước",
+  "outdoor_column_size": "Kích thước cột (m)",
+  "insert_point": "Thêm góc sau điểm này",
   "close": "Đóng"
 }

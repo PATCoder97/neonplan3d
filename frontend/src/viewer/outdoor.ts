@@ -6,7 +6,7 @@
 
 import { Color } from "three";
 import type { Floor, OutdoorArea, OutdoorType, Vec2 } from "../model.ts";
-import { bounds, groundLevel, isAxisRect, OUTDOOR_TOP, outdoorDrop, outdoorStanding, pointInPolygon, signedArea } from "../model.ts";
+import { bounds, groundLevel, isAxisRect, OUTDOOR_TOP, outdoorDrop, outdoorFloorTop, outdoorStanding, pointInPolygon, signedArea } from "../model.ts";
 import { ALWAYS, type GeoBuffer, type LineBuffer, pushPrism, shade, triangulate } from "./geo.ts";
 
 interface Look {
@@ -31,9 +31,30 @@ const LOOKS: Record<OutdoorType, Look> = {
   veranda: { color: 0xd5d9e8, side: 0x67718a, edge: 0x37e0ff, edgeAlpha: 0.58 },
 };
 
+const SURFACE_COLORS: Record<string, number> = {
+  wood: 0x30251f,
+  oak: 0x4a3728,
+  tiles: 0x283149,
+  carpet: 0x25243a,
+  stone: 0x30384a,
+  concrete: 0x272d3a,
+};
+
+function coveredLook(a: OutdoorArea, fallback: Look): { roof: number; under: number; floor: number } {
+  const roof = a.roof_style === "glass" ? 0x315a72 : a.roof_style === "tile" ? 0x26304a : fallback.color;
+  const under = a.roof_style === "glass" ? 0x203c50 : a.roof_style === "tile" ? 0x171d2d : fallback.side;
+  return { roof, under, floor: SURFACE_COLORS[a.floor_material ?? "tiles"] ?? SURFACE_COLORS.tiles };
+}
+
 /** Height of the visible surface of an area (for the lighting layer), at its high edge. */
 export function outdoorSurface(floor: Floor, a: OutdoorArea): number {
-  return groundLevel(floor) + (a.offset ?? 0) + (outdoorStanding(a.type) ? 0.01 : OUTDOOR_TOP[a.type]);
+  return groundLevel(floor) + (a.offset ?? 0) + (outdoorFloorTop(a.type) ?? (outdoorStanding(a.type) ? 0.01 : OUTDOOR_TOP[a.type]));
+}
+
+export interface OutdoorTriRange {
+  id: string;
+  start: number;
+  end: number;
 }
 
 function ccw(points: Vec2[]): Vec2[] {
@@ -94,11 +115,13 @@ function pushCanopyPanel(buf: GeoBuffer, poly: Vec2[], topAt: (x: number, z: num
   }
 }
 
-export function pushOutdoor(buf: GeoBuffer, lines: LineBuffer, floor: Floor): void {
+export function pushOutdoor(buf: GeoBuffer, lines: LineBuffer, floor: Floor): OutdoorTriRange[] {
   const ground = groundLevel(floor);
   const areas = floor.outdoor ?? [];
+  const ranges: OutdoorTriRange[] = [];
   areas.forEach((a, index) => {
     if (a.points.length < 3) return;
+    const start = buf.count;
     // an area may sit above or below the ground (a driveway down to a lower garage) and fall along one direction
     const g = ground + (a.offset ?? 0);
     const groundAt = (x: number, z: number) => g - outdoorDrop(a, x, z);
@@ -203,50 +226,60 @@ export function pushOutdoor(buf: GeoBuffer, lines: LineBuffer, floor: Floor): vo
         break;
       }
       case "canopy": {
-        // A Vietnamese-style terrace/carport canopy: posts and perimeter beams carry a solid,
-        // slightly sloped sheet.
+        // A complete covered yard: its own paved surface, posts, beams and a solid sloping roof.
         const h = look.top;
-        const roofAt = (x: number, z: number) => g + h - outdoorDrop(a, x, z);
+        const finish = coveredLook(a, look);
+        const floorY = g + (outdoorFloorTop(a.type) ?? 0);
+        const roofAt = (x: number, z: number) => floorY + h - outdoorDrop(a, x, z);
+        const columnHalf = Math.min(0.4, Math.max(0.04, (a.column_size ?? 0.12) / 2));
+        pushPrism(buf, poly, g - 0.06, floorY, look.side, finish.floor, { aoFrom: g - 0.06 });
         for (const [x, z] of poly) {
           const top = roofAt(x, z) - 0.08;
-          pushPrism(buf, ccw([[x - 0.06, z - 0.06], [x + 0.06, z - 0.06], [x + 0.06, z + 0.06], [x - 0.06, z + 0.06]]), g, top, look.side, look.color);
+          pushPrism(buf, ccw([[x - columnHalf, z - columnHalf], [x + columnHalf, z - columnHalf], [x + columnHalf, z + columnHalf], [x - columnHalf, z + columnHalf]]), floorY, top, finish.under, finish.roof);
         }
         for (let i = 0; i < poly.length; i++) {
           if (i === openEnd) continue;
           const p = poly[i];
           const q = poly[(i + 1) % poly.length];
           const y = (roofAt(p[0], p[1]) + roofAt(q[0], q[1])) / 2;
-          pushBeam(buf, p, q, 0.12, y - 0.18, y - 0.08, look.side, look.color);
+          pushBeam(buf, p, q, 0.12, y - 0.18, y - 0.08, finish.under, finish.roof);
         }
-        pushCanopyPanel(buf, poly, roofAt, 0.08, look.side, look.color);
+        pushCanopyPanel(buf, poly, roofAt, 0.08, finish.under, finish.roof);
         outline((x, z) => roofAt(x, z) + 0.004);
         break;
       }
       case "veranda": {
-        // A Vietnamese upper-floor veranda: a railing around the three free edges, two substantial
-        // front columns and a deep lintel above them. The closing edge can be omitted where it joins
-        // the house; the terrace beneath remains a separate outdoor surface.
+        // A complete Vietnamese upper-floor veranda: slab, railing around the free edges, two
+        // substantial front columns, lintel and roof. Its closing edge joins the house.
         const h = look.top;
+        const finish = coveredLook(a, look);
+        const floorY = g + (outdoorFloorTop(a.type) ?? 0);
+        const baseAt = (_x: number, _z: number) => floorY;
+        const roofAt = (x: number, z: number) => floorY + h - outdoorDrop(a, x, z);
         const railH = Math.min(1.1, h * 0.48);
         const squarePost = (x: number, z: number, half: number, y0: number, y1: number, side = look.side, top = look.color) =>
           pushPrism(buf, ccw([[x - half, z - half], [x + half, z - half], [x + half, z + half], [x - half, z + half]]), y0, y1, side, top);
 
+        pushPrism(buf, poly, g - 0.12, floorY, look.side, finish.floor, { aoFrom: g - 0.12 });
+
         // Slim balusters and two horizontal rails around every free edge.
-        for (let i = 0; i < poly.length; i++) {
-          if (i === openEnd) continue;
-          const p = poly[i];
-          const q = poly[(i + 1) % poly.length];
-          const len = Math.hypot(q[0] - p[0], q[1] - p[1]);
-          const n = Math.max(1, Math.ceil(len / 0.22));
-          const y = (groundAt(p[0], p[1]) + groundAt(q[0], q[1])) / 2;
-          pushBeam(buf, p, q, 0.07, y + 0.3, y + 0.38, look.side, look.color);
-          pushBeam(buf, p, q, 0.09, y + railH - 0.09, y + railH, look.side, look.color);
-          for (let k = 0; k <= n; k++) {
-            const t = k / n;
-            const x = p[0] + (q[0] - p[0]) * t;
-            const z = p[1] + (q[1] - p[1]) * t;
-            const gy = groundAt(x, z);
-            squarePost(x, z, 0.018, gy + 0.08, gy + railH - 0.07);
+        if (a.railing !== false) {
+          for (let i = 0; i < poly.length; i++) {
+            if (i === openEnd) continue;
+            const p = poly[i];
+            const q = poly[(i + 1) % poly.length];
+            const len = Math.hypot(q[0] - p[0], q[1] - p[1]);
+            const n = Math.max(1, Math.ceil(len / 0.22));
+            const y = floorY;
+            pushBeam(buf, p, q, 0.07, y + 0.3, y + 0.38, finish.under, finish.roof);
+            pushBeam(buf, p, q, 0.09, y + railH - 0.09, y + railH, finish.under, finish.roof);
+            for (let k = 0; k <= n; k++) {
+              const t = k / n;
+              const x = p[0] + (q[0] - p[0]) * t;
+              const z = p[1] + (q[1] - p[1]) * t;
+              const gy = baseAt(x, z);
+              squarePost(x, z, 0.018, gy + 0.08, gy + railH - 0.07, finish.under, finish.roof);
+            }
           }
         }
 
@@ -279,16 +312,22 @@ export function pushOutdoor(buf: GeoBuffer, lines: LineBuffer, floor: Floor): vo
         }
         const p = poly[front];
         const q = poly[(front + 1) % poly.length];
-        for (const [x, z] of [p, q]) {
-          const gy = groundAt(x, z);
-          squarePost(x, z, 0.22, gy, gy + 0.28);
-          squarePost(x, z, 0.16, gy + 0.2, gy + h - 0.2);
-          squarePost(x, z, 0.22, gy + h - 0.28, gy + h);
-          lines.seg([x, gy + 0.28, z], [x, gy + h - 0.28, z], edge, ALWAYS);
+        const columns = Math.min(12, Math.max(0, Math.round(a.columns ?? 2)));
+        const columnHalf = Math.min(0.4, Math.max(0.04, (a.column_size ?? 0.32) / 2));
+        for (let i = 0; i < columns; i++) {
+          const t = columns === 1 ? 0.5 : i / (columns - 1);
+          const x = p[0] + (q[0] - p[0]) * t;
+          const z = p[1] + (q[1] - p[1]) * t;
+          const gy = baseAt(x, z);
+          squarePost(x, z, columnHalf * 1.375, gy, gy + 0.28, finish.under, finish.roof);
+          squarePost(x, z, columnHalf, gy + 0.2, roofAt(x, z) - 0.2, finish.under, finish.roof);
+          squarePost(x, z, columnHalf * 1.375, roofAt(x, z) - 0.28, roofAt(x, z), finish.under, finish.roof);
+          lines.seg([x, gy + 0.28, z], [x, roofAt(x, z) - 0.28, z], edge, ALWAYS);
         }
-        const topY = (groundAt(p[0], p[1]) + groundAt(q[0], q[1])) / 2 + h;
-        pushBeam(buf, p, q, 0.42, topY - 0.28, topY, look.side, look.color);
-        outline((x, z) => groundAt(x, z) + railH + 0.004);
+        const topY = (roofAt(p[0], p[1]) + roofAt(q[0], q[1])) / 2;
+        pushBeam(buf, p, q, Math.max(0.2, columnHalf * 2.6), topY - 0.28, topY, finish.under, finish.roof);
+        pushCanopyPanel(buf, poly, roofAt, 0.1, finish.under, finish.roof);
+        outline((x, z) => baseAt(x, z) + (a.railing === false ? 0.004 : railH + 0.004));
         break;
       }
       default: {
@@ -310,5 +349,7 @@ export function pushOutdoor(buf: GeoBuffer, lines: LineBuffer, floor: Floor): vo
         }
       }
     }
+    if (buf.count > start) ranges.push({ id: a.id, start, end: buf.count });
   });
+  return ranges;
 }
