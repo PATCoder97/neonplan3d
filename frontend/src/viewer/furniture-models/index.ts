@@ -5,6 +5,7 @@ import { BATHROOM_FURNITURE_MODELS, BATHROOM_FURNITURE_SCREENS } from "./bathroo
 import { CLIMATE_FURNITURE_MODELS } from "./climate.ts";
 import { ENERGY_FURNITURE_MODELS } from "./energy.ts";
 import { EVERYDAY_FURNITURE_MODELS, EVERYDAY_FURNITURE_SCREENS } from "./everyday.ts";
+import { FITNESS_FURNITURE_MODELS, FITNESS_FURNITURE_SCREENS } from "./fitness.ts";
 import { GARDEN_FURNITURE_MODELS } from "./garden.ts";
 import { GARAGE_FURNITURE_MODELS } from "./garage.ts";
 import { KITCHEN_BATH_FURNITURE_MODELS } from "./kitchen-bath.ts";
@@ -22,6 +23,7 @@ import type { FurnitureModelContext, FurnitureModelRenderer, FurnitureScreenRect
 /** Built-in renderers split by functional family. Add new families to this one composition point. */
 const BUILTIN_FURNITURE_MODELS: Readonly<Record<string, FurnitureModelRenderer>> = {
   ...EVERYDAY_FURNITURE_MODELS,
+  ...FITNESS_FURNITURE_MODELS,
   ...BEDROOM_FURNITURE_MODELS,
   ...LIVING_FURNITURE_MODELS,
   ...KITCHEN_BATH_FURNITURE_MODELS,
@@ -47,6 +49,7 @@ const BUILTIN_FURNITURE_SCREENS: Readonly<Record<string, FurnitureScreenRenderer
   ...BATHROOM_FURNITURE_SCREENS,
   ...BEDROOM_FURNITURE_SCREENS,
   ...EVERYDAY_FURNITURE_SCREENS,
+  ...FITNESS_FURNITURE_SCREENS,
   ...KIDS_FURNITURE_SCREENS,
   ...LIVING_FURNITURE_SCREENS,
   ...OFFICE_FURNITURE_SCREENS,

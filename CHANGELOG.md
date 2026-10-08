@@ -4,6 +4,18 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.23.5
+
+### Added
+
+- Completed the 17-item Fitness family with cardio machines, strength equipment, yoga and wall-training accessories, a smart mirror, indoor bike trainer, sauna cabin, massage chair, kettlebells and a cooled water station.
+- Added a dedicated Fitness library group with procedural 3D models, plan symbols and English, German and Vietnamese names.
+
+### Changed
+
+- The smart fitness mirror supports Live Screens; wall mirrors and bars use dedicated mount heights, and nine powered fitness devices expose Home Assistant linking capability.
+- Expanded the reproducible inventory to 421 declared types and 414 library items, completing Fitness coverage at 17 of 17.
+
 ## 1.23.4
 
 ### Added

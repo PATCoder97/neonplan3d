@@ -126,6 +126,31 @@ test("pet furniture batch two has distinct bounded habitats and powered care dev
   for (const type of ["pet_feeder_automatic", "pet_water_fountain", "aquarium_100", "aquarium_240_cabinet", "terrarium"]) assert.ok(ELECTRIC_FURNITURE.has(type), `${type}: powered capability`);
 });
 
+test("fitness family has bounded dedicated equipment, wall mounts and a smart live mirror", () => {
+  const types = ["fitness_treadmill", "fitness_power_rack", "fitness_rower", "fitness_spin_bike", "fitness_dumbbell_rack", "fitness_punching_bag", "fitness_yoga_mat", "fitness_cross_trainer", "fitness_mirror_wall", "fitness_ball", "fitness_wall_bars", "fitness_mirror_smart", "fitness_bike_trainer", "fitness_sauna_cabin", "fitness_massage_chair", "fitness_kettlebell_set", "fitness_water_station"] as const;
+  const signatures = new Set<string>();
+  for (const type of types) {
+    const [w, d, h] = FURNITURE_SIZE[type];
+    const buf = new GeoBuffer();
+    const lines = new LineBuffer();
+    const item = { id: type, type, x: 0, z: 0, rotation: 0, w, d, h, variant: null } as Furniture;
+    pushFurniture(buf, lines, new GeoBuffer(), item, builtinBase(item));
+    assert.ok(buf.count > 0 && lines.p.length > 0, `${type}: solid and outline geometry`);
+    assert.ok(buf.p.every(Number.isFinite) && lines.p.every(Number.isFinite), `${type}: finite geometry`);
+    const ys = buf.p.filter((_, index) => index % 3 === 1);
+    assert.ok(Math.min(...ys) >= -1e-6 && Math.max(...ys) <= h + 1e-6, `${type}: geometry stays inside declared height`);
+    signatures.add(`${buf.count}:${lines.p.length}`);
+  }
+  assert.ok(signatures.size >= 13, "fitness models keep varied geometric complexity");
+  const floor = newFloor("fitness", "Fitness", 0);
+  assert.equal(mountBase(floor, { type: "fitness_mirror_wall", x: 0, z: 0, h: FURNITURE_SIZE.fitness_mirror_wall[2] }), 0.5);
+  assert.equal(mountBase(floor, { type: "fitness_wall_bars", x: 0, z: 0, h: FURNITURE_SIZE.fitness_wall_bars[2] }), 0.3);
+  assert.equal(mountBase(floor, { type: "fitness_mirror_smart", x: 0, z: 0, h: FURNITURE_SIZE.fitness_mirror_smart[2] }), 0.4);
+  const [w, d, h] = FURNITURE_SIZE.fitness_mirror_smart;
+  assert.ok(screenRect({ id: "fitness-screen", type: "fitness_mirror_smart", x: 0, z: 0, rotation: 0, w, d, h, variant: null } as Furniture, floor), "smart mirror exposes a Live Screen");
+  for (const type of ["fitness_treadmill", "fitness_rower", "fitness_spin_bike", "fitness_cross_trainer", "fitness_mirror_smart", "fitness_bike_trainer", "fitness_sauna_cabin", "fitness_massage_chair", "fitness_water_station"]) assert.ok(ELECTRIC_FURNITURE.has(type), `${type}: powered capability`);
+});
+
 test("office fixtures have distinct geometry and monitors follow the supporting desk", () => {
   const types = ["desk_l", "desk_corner", "desk_sit_stand", "chair_ergonomic", "chair_visitor", "filing_cabinet", "drawer_unit_office", "bookcase_office", "monitor_single", "monitor_dual", "pc_tower", "gaming_chair", "sim_racing_cockpit", "server_rack_42u", "printer_3d_open", "whiteboard_office", "monitor_triple", "arcade_cabinet", "laser_printer", "phone_booth_office", "printer_3d_enclosed", "filament_shelf_wall"] as const;
   const complexity = new Map<string, number>();

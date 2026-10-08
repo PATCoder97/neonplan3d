@@ -947,6 +947,12 @@ export function builtinBase(f: Pick<Furniture, "type" | "h"> & { variant?: strin
       return 1.15;
     case "cat_climbing_steps_wall":
       return 0.55;
+    case "fitness_mirror_wall":
+      return 0.5;
+    case "fitness_wall_bars":
+      return 0.3;
+    case "fitness_mirror_smart":
+      return 0.4;
     case "nightstand_floating":
       return 0.48;
     case "tv_wall":
