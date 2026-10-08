@@ -738,6 +738,12 @@ const FURNITURE_NAMES: Record<string, RegExp> = {
   vanity_light: /(vanity|dressing|schmink|trang điểm|trang diem).*(light|licht|đèn|den)/i,
   mirror_round_light: /(mirror|spiegel|gương|guong).*(round|rund|tròn|tron|light|licht|đèn|den)/i,
   mirror_80_light: /(mirror|spiegel|gương|guong).*(light|licht|đèn|den)/i,
+  mirror_cabinet_light: /(mirror|spiegel|gương|guong).*(cabinet|schrank|tủ|tu).*(light|licht|đèn|den)/i,
+  electric_towel_heater: /(towel|handtuch|khăn|khan).*(heater|wärm|sưởi|suoi)/i,
+  bathroom_fan: /(bath|bad|toilet|wc|phòng tắm|phong tam).*(fan|lüfter|quạt|quat)/i,
+  washer_vanity: /(washer|washing|wasch|máy giặt|may giat)/i,
+  rain_shower_led: /(shower|dusche|sen).*(led|light|licht|đèn|den)/i,
+  mirror_led_clock: /(mirror|spiegel|gương|guong).*(led|clock|uhr|đồng hồ|dong ho)/i,
 };
 const MEDIA_FURNITURE = new Set(["tv_board", "tv_wall", "tv_stand", "media_wall_tv", "smart_display"]);
 

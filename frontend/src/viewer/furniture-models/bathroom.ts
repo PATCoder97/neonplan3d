@@ -118,8 +118,85 @@ function towelRail(b: Builder, w: number, d: number, h: number): void {
   b.pad(-w * 0.32, w * 0.32, y0 + h * 0.23, y0 + h * 0.66, 0, d / 2, C.fabric, C.cushion, 0.018, EDGE_FAINT);
 }
 
+function sauna(b: Builder, w: number, d: number, h: number): void {
+  const t = 0.06;
+  b.box(-w / 2, -w / 2 + t, 0, h, -d / 2, d / 2, C.wood, C.woodTop, EDGE_FURN);
+  b.box(w / 2 - t, w / 2, 0, h, -d / 2, d / 2, C.wood, C.woodTop, EDGE_FURN);
+  b.box(-w / 2, w / 2, 0, h, -d / 2, -d / 2 + t, C.wood, C.woodTop, EDGE_FURN);
+  b.box(-w / 2, w / 2, h - t, h, -d / 2, d / 2, C.wood, C.woodTop, EDGE_FURN);
+  b.box(-w * 0.42, w * 0.42, h * 0.18, h * 0.38, -d * 0.32, d * 0.3, C.wood, C.woodTop, EDGE_FAINT);
+  b.box(-w * 0.18, w * 0.18, 0, h * 0.2, d * 0.12, d * 0.42, C.dark, C.metal, EDGE_GLOW);
+}
+
+function towelHeater(b: Builder, w: number, d: number, h: number, electric: boolean): void {
+  const y0 = 0.55;
+  for (const x of [-w * 0.46, w * 0.46]) b.box(x - 0.018, x + 0.018, y0, y0 + h, -d * 0.1, d * 0.1, C.metal, C.metal, EDGE_FURN);
+  for (let i = 0; i < 8; i++) {
+    const y = y0 + (h * i) / 7;
+    b.box(-w * 0.46, w * 0.46, y - 0.012, y + 0.012, -d * 0.1, d * 0.1, electric ? C.accent : C.metal, C.metal, electric ? EDGE_GLOW : EDGE_FAINT);
+  }
+}
+
+function whirlpool(b: Builder, w: number, d: number, h: number): void {
+  rectangularTub(b, w, d, h, true);
+  for (const x of [-w * 0.28, 0, w * 0.28]) for (const z of [-d * 0.25, d * 0.25]) b.cyl(x, z, 0.025, h - 0.012, h + 0.006, C.accent, C.accent, 8, EDGE_GLOW);
+}
+
+function applianceCabinet(b: Builder, w: number, d: number, h: number, withBasket: boolean): void {
+  b.box(-w / 2, w / 2, 0, h, -d / 2, d / 2, C.body, C.bodyTop, EDGE_FURN);
+  const front = d / 2 + 0.006;
+  b.cyl(0, front, w * 0.31, 0.12, Math.min(h * 0.38, 0.68), C.dark, C.glass, 20, EDGE_GLOW);
+  b.seg(-w * 0.42, h * 0.5, front, w * 0.42, h * 0.5, front, EDGE_FAINT);
+  if (withBasket) b.box(-w * 0.38, w * 0.38, h * 0.56, h * 0.86, -d * 0.34, d * 0.38, C.fabric, C.fabricTop, EDGE_FURN);
+}
+
+function laundryBasket(b: Builder, w: number, d: number, h: number): void {
+  b.loft([-w * 0.42, w * 0.42, -d * 0.42, d * 0.42], [-w / 2, w / 2, -d / 2, d / 2], 0, h, C.fabric, C.fabricTop, EDGE_FURN);
+  for (const x of [-w * 0.28, 0, w * 0.28]) b.seg(x, h * 0.12, d / 2 + 0.002, x, h * 0.88, d / 2 + 0.002, EDGE_FAINT);
+}
+
+function ladderShelf(b: Builder, w: number, d: number, h: number): void {
+  for (const x of [-w * 0.45, w * 0.45]) b.box(x - 0.025, x + 0.025, 0, h, -d * 0.18, d * 0.18, C.wood, C.wood, EDGE_FURN);
+  for (let i = 1; i < 5; i++) {
+    const y = (h * i) / 5;
+    b.box(-w * 0.45, w * 0.45, y - 0.018, y + 0.018, -d * 0.18, d * 0.18, C.wood, C.wood, EDGE_FAINT);
+  }
+  b.pad(-w * 0.32, w * 0.32, h * 0.52, h * 0.76, 0, d / 2, C.fabric, C.cushion, 0.015, EDGE_GLOW);
+}
+
+function mirrorCabinet(b: Builder, w: number, d: number, h: number): void {
+  const y0 = 1.05;
+  b.box(-w / 2, w / 2, y0, y0 + h, -d / 2, d / 2, C.body, C.bodyTop, EDGE_FURN);
+  b.box(-w * 0.46, w * 0.46, y0 + h * 0.06, y0 + h * 0.94, d / 2, d / 2 + 0.012, C.glass, C.glass, EDGE_GLOW);
+  b.seg(0, y0 + h * 0.08, d / 2 + 0.014, 0, y0 + h * 0.92, d / 2 + 0.014, EDGE_FAINT);
+}
+
+function bathroomFan(b: Builder, w: number, d: number, h: number): void {
+  const y0 = 1.75;
+  b.box(-w / 2, w / 2, y0, y0 + h, -d / 2, d / 2, C.white, C.whiteTop, EDGE_FURN);
+  b.lyingCyl("z", 0, d * 0.51, y0 + h * 0.12, y0 + h * 0.88, d * 0.08, h * 0.76, C.dark, C.metal, 16, EDGE_GLOW);
+}
+
+function washerVanity(b: Builder, w: number, d: number, h: number): void {
+  const washerW = Math.min(0.62, w * 0.5);
+  b.box(-w / 2, -w / 2 + washerW, 0, h - 0.05, -d / 2, d / 2, C.white, C.whiteTop, EDGE_FURN);
+  b.lyingCyl("z", -w / 2 + washerW / 2, d / 2 + 0.006, h * 0.18, h * 0.72, 0.03, washerW * 0.54, C.dark, C.glass, 18, EDGE_GLOW);
+  vanity(b, w - washerW, d, h, 1);
+  b.box(-w / 2, w / 2, h - 0.05, h, -d / 2, d / 2, C.whiteTop, C.whiteTop, EDGE_FURN);
+}
+
+function rainShower(b: Builder, w: number, d: number, h: number): void {
+  b.cyl(0, -d * 0.35, 0.018, 0.1, h, C.metal, C.metal, 8, EDGE_FURN);
+  b.box(-w * 0.38, w * 0.38, h - 0.035, h, -d * 0.35, d * 0.25, C.metal, C.metal, EDGE_GLOW);
+  b.box(-w * 0.32, w * 0.32, h - 0.041, h - 0.035, -d * 0.29, d * 0.19, C.accent, C.accent, EDGE_GLOW);
+}
+
 const roundMirrorScreen: FurnitureScreenRenderer = (w, d, h) => ({ x0: -w * 0.46, x1: w * 0.46, y0: 1.12 + h * 0.04, y1: 1.12 + h * 0.96, z: d / 2 + 0.004 });
 const rectangularMirrorScreen: FurnitureScreenRenderer = (w, d, h) => ({ x0: -w * 0.47, x1: w * 0.47, y0: 1.12 + h * 0.03, y1: 1.12 + h * 0.97, z: d / 2 + 0.004 });
+const mirrorCabinetScreen: FurnitureScreenRenderer = (w, d, h) => ({ x0: -w * 0.44, x1: w * 0.44, y0: 1.05 + h * 0.08, y1: 1.05 + h * 0.92, z: d / 2 + 0.016 });
+const heaterScreen: FurnitureScreenRenderer = (w, d, h) => ({ x0: -w * 0.44, x1: w * 0.44, y0: 0.55 + h * 0.08, y1: 0.55 + h * 0.92, z: d / 2 + 0.004 });
+const fanScreen: FurnitureScreenRenderer = (w, d, h) => ({ x0: -w * 0.36, x1: w * 0.36, y0: 1.75 + h * 0.14, y1: 1.75 + h * 0.86, z: d / 2 + 0.008 });
+const showerLightScreen: FurnitureScreenRenderer = (w, d, h) => ({ x0: -w * 0.3, x1: w * 0.3, y0: h - 0.045, y1: h - 0.032, z: d * 0.18 });
 
 export const BATHROOM_FURNITURE_MODELS: Readonly<Record<string, FurnitureModelRenderer>> = {
   bathtub: ({ b, w, d, h }) => (rectangularTub(b, w, d, h, true), 0.5),
@@ -147,9 +224,27 @@ export const BATHROOM_FURNITURE_MODELS: Readonly<Record<string, FurnitureModelRe
   bathroom_wall_shelf: ({ b, w, d, h }) => (wallShelf(b, w, d, h), false),
   towel_rail: ({ b, w, d, h }) => (towelRail(b, w, d, h), false),
   bathtub_freestanding: ({ b, w, d, h }) => (rectangularTub(b, w, d, h, true), 0.5),
+  sauna: ({ b, w, d, h }) => (sauna(b, w, d, h), 0.5),
+  towel_radiator: ({ b, w, d, h }) => (towelHeater(b, w, d, h, false), false),
+  whirlpool_indoor: ({ b, w, d, h }) => (whirlpool(b, w, d, h), 0.5),
+  washing_machine_cabinet: ({ b, w, d, h }) => (applianceCabinet(b, w, d, h, false), 0.5),
+  laundry_basket: ({ b, w, d, h }) => (laundryBasket(b, w, d, h), 0.5),
+  ladder_shelf_towels: ({ b, w, d, h }) => (ladderShelf(b, w, d, h), 0.5),
+  mirror_cabinet_light: ({ b, w, d, h }) => (mirrorCabinet(b, w, d, h), false),
+  electric_towel_heater: ({ b, w, d, h }) => (towelHeater(b, w, d, h, true), false),
+  bathroom_fan: ({ b, w, d, h }) => (bathroomFan(b, w, d, h), false),
+  washer_vanity: ({ b, w, d, h }) => (washerVanity(b, w, d, h), 0.5),
+  rain_shower_led: ({ b, w, d, h }) => (rainShower(b, w, d, h), false),
+  mirror_led_clock: ({ b, w, d, h }) => (litMirror(b, w, d, h, false), false),
+  laundry_cabinet_basket: ({ b, w, d, h }) => (applianceCabinet(b, w, d, h, true), 0.5),
 };
 
 export const BATHROOM_FURNITURE_SCREENS: Readonly<Record<string, FurnitureScreenRenderer>> = {
   mirror_round_light: roundMirrorScreen,
   mirror_80_light: rectangularMirrorScreen,
+  mirror_cabinet_light: mirrorCabinetScreen,
+  electric_towel_heater: heaterScreen,
+  bathroom_fan: fanScreen,
+  rain_shower_led: showerLightScreen,
+  mirror_led_clock: rectangularMirrorScreen,
 };

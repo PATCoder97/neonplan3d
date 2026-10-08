@@ -4,6 +4,19 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.20.11
+
+### Added
+
+- Completed the bathroom reference milestone at 37/37 with a sauna, indoor whirlpool, towel radiator and electric heater, washer/laundry cabinets and basket, towel ladder, illuminated mirror cabinet, bathroom fan, washer vanity, LED rain shower and clock mirror.
+- Added dedicated 2D symbols, low-poly 3D geometry and German/English/Vietnamese names for all thirteen items.
+- Added live state surfaces and automatic entity-name matching to six electrical bathroom fixtures.
+
+### Changed
+
+- Mapped the existing standalone shower screen to Architecture & Finishing while retaining it in the Bathroom editor group.
+- Expanded the reproducible catalog inventory to 256 declared types and 249 library items.
+
 ## 1.20.10
 
 ### Added

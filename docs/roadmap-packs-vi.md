@@ -25,7 +25,7 @@ Nói ngắn gọn: ảnh của họ được dùng để trả lời “cần c�
 
 ## Hiện trạng ngày 08/10/2026
 
-- Thư viện tích hợp hiện có **236 mục** trong 10 nhóm giao diện, gồm nhiều đồ dùng đặc trưng tại Việt Nam như bàn thờ, xe máy, bồn nước, võng, tủ giày, giàn phơi, quạt trần có đèn, quạt treo tường, robot cắt cỏ, cụm hạ tầng mạng/an toàn, cụm thiết bị kỹ thuật, bộ điều khiển/cảm biến nhà thông minh, chín kiểu đèn, sáu lô phòng khách, ba lô phòng ngủ và hai lô phòng tắm theo gallery công khai.
+- Thư viện tích hợp hiện có **249 mục** trong 10 nhóm giao diện, gồm nhiều đồ dùng đặc trưng tại Việt Nam như bàn thờ, xe máy, bồn nước, võng, tủ giày, giàn phơi, quạt trần có đèn, quạt treo tường, robot cắt cỏ, cụm hạ tầng mạng/an toàn, cụm thiết bị kỹ thuật, bộ điều khiển/cảm biến nhà thông minh, chín kiểu đèn, sáu lô phòng khách, ba lô phòng ngủ và ba lô phòng tắm theo gallery công khai.
 - Có 9 gói bố trí nhanh cho phòng: hai kiểu bếp, phòng tắm, phòng ngủ, phòng khách, phòng ăn, văn phòng, phòng trẻ em và sảnh.
 - Trình chỉnh sửa đã có tìm kiếm song ngữ, nhóm thu gọn, xem trước, đổi kích thước, xoay, lật, đặt lên sàn/tường/trần/bề mặt và liên kết entity.
 - Định dạng pack nhập ngoài đã hỗ trợ khối hộp, trụ, khối vát, đèn, màn hình, bề mặt đặt đồ, phương tiện và lỗ cầu thang.
@@ -132,6 +132,8 @@ Bảng kiểm kê làm việc nên có các cột: `nhóm`, `nguồn ảnh`, `t�
 | Khu tắm kính | Chỉ có `shower` và vách kính rời | Thêm buồng góc 90 × 90, buồng hốc 120 × 90 và walk-in 140 × 90 với cách bố trí vách riêng. |
 | Thiết bị vệ sinh và lưu trữ | Chỉ có một `wc`, chưa có bidet hoặc tủ chuyên dụng | Thêm bồn cầu két liền, bồn cầu treo, bidet, tủ cao và tủ lửng phòng tắm. |
 | Gương, khăn và phụ kiện | Chưa có gương sáng hoặc giá khăn nhận diện riêng | Thêm gương tròn/80 cm có vùng trạng thái đèn, kệ tường và giá khăn kèm khăn. |
+| Wellness và giặt | Thiếu sauna, whirlpool và cụm lưu trữ đồ giặt | Thêm sauna, bồn sục, tủ máy giặt, giỏ đồ, kệ thang khăn và tủ giặt có giỏ. |
+| Thiết bị phòng tắm thông minh | Chỉ có thiết bị kỹ thuật dùng chung | Thêm tủ gương sáng, sưởi khăn điện, quạt phòng tắm, máy giặt dưới lavabo, sen mưa LED và gương LED có đồng hồ; mỗi mẫu có vùng trạng thái riêng. |
 
 ## Kiến trúc cần làm trước
 
@@ -157,7 +159,7 @@ Các biến thể cùng họ, ví dụ sofa 2/3 chỗ, tủ bếp 40/60/80 cm ho
 Mục tiêu: biến hiện trạng thành đường cơ sở có thể đo được.
 
 - [x] Sinh báo cáo tự động từ `FURNITURE_TYPES`, `FURNITURE_GROUPS` và `FURNITURE_SIZE` để phát hiện ID trùng, thiếu tên hoặc thiếu kích thước (`cd frontend && npm run catalog`).
-- [x] Lập bảng ánh xạ các mục hiện tại vào 16 nhóm đích; catalog kiểm kê hiện khóa 243 type, 236 mục thư viện, 7 mục nội bộ và trường hợp `worktop` đang nằm trong hai nhóm. Mỗi mục chỉ được tính một lần trong `REFERENCE_PACK_ITEMS`.
+- [x] Lập bảng ánh xạ các mục hiện tại vào 16 nhóm đích; catalog kiểm kê hiện khóa 256 type, 249 mục thư viện, 7 mục nội bộ và trường hợp `worktop` đang nằm trong hai nhóm. Mỗi mục chỉ được tính một lần trong `REFERENCE_PACK_ITEMS`.
 - [ ] Duyệt toàn bộ ảnh gallery công khai của 16 trang sản phẩm, không chỉ ảnh đại diện ở trang Packs; lập bảng `đã phù hợp / cần sửa hình / cần thêm mới` kèm URL và ngày xem.
 - [ ] Chọn khoảng 10 mẫu hiện có cần sửa hình trước; `fan_ceiling` là mẫu thí điểm và phải giữ nguyên ID.
 - [ ] Chụp bộ ảnh chuẩn ở góc nhìn 2D, 3D và chế độ Day/Neon để so sánh hồi quy.
@@ -198,9 +200,10 @@ Mục tiêu: hoàn thiện bốn nhóm được dùng nhiều nhất trước, k
   - Đợt 1 đã thêm năm cỡ giường cố định, ba kiểu giường bọc/box-spring/futon và tủ áo 2/3 cánh; renderer và symbol nằm trong module Bedroom riêng.
   - Đợt 2 đã thêm tủ áo 4/6 cánh, tủ gương, tủ góc, ba kiểu tủ đầu giường và ba tủ ngăn kéo; tủ đầu giường treo có cao độ 48 cm và không tạo bóng tiếp xúc sàn.
   - Đợt 3 đã thêm 14 mẫu tủ mở/phụ kiện/nội thất có đèn; độ phủ phòng ngủ đạt mốc tham chiếu 41/41, bốn mẫu có đèn có vùng trạng thái entity riêng.
-- [ ] Phòng tắm/giặt: lavabo bàn/treo, bồn cầu, khu tắm kính, bình nóng lạnh, máy giặt cửa trên/cửa trước và giàn phơi.
+- [x] Phòng tắm/giặt: lavabo bàn/treo, bồn cầu, khu tắm kính, bình nóng lạnh, máy giặt cửa trên/cửa trước và giàn phơi.
   - Đợt 1 đã thêm năm loại lavabo/vanity, hai bồn tắm và ba khu tắm kính kích thước cố định; model/symbol mới nằm trong module Bathroom riêng, độ phủ đạt 15/37.
   - Đợt 2 đã thêm bồn cầu két liền/treo, bidet, hai tủ, hai gương sáng, kệ tường, giá khăn và bồn tắm độc lập; độ phủ đạt 25/37.
+  - Đợt 3 đã thêm 13 mẫu wellness, lưu trữ đồ giặt và thiết bị điện; chuyển vách kính rời sang nhóm tham chiếu Kiến trúc để Bathroom đạt đúng mốc 37/37 mà không tạo biến thể vô nghĩa.
 - [ ] Đèn và làm mát: sửa hình `fan_ceiling`, thêm `fan_ceiling_light`, quạt treo tường và các kiểu đèn phổ biến; quạt có đèn phải điều khiển riêng phần quạt và phần sáng.
   - Đã hoàn thành `fan_ceiling`, biến thể 3/4/5 cánh, `fan_ceiling_light` với entity quạt/đèn riêng và `fan_wall`.
   - Đã thêm chín kiểu đèn theo gallery Smart Home: cột đèn, cặp thanh sáng TV, đèn bàn cầu, đèn xách tay, đèn ambient, khối đèn, panel tròn, cụm đèn sân vườn và đèn tường hắt hai đầu; mỗi kiểu có symbol 2D, hình học 3D và hiệu ứng sáng riêng.
