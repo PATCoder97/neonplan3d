@@ -38,6 +38,7 @@ import {
   type HologramSettings,
   type StartView,
   FURNITURE_SIZE,
+  BUILTIN_VEHICLE_TYPES,
   STAIR_TYPES,
   canLift,
   isFixed,
@@ -5880,7 +5881,7 @@ export class Fp3dEditor extends LitElement {
           </div>`
         : nothing}
       ${isElectric(f.type) ? this.renderFurnitureLinks(f) : nothing} ${f.type === "parking" ? this.renderParkingForm(f) : nothing}
-      ${f.type.startsWith("pack:mastershort.vehicles:") && this.isAdmin
+      ${((BUILTIN_VEHICLE_TYPES as readonly string[]).includes(f.type) || !!packItem(f.type)?.vehicle) && this.isAdmin
         ? html`<section>
             <p class="fp3d-sub">${this.t("vehicle_to_spot_hint")}</p>
             <div class="fp3d-actions"><button class="fp3d-btn fp3d-primary" @click=${() => this.vehicleToSpot(f)}>🅿 ${this.t("vehicle_to_spot")}</button></div>
@@ -6389,7 +6390,10 @@ export class Fp3dEditor extends LitElement {
   private renderParkingForm(f: Furniture) {
     const admin = this.isAdmin;
     const lang = this.hass?.language ?? "en";
-    const vehicles = (this.packs ?? []).flatMap((p) => p.items.filter((it) => it.vehicle).map((it) => ({ id: packType(p.id, it.id), label: `${packItemName(it, lang)} · ${p.name}` })));
+    const vehicles = [
+      ...BUILTIN_VEHICLE_TYPES.map((id) => ({ id, label: furnitureName(this.hass, id) })),
+      ...(this.packs ?? []).flatMap((p) => p.items.filter((it) => it.vehicle).map((it) => ({ id: packType(p.id, it.id), label: `${packItemName(it, lang)} · ${p.name}` }))),
+    ];
     const presence = this.entityOptions((id) => /^(binary_sensor|device_tracker|input_boolean|switch|sensor)\./.test(id));
     const typeSensors = this.entityOptions((id) => /^(sensor|input_select|select|input_text)\./.test(id));
     const typeState = f.type_entity ? this.hass?.states[f.type_entity] : undefined;
@@ -6405,12 +6409,12 @@ export class Fp3dEditor extends LitElement {
     const floor = this.floor;
     const room = floor?.rooms.find((r) => r.points.length >= 3 && pointInPolygon([f.x, f.z], r.points));
     const item = f.vehicle ? packItem(f.vehicle) : undefined;
-    const carH = item ? item.size[2] * (f.scale ?? 1) : 0;
+    const builtinSize = f.vehicle && (BUILTIN_VEHICLE_TYPES as readonly string[]).includes(f.vehicle) ? FURNITURE_SIZE[f.vehicle as FurnitureType] : undefined;
+    const carH = (item?.size[2] ?? builtinSize?.[2] ?? 0) * (f.scale ?? 1);
     const tooTall = !!room && !!floor && carH > floor.height + 1e-6;
     return html`<div class="fp3d-form fp3d-links">
         ${this.entitySelect(this.t("parking_entity"), f.entity ?? null, undefined, presence, (v) => this.updateFurniture({ entity: v === "none" ? null : v }))}
         <label class="fp3d-field fp3d-wide">${this.t("parking_vehicle")} ${vehicleSelect(f.vehicle ?? null, (v) => this.updateFurniture({ vehicle: v }))}</label>
-        ${vehicles.length ? nothing : html`<p class="fp3d-sub fp3d-wide">${this.t("parking_no_pack")}</p>`}
         ${this.num(this.t("parking_scale"), Math.round((f.scale ?? 1) * 100), (v) => this.updateFurniture({ scale: Math.min(150, Math.max(30, v)) / 100 }), 5, 30)}
         ${this.entitySelect(this.t("parking_type_entity"), f.type_entity ?? null, undefined, typeSensors, (v) => this.updateFurniture({ type_entity: v === "none" ? null : v }))}
         ${f.type_entity

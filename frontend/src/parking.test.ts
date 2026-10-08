@@ -64,3 +64,13 @@ test("the parked vehicle becomes furniture of the pack item's size times the spo
   assert.equal(withVehicles(floor, new Map()).furniture.length, 1);
   assert.equal(withVehicles(floor, new Map([["p1", parkedVehicle(hass, spot)!]])).furniture.length, 2);
 });
+
+test("built-in vehicles can be selected, scaled and rendered by a parking spot", () => {
+  const { hass, spot } = setup();
+  const builtin = { ...spot, vehicle: "car_suv" } as Furniture;
+  assert.equal(parkedVehicle(hass, builtin), "car_suv");
+  const car = vehicleFurniture(builtin, "car_suv")!;
+  assert.equal(car.type, "car_suv");
+  assert.deepEqual([car.w, car.d, car.h].map((v) => Math.round(v * 1000) / 1000), [1.728, 4.185, 1.548]);
+  assert.equal(vehicleFurniture(builtin, "car_unknown"), null);
+});

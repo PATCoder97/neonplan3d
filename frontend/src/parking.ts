@@ -2,7 +2,7 @@
 // presence entity the vehicle appears only while a car is reported; a type sensor (e.g. from an AI
 // camera analysis) can pick which vehicle model is shown.
 
-import type { Building, Floor, Furniture } from "./model.ts";
+import { BUILTIN_VEHICLE_TYPES, FURNITURE_SIZE, type Building, type Floor, type Furniture } from "./model.ts";
 import { packItem } from "./packs.ts";
 import type { HomeAssistant } from "./types.ts";
 
@@ -36,7 +36,7 @@ export function parkedVehicle(hass: HomeAssistant, f: Furniture): string | null 
       if (hit) vehicle = hit.vehicle;
     }
   }
-  return vehicle && packItem(vehicle) ? vehicle : null;
+  return vehicle && (packItem(vehicle) || (BUILTIN_VEHICLE_TYPES as readonly string[]).includes(vehicle)) ? vehicle : null;
 }
 
 /** Vehicles standing in the building's parking spots, by spot id. */
@@ -59,9 +59,10 @@ export function parkingEntities(floors: readonly Floor[]): string[] {
 /** The vehicle as furniture in its spot: the pack item's size times the spot's scale, turned like the spot. */
 export function vehicleFurniture(spot: Furniture, vehicle: string): Furniture | null {
   const item = packItem(vehicle);
-  if (!item) return null;
+  const size = item?.size ?? ((BUILTIN_VEHICLE_TYPES as readonly string[]).includes(vehicle) ? FURNITURE_SIZE[vehicle as keyof typeof FURNITURE_SIZE] : null);
+  if (!size) return null;
   const k = spot.scale ?? 1;
-  return { id: `${spot.id}:vehicle`, type: vehicle, x: spot.x, z: spot.z, rotation: spot.rotation, w: item.size[0] * k, d: item.size[1] * k, h: item.size[2] * k, variant: null, entity: null, power: null };
+  return { id: `${spot.id}:vehicle`, type: vehicle, x: spot.x, z: spot.z, rotation: spot.rotation, w: size[0] * k, d: size[1] * k, h: size[2] * k, variant: null, entity: null, power: null };
 }
 
 /** A floor with the parked vehicles added to its furniture (for building the 3D geometry). */

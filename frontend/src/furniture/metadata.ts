@@ -30,6 +30,19 @@ export const FURNITURE_TYPES = [
   "altar_wall",
   "shoe_cabinet",
   "motorbike",
+  "bicycle_city",
+  "bicycle_cargo",
+  "scooter",
+  "motorcycle_touring",
+  "car_sedan",
+  "car_hatchback",
+  "car_suv",
+  "car_pickup",
+  "car_van",
+  "car_wagon",
+  "car_compact",
+  "car_electric",
+  "car_minibus",
   "fan_ceiling",
   "fan_ceiling_light",
   "fan_wall",
@@ -337,6 +350,7 @@ export type FurnitureType = (typeof FURNITURE_TYPES)[number];
 
 /** Built-in stairs that reach the next floor and automatically cut its slab. */
 export const STAIR_TYPES = new Set<string>(["stairs", "stairs_landing", "stairs_landing_l", "stairs_winder_l", "stairs_spiral", "stairs_open", "stairs_concrete", "stairs_compact"]);
+export const BUILTIN_VEHICLE_TYPES = ["motorbike", "bicycle_city", "bicycle_cargo", "scooter", "motorcycle_touring", "car_sedan", "car_hatchback", "car_suv", "car_pickup", "car_van", "car_wagon", "car_compact", "car_electric", "car_minibus"] as const satisfies readonly FurnitureType[];
 
 /** Furniture library sections (the editor lists them in this order). */
 export const FURNITURE_GROUPS: Record<string, FurnitureType[]> = {
@@ -349,7 +363,7 @@ export const FURNITURE_GROUPS: Record<string, FurnitureType[]> = {
   climate: ["air_conditioner", "heat_pump_outdoor", "air_purifier", "humidifier", "radiator", "wall_thermostat", "temperature_humidity_sensor", "ventilation_fan", "fan_ceiling", "fan_ceiling_light", "fan_wall", "fan_floor"],
   outdoor: ["security_camera", "video_doorbell", "smart_lock", "water_pump", "robot_mower", "balcony_solar", "hammock", "stone_table_set", "planter_large", "water_tank", "gate", "fence", "gas_grill", "lounge_set_outdoor", "sun_lounger", "parasol", "pergola", "raised_bed", "greenhouse", "hot_tub_outdoor", "fire_bowl", "garden_torch", "play_tower_slide", "garden_shed", "trampoline", "flower_pots_3", "lawn_sprinkler", "irrigation_valve_box", "rain_barrel", "garden_lantern", "outdoor_kitchen", "patio_heater", "tree_oak", "tree_lime", "tree_birch", "tree_maple", "tree_fruit", "tree_spruce", "tree_pine", "tree_thuja", "shrub", "shrub_flowering", "brush_wild", "trees_group_3"],
   work: ["desk", "worktop", "office_chair", "tall_cabinet", "coat_rack", "shoe_cabinet", "shoe_bench", "wall_switch", "wall_outlet", "smart_plug", "motion_sensor", "contact_sensor", "water_leak_sensor", "network_cabinet", "nas_server", "modem_router", "electrical_panel", "ups_unit", "access_point", "smoke_detector", "siren_alarm", "stairs", "stairs_landing", "stairs_landing_l", "stairs_winder_l", "stairs_spiral", "stairs_open", "stairs_concrete", "stairs_compact", "railing_glass", "railing_metal", "railing_wood", "railing_cable", "workbench", "workbench_pegboard", "tool_cabinet", "tool_chest", "storage_rack_garage", "wall_shelf_garage", "air_compressor", "shop_vacuum", "ladder_step", "ladder_extension", "storage_boxes", "tire_stack", "bike_rack", "repair_stand", "parts_bin", "utility_sink_garage", "charging_bay", "robot_vacuum", "column_round", "column_square", "column_steel", "ceiling_beams", "downstand_beam", "chimney_inside", "led_niche", "light_cove", "platform_steps", "gallery_railing_glass"],
-  vehicles: ["motorbike", "parking"],
+  vehicles: [...BUILTIN_VEHICLE_TYPES, "parking"],
 };
 
 /** Energy devices: placed and set up in the Energy tool (stored like furniture, not in the library). */
@@ -596,6 +610,19 @@ export const FURNITURE_SIZE: Record<FurnitureType, [number, number, number]> = {
   altar_wall: [0.89, 0.48, 0.48],
   shoe_cabinet: [1.0, 0.35, 1.0],
   motorbike: [0.72, 1.9, 1.15],
+  bicycle_city: [0.65, 1.8, 1.15],
+  bicycle_cargo: [0.75, 2.35, 1.2],
+  scooter: [0.72, 1.85, 1.15],
+  motorcycle_touring: [0.9, 2.25, 1.4],
+  car_sedan: [1.82, 4.65, 1.45],
+  car_hatchback: [1.78, 4.15, 1.5],
+  car_suv: [1.92, 4.65, 1.72],
+  car_pickup: [1.95, 5.25, 1.78],
+  car_van: [1.95, 5.05, 2.05],
+  car_wagon: [1.84, 4.75, 1.5],
+  car_compact: [1.7, 3.75, 1.48],
+  car_electric: [1.86, 4.55, 1.48],
+  car_minibus: [2.0, 5.4, 2.25],
   fan_ceiling: [1.4, 1.4, 0.32],
   fan_ceiling_light: [1.4, 1.4, 0.4],
   fan_wall: [0.5, 0.3, 0.5],

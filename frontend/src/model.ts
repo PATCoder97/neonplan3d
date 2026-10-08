@@ -2,11 +2,11 @@
 // Units are metres; x grows to the right, z grows downwards (as in the 2D editor).
 
 import { packItem } from "./packs.ts";
-import { ELECTRIC_FURNITURE, ENERGY_DEVICES, FURNITURE_GROUPS, FURNITURE_SIZE, FURNITURE_TYPES, LAMP_TYPES, STAIR_TYPES, type FurnitureType } from "./furniture/metadata.ts";
+import { BUILTIN_VEHICLE_TYPES, ELECTRIC_FURNITURE, ENERGY_DEVICES, FURNITURE_GROUPS, FURNITURE_SIZE, FURNITURE_TYPES, LAMP_TYPES, STAIR_TYPES, type FurnitureType } from "./furniture/metadata.ts";
 import type { LampModel } from "./viewer/viewer3d.ts";
 
 // Compatibility facade: existing callers can keep importing furniture metadata from model.ts.
-export { ELECTRIC_FURNITURE, ENERGY_DEVICES, FURNITURE_GROUPS, FURNITURE_SIZE, FURNITURE_TYPES, LAMP_TYPES, STAIR_TYPES };
+export { BUILTIN_VEHICLE_TYPES, ELECTRIC_FURNITURE, ENERGY_DEVICES, FURNITURE_GROUPS, FURNITURE_SIZE, FURNITURE_TYPES, LAMP_TYPES, STAIR_TYPES };
 export type { FurnitureType };
 
 export type Vec2 = [number, number];

@@ -4,6 +4,18 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.22.7
+
+### Added
+
+- Completed the 15-item Vehicles reference family with city and cargo bicycles, scooter, touring motorcycle and nine distinct car/van body styles alongside the existing motorbike and parking spot.
+- Added procedural low-poly models, plan symbols and English, German and Vietnamese names for all built-in vehicles.
+
+### Changed
+
+- Parking spots now accept built-in vehicles as well as imported-pack vehicles, including presence/type selection, scaling, floor rendering and existing Car Pro state overlays.
+- Expanded the reproducible inventory to 342 declared types and 335 library items, with Vehicles coverage at 15 of 15.
+
 ## 1.22.6
 
 ### Added

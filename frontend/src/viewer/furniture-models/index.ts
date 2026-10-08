@@ -13,6 +13,7 @@ import { MISC_FURNITURE_MODELS } from "./misc.ts";
 import { SMART_HOME_FURNITURE_MODELS } from "./smart-home.ts";
 import { STAIR_FURNITURE_MODELS } from "./stairs.ts";
 import { UTILITY_FURNITURE_MODELS, UTILITY_FURNITURE_SCREENS } from "./utility.ts";
+import { VEHICLE_FURNITURE_MODELS } from "./vehicles.ts";
 import type { FurnitureModelContext, FurnitureModelRenderer, FurnitureScreenRect, FurnitureScreenRenderer } from "./types.ts";
 
 /** Built-in renderers split by functional family. Add new families to this one composition point. */
@@ -32,6 +33,7 @@ const BUILTIN_FURNITURE_MODELS: Readonly<Record<string, FurnitureModelRenderer>>
   ...ENERGY_FURNITURE_MODELS,
   ...MISC_FURNITURE_MODELS,
   ...UTILITY_FURNITURE_MODELS,
+  ...VEHICLE_FURNITURE_MODELS,
 };
 
 const BUILTIN_FURNITURE_SCREENS: Readonly<Record<string, FurnitureScreenRenderer>> = {
