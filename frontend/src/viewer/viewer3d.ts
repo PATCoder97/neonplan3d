@@ -335,7 +335,7 @@ interface FloorMaterials {
   pattern: MeshBasicMaterial;
   wall: MeshBasicMaterial;
   glassWall: MeshBasicMaterial;
-  /** Slightly transparent covered-room roof, so devices remain visible before opening the room. */
+  /** Clearly visible but translucent covered-room roof; selecting its room still opens it completely. */
   coveredRoof: MeshBasicMaterial;
   shadow: MeshBasicMaterial;
   lines: LineBasicMaterial;

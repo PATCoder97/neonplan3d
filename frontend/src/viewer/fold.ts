@@ -19,6 +19,10 @@ export interface FoldMasks {
 
 export type FoldRole = "plain" | "solid" | "glass" | "roof";
 
+/** Covered-room roofs stay translucent, but must remain legible against the dark outdoor canvas. */
+export const COVERED_ROOF_BRIGHTNESS = 1.35;
+export const COVERED_ROOF_ALPHA = 0.78;
+
 export function makeFoldable<T extends Material>(material: T, masks: FoldMasks, role: FoldRole = "plain"): T {
   material.onBeforeCompile = (shader) => {
     shader.uniforms.uStanding = masks.standing;
@@ -53,7 +57,12 @@ export function makeFoldable<T extends Material>(material: T, masks: FoldMasks, 
         diffuseColor.a *= 0.2;`,
       );
     } else if (role === "roof") {
-      shader.fragmentShader = shader.fragmentShader.replace("#include <color_fragment>", "#include <color_fragment>\ndiffuseColor.a *= 0.48;");
+      shader.fragmentShader = shader.fragmentShader.replace(
+        "#include <color_fragment>",
+        `#include <color_fragment>
+        diffuseColor.rgb *= ${COVERED_ROOF_BRIGHTNESS.toFixed(2)};
+        diffuseColor.a *= ${COVERED_ROOF_ALPHA.toFixed(2)};`,
+      );
     }
   };
   material.customProgramCacheKey = () => `fp3d-fold-${role}`;
