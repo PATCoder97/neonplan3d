@@ -508,5 +508,8 @@
   "pkg_living_medium": "Phòng khách · vừa",
   "pkg_living_medium_desc": "Sofa ba chỗ, ghế bành, TV, bàn và thảm",
   "pkg_living_large": "Phòng khách · lớn",
-  "pkg_living_large_desc": "Sofa chữ U, vách media, tủ kính, bàn, thảm và cây"
+  "pkg_living_large_desc": "Sofa chữ U, vách media, tủ kính, bàn, thảm và cây",
+  "lib_badge_screen": "Màn hình: hiển thị ảnh trực tiếp hoặc theo trạng thái",
+  "lib_badge_motion": "Chuyển động: thể hiện trạng thái đang chạy trong 3D",
+  "lib_badge_power": "Công suất: liên kết entity và cảm biến công suất"
 }

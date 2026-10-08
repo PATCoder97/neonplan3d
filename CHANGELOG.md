@@ -4,6 +4,18 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.21.0
+
+### Added
+
+- Added separate, composable library badges for lights, screens, moving furniture and power-linked devices; one item may expose several capabilities.
+- Added regression coverage for normalized occupancy, playback, opening and unavailable entity states.
+
+### Changed
+
+- Completed the technical-device, entity-mapping and capability-badge milestones of the Smart Home phase in the Vietnamese roadmap.
+- Preserved the existing safe unavailable fallback and power/battery mappings while documenting their completed coverage.
+
 ## 1.20.12
 
 ### Added

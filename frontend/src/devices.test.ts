@@ -94,6 +94,16 @@ test("kinds, active states and light glow", () => {
   assert.equal(lightGlow(hass.states["light.stehlampe"]), null);
 });
 
+test("standard active-state mapping covers occupancy, playback, openings and unavailable fallbacks", () => {
+  const st = (entity_id: string, state: string, attributes: Record<string, unknown> = {}) => ({ entity_id, state, attributes }) as never;
+  assert.ok(isActive(st("binary_sensor.occupied", "on", { device_class: "occupancy" })));
+  assert.ok(isActive(st("media_player.speaker", "playing")));
+  assert.ok(isActive(st("cover.blind", "open")));
+  assert.ok(!isActive(st("binary_sensor.occupied", "off", { device_class: "occupancy" })));
+  assert.ok(!isActive(st("media_player.speaker", "unavailable")));
+  assert.ok(!isActive(undefined));
+});
+
 const room: Room = { id: "r", name: "R", area_id: null, points: [[0, 0], [5, 0], [5, 4], [0, 4]], floor_material: "wood" };
 
 test("automatic placement keeps devices inside the room, apart, and off the room label", () => {

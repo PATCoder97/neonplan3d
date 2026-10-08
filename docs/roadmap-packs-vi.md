@@ -219,10 +219,12 @@ Mục tiêu: đồ vật không chỉ đẹp mà còn phản ánh đúng trạng
 - [x] Smart Home: công tắc, ổ cắm, cảm biến, chuông cửa, khóa, rèm, camera, loa, robot hút bụi có dock, robot cắt cỏ có garage và màn hình điều khiển.
   - Đã hoàn thành robot hút bụi với trạm sạc dạng tháp, robot cắt cỏ có garage, màn hình điều khiển Live Screen và lô 8 mẫu công tắc/ổ cắm/cảm biến/chuông cửa có lọc entity theo domain/device class.
 - [x] Hạ tầng mạng và an toàn theo ảnh kiểm kê: tủ mạng, NAS, access point trần, thermostat, báo khói và còi có đèn chớp.
-- [ ] Kỹ thuật: tủ điện, UPS, modem/router, bơm, bồn nước, bình nước nóng, điều hòa, quạt thông gió và thiết bị năng lượng.
+- [x] Kỹ thuật: tủ điện, UPS, modem/router, bơm, bồn nước, bình nước nóng, điều hòa, quạt thông gió và thiết bị năng lượng.
   - Đã hoàn thành tủ điện, UPS, modem/router, dàn nóng bơm nhiệt, bình tích nước nóng, quạt thông gió, máy tạo ẩm, tháp máy giặt–sấy và bộ pin mặt trời ban công; nhóm Utility đạt 18/18 mẫu tham chiếu, còn mở rộng thiết bị năng lượng và các biến thể bơm/bồn.
-- [ ] Chuẩn hóa ánh xạ entity theo domain/device class và trạng thái `on`, `open`, `occupied`, `playing`, công suất hoặc mức pin.
-- [ ] Thêm badge trong thư viện để phân biệt mẫu có đèn, màn hình, chuyển động hoặc liên kết công suất.
+- [x] Chuẩn hóa ánh xạ entity theo domain/device class và trạng thái `on`, `open`, `occupied`, `playing`, công suất hoặc mức pin.
+  - Test hồi quy khóa trạng thái bật, hiện diện, phát media, cửa/rèm mở và fallback `unavailable`; cảm biến công suất và mức pin tiếp tục được chọn theo device class rồi mới theo tên.
+- [x] Thêm badge trong thư viện để phân biệt mẫu có đèn, màn hình, chuyển động hoặc liên kết công suất.
+  - Badge Đèn, Màn hình, Chuyển động và Công suất có thể xuất hiện đồng thời thay vì gộp mọi capability vào một biểu tượng đồ điện.
 
 Điều kiện hoàn thành: mỗi thiết bị tương tác có trạng thái dự phòng khi entity thiếu/unavailable và có test logic tương ứng.
 

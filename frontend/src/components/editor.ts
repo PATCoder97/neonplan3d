@@ -6737,11 +6737,16 @@ export class Fp3dEditor extends LitElement {
 
   private libraryButton(type: string, label: string) {
     const show = (e: Event) => void this.showPreview(type, e.currentTarget as HTMLElement);
-    // a lamp can be switched from 3D, another electric item takes an entity and a power sensor
-    const badge = isLamp(type) ? "light" : isElectric(type) ? "switch" : null;
+    const moving = /^(fan_|robot_|smart_curtain|bathroom_fan)/.test(type);
+    const badges = [
+      ...(isLamp(type) ? [{ icon: "light" as const, title: "lib_badge_light" as const }] : []),
+      ...(hasScreen(type) ? [{ icon: "media" as const, title: "lib_badge_screen" as const }] : []),
+      ...(moving ? [{ icon: "fan" as const, title: "lib_badge_motion" as const }] : []),
+      ...(isElectric(type) && !isLamp(type) ? [{ icon: "switch" as const, title: "lib_badge_power" as const }] : []),
+    ];
     return html`<button
-      class="fp3d-btn ${badge ? "fp3d-lib-electric" : ""}"
-      title=${badge ? this.t(badge === "light" ? "lib_badge_light" : "lib_badge_electric") : label}
+      class="fp3d-btn ${badges.length ? "fp3d-lib-electric" : ""}"
+      title=${badges.length ? badges.map((badge) => this.t(badge.title)).join(" · ") : label}
       @click=${() => this.addFurniture(type)}
       @mouseenter=${show}
       @focus=${show}
@@ -6749,11 +6754,9 @@ export class Fp3dEditor extends LitElement {
       @blur=${() => (this._preview = null)}
     >
       ${label}
-      ${badge
-        ? html`<svg class="fp3d-lib-badge" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d=${iconPath(badge)} />
-          </svg>`
-        : nothing}
+      ${badges.map((badge) => html`<svg class="fp3d-lib-badge" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d=${iconPath(badge.icon)} />
+      </svg>`)}
     </button>`;
   }
 
