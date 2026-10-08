@@ -30,8 +30,11 @@ test("a canopy room draws a high fence, front gate, posts, beams and a projectin
   assert.ok(heights.some((y) => Math.abs(y - 1.27) < 1e-6), "the yard fence reaches 1.45 m above the paved surface");
   assert.ok(heights.some((y) => y > 1.62 && y < 1.75), "the clean gate arch rises above the fence in the centre");
   assert.ok(hasColor(solid, 0x315166) && hasColor(solid, 0x52788c), "the roof uses dark metal sheets with raised lighter corrugations");
-  const roofX = solid.p.slice(ranges[0].roofStart! * 9, ranges[0].roofEnd! * 9).filter((_, i) => i % 3 === 0);
+  const roofPositions = solid.p.slice(ranges[0].roofStart! * 9, ranges[0].roofEnd! * 9);
+  const roofX = roofPositions.filter((_, i) => i % 3 === 0);
+  const roofZ = roofPositions.filter((_, i) => i % 3 === 2);
   assert.ok(Math.max(...roofX) > 4.34 && Math.max(...roofX) < 4.36, "the sheet projects 35 cm beyond the front posts");
+  assert.ok(Math.min(...roofZ) < -0.119 && Math.max(...roofZ) > 3.119, "the sheet reaches the exterior wall faces and fully covers both side columns");
 
   const crest = new Color(0x52788c);
   const roofOffset = ranges[0].roofStart! * 9;

@@ -8,6 +8,7 @@
 import { Color } from "three";
 import type { CoveredRoomKind, Floor, OutdoorArea, OutdoorType, SlopeDir, Vec2 } from "../model.ts";
 import { bounds, coveredFloorTop, coveredFrontEdge, groundLevel, isAxisRect, OUTDOOR_TOP, outdoorDrop, outdoorStanding, pointInPolygon, signedArea } from "../model.ts";
+import { offsetPolygon } from "../roof-sections.ts";
 import { ALWAYS, type GeoBuffer, type LineBuffer, pushPrism, shade, triangulate } from "./geo.ts";
 import { NEON } from "./palette.ts";
 
@@ -60,6 +61,8 @@ export interface CoveredRenderArea {
   outline?: boolean;
   /** Selected room-floor colour; opaque roofs follow it so they stay in the same theme palette. */
   roomColor?: number;
+  /** Exterior wall thickness, used to carry the canopy roof fully over its side columns. */
+  wallThickness?: number;
 }
 
 type RenderArea = OutdoorArea | CoveredRenderArea;
@@ -212,19 +215,21 @@ function pushCanopyPanel(buf: GeoBuffer, poly: Vec2[], topAt: (x: number, z: num
   }
 }
 
-/** Extend the roof past the front posts while keeping the edge against the house unchanged. */
-function canopyRoofPolygon(poly: Vec2[], openEnd: number): Vec2[] {
+/** Cover every column/wall edge, then retain the configured total projection at the front. */
+function canopyRoofPolygon(poly: Vec2[], openEnd: number, margin: number): Vec2[] {
   const front = coveredFrontEdge(poly, openEnd);
-  const p = poly[front];
-  const q = poly[(front + 1) % poly.length];
+  const padded = offsetPolygon(poly, margin);
+  const p = padded[front];
+  const q = padded[(front + 1) % padded.length];
   const dx = q[0] - p[0];
   const dz = q[1] - p[1];
   const len = Math.hypot(dx, dz);
-  if (len < 1e-6) return poly;
+  if (len < 1e-6) return padded;
   // `poly` is counter-clockwise, so its outward normal lies to the right of this edge.
-  const ox = (dz / len) * CANOPY_FRONT_OVERHANG;
-  const oz = (-dx / len) * CANOPY_FRONT_OVERHANG;
-  return poly.map(([x, z], i) => i === front || i === (front + 1) % poly.length ? [x + ox, z + oz] : [x, z]);
+  const frontExtra = Math.max(0, CANOPY_FRONT_OVERHANG - margin);
+  const ox = (dz / len) * frontExtra;
+  const oz = (-dx / len) * frontExtra;
+  return padded.map(([x, z], i) => i === front || i === (front + 1) % padded.length ? [x + ox, z + oz] : [x, z]);
 }
 
 /** Intersections of an oriented scan line with a polygon, paired into inside spans. */
@@ -423,6 +428,7 @@ function pushAreas(buf: GeoBuffer, lines: LineBuffer, floor: Floor, areas: Rende
         const front = coveredFrontEdge(poly, openEnd);
         const canopyRoofFold = roofFold === ALWAYS ? ALWAYS : roofFold + CANOPY_ROOF_KIND * 16;
         const columnHalf = Math.min(0.4, Math.max(0.04, (a.column_size ?? 0.12) / 2));
+        const roofMargin = Math.max(columnHalf, (a.wallThickness ?? 0.24) / 2);
         for (const [x, z] of poly) {
           const top = roofAt(x, z) - 0.08;
           pushPrism(buf, ccw([[x - columnHalf, z - columnHalf], [x + columnHalf, z - columnHalf], [x + columnHalf, z + columnHalf], [x - columnHalf, z + columnHalf]]), floorY, top, finish.under, finish.roof);
@@ -461,7 +467,7 @@ function pushAreas(buf: GeoBuffer, lines: LineBuffer, floor: Floor, areas: Rende
           pushBeam(buf, p, q, 0.12, y - 0.18, y - 0.08, finish.under, finish.roof);
           outlineBeam(lines, p, q, y - 0.08, edge);
         }
-        const roofPoly = canopyRoofPolygon(poly, openEnd);
+        const roofPoly = canopyRoofPolygon(poly, openEnd, roofMargin);
         roofStart = buf.count;
         pushCanopyPanel(buf, roofPoly, roofAt, 0.045, finish.under, CORRUGATED_METAL, canopyRoofFold);
         pushCorrugatedRoof(buf, roofPoly, roofAt, front, canopyRoofFold);
