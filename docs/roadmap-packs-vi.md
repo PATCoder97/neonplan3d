@@ -26,7 +26,7 @@ Nói ngắn gọn: ảnh của họ được dùng để trả lời “cần c�
 ## Hiện trạng ngày 08/10/2026
 
 - Thư viện tích hợp hiện có **249 mục** trong 10 nhóm giao diện, gồm nhiều đồ dùng đặc trưng tại Việt Nam như bàn thờ, xe máy, bồn nước, võng, tủ giày, giàn phơi, quạt trần có đèn, quạt treo tường, robot cắt cỏ, cụm hạ tầng mạng/an toàn, cụm thiết bị kỹ thuật, bộ điều khiển/cảm biến nhà thông minh, chín kiểu đèn, sáu lô phòng khách, ba lô phòng ngủ và ba lô phòng tắm theo gallery công khai.
-- Có 9 gói bố trí nhanh cho phòng: hai kiểu bếp, phòng tắm, phòng ngủ, phòng khách, phòng ăn, văn phòng, phòng trẻ em và sảnh.
+- Có 21 gói bố trí nhanh cho phòng, gồm ba mức nhỏ/vừa/lớn cho bếp, phòng tắm, phòng ngủ và phòng khách; gói mới bỏ qua vị trí đã có đồ thay vì xếp chồng.
 - Trình chỉnh sửa đã có tìm kiếm song ngữ, nhóm thu gọn, xem trước, đổi kích thước, xoay, lật, đặt lên sàn/tường/trần/bề mặt và liên kết entity.
 - Định dạng pack nhập ngoài đã hỗ trợ khối hộp, trụ, khối vát, đèn, màn hình, bề mặt đặt đồ, phương tiện và lỗ cầu thang.
 - Sáu tính năng Pro có mã triển khai trong frontend đã được bật sẵn ở fork này; chúng không phải phạm vi cần làm lại của roadmap.
@@ -204,10 +204,11 @@ Mục tiêu: hoàn thiện bốn nhóm được dùng nhiều nhất trước, k
   - Đợt 1 đã thêm năm loại lavabo/vanity, hai bồn tắm và ba khu tắm kính kích thước cố định; model/symbol mới nằm trong module Bathroom riêng, độ phủ đạt 15/37.
   - Đợt 2 đã thêm bồn cầu két liền/treo, bidet, hai tủ, hai gương sáng, kệ tường, giá khăn và bồn tắm độc lập; độ phủ đạt 25/37.
   - Đợt 3 đã thêm 13 mẫu wellness, lưu trữ đồ giặt và thiết bị điện; chuyển vách kính rời sang nhóm tham chiếu Kiến trúc để Bathroom đạt đúng mốc 37/37 mà không tạo biến thể vô nghĩa.
-- [ ] Đèn và làm mát: sửa hình `fan_ceiling`, thêm `fan_ceiling_light`, quạt treo tường và các kiểu đèn phổ biến; quạt có đèn phải điều khiển riêng phần quạt và phần sáng.
+- [x] Đèn và làm mát: sửa hình `fan_ceiling`, thêm `fan_ceiling_light`, quạt treo tường và các kiểu đèn phổ biến; quạt có đèn phải điều khiển riêng phần quạt và phần sáng.
   - Đã hoàn thành `fan_ceiling`, biến thể 3/4/5 cánh, `fan_ceiling_light` với entity quạt/đèn riêng và `fan_wall`.
   - Đã thêm chín kiểu đèn theo gallery Smart Home: cột đèn, cặp thanh sáng TV, đèn bàn cầu, đèn xách tay, đèn ambient, khối đèn, panel tròn, cụm đèn sân vườn và đèn tường hắt hai đầu; mỗi kiểu có symbol 2D, hình học 3D và hiệu ứng sáng riêng.
-- [ ] Mở rộng gói bố trí nhanh theo diện tích phòng nhỏ, vừa và lớn; không tự ghi đè đồ đã đặt.
+- [x] Mở rộng gói bố trí nhanh theo diện tích phòng nhỏ, vừa và lớn; không tự ghi đè đồ đã đặt.
+  - Đã thêm 12 gói nhỏ/vừa/lớn cho bếp, phòng tắm, phòng ngủ và phòng khách; thuật toán loại các món có footprint giao với đồ đang có trong phòng.
 
 Điều kiện hoàn thành: có thể dựng hoàn chỉnh một căn hộ Việt Nam thông dụng mà không cần pack ngoài.
 

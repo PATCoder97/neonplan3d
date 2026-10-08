@@ -4,6 +4,19 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.20.12
+
+### Added
+
+- Added small, medium and large quick-layout packs for kitchens, bathrooms, bedrooms and living rooms, expanding the chooser from 9 to 21 layouts.
+- Added German, English and Vietnamese labels and practical furniture combinations for every new room size.
+- Added package regression coverage for all size tiers and occupied-room collision avoidance.
+
+### Changed
+
+- Quick layouts now skip positions already occupied by placed furniture instead of stacking new items over them.
+- Marked the completed lighting/cooling and room-layout milestones in the Vietnamese furniture roadmap.
+
 ## 1.20.11
 
 ### Added

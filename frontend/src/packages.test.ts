@@ -37,3 +37,16 @@ test("items that do not fit a small wall are left out", () => {
   assert.ok(pointInPolygon([bed.x, bed.z], room(4, 4).points));
   assert.equal(bed.rotation, 0);
 });
+
+test("size-based packages cover small, medium and large rooms without replacing placed furniture", () => {
+  let n = 0;
+  for (const kind of ["kitchen", "bath", "bedroom", "living"] as const) {
+    for (const size of ["small", "medium", "large"] as const) {
+      const items = furnishRoom(room(size === "small" ? 2.8 : size === "medium" ? 4 : 5.5, size === "small" ? 2.6 : size === "medium" ? 3.6 : 4.8), `${kind}_${size}`, () => `m${n++}`);
+      assert.ok(items.length > 0, `${kind}_${size}`);
+    }
+  }
+  const existing = furnishRoom(room(4, 4), "bedroom_small", () => `m${n++}`);
+  const repeated = furnishRoom(room(4, 4), "bedroom_small", () => `m${n++}`, existing);
+  assert.equal(repeated.length, 0, "an occupied layout is not covered by a second package");
+});

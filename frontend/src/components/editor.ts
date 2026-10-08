@@ -5450,7 +5450,7 @@ export class Fp3dEditor extends LitElement {
   /** Adds the furniture of a room package (lamps link to the room's lights automatically). */
   private applyPackage(room: Room, pkg: PackageId): void {
     if (!this.isAdmin) return;
-    const items = furnishRoom(room, pkg, () => uid("furniture"));
+    const items = furnishRoom(room, pkg, () => uid("furniture"), this.floor?.furniture ?? []);
     this.change((_, floor) => floor.furniture.push(...items));
     this._packages = false;
     this._notice = this.t("pkg_done", { n: items.length });
