@@ -25,7 +25,7 @@ Nói ngắn gọn: ảnh của họ được dùng để trả lời “cần c�
 
 ## Hiện trạng ngày 08/10/2026
 
-- Thư viện tích hợp hiện có **257 mục** trong 10 nhóm giao diện, gồm các lô hoàn chỉnh cho phòng khách, phòng ngủ, phòng tắm cùng Smart Home, kỹ thuật và lô Kiến trúc đầu tiên; toàn bộ hình học tích hợp được dựng thủ tục trong repository.
+- Thư viện tích hợp hiện có **263 mục** trong 10 nhóm giao diện, gồm các lô hoàn chỉnh cho phòng khách, phòng ngủ, phòng tắm, Kiến trúc cùng Smart Home và kỹ thuật; toàn bộ hình học tích hợp được dựng thủ tục trong repository.
 - Có 21 gói bố trí nhanh cho phòng, gồm ba mức nhỏ/vừa/lớn cho bếp, phòng tắm, phòng ngủ và phòng khách; gói mới bỏ qua vị trí đã có đồ thay vì xếp chồng.
 - Trình chỉnh sửa đã có tìm kiếm song ngữ, nhóm thu gọn, xem trước, đổi kích thước, xoay, lật, đặt lên sàn/tường/trần/bề mặt và liên kết entity.
 - Định dạng pack nhập ngoài đã hỗ trợ khối hộp, trụ, khối vát, đèn, màn hình, bề mặt đặt đồ, phương tiện và lỗ cầu thang.
@@ -144,6 +144,8 @@ Bảng kiểm kê làm việc nên có các cột: `nhóm`, `nguồn ảnh`, `t�
 | Cột và dầm | Chưa có cấu kiện nội thất độc lập | Thêm cột tròn, cột vuông, cột thép chữ thập, bộ năm dầm gỗ trần và dầm hạ trần. |
 | Ống khói và lò sưởi | Chỉ có lò sưởi dạng đồ phòng khách | Thêm ống khói cao toàn phòng và lò sưởi âm tường có vùng trạng thái đèn. |
 | Vách linh hoạt | Có rèm motor và vách kính dùng lại | Thêm vách trượt ba tấm; chuyển rèm motor/vách kính vào kiểm kê Kiến trúc, còn cổng/hàng rào và chỗ đỗ về đúng Garden/Vehicles. |
+| Hốc tường và chiếu sáng | Chưa có module kiến trúc riêng | Thêm kệ hốc tường, hốc LED và khe hắt trần; hai mẫu chiếu sáng có trạng thái entity. |
+| Bục, lan can và bệ cửa sổ | Chưa có footprint/cao độ chuyên biệt | Thêm bục hai bậc, lan can gallery kính và bệ ngồi cửa sổ; bục và bệ ngồi nhận đồ đặt trên bề mặt. |
 
 ## Kiến trúc cần làm trước
 
@@ -169,7 +171,7 @@ Các biến thể cùng họ, ví dụ sofa 2/3 chỗ, tủ bếp 40/60/80 cm ho
 Mục tiêu: biến hiện trạng thành đường cơ sở có thể đo được.
 
 - [x] Sinh báo cáo tự động từ `FURNITURE_TYPES`, `FURNITURE_GROUPS` và `FURNITURE_SIZE` để phát hiện ID trùng, thiếu tên hoặc thiếu kích thước (`cd frontend && npm run catalog`).
-- [x] Lập bảng ánh xạ các mục hiện tại vào 16 nhóm đích; catalog kiểm kê hiện khóa 264 type, 257 mục thư viện, 7 mục nội bộ và trường hợp `worktop` đang nằm trong hai nhóm. Mỗi mục chỉ được tính một lần trong `REFERENCE_PACK_ITEMS`.
+- [x] Lập bảng ánh xạ các mục hiện tại vào 16 nhóm đích; catalog kiểm kê hiện khóa 270 type, 263 mục thư viện, 7 mục nội bộ và trường hợp `worktop` đang nằm trong hai nhóm. Mỗi mục chỉ được tính một lần trong `REFERENCE_PACK_ITEMS`.
 - [ ] Duyệt toàn bộ ảnh gallery công khai của 16 trang sản phẩm, không chỉ ảnh đại diện ở trang Packs; lập bảng `đã phù hợp / cần sửa hình / cần thêm mới` kèm URL và ngày xem.
 - [ ] Chọn khoảng 10 mẫu hiện có cần sửa hình trước; `fan_ceiling` là mẫu thí điểm và phải giữ nguyên ID.
 - [ ] Chụp bộ ảnh chuẩn ở góc nhìn 2D, 3D và chế độ Day/Neon để so sánh hồi quy.
@@ -242,8 +244,9 @@ Mục tiêu: đồ vật không chỉ đẹp mà còn phản ánh đúng trạng
 
 Mục tiêu: phủ các hạng mục khó quan sát nhưng quan trọng với mô hình nhà hoàn chỉnh.
 
-- [ ] Kiến trúc & hoàn thiện: cột, dầm trang trí, lam, vách ngăn, bục, rèm, thảm và các module ốp.
+- [x] Kiến trúc & hoàn thiện: cột, dầm trang trí, lam, vách ngăn, bục, rèm, thảm và các module ốp.
   - Đợt 1 đã thêm ba cột, hai họ dầm, ống khói, lò sưởi âm và vách trượt trong module Architecture riêng; độ phủ đạt 11/17 khi tính cả rèm motor và vách kính hiện có.
+  - Đợt 2 đã thêm kệ hốc tường, hốc LED, khe hắt trần, bục hai bậc, lan can gallery kính và bệ ngồi cửa sổ; độ phủ hoàn tất 17/17.
 - [ ] Sân vườn & hiên: bàn ghế ngoài trời, chậu cây, bếp nướng, xích đu, võng, mái che nhẹ, hàng rào và cổng.
 - [ ] Cầu thang & lan can: thẳng, chữ L, chữ U, xoắn, lan can kính/sắt và tự tạo khoảng mở tầng.
 - [ ] Garage & xưởng: bàn nguội, tủ dụng cụ, giá kho, máy nén, thang, thùng đồ và khu sạc.

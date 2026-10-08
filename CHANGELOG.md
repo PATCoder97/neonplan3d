@@ -4,6 +4,17 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.22.1
+
+### Added
+
+- Completed Architecture & Fit-out with a built-in shelf niche, LED niche, ceiling light cove, two-step platform, glass gallery railing and window seat.
+- Added dedicated 2D symbols, procedural 3D geometry, localized names, placement surfaces and live light states for the new architectural elements.
+
+### Changed
+
+- Expanded the reproducible catalog inventory to 270 declared types and 263 library items, with Architecture coverage complete at 17 of 17.
+
 ## 1.22.0
 
 ### Added

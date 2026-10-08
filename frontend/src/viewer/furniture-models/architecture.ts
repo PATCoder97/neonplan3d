@@ -49,7 +49,41 @@ function slidingWall(b: Builder, w: number, d: number, h: number): void {
   b.box(-w / 2, w / 2, h, h + 0.04, -d / 2, d / 2, C.metal, C.metal, EDGE_FAINT);
 }
 
+function shelfNiche(b: Builder, w: number, d: number, h: number, lit: boolean): void {
+  const frame = 0.06;
+  b.box(-w / 2, -w / 2 + frame, 0, h, -d / 2, d / 2, C.body, C.bodyTop, EDGE_FURN);
+  b.box(w / 2 - frame, w / 2, 0, h, -d / 2, d / 2, C.body, C.bodyTop, EDGE_FURN);
+  b.box(-w / 2, w / 2, h - frame, h, -d / 2, d / 2, C.body, C.bodyTop, EDGE_FURN);
+  for (const y of [h * 0.25, h * 0.5, h * 0.75]) b.box(-w / 2 + frame, w / 2 - frame, y - 0.018, y + 0.018, -d / 2, d / 2, C.wood, C.woodTop, lit ? EDGE_GLOW : EDGE_FAINT);
+  if (lit) b.box(-w * 0.42, w * 0.42, h * 0.08, h * 0.12, d / 2, d / 2 + 0.012, C.accent, C.accent, EDGE_GLOW);
+}
+
+function lightCove(b: Builder, w: number, d: number, h: number): void {
+  const y = 2.7 - h;
+  b.box(-w / 2, w / 2, y, y + h, -d / 2, d / 2, C.white, C.whiteTop, EDGE_FURN);
+  b.box(-w * 0.44, w * 0.44, y - 0.015, y + 0.015, d * 0.22, d * 0.4, C.accent, C.accent, EDGE_GLOW);
+}
+
+function platform(b: Builder, w: number, d: number, h: number): void {
+  b.box(-w / 2, w / 2, 0, h, -d / 2, d * 0.12, C.wood, C.woodTop, EDGE_FURN);
+  b.box(-w / 2, w / 2, 0, h * 0.5, d * 0.12, d / 2, C.wood, C.woodTop, EDGE_FAINT);
+}
+
+function glassRailing(b: Builder, w: number, d: number, h: number): void {
+  for (const x of [-w / 2, 0, w / 2]) b.box(x - 0.02, x + 0.02, 0, h, -d / 2, d / 2, C.metal, C.metal, EDGE_FURN);
+  b.box(-w / 2, w / 2, h - 0.045, h, -d / 2, d / 2, C.metal, C.metal, EDGE_GLOW);
+  b.seg(-w / 2, h * 0.08, 0, w / 2, h * 0.08, 0, EDGE_FAINT);
+}
+
+function windowSeat(b: Builder, w: number, d: number, h: number): void {
+  b.box(-w / 2, w / 2, 0, h * 0.72, -d / 2, d / 2, C.wood, C.woodTop, EDGE_FURN);
+  b.pad(-w * 0.47, w * 0.47, h * 0.7, h, -d * 0.46, d * 0.46, C.fabric, C.cushion, 0.035, EDGE_GLOW);
+  b.seg(0, 0.06, d / 2 + 0.004, 0, h * 0.58, d / 2 + 0.004, EDGE_FAINT);
+}
+
 const fireplaceScreen: FurnitureScreenRenderer = (w, d, h) => ({ x0: -w * 0.37, x1: w * 0.37, y0: h * 0.15, y1: h * 0.67, z: d / 2 + 0.014 });
+const nicheScreen: FurnitureScreenRenderer = (w, d, h) => ({ x0: -w * 0.4, x1: w * 0.4, y0: h * 0.07, y1: h * 0.13, z: d / 2 + 0.014 });
+const coveScreen: FurnitureScreenRenderer = (w, d, h) => ({ x0: -w * 0.42, x1: w * 0.42, y0: 2.7 - h - 0.018, y1: 2.7 - h + 0.018, z: d * 0.32 });
 
 export const ARCHITECTURE_FURNITURE_MODELS: Readonly<Record<string, FurnitureModelRenderer>> = {
   column_round: ({ b, w, d, h }) => (column(b, w, d, h, "round"), 0.5),
@@ -60,6 +94,12 @@ export const ARCHITECTURE_FURNITURE_MODELS: Readonly<Record<string, FurnitureMod
   chimney_inside: ({ b, w, d, h }) => (chimney(b, w, d, h), 0.5),
   fireplace_builtin: ({ b, w, d, h }) => (fireplace(b, w, d, h), 0.5),
   sliding_wall: ({ b, w, d, h }) => (slidingWall(b, w, d, h), 0.5),
+  builtin_shelf_niche: ({ b, w, d, h }) => (shelfNiche(b, w, d, h, false), false),
+  led_niche: ({ b, w, d, h }) => (shelfNiche(b, w, d, h, true), false),
+  light_cove: ({ b, w, d, h }) => (lightCove(b, w, d, h), false),
+  platform_steps: ({ b, w, d, h }) => (platform(b, w, d, h), 0.5),
+  gallery_railing_glass: ({ b, w, d, h }) => (glassRailing(b, w, d, h), 0.5),
+  window_seat: ({ b, w, d, h }) => (windowSeat(b, w, d, h), 0.5),
 };
 
-export const ARCHITECTURE_FURNITURE_SCREENS: Readonly<Record<string, FurnitureScreenRenderer>> = { fireplace_builtin: fireplaceScreen };
+export const ARCHITECTURE_FURNITURE_SCREENS: Readonly<Record<string, FurnitureScreenRenderer>> = { fireplace_builtin: fireplaceScreen, led_niche: nicheScreen, light_cove: coveScreen };
