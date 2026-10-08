@@ -121,7 +121,8 @@ Mục tiêu: biến hiện trạng thành đường cơ sở có thể đo đư�
 
 Mục tiêu: có nền tảng đủ gọn để thêm nhiều mẫu theo lô.
 
-- [ ] Tách metadata khỏi `frontend/src/model.ts`; giữ export tương thích để chưa phải sửa toàn bộ nơi dùng.
+- [x] Tách metadata khỏi `frontend/src/model.ts`; giữ export tương thích để chưa phải sửa toàn bộ nơi dùng.
+  - Type, nhóm thư viện, kích thước mặc định và capability tĩnh hiện nằm trong `frontend/src/furniture/metadata.ts`; catalog đọc trực tiếp module thuần này, còn `model.ts` re-export cùng tham chiếu để API cũ không đổi.
 - [x] Tách renderer trong `frontend/src/viewer/furniture.ts` thành các họ tái sử dụng.
   - Toàn bộ 114 model 3D built-in không phải đèn đã chuyển sang registry theo các họ everyday, kitchen/bath, architecture/outdoor, climate, smart-home, energy, utility và miscellaneous; `furniture.ts` chỉ còn cầu nối dựng hình, màn hình động và pack.
 - [x] Chuyển `frontend/src/components/furniture2d.ts` sang registry ký hiệu 2D.
@@ -215,8 +216,8 @@ Mỗi PR chỉ nên chứa một họ sản phẩm khoảng 8–20 mẫu: catalo
 
 ## Các tệp dự kiến tác động
 
-- `frontend/src/model.ts`: lớp tương thích cho type, nhóm và kích thước cũ.
-- `frontend/src/furniture/`: catalog, renderer và symbol mới.
+- `frontend/src/model.ts`: lớp tương thích re-export metadata furniture cũ.
+- `frontend/src/furniture/`: metadata thuần, catalog, báo cáo và validator.
 - `frontend/src/viewer/furniture-builder.ts` và `frontend/src/viewer/furniture-models/`: primitive dùng chung và renderer theo họ.
 - `frontend/src/viewer/furniture.ts`: cầu nối renderer, màn hình động và pack.
 - `frontend/src/components/furniture-symbols/`: symbol SVG và registry theo họ.

@@ -4,6 +4,13 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.19.15
+
+### Changed
+
+- Moved built-in furniture types, groups, default sizes and static capability sets from the shared data model into a dependency-free furniture metadata module.
+- Kept identity-compatible exports from `model.ts`, switched the catalog to the new source directly and added regression coverage for the compatibility facade.
+
 ## 1.19.14
 
 ### Changed

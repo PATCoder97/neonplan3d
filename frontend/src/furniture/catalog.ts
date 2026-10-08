@@ -2,7 +2,7 @@
 // compatibility; this module is the first migration step towards one declarative catalog. It gives
 // tests, reports and future renderers one typed place to inspect every id, size and library group.
 
-import { FURNITURE_GROUPS, FURNITURE_SIZE, FURNITURE_TYPES, type FurnitureType } from "../model.ts";
+import { FURNITURE_GROUPS, FURNITURE_SIZE, FURNITURE_TYPES, type FurnitureType } from "./metadata.ts";
 
 export type FurnitureGroup = keyof typeof FURNITURE_GROUPS;
 

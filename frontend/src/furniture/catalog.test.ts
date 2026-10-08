@@ -5,6 +5,13 @@ import { translate, type I18nKey } from "../i18n.ts";
 import { FURNITURE_GROUPS, FURNITURE_SIZE, FURNITURE_TYPES } from "../model.ts";
 import type { HomeAssistant } from "../types.ts";
 import { BUILTIN_FURNITURE_BY_ID, BUILTIN_FURNITURE_CATALOG, furnitureCatalogEntry, furnitureCatalogIssues, furnitureCatalogSummary, FURNITURE_LIBRARY_GROUPS, HIDDEN_FURNITURE_TYPES, REFERENCE_PACK_ITEMS, REFERENCE_PACK_TARGETS } from "./catalog.ts";
+import { FURNITURE_GROUPS as METADATA_GROUPS, FURNITURE_SIZE as METADATA_SIZE, FURNITURE_TYPES as METADATA_TYPES } from "./metadata.ts";
+
+test("model keeps identity-compatible furniture metadata exports", () => {
+  assert.equal(FURNITURE_TYPES, METADATA_TYPES);
+  assert.equal(FURNITURE_GROUPS, METADATA_GROUPS);
+  assert.equal(FURNITURE_SIZE, METADATA_SIZE);
+});
 
 test("built-in furniture catalog has stable complete metadata", () => {
   assert.deepEqual(furnitureCatalogIssues(), []);
