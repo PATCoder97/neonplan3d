@@ -3,7 +3,7 @@
 import { circle, createSymbolRegistry, ellipse, line, rect, type SymbolPart } from "./common.ts";
 import type { FurnitureSymbol } from "./types.ts";
 
-const TYPES = ["gas_grill", "lounge_set_outdoor", "sun_lounger", "parasol", "pergola", "raised_bed", "greenhouse", "hot_tub_outdoor", "fire_bowl", "garden_torch", "play_tower_slide", "garden_shed", "trampoline", "flower_pots_3", "lawn_sprinkler", "irrigation_valve_box", "rain_barrel", "garden_lantern", "outdoor_kitchen", "patio_heater"] as const;
+const TYPES = ["gas_grill", "lounge_set_outdoor", "sun_lounger", "parasol", "pergola", "raised_bed", "greenhouse", "hot_tub_outdoor", "fire_bowl", "garden_torch", "play_tower_slide", "garden_shed", "trampoline", "flower_pots_3", "lawn_sprinkler", "irrigation_valve_box", "rain_barrel", "garden_lantern", "outdoor_kitchen", "patio_heater", "tree_oak", "tree_lime", "tree_birch", "tree_maple", "tree_fruit", "tree_spruce", "tree_pine", "tree_thuja", "shrub", "shrub_flowering", "brush_wild", "trees_group_3"] as const;
 
 function symbol(type: string, w: number, d: number): FurnitureSymbol {
   if (type === "gas_grill") return [rect(-w * 0.38, -d * 0.4, w * 0.38, d * 0.36, "fp3d-sym-fill"), line(-w * 0.48, -d * 0.3, w * 0.48, -d * 0.3)];
@@ -30,6 +30,10 @@ function symbol(type: string, w: number, d: number): FurnitureSymbol {
   if (type === "garden_lantern") return [circle(0, 0, Math.min(w, d) * 0.46, "fp3d-sym-fill"), line(-w * 0.32, 0, w * 0.32, 0), line(0, -d * 0.32, 0, d * 0.32)];
   if (type === "outdoor_kitchen") return [rect(-w / 2, -d / 2, w / 2, d / 2, "fp3d-sym-fill"), rect(-w * 0.38, -d * 0.32, -w * 0.05, d * 0.18), circle(w * 0.24, -d * 0.05, Math.min(w, d) * 0.18)];
   if (type === "patio_heater") return [circle(0, 0, Math.min(w, d) / 2, "fp3d-sym-fill"), circle(0, 0, Math.min(w, d) * 0.18)];
+  if (type === "trees_group_3") return [circle(-w * 0.27, -d * 0.12, Math.min(w, d) * 0.16, "fp3d-sym-fill"), circle(w * 0.22, -d * 0.2, Math.min(w, d) * 0.19, "fp3d-sym-fill"), circle(w * 0.05, d * 0.28, Math.min(w, d) * 0.17, "fp3d-sym-fill")];
+  if (type === "brush_wild") return Array.from({ length: 8 }, (_, i) => line(-w * 0.42 + (w * i) / 7, -d * 0.38 + (i % 3) * d * 0.3, -w * 0.36 + (w * i) / 7, -d * 0.22 + (i % 3) * d * 0.3));
+  if (type === "shrub" || type === "shrub_flowering") return [circle(-w * 0.18, -d * 0.08, Math.min(w, d) * 0.3, "fp3d-sym-fill"), circle(w * 0.2, d * 0.08, Math.min(w, d) * 0.34, "fp3d-sym-fill")];
+  if (type.startsWith("tree_")) return [circle(0, 0, Math.min(w, d) / 2, "fp3d-sym-fill"), circle(0, 0, Math.min(w, d) * 0.1), line(-w * 0.34, 0, w * 0.34, 0), line(0, -d * 0.34, 0, d * 0.34)];
   return [ellipse(0, 0, w / 2, d / 2)];
 }
 

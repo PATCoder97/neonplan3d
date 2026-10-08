@@ -23,9 +23,9 @@ Mã nguồn lõi dùng giấy phép MIT không đồng nghĩa với các pack b�
 
 Nói ngắn gọn: ảnh của họ được dùng để trả lời “cần có những đồ vật gì và phải nhìn ra công dụng gì”, không dùng để tạo bản sao 1:1 của sản phẩm trả phí.
 
-## Hiện trạng ngày 08/10/2026
+## Hiện trạng ngày 09/10/2026
 
-- Thư viện tích hợp hiện có **283 mục** trong 10 nhóm giao diện, gồm các lô hoàn chỉnh cho phòng khách, phòng ngủ, phòng tắm, Kiến trúc cùng Smart Home, kỹ thuật và hai lô Sân vườn; toàn bộ hình học tích hợp được dựng thủ tục trong repository.
+- Thư viện tích hợp hiện có **295 mục** trong 10 nhóm giao diện, gồm các lô hoàn chỉnh cho phòng khách, phòng ngủ, phòng tắm, Kiến trúc, Smart Home, kỹ thuật và Sân vườn; toàn bộ hình học tích hợp được dựng thủ tục trong repository.
 - Có 21 gói bố trí nhanh cho phòng, gồm ba mức nhỏ/vừa/lớn cho bếp, phòng tắm, phòng ngủ và phòng khách; gói mới bỏ qua vị trí đã có đồ thay vì xếp chồng.
 - Trình chỉnh sửa đã có tìm kiếm song ngữ, nhóm thu gọn, xem trước, đổi kích thước, xoay, lật, đặt lên sàn/tường/trần/bề mặt và liên kết entity.
 - Định dạng pack nhập ngoài đã hỗ trợ khối hộp, trụ, khối vát, đèn, màn hình, bề mặt đặt đồ, phương tiện và lỗ cầu thang.
@@ -42,7 +42,7 @@ Trang chính thức đang công bố gói đầy đủ gồm 474 mẫu/phương 
 | Smart Home & công nghệ | 30 | Có một số thiết bị và liên kết entity | P0 |
 | Tiện ích & kỹ thuật tòa nhà | 18 | Có điện, nước và điều hòa cơ bản | P0 |
 | Kiến trúc & hoàn thiện | 17 | Có một phần trong công cụ xây dựng | P1 |
-| Sân vườn & hiên | 33 | Có bộ ngoài trời cơ bản | P1 |
+| Sân vườn & hiên | 33 | Hoàn tất độ phủ chức năng (37 mục độc lập) | P1 |
 | Cầu thang & lan can | 12 | Có cầu thang thẳng và chiếu nghỉ | P1 |
 | Garage & xưởng | 17 | Chưa có nhóm riêng | P1 |
 | Phương tiện | 15 | Có xe máy và chỗ đỗ xe | P1 |
@@ -160,6 +160,7 @@ Bảng kiểm kê làm việc nên có các cột: `nhóm`, `nguồn ảnh`, `t�
 | Vui chơi và lưu trữ | Chưa có | Thêm tháp chơi có cầu trượt, nhà kho sân vườn và trampoline có footprint an toàn rõ ràng. |
 | Tưới và trữ nước | Có bồn nước kỹ thuật dùng chung | Thêm vòi tưới cỏ, hộp van tưới và thùng hứng nước mưa theo đúng ngữ cảnh sân vườn. |
 | Tiện ích hiên | Chưa có | Thêm bộ ba chậu hoa, đèn sân vườn, bếp ngoài trời và sưởi hiên. |
+| Cây xanh và bụi cảnh | Chỉ có chậu cây lớn | Thêm tám dáng cây, hai bụi cảnh, bụi tự nhiên và cụm ba cây; dùng hình học thủ tục, không dùng texture/mesh ngoài. |
 
 ## Kiến trúc cần làm trước
 
@@ -185,7 +186,7 @@ Các biến thể cùng họ, ví dụ sofa 2/3 chỗ, tủ bếp 40/60/80 cm ho
 Mục tiêu: biến hiện trạng thành đường cơ sở có thể đo được.
 
 - [x] Sinh báo cáo tự động từ `FURNITURE_TYPES`, `FURNITURE_GROUPS` và `FURNITURE_SIZE` để phát hiện ID trùng, thiếu tên hoặc thiếu kích thước (`cd frontend && npm run catalog`).
-- [x] Lập bảng ánh xạ các mục hiện tại vào 16 nhóm đích; catalog kiểm kê hiện khóa 290 type, 283 mục thư viện, 7 mục nội bộ và trường hợp `worktop` đang nằm trong hai nhóm. Mỗi mục chỉ được tính một lần trong `REFERENCE_PACK_ITEMS`.
+- [x] Lập bảng ánh xạ các mục hiện tại vào 16 nhóm đích; catalog kiểm kê hiện khóa 302 type, 295 mục thư viện, 7 mục nội bộ và trường hợp `worktop` đang nằm trong hai nhóm. Mỗi mục chỉ được tính một lần trong `REFERENCE_PACK_ITEMS`.
 - [ ] Duyệt toàn bộ ảnh gallery công khai của 16 trang sản phẩm, không chỉ ảnh đại diện ở trang Packs; lập bảng `đã phù hợp / cần sửa hình / cần thêm mới` kèm URL và ngày xem.
 - [ ] Chọn khoảng 10 mẫu hiện có cần sửa hình trước; `fan_ceiling` là mẫu thí điểm và phải giữ nguyên ID.
 - [ ] Chụp bộ ảnh chuẩn ở góc nhìn 2D, 3D và chế độ Day/Neon để so sánh hồi quy.
@@ -261,9 +262,10 @@ Mục tiêu: phủ các hạng mục khó quan sát nhưng quan trọng với m�
 - [x] Kiến trúc & hoàn thiện: cột, dầm trang trí, lam, vách ngăn, bục, rèm, thảm và các module ốp.
   - Đợt 1 đã thêm ba cột, hai họ dầm, ống khói, lò sưởi âm và vách trượt trong module Architecture riêng; độ phủ đạt 11/17 khi tính cả rèm motor và vách kính hiện có.
   - Đợt 2 đã thêm kệ hốc tường, hốc LED, khe hắt trần, bục hai bậc, lan can gallery kính và bệ ngồi cửa sổ; độ phủ hoàn tất 17/17.
-- [ ] Sân vườn & hiên: bàn ghế ngoài trời, chậu cây, bếp nướng, xích đu, võng, mái che nhẹ, hàng rào và cổng.
+- [x] Sân vườn & hiên: bàn ghế ngoài trời, chậu cây, bếp nướng, xích đu, võng, mái che nhẹ, hàng rào và cổng.
   - Đợt 1 đã thêm 10 mẫu đồ hiên, công trình nhẹ, trồng cây và tiện nghi nước/lửa trong module Garden riêng; độ phủ kiểm kê đạt 15/33 khi tính năm mẫu ngoài trời hiện có.
   - Đợt 2 đã thêm 10 mẫu vui chơi, lưu trữ, tưới nước và tiện ích hiên; độ phủ kiểm kê đạt 25/33.
+  - Đợt 3 đã thêm 12 mẫu cây xanh và bụi cảnh thủ tục; độ phủ đạt 37 mục hữu dụng, vượt mốc tham chiếu 33 mà không dùng biến thể chỉ đổi kích thước.
 - [ ] Cầu thang & lan can: thẳng, chữ L, chữ U, xoắn, lan can kính/sắt và tự tạo khoảng mở tầng.
 - [ ] Garage & xưởng: bàn nguội, tủ dụng cụ, giá kho, máy nén, thang, thùng đồ và khu sạc.
 - [ ] Phương tiện: xe đạp, xe máy/scooter, sedan, hatchback, SUV, bán tải và xe van; hỗ trợ trạng thái có mặt, khóa và sạc.

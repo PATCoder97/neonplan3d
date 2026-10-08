@@ -4,6 +4,18 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.22.4
+
+### Added
+
+- Added twelve procedural Garden & Patio vegetation models: eight tree silhouettes, two shrubs, wild brush and a three-tree group.
+- Added dedicated 2D symbols and English, German and Vietnamese names for the complete vegetation family.
+
+### Changed
+
+- Completed Garden & Patio coverage beyond the 33-item reference milestone, with 37 independently designed built-in items and 295 library items overall.
+- Added geometry regression coverage for tree crowns, shrubs, blossoms and grouped planting.
+
 ## 1.22.3
 
 ### Added

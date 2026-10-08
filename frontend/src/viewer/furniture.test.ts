@@ -48,6 +48,30 @@ test("every non-lamp catalog item builds visible finite 3D geometry", () => {
   }
 });
 
+test("garden vegetation families keep recognisable silhouettes within their declared height", () => {
+  const trees = ["tree_oak", "tree_lime", "tree_birch", "tree_maple", "tree_fruit", "tree_spruce", "tree_pine", "tree_thuja"] as const;
+  for (const type of trees) {
+    const [w, d, h] = FURNITURE_SIZE[type];
+    const buf = new GeoBuffer();
+    const lines = new LineBuffer();
+    pushFurniture(buf, lines, new GeoBuffer(), { id: type, type, x: 0, z: 0, rotation: 0, w, d, h, variant: null } as Furniture);
+    const ys = buf.p.filter((_, index) => index % 3 === 1);
+    assert.ok(buf.count > 50 && lines.p.length > 0, `${type}: trunk and crown are visible`);
+    assert.ok(Math.min(...ys) >= -1e-6 && Math.max(...ys) <= h + 1e-6, `${type}: geometry stays inside its height`);
+  }
+
+  const counts = ["shrub", "shrub_flowering", "brush_wild", "trees_group_3"].map((type) => {
+    const [w, d, h] = FURNITURE_SIZE[type as keyof typeof FURNITURE_SIZE];
+    const buf = new GeoBuffer();
+    const lines = new LineBuffer();
+    pushFurniture(buf, lines, new GeoBuffer(), { id: type, type, x: 0, z: 0, rotation: 0, w, d, h, variant: null } as Furniture);
+    assert.ok(buf.count > 0 || lines.p.length > 0, `${type}: visible vegetation geometry`);
+    return buf.count + lines.p.length;
+  });
+  assert.ok(counts[1] > counts[0], "the flowering shrub adds blossoms");
+  assert.ok(counts[3] > counts[0], "the tree group contains more geometry than one shrub");
+});
+
 test("living-room sofa variants keep fixed seats and distinct corner footprints", () => {
   const geometry = (type: "sofa_2" | "sofa_3" | "sofa_4" | "sofa_corner_left" | "sofa_corner_right" | "sofa_chaise" | "sofa_u") => {
     const [w, d, h] = FURNITURE_SIZE[type];

@@ -187,6 +187,65 @@ function patioHeater(b: Builder, w: number, d: number, h: number): void {
   b.loft([-r * 0.65, r * 0.65, -r * 0.65, r * 0.65], [-r, r, -r, r], h * 0.86, h, C.metal, C.metal, EDGE_FURN);
 }
 
+type TreeCrown = "round" | "oval" | "tiered" | "column" | "fruit";
+
+function tree(b: Builder, w: number, d: number, h: number, crown: TreeCrown): void {
+  const r = Math.min(w, d) / 2;
+  const trunkH = h * (crown === "tiered" ? 0.3 : 0.38);
+  b.cyl(0, 0, r * 0.12, 0, trunkH, C.wood, C.woodTop, 10, EDGE_FAINT);
+  if (crown === "tiered") {
+    for (let i = 0; i < 4; i++) {
+      const y0 = h * (0.2 + i * 0.16);
+      const radius = r * (1 - i * 0.16);
+      b.loft([-radius, radius, -radius, radius], [-r * 0.08, r * 0.08, -r * 0.08, r * 0.08], y0, Math.min(h, y0 + h * 0.34), C.plant, C.plantTop, i === 3 ? EDGE_FURN : EDGE_FAINT);
+    }
+    return;
+  }
+  const layers = crown === "column" ? 4 : 3;
+  for (let i = 0; i < layers; i++) {
+    const y = trunkH + (h - trunkH) * (i / (layers + 0.3));
+    const radius = crown === "column" ? r * (0.52 - i * 0.06) : r * (0.72 - i * 0.08);
+    const zScale = crown === "oval" ? 0.72 : 1;
+    b.loft([-radius, radius, -radius * zScale, radius * zScale], [-radius * 0.62, radius * 0.62, -radius * zScale * 0.62, radius * zScale * 0.62], y, Math.min(h, y + h * 0.28), C.plant, C.plantTop, i === layers - 1 ? EDGE_FURN : EDGE_FAINT);
+  }
+  if (crown === "fruit") for (let i = 0; i < 7; i++) {
+    const a = (i * Math.PI * 2) / 7;
+    b.cyl(Math.cos(a) * r * 0.46, Math.sin(a) * r * 0.4, r * 0.045, h * (0.55 + (i % 3) * 0.08), h * (0.58 + (i % 3) * 0.08), C.accent, C.accent, 7, EDGE_GLOW);
+  }
+}
+
+function shrub(b: Builder, w: number, d: number, h: number, flowering: boolean): void {
+  const r = Math.min(w, d) / 2;
+  for (const [x, z, s] of [[-0.25, -0.12, 0.58], [0.18, -0.18, 0.7], [-0.08, 0.24, 0.64], [0.3, 0.2, 0.48]] as const) {
+    b.cyl(x * w, z * d, r * s, 0.04, h * (0.7 + s * 0.3), C.plant, C.plantTop, 9, EDGE_FAINT);
+    if (flowering) b.cyl(x * w + r * 0.08, z * d, r * 0.09, h * (0.68 + s * 0.3), h * (0.72 + s * 0.3), C.accent, C.accent, 7, EDGE_GLOW);
+  }
+}
+
+function wildBrush(b: Builder, w: number, d: number, h: number): void {
+  for (let i = 0; i < 13; i++) {
+    const x = (((i * 37) % 13) / 12 - 0.5) * w * 0.88;
+    const z = (((i * 17) % 11) / 10 - 0.5) * d * 0.88;
+    const top = h * (0.45 + (i % 5) * 0.12);
+    b.seg(x, 0, z, x + ((i % 3) - 1) * 0.06, top, z + ((i % 4) - 1.5) * 0.04, i % 3 === 0 ? EDGE_GLOW : EDGE_FAINT);
+  }
+}
+
+function treeGroup(b: Builder, w: number, d: number, h: number): void {
+  for (const [x, z, scale] of [[-0.27, -0.12, 0.78], [0.22, -0.2, 1], [0.05, 0.28, 0.86]] as const) {
+    const cx = x * w;
+    const cz = z * d;
+    const r = Math.min(w, d) * 0.16 * scale;
+    const top = h * scale;
+    b.cyl(cx, cz, r * 0.18, 0, top * 0.4, C.wood, C.woodTop, 9, EDGE_FAINT);
+    for (let i = 0; i < 3; i++) {
+      const y = top * (0.34 + i * 0.16);
+      const cr = r * (1 - i * 0.12);
+      b.loft([cx - cr, cx + cr, cz - cr, cz + cr], [cx - cr * 0.58, cx + cr * 0.58, cz - cr * 0.58, cz + cr * 0.58], y, Math.min(top, y + top * 0.3), C.plant, C.plantTop, i === 2 ? EDGE_FURN : EDGE_FAINT);
+    }
+  }
+}
+
 export const GARDEN_FURNITURE_MODELS: Readonly<Record<string, FurnitureModelRenderer>> = {
   gas_grill: ({ b, w, d, h }) => (gasGrill(b, w, d, h), 0.5),
   lounge_set_outdoor: ({ b, w, d, h }) => (loungeSet(b, w, d, h), 0.5),
@@ -208,4 +267,16 @@ export const GARDEN_FURNITURE_MODELS: Readonly<Record<string, FurnitureModelRend
   garden_lantern: ({ b, w, d, h }) => (gardenLantern(b, w, d, h), 0.5),
   outdoor_kitchen: ({ b, w, d, h }) => (outdoorKitchen(b, w, d, h), 0.5),
   patio_heater: ({ b, w, d, h }) => (patioHeater(b, w, d, h), 0.5),
+  tree_oak: ({ b, w, d, h }) => (tree(b, w, d, h, "round"), 0.5),
+  tree_lime: ({ b, w, d, h }) => (tree(b, w, d, h, "oval"), 0.5),
+  tree_birch: ({ b, w, d, h }) => (tree(b, w, d, h, "column"), 0.5),
+  tree_maple: ({ b, w, d, h }) => (tree(b, w, d, h, "round"), 0.5),
+  tree_fruit: ({ b, w, d, h }) => (tree(b, w, d, h, "fruit"), 0.5),
+  tree_spruce: ({ b, w, d, h }) => (tree(b, w, d, h, "tiered"), 0.5),
+  tree_pine: ({ b, w, d, h }) => (tree(b, w, d, h, "tiered"), 0.5),
+  tree_thuja: ({ b, w, d, h }) => (tree(b, w, d, h, "column"), 0.5),
+  shrub: ({ b, w, d, h }) => (shrub(b, w, d, h, false), 0.5),
+  shrub_flowering: ({ b, w, d, h }) => (shrub(b, w, d, h, true), 0.5),
+  brush_wild: ({ b, w, d, h }) => (wildBrush(b, w, d, h), 0.5),
+  trees_group_3: ({ b, w, d, h }) => (treeGroup(b, w, d, h), 0.5),
 };
