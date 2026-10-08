@@ -4,6 +4,18 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.23.0
+
+### Added
+
+- Added the first Office & Gaming batch with three desk layouts, two office chairs, filing and drawer storage, an office bookcase, single and dual monitors, and a PC tower.
+- Added dedicated procedural 3D models, plan symbols, localized names and geometry regression coverage for all 11 new items.
+
+### Changed
+
+- Monitors now detect built-in desk surfaces and sit at the supporting desk's height.
+- Expanded the reproducible inventory to 353 declared types and 346 library items, with Office & Gaming coverage at 14 of 25.
+
 ## 1.22.7
 
 ### Added

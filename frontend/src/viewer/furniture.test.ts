@@ -84,6 +84,29 @@ test("garage workshop fixtures have dedicated geometry and the wall shelf uses i
   assert.equal(mountBase(floor, { type: "wall_shelf_garage", x: 0, z: 0, h: FURNITURE_SIZE.wall_shelf_garage[2] }), 1.25);
 });
 
+test("office fixtures have distinct geometry and monitors follow the supporting desk", () => {
+  const types = ["desk_l", "desk_corner", "desk_sit_stand", "chair_ergonomic", "chair_visitor", "filing_cabinet", "drawer_unit_office", "bookcase_office", "monitor_single", "monitor_dual", "pc_tower"] as const;
+  const complexity = new Map<string, number>();
+  const geometry = new Map<string, string>();
+  for (const type of types) {
+    const [w, d, h] = FURNITURE_SIZE[type];
+    const buf = new GeoBuffer();
+    const lines = new LineBuffer();
+    pushFurniture(buf, lines, new GeoBuffer(), { id: type, type, x: 0, z: 0, rotation: 0, w, d, h, variant: null } as Furniture);
+    assert.ok(buf.count > 0 && lines.p.length > 0, `${type}: solid and outline geometry`);
+    complexity.set(type, buf.count + lines.p.length);
+    geometry.set(type, buf.p.map((value, index) => Math.round((value / (index % 3 === 0 ? w : index % 3 === 2 ? d : h)) * 1000)).join(","));
+  }
+  assert.notEqual(geometry.get("desk_l"), geometry.get("desk_corner"), "L and corner desks use distinct footprints");
+  assert.ok(complexity.get("monitor_dual")! > complexity.get("monitor_single")!, "the dual setup contains a second display");
+
+  const floor = newFloor("office", "Office", 0);
+  const [w, d, h] = FURNITURE_SIZE.desk_sit_stand;
+  floor.furniture.push({ id: "desk", type: "desk_sit_stand", x: 0, z: 0, rotation: 0, w, d, h, variant: null } as Furniture);
+  assert.equal(mountBase(floor, { type: "monitor_single", x: 0, z: 0, h: FURNITURE_SIZE.monitor_single[2] }), h);
+  assert.equal(mountBase(floor, { type: "monitor_dual", x: 0, z: 0, h: FURNITURE_SIZE.monitor_dual[2] }), h);
+});
+
 test("living-room sofa variants keep fixed seats and distinct corner footprints", () => {
   const geometry = (type: "sofa_2" | "sofa_3" | "sofa_4" | "sofa_corner_left" | "sofa_corner_right" | "sofa_chaise" | "sofa_u") => {
     const [w, d, h] = FURNITURE_SIZE[type];
