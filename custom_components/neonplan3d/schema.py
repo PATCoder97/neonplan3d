@@ -39,6 +39,16 @@ ROOM_SCHEMA = vol.Schema(
         vol.Required("area_id"): vol.Any(None, vol.All(str, vol.Length(max=255))),
         vol.Required("points"): vol.All([_POINT], vol.Length(min=3, max=MAX_POINTS)),
         vol.Required("floor_material"): vol.All(str, vol.Length(max=32)),
+        # Open covered spaces remain rooms for areas/devices, but render without enclosing walls.
+        vol.Optional("kind", default="room"): vol.In(["room", "veranda", "canopy"]),
+        vol.Optional("roof_style", default=None): vol.Any(None, vol.In(["solid", "glass", "tile"])),
+        vol.Optional("railing", default=None): vol.Any(None, bool),
+        vol.Optional("columns", default=None): vol.Any(None, vol.All(vol.Coerce(int), vol.Range(min=0, max=12))),
+        vol.Optional("column_size", default=None): vol.Any(None, vol.All(vol.Coerce(float), vol.Range(min=0.08, max=0.8))),
+        vol.Optional("height", default=None): vol.Any(None, vol.All(vol.Coerce(float), vol.Range(min=0.1, max=6))),
+        vol.Optional("slope", default=None): vol.Any(None, vol.All(vol.Coerce(float), vol.Range(min=0, max=20))),
+        vol.Optional("slope_dir", default="x"): vol.In(["x", "-x", "z", "-z"]),
+        vol.Optional("open", default=False): bool,
         # entities shown in the room's panel although they are not in the plan
         vol.Optional("panel", default=list): vol.All([vol.All(str, vol.Length(max=255))], vol.Length(max=100)),
         # entities of the area kept out of the room panel

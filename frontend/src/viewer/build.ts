@@ -11,8 +11,8 @@
 //   fold = 48 + b    top face of the lower part at the cut height: visible while bucket b is cut
 
 import { Color, type BufferGeometry } from "three";
-import type { Floor, Opening, Room, SolarField, Vec2 } from "../model.ts";
-import { furnitureFootprint, isLamp, pointInPolygon } from "../model.ts";
+import type { Floor, Opening, OutdoorArea, Room, SolarField, Vec2 } from "../model.ts";
+import { furnitureFootprint, groundLevel, isCoveredRoom, isLamp, outdoorFloorTop, pointInPolygon } from "../model.ts";
 import { generateWalls, locateOpening, openingHost, type Wall } from "../geometry/walls.ts";
 import { holeInRoom, insetHole, mergeHoles } from "../geometry/holes.ts";
 import { pushFurniture } from "./furniture.ts";
@@ -87,6 +87,8 @@ export interface FloorGeometry {
   furnitureTris: { id: string; start: number; end: number }[];
   /** Composite outdoor structures in `walls`, so they can be selected directly in 3D. */
   outdoorTris: { id: string; start: number; end: number }[];
+  /** Covered rooms in `walls`; tapping these must select a room, not an outdoor area. */
+  coveredRoomTris: { id: string; start: number; end: number }[];
 }
 
 export const SLAB = 0.2;
@@ -140,6 +142,7 @@ export function buildFloorGeometry(
   const holeLines = new LineBuffer();
   const cutHoles: Vec2[][] = [];
   for (const room of floor.rooms) {
+    if (isCoveredRoom(room)) continue;
     if (room.points.length < 3) continue;
     const poly = ccw(room.points);
     const look = FLOOR_LOOK[room.floor_material] ?? FLOOR_LOOK.wood;
@@ -347,6 +350,25 @@ export function buildFloorGeometry(
 
   // ---------------------------------------------------------------- furniture and shadows
   const shadow = buildShadow(outline.edges, floor.rooms, spans);
+  const coveredAreas: OutdoorArea[] = floor.rooms.filter(isCoveredRoom).map((room) => ({
+    id: room.id,
+    type: room.kind,
+    name: room.name,
+    points: room.points,
+    floor_material: room.floor_material,
+    roof_style: room.roof_style,
+    railing: room.railing,
+    columns: room.columns,
+    column_size: room.column_size,
+    height: room.height ?? floor.height,
+    slope: room.slope,
+    slope_dir: room.slope_dir,
+    open: room.open ?? true,
+    // Composite outdoor geometry normally starts at ground level. Move it so its finished floor is
+    // exactly y=0 of this storey, matching normal rooms and every room-mounted device.
+    offset: -groundLevel(floor) - (outdoorFloorTop(room.kind) ?? 0),
+  }));
+  const coveredRoomTris = pushOutdoor(wallBuf, lines, { ...floor, outdoor: coveredAreas });
   const outdoorTris = pushOutdoor(wallBuf, lines, floor);
   for (const s of solar) pushModules(wallBuf, lines, s.face, s.field, floor.elevation);
 
@@ -380,6 +402,7 @@ export function buildFloorGeometry(
     wallBuckets: walls.map((w) => wallBucket.get(w)!),
     furnitureTris,
     outdoorTris,
+    coveredRoomTris,
   };
 }
 

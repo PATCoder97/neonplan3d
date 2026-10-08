@@ -4,6 +4,13 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.18.18
+
+### Added
+
+- Added verandas and covered areas directly to the Room menu, retaining room selection, Home Assistant Area assignment and device attachment without enclosing walls.
+- Added configurable covered-room roofs, slopes, railings and columns, with direct room selection from the complete 3D structure.
+
 ## 1.18.17
 
 ### Added

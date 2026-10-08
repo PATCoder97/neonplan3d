@@ -24,6 +24,18 @@ export interface Room {
   area_id: string | null;
   points: Vec2[];
   floor_material: string;
+  /** A covered, open room keeps room/area/device behaviour but renders as a veranda or canopy. */
+  kind?: "room" | "veranda" | "canopy";
+  /** Covered-room roof finish and structural options (the same look as composite outdoor areas). */
+  roof_style?: "solid" | "glass" | "tile" | null;
+  railing?: boolean | null;
+  columns?: number | null;
+  column_size?: number | null;
+  height?: number | null;
+  slope?: number | null;
+  slope_dir?: SlopeDir;
+  /** Leave the last polygon edge open where the covered room joins the house. */
+  open?: boolean;
   /** Entities shown in the room's panel although they are not in the plan. */
   panel?: string[];
   /** Entities of the room's area kept out of the room panel. */
@@ -45,6 +57,10 @@ export interface Room {
    * into parts of their own (each with its own height), e.g. a 2.5 m wall next to a 1.7 m one in line.
    */
   wall_splits?: (number[] | null)[];
+}
+
+export function isCoveredRoom(room: Room): room is Room & { kind: "veranda" | "canopy" } {
+  return room.kind === "veranda" || room.kind === "canopy";
 }
 
 export type OpeningType = "door" | "window" | "garage";

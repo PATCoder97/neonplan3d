@@ -7,7 +7,7 @@
 // neighbouring walls.
 
 import type { FreeWall, Opening, Room, Vec2 } from "../model.ts";
-import { pointInPolygon, signedArea } from "../model.ts";
+import { isCoveredRoom, pointInPolygon, signedArea } from "../model.ts";
 
 export interface WallSource {
   room_id: string;
@@ -92,6 +92,9 @@ const rightNormal = (d: Vec2): Vec2 => [d[1], -d[0]];
 export function generateWalls(rooms: readonly Room[], options: WallOptions, free: readonly FreeWall[] = []): WallResult {
   const eps = options.eps ?? 0.005;
   const warnings: string[] = [];
+  // Verandas and covered yards are rooms for selection, areas and devices, but their outline is not
+  // an enclosing wall. Their columns, railing and roof are built by the covered-room renderer.
+  const structuralRooms = rooms.filter((room) => !isCoveredRoom(room));
   const freeWalls = free.filter((w) => Math.hypot(w.b[0] - w.a[0], w.b[1] - w.a[1]) > 0.05);
 
   // 1. canonical vertices (merge points closer than eps)
@@ -114,7 +117,7 @@ export function generateWalls(rooms: readonly Room[], options: WallOptions, free
     forward: boolean;
   }
   const edges: Edge[] = [];
-  for (const room of rooms) {
+  for (const room of structuralRooms) {
     const pts = room.points;
     if (pts.length < 3 || Math.abs(signedArea(pts)) < 1e-6) continue;
     const ccw = signedArea(pts) > 0;
@@ -131,7 +134,7 @@ export function generateWalls(rooms: readonly Room[], options: WallOptions, free
   const freeIds = freeWalls.map((w) => [vertexId(w.a), vertexId(w.b)] as const);
   // split points set by hand on room edges: vertices as well, and the wall never merges back across them
   const splitNodes = new Set<number>();
-  for (const room of rooms) {
+  for (const room of structuralRooms) {
     const pts = room.points;
     if (pts.length < 3) continue;
     (room.wall_splits ?? []).forEach((list, i) => {
@@ -187,7 +190,7 @@ export function generateWalls(rooms: readonly Room[], options: WallOptions, free
     partsOf.set(key, [...(partsOf.get(key) ?? []), s.t0].sort((a, b) => a - b));
   }
   const heightSet = (s: Segment): number | null | undefined => {
-    const h = rooms.find((r) => r.id === s.room)?.wall_heights?.[s.edge];
+    const h = structuralRooms.find((r) => r.id === s.room)?.wall_heights?.[s.edge];
     if (!Array.isArray(h)) return h;
     const parts = partsOf.get(`${s.room}:${s.edge}`) ?? [];
     return h[parts.indexOf(s.t0)] ?? null;
@@ -199,7 +202,7 @@ export function generateWalls(rooms: readonly Room[], options: WallOptions, free
   };
   // a thickness set on a room edge (D149); a shared wall takes the thicker setting of its two rooms
   const thickOf = (list: Segment[]): number | undefined => {
-    const ts = list.map((s) => rooms.find((r) => r.id === s.room)?.wall_thickness?.[s.edge]).filter((t): t is number => typeof t === "number" && t > 0);
+    const ts = list.map((s) => structuralRooms.find((r) => r.id === s.room)?.wall_thickness?.[s.edge]).filter((t): t is number => typeof t === "number" && t > 0);
     return ts.length ? Math.max(...ts) : undefined;
   };
   // a height of 0 on an edge: no wall there at all (an open floor plan whose rooms share one space)

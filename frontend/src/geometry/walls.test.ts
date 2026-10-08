@@ -34,6 +34,12 @@ test("single room gets four exterior walls with mitred corners", () => {
   assert.ok(hasPoint(all, [4 + EXT, 3 + EXT]));
 });
 
+test("a covered room keeps room behaviour without generating enclosing walls", () => {
+  const covered: Room = { ...rect("porch", 0, 0, 4, 2), kind: "veranda" };
+  assert.equal(generateWalls([covered], opts).walls.length, 0);
+  assert.equal(generateWalls([covered, rect("room", 5, 0, 8, 3)], opts).walls.length, 4);
+});
+
 test("clockwise rooms give the same walls", () => {
   const cw: Room = { ...rect("a", 0, 0, 4, 3) };
   cw.points = [...cw.points].reverse();

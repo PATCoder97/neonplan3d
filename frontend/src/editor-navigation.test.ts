@@ -6,7 +6,7 @@ test("editor tools follow the user workflow and occur only once", () => {
   assert.deepEqual(
     EDITOR_TOOL_GROUPS.map((group) => [group.key, ...group.tools]),
     [
-      ["room", "rect", "polygon"],
+      ["room", "rect", "polygon", "covered"],
       ["structure", "wall", "opening", "hole", "roof"],
       ["layout", "furniture", "outdoor"],
       ["energy", "energy"],

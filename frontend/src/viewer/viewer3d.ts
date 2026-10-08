@@ -2809,6 +2809,8 @@ export class FloorplanViewer {
         const entity = id ? this.pickOpenings.get(id) : undefined;
         if (entity) return { entity };
       } else if (hit.object === fv.wallMesh) {
+        const coveredRoomId = inRange(fv.geo.coveredRoomTris, tri);
+        if (coveredRoomId) return { floorId: fv.floor.id, roomId: coveredRoomId };
         const outdoorId = inRange(fv.geo.outdoorTris, tri);
         if (outdoorId) return { floorId: fv.floor.id, outdoorId };
         const id = inRange(fv.geo.furnitureTris, tri);

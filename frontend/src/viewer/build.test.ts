@@ -65,6 +65,16 @@ test("a composite outdoor structure keeps one triangle range for 3D selection", 
   assert.ok(geo.outdoorTris[0].end > geo.outdoorTris[0].start);
 });
 
+test("a covered room renders as one selectable room structure without a normal floor slab", () => {
+  const covered: Room = { ...rect("porch", 0, 0, 4, 2), kind: "veranda", roof_style: "tile", railing: true, columns: 2, open: true };
+  const geo = buildFloorGeometry(floorWith([covered]), EXT, INT);
+  assert.equal(geo.roomTris.length, 0);
+  assert.equal(geo.walls2d.length, 0);
+  assert.equal(geo.coveredRoomTris.length, 1);
+  assert.equal(geo.coveredRoomTris[0].id, "porch");
+  assert.ok(geo.coveredRoomTris[0].end > geo.coveredRoomTris[0].start);
+});
+
 test("a straight outer face across a T-joint gets no corner line", () => {
   const geo = buildFloorGeometry(floorWith([rect("a", 0, 0, 4, 3), rect("b", 4, 0, 7, 3)]), EXT, INT);
   const corners = segments(geo.lines).filter((s) => vertical(s) && s[6] === -1);
