@@ -28,6 +28,7 @@ import { furnishRoom, PACKAGES, type PackageId } from "../packages.ts";
 import { generateWalls, locateOpening, openingHost, pointOnRoomEdge, type Wall } from "../geometry/walls.ts";
 import { formatNumber, languageReady, loadLanguage, translate, type I18nKey } from "../i18n.ts";
 import { iconPath } from "../icons.ts";
+import { coveredPlanStructure } from "../covered-plan.ts";
 import {
   bounds,
   centroid,
@@ -4748,6 +4749,23 @@ export class Fp3dEditor extends LitElement {
         const pts = r.points.map((p) => this.toScreen(p).join(",")).join(" ");
         return svg`<polygon data-room=${r.id} class=${`fp3d-room${isCoveredRoom(r) ? " fp3d-room-covered" : ""}${r.id === this._roomId ? " fp3d-room-sel" : ""}`} points=${pts} />`;
       })}</g>
+      <g class="fp3d-covered-structure" pointer-events="none">${floor.rooms.map((room) => {
+        const structure = coveredPlanStructure(room);
+        if (!structure) return nothing;
+        const railWidth = Math.max(3, Math.min(8, this._view.scale * (room.kind === "canopy" ? 0.08 : 0.07)));
+        return svg`${structure.railings.map(({ a, b }) => {
+          const [x1, y1] = this.toScreen(a);
+          const [x2, y2] = this.toScreen(b);
+          return svg`<line class="fp3d-covered-rail" x1=${x1} y1=${y1} x2=${x2} y2=${y2} stroke-width=${railWidth} />
+            <line class="fp3d-covered-rail-edge" x1=${x1} y1=${y1} x2=${x2} y2=${y2} />`;
+        })}${structure.columns.map((column) => {
+          const [x, y] = this.toScreen(column.at);
+          const shaft = Math.max(6, column.size * this._view.scale);
+          const base = Math.max(shaft, (column.baseSize ?? column.size) * this._view.scale);
+          return svg`<rect class="fp3d-covered-column-base" x=${x - base / 2} y=${y - base / 2} width=${base} height=${base} />
+            <rect class="fp3d-covered-column" x=${x - shaft / 2} y=${y - shaft / 2} width=${shaft} height=${shaft} />`;
+        })}`;
+      })}</g>
       ${this.renderEdgeHighlight()}
       <g pointer-events="none">${floor.rooms.map((r) => {
         const [cx, cy] = this.toScreen(centroid(r.points));
@@ -7786,6 +7804,25 @@ export class Fp3dEditor extends LitElement {
       .fp3d-room-covered {
         fill: rgba(91, 124, 255, 0.1);
         stroke-dasharray: 7 4;
+      }
+      .fp3d-covered-rail {
+        stroke: #22345a;
+        stroke-linecap: square;
+      }
+      .fp3d-covered-rail-edge {
+        fill: none;
+        stroke: rgba(55, 224, 255, 0.72);
+        stroke-width: 1;
+      }
+      .fp3d-covered-column-base {
+        fill: #22345a;
+        stroke: rgba(55, 224, 255, 0.62);
+        stroke-width: 1;
+      }
+      .fp3d-covered-column {
+        fill: #1b2a47;
+        stroke: rgba(55, 224, 255, 0.9);
+        stroke-width: 1.2;
       }
       .fp3d-room-sel {
         fill: rgba(55, 224, 255, 0.14);
