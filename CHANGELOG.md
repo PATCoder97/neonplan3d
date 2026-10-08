@@ -4,6 +4,13 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.19.2
+
+### Added
+
+- Added a wall-mounted fan with dedicated 2D/3D geometry, adjustable mounting height, live rotor animation and Home Assistant fan linking.
+- Added selectable three-, four- and five-blade variants for both ceiling-fan models while keeping existing plans on the original three-blade shape.
+
 ## 1.19.1
 
 ### Added

@@ -25,7 +25,7 @@ Nói ngắn gọn: ảnh của họ được dùng để trả lời “cần c�
 
 ## Hiện trạng ngày 08/10/2026
 
-- Thư viện tích hợp hiện có **93 mục** trong 10 nhóm giao diện, gồm nhiều đồ dùng đặc trưng tại Việt Nam như bàn thờ, xe máy, bồn nước, võng, tủ giày, giàn phơi và quạt trần có đèn.
+- Thư viện tích hợp hiện có **94 mục** trong 10 nhóm giao diện, gồm nhiều đồ dùng đặc trưng tại Việt Nam như bàn thờ, xe máy, bồn nước, võng, tủ giày, giàn phơi, quạt trần có đèn và quạt treo tường.
 - Có 9 gói bố trí nhanh cho phòng: hai kiểu bếp, phòng tắm, phòng ngủ, phòng khách, phòng ăn, văn phòng, phòng trẻ em và sảnh.
 - Trình chỉnh sửa đã có tìm kiếm song ngữ, nhóm thu gọn, xem trước, đổi kích thước, xoay, lật, đặt lên sàn/tường/trần/bề mặt và liên kết entity.
 - Định dạng pack nhập ngoài đã hỗ trợ khối hộp, trụ, khối vát, đèn, màn hình, bề mặt đặt đồ, phương tiện và lỗ cầu thang.
@@ -72,8 +72,9 @@ Bảng kiểm kê làm việc nên có các cột: `nhóm`, `nguồn ảnh`, `t�
 
 | Mục | Hiện trạng | Hành động trong fork |
 |---|---|---|
-| Quạt trần | Đã có `fan_ceiling` | Sửa hình theo dáng quạt hiện đại dễ nhận biết hơn; giữ ID và hoạt ảnh quay hiện tại; hỗ trợ biến thể 3/4/5 cánh bằng renderer tham số hóa. |
+| Quạt trần | Đã có `fan_ceiling` | Đã giữ ID và hoạt ảnh quay hiện tại, đồng thời hỗ trợ biến thể 3/4/5 cánh bằng renderer tham số hóa. |
 | Quạt trần có đèn | Đã thêm `fan_ceiling_light` | Đã dùng hình học quạt riêng của dự án với cụm đèn trung tâm, rotor động và hai entity quạt/đèn độc lập; không sao chép chính xác mẫu trong ảnh. |
+| Quạt treo tường | Đã thêm `fan_wall` | Đã có ký hiệu 2D, thân và lồng quạt 3D gắn tường, chiều cao lắp đặt tùy chỉnh, rotor động và liên kết fan entity. |
 | Robot hút bụi có dock | Mới có robot cơ bản | Giữ `robot_vacuum`, bổ sung variant dock sạc và trạng thái đang sạc/dọn dẹp. |
 | Robot cắt cỏ có garage | Chưa có | Thêm một mẫu ngoài trời, hỗ trợ entity lawn mower khi Home Assistant cung cấp. |
 | Tủ mạng/NAS/access point trần | Chưa đủ | Tách thành các mẫu đúng vị trí lắp; thiết bị mạng có thể phát sáng theo trạng thái. |
@@ -105,7 +106,7 @@ Các biến thể cùng họ, ví dụ sofa 2/3 chỗ, tủ bếp 40/60/80 cm ho
 Mục tiêu: biến hiện trạng thành đường cơ sở có thể đo được.
 
 - [x] Sinh báo cáo tự động từ `FURNITURE_TYPES`, `FURNITURE_GROUPS` và `FURNITURE_SIZE` để phát hiện ID trùng, thiếu tên hoặc thiếu kích thước (`cd frontend && npm run catalog`).
-- [x] Lập bảng ánh xạ các mục hiện tại vào 16 nhóm đích; catalog kiểm kê hiện khóa 100 type, 93 mục thư viện, 7 mục nội bộ và trường hợp `worktop` đang nằm trong hai nhóm. Mỗi mục chỉ được tính một lần trong `REFERENCE_PACK_ITEMS`.
+- [x] Lập bảng ánh xạ các mục hiện tại vào 16 nhóm đích; catalog kiểm kê hiện khóa 101 type, 94 mục thư viện, 7 mục nội bộ và trường hợp `worktop` đang nằm trong hai nhóm. Mỗi mục chỉ được tính một lần trong `REFERENCE_PACK_ITEMS`.
 - [ ] Duyệt toàn bộ ảnh gallery công khai của 16 trang sản phẩm, không chỉ ảnh đại diện ở trang Packs; lập bảng `đã phù hợp / cần sửa hình / cần thêm mới` kèm URL và ngày xem.
 - [ ] Chọn khoảng 10 mẫu hiện có cần sửa hình trước; `fan_ceiling` là mẫu thí điểm và phải giữ nguyên ID.
 - [ ] Chụp bộ ảnh chuẩn ở góc nhìn 2D, 3D và chế độ Day/Neon để so sánh hồi quy.
@@ -135,7 +136,7 @@ Mục tiêu: hoàn thiện bốn nhóm được dùng nhiều nhất trước, k
 - [ ] Phòng ngủ: giường đơn/đôi, giường tầng, tủ áo cánh mở/cửa lùa, bàn trang điểm, nôi và tủ đầu giường.
 - [ ] Phòng tắm/giặt: lavabo bàn/treo, bồn cầu, khu tắm kính, bình nóng lạnh, máy giặt cửa trên/cửa trước và giàn phơi.
 - [ ] Đèn và làm mát: sửa hình `fan_ceiling`, thêm `fan_ceiling_light`, quạt treo tường và các kiểu đèn phổ biến; quạt có đèn phải điều khiển riêng phần quạt và phần sáng.
-  - Đã hoàn thành `fan_ceiling_light` với entity quạt/đèn riêng; còn quạt treo tường và các kiểu đèn mới.
+  - Đã hoàn thành `fan_ceiling`, biến thể 3/4/5 cánh, `fan_ceiling_light` với entity quạt/đèn riêng và `fan_wall`; còn các kiểu đèn mới.
 - [ ] Mở rộng gói bố trí nhanh theo diện tích phòng nhỏ, vừa và lớn; không tự ghi đè đồ đã đặt.
 
 Điều kiện hoàn thành: có thể dựng hoàn chỉnh một căn hộ Việt Nam thông dụng mà không cần pack ngoài.

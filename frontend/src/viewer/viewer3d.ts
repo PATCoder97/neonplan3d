@@ -433,7 +433,7 @@ interface FloorView {
 
 interface FanRotor {
   rotor: Group;
-  type: "fan_ceiling" | "fan_ceiling_light" | "fan_floor";
+  type: "fan_ceiling" | "fan_ceiling_light" | "fan_wall" | "fan_floor";
   active: boolean;
 }
 
@@ -1774,17 +1774,17 @@ export class FloorplanViewer {
       // Fan rotors are separate groups: their bodies and cages stay in the merged furniture mesh,
       // while these blades can rotate cheaply without rebuilding the floor geometry every frame.
       for (const f of floor.furniture) {
-        if (f.type !== "fan_ceiling" && f.type !== "fan_ceiling_light" && f.type !== "fan_floor") continue;
+        if (f.type !== "fan_ceiling" && f.type !== "fan_ceiling_light" && f.type !== "fan_wall" && f.type !== "fan_floor") continue;
         const solid = new GeoBuffer();
         const edges = new LineBuffer();
-        pushFanRotor(solid, edges, f.type, f.w, f.d, f.h);
+        pushFanRotor(solid, edges, f.type, f.w, f.d, f.h, f.variant);
         const rotor = new Group();
         rotor.add(new Mesh(solid.geometry(), materials.wall), new LineSegments(edges.geometry(), materials.lines));
         const holder = new Group();
         const a = f.rotation * DEG;
         holder.position.set(f.x, mountBase(floor, f), f.z);
         holder.rotation.y = -a;
-        rotor.position.set(0, f.type === "fan_ceiling" || f.type === "fan_ceiling_light" ? f.h * 0.18 : f.h * 0.78, 0);
+        rotor.position.set(0, f.type === "fan_ceiling" || f.type === "fan_ceiling_light" ? f.h * 0.18 : f.type === "fan_wall" ? f.h * 0.5 : f.h * 0.78, 0);
         holder.add(rotor);
         group.add(holder);
         const active = this.devices.some((d) => d.furnitureId === f.id && d.active);

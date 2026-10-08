@@ -618,6 +618,7 @@ test("Vietnamese fans and water heater automatically take matching room entities
   const states = {
     "fan.quat_tran_phong_khach": st("fan.quat_tran_phong_khach", "off", { friendly_name: "Quạt trần phòng khách" }),
     "fan.quat_dung_phong_khach": st("fan.quat_dung_phong_khach", "off", { friendly_name: "Quạt đứng phòng khách" }),
+    "fan.quat_treo_tuong_phong_khach": st("fan.quat_treo_tuong_phong_khach", "off", { friendly_name: "Quạt treo tường phòng khách" }),
     "water_heater.binh_nong_lanh": st("water_heater.binh_nong_lanh", "off", { friendly_name: "Bình nóng lạnh" }),
     "fan.may_hut_mui": st("fan.may_hut_mui", "off", { friendly_name: "Máy hút mùi" }),
     "switch.lo_vi_song": st("switch.lo_vi_song", "off", { friendly_name: "Lò vi sóng" }),
@@ -629,6 +630,7 @@ test("Vietnamese fans and water heater automatically take matching room entities
   const furniture = [
     { id: "ceiling", type: "fan_ceiling", x: 1, z: 1, w: 1.4, d: 1.4, h: 0.32, rotation: 0, variant: null },
     { id: "floor", type: "fan_floor", x: 2, z: 2, w: 0.45, d: 0.45, h: 1.25, rotation: 0, variant: null },
+    { id: "wall", type: "fan_wall", x: 2.5, z: 0.2, w: 0.5, d: 0.3, h: 0.5, rotation: 0, variant: null },
     { id: "heater", type: "water_heater", x: 3, z: 3, w: 0.75, d: 0.35, h: 0.45, rotation: 0, variant: null },
     { id: "hood", type: "range_hood", x: 1, z: 3, w: 0.75, d: 0.5, h: 0.5, rotation: 0, variant: null },
     { id: "microwave", type: "microwave", x: 2, z: 3, w: 0.5, d: 0.4, h: 0.3, rotation: 0, variant: null },
@@ -637,6 +639,7 @@ test("Vietnamese fans and water heater automatically take matching room entities
   const links = furnitureEntities(hass, [{ ...newFloor("eg", "Tầng trệt", 0), rooms: [room], furniture }]);
   assert.equal(links.get("ceiling")?.entity, "fan.quat_tran_phong_khach");
   assert.equal(links.get("floor")?.entity, "fan.quat_dung_phong_khach");
+  assert.equal(links.get("wall")?.entity, "fan.quat_treo_tuong_phong_khach");
   assert.equal(links.get("heater")?.entity, "water_heater.binh_nong_lanh");
   assert.equal(links.get("hood")?.entity, "fan.may_hut_mui");
   assert.equal(links.get("microwave")?.entity, "switch.lo_vi_song");

@@ -5,7 +5,7 @@ import { emptyBuilding, floorElevation, FURNITURE_GROUPS, furnitureCorner, furni
 test("furniture is grouped by function instead of a regional collection", () => {
   assert.equal(FURNITURE_GROUPS.vietnam, undefined);
   assert.ok(FURNITURE_GROUPS.living.includes("altar") && FURNITURE_GROUPS.living.includes("altar_wall"));
-  assert.ok(FURNITURE_GROUPS.climate.includes("fan_ceiling") && FURNITURE_GROUPS.climate.includes("fan_ceiling_light") && FURNITURE_GROUPS.climate.includes("fan_floor"));
+  assert.ok(FURNITURE_GROUPS.climate.includes("fan_ceiling") && FURNITURE_GROUPS.climate.includes("fan_ceiling_light") && FURNITURE_GROUPS.climate.includes("fan_wall") && FURNITURE_GROUPS.climate.includes("fan_floor"));
   assert.ok(FURNITURE_GROUPS.bath.includes("water_heater") && FURNITURE_GROUPS.bath.includes("drying_rack"));
   assert.ok(FURNITURE_GROUPS.vehicles.includes("motorbike"));
   assert.ok(FURNITURE_GROUPS.living.includes("smart_speaker") && FURNITURE_GROUPS.living.includes("smart_curtain"));

@@ -67,6 +67,8 @@ export function furnitureSymbol(type: string, w: number, d: number): Part[] | ty
     }
     case "fan_floor":
       return [circle(0, 0, Math.min(w, d) * 0.46), circle(0, 0, Math.min(w, d) * 0.12, "fp3d-sym-fill")];
+    case "fan_wall":
+      return [rect(-w * 0.16, -d / 2, w * 0.16, -d * 0.2, "fp3d-sym-fill"), line(0, -d * 0.2, 0, d * 0.08, "fp3d-sym-strong"), ellipse(0, d * 0.15, w * 0.46, d * 0.3), circle(0, d * 0.15, Math.min(w, d) * 0.13, "fp3d-sym-fill")];
     case "water_heater":
       return [rect(-w / 2, -d / 2, w / 2, d / 2), circle(w * 0.3, d * 0.18, Math.min(w, d) * 0.06, "fp3d-sym-fill")];
     case "drying_rack": {

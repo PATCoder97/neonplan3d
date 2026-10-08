@@ -60,7 +60,7 @@ export const REFERENCE_PACK_ITEMS: Record<ReferencePack, readonly FurnitureType[
   garage: [],
   fitness: [],
   smart_home: [
-    "lamp_ceiling", "lamp_downlight", "lamp_spot", "lamp_panel", "lamp_pendant", "lamp_floor", "lamp_table", "lamp_wall", "led_strip", "lamp_uplight", "lamp_bollard", "lamp_garden", "fan_ceiling", "fan_ceiling_light", "fan_floor", "security_camera", "smart_lock", "smart_curtain", "robot_vacuum",
+    "lamp_ceiling", "lamp_downlight", "lamp_spot", "lamp_panel", "lamp_pendant", "lamp_floor", "lamp_table", "lamp_wall", "led_strip", "lamp_uplight", "lamp_bollard", "lamp_garden", "fan_ceiling", "fan_ceiling_light", "fan_wall", "fan_floor", "security_camera", "smart_lock", "smart_curtain", "robot_vacuum",
   ],
   vehicles: ["motorbike"],
   stairs: ["stairs", "stairs_landing"],

@@ -1042,13 +1042,39 @@ function floorFan(b: Builder, w: number, d: number, h: number): void {
   }
 }
 
+function wallFan(b: Builder, w: number, d: number, h: number): void {
+  const cy = h * 0.5;
+  const r = Math.min(w, h) * 0.46;
+  const cageZ = d * 0.16;
+  // Rear plate, short articulated arm and motor visibly anchor the fan to a wall.
+  b.box(-w * 0.15, w * 0.15, h * 0.28, h * 0.72, -d / 2, -d * 0.4, C.body, C.bodyTop, EDGE_FURN);
+  b.box(-w * 0.06, w * 0.06, cy - h * 0.06, cy + h * 0.06, -d * 0.42, -d * 0.18, C.metal, C.metal, EDGE_FURN);
+  b.lyingCyl("z", 0, -d * 0.12, cy - r * 0.3, cy + r * 0.3, d * 0.24, r * 0.6, C.body, C.bodyTop, 16, EDGE_FURN);
+  for (const z of [-cageZ, cageZ]) {
+    for (let i = 0; i < 16; i++) {
+      const a = (i / 16) * Math.PI * 2;
+      b.seg(Math.cos(a) * r * 0.18, cy + Math.sin(a) * r * 0.18, z, Math.cos(a) * r, cy + Math.sin(a) * r, z, EDGE_FAINT);
+    }
+    ring(b, 0, cy, r, z, 32);
+    ring(b, 0, cy, r * 0.86, z, 32);
+    ring(b, 0, cy, r * 0.18, z, 18);
+  }
+  for (const a of [0, Math.PI / 2, Math.PI, (Math.PI * 3) / 2]) {
+    const x = Math.cos(a) * r;
+    const y = cy + Math.sin(a) * r;
+    b.seg(x, y, -cageZ, x, y, cageZ, EDGE_FURN);
+  }
+}
+
 /** Moving blades of a built-in fan, centred on its rotation axis for the viewer to spin as one group. */
-export function pushFanRotor(buf: GeoBuffer, lines: LineBuffer, type: "fan_ceiling" | "fan_ceiling_light" | "fan_floor", w: number, d: number, h: number): void {
+export function pushFanRotor(buf: GeoBuffer, lines: LineBuffer, type: "fan_ceiling" | "fan_ceiling_light" | "fan_wall" | "fan_floor", w: number, d: number, h: number, variant: string | null = null): void {
   if (type === "fan_ceiling" || type === "fan_ceiling_light") {
     const b = new Builder(buf, lines, (x, z) => [x, z]);
     const bladeW = Math.min(w, d) * 0.13;
-    // Three tapered blades have a natural silhouette while remaining light enough for live animation.
-    for (const a of [0, 120, 240]) {
+    const blades = variant === "4" ? 4 : variant === "5" ? 5 : 3;
+    // Existing plans keep the original three blades; the editor can opt into four or five.
+    for (let i = 0; i < blades; i++) {
+      const a = (i / blades) * 360;
       b.rotated(0, 0, a).loft([w * 0.08, w * 0.48, -bladeW * 0.52, bladeW * 0.52], [w * 0.12, w * 0.46, -bladeW * 0.32, bladeW * 0.32], 0, h * 0.07, C.wood, C.woodTop, EDGE_FURN);
     }
     b.cyl(0, 0, Math.min(w, d) * 0.14, -h * 0.035, h * 0.08, C.body, C.bodyTop, 18, EDGE_GLOW);
@@ -1644,6 +1670,9 @@ function buildFurniture(buf: GeoBuffer, lines: LineBuffer, shadow: GeoBuffer, f:
     case "fan_floor":
       floorFan(b, w, d, h);
       break;
+    case "fan_wall":
+      wallFan(b, w, d, h);
+      return;
     case "water_heater":
       waterHeater(b, w, d, h);
       return;

@@ -5861,6 +5861,18 @@ export class Fp3dEditor extends LitElement {
             >
           </div>`
         : nothing}
+      ${f.type === "fan_ceiling" || f.type === "fan_ceiling_light"
+        ? html`<div class="fp3d-form">
+            <label class="fp3d-field fp3d-wide"
+              >${this.t("fan_blades")}
+              <select ?disabled=${!admin} @change=${(e: Event) => this.updateFurniture({ variant: (e.target as HTMLSelectElement).value || null })}>
+                ${(["3", "4", "5"] as const).map(
+                  (v) => html`<option value=${v} ?selected=${(f.variant ?? "3") === v}>${this.t(`fan_blades_${v}` as I18nKey)}</option>`,
+                )}
+              </select></label
+            >
+          </div>`
+        : nothing}
       ${isElectric(f.type) ? this.renderFurnitureLinks(f) : nothing} ${f.type === "parking" ? this.renderParkingForm(f) : nothing}
       ${f.type.startsWith("pack:mastershort.vehicles:") && this.isAdmin
         ? html`<section>

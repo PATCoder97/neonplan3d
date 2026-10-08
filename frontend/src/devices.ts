@@ -688,6 +688,7 @@ const FURNITURE_NAMES: Record<string, RegExp> = {
   water_pump: /(wasserpumpe|gartenpumpe|brunnenpumpe|water ?pump|garden ?pump|well ?pump|pool ?pump|irrigation|máy bơm|may bom|bơm nước|bom nuoc|bơm giếng|bom gieng|bơm tưới|bom tuoi)/i,
   fan_ceiling: /(deckenventilator|ceiling ?fan|quạt trần|quat tran)/i,
   fan_ceiling_light: /(deckenventilator|ceiling ?fan|quạt trần|quat tran)/i,
+  fan_wall: /(wandventilator|wall(?: mounted)? ?fan|quạt (?:treo )?tường|quat (?:treo )?tuong)/i,
   fan_floor: /(standventilator|standing ?fan|floor ?fan|quạt đứng|quat dung)/i,
   water_heater: /(warmwasser|water ?heater|boiler|bình nóng lạnh|binh nong lanh|máy nước nóng|may nuoc nong)/i,
   range_hood: /(dunstabzug|range ?hood|extractor|hút mùi|hut mui)/i,
