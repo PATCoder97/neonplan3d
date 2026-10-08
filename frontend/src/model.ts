@@ -871,6 +871,8 @@ const SURFACES = new Set<string>([
   "vanity_80",
   "vanity_100",
   "double_vanity_120",
+  "bathroom_cabinet_mid",
+  "bathroom_wall_shelf",
   "sideboard",
   "dresser",
   "kitchen",

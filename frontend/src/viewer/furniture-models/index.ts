@@ -1,6 +1,6 @@
 import { ARCHITECTURE_OUTDOOR_FURNITURE_MODELS } from "./architecture-outdoor.ts";
 import { BEDROOM_FURNITURE_MODELS, BEDROOM_FURNITURE_SCREENS } from "./bedroom.ts";
-import { BATHROOM_FURNITURE_MODELS } from "./bathroom.ts";
+import { BATHROOM_FURNITURE_MODELS, BATHROOM_FURNITURE_SCREENS } from "./bathroom.ts";
 import { CLIMATE_FURNITURE_MODELS } from "./climate.ts";
 import { ENERGY_FURNITURE_MODELS } from "./energy.ts";
 import { EVERYDAY_FURNITURE_MODELS, EVERYDAY_FURNITURE_SCREENS } from "./everyday.ts";
@@ -27,6 +27,7 @@ const BUILTIN_FURNITURE_MODELS: Readonly<Record<string, FurnitureModelRenderer>>
 };
 
 const BUILTIN_FURNITURE_SCREENS: Readonly<Record<string, FurnitureScreenRenderer>> = {
+  ...BATHROOM_FURNITURE_SCREENS,
   ...BEDROOM_FURNITURE_SCREENS,
   ...EVERYDAY_FURNITURE_SCREENS,
   ...LIVING_FURNITURE_SCREENS,

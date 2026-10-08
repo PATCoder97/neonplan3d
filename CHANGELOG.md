@@ -4,6 +4,18 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.20.10
+
+### Added
+
+- Added close-coupled and wall-hung toilets, a bidet, tall and mid-height bathroom cabinets, two lit mirrors, a wall shelf, towel rail and freestanding tub.
+- Added dedicated 2D symbols, low-poly 3D geometry and German/English/Vietnamese names for all ten bathroom items.
+- Added live state surfaces and automatic light-name matching for the round and rectangular illuminated mirrors.
+
+### Changed
+
+- Expanded the reproducible catalog inventory to 243 declared types and 236 library items, with bathroom reference coverage at 25 of 37.
+
 ## 1.20.9
 
 ### Added
