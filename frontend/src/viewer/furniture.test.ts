@@ -72,6 +72,18 @@ test("garden vegetation families keep recognisable silhouettes within their decl
   assert.ok(counts[3] > counts[0], "the tree group contains more geometry than one shrub");
 });
 
+test("garage workshop fixtures have dedicated geometry and the wall shelf uses its mount height", () => {
+  const types = ["workbench", "workbench_pegboard", "tool_cabinet", "tool_chest", "storage_rack_garage", "air_compressor", "shop_vacuum", "ladder_step", "ladder_extension", "storage_boxes", "tire_stack", "bike_rack", "repair_stand", "parts_bin", "utility_sink_garage", "charging_bay"] as const;
+  for (const type of types) {
+    const [w, d, h] = FURNITURE_SIZE[type];
+    const buf = new GeoBuffer(), lines = new LineBuffer();
+    pushFurniture(buf, lines, new GeoBuffer(), { id: type, type, x: 0, z: 0, rotation: 0, w, d, h, variant: null } as Furniture);
+    assert.ok(buf.count > 0 || lines.p.length > 0, `${type}: visible dedicated geometry`);
+  }
+  const floor = newFloor("g", "Garage", 0);
+  assert.equal(mountBase(floor, { type: "wall_shelf_garage", x: 0, z: 0, h: FURNITURE_SIZE.wall_shelf_garage[2] }), 1.25);
+});
+
 test("living-room sofa variants keep fixed seats and distinct corner footprints", () => {
   const geometry = (type: "sofa_2" | "sofa_3" | "sofa_4" | "sofa_corner_left" | "sofa_corner_right" | "sofa_chaise" | "sofa_u") => {
     const [w, d, h] = FURNITURE_SIZE[type];

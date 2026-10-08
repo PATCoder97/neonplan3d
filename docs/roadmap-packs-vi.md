@@ -25,7 +25,7 @@ Nói ngắn gọn: ảnh của họ được dùng để trả lời “cần c�
 
 ## Hiện trạng ngày 09/10/2026
 
-- Thư viện tích hợp hiện có **305 mục** trong 10 nhóm giao diện, gồm các lô hoàn chỉnh cho phòng khách, phòng ngủ, phòng tắm, Kiến trúc, Smart Home, kỹ thuật, Sân vườn và Cầu thang; toàn bộ hình học tích hợp được dựng thủ tục trong repository.
+- Thư viện tích hợp hiện có **322 mục** trong 10 nhóm giao diện, gồm các lô hoàn chỉnh cho phòng khách, phòng ngủ, phòng tắm, Kiến trúc, Smart Home, kỹ thuật, Sân vườn, Cầu thang và Garage; toàn bộ hình học tích hợp được dựng thủ tục trong repository.
 - Có 21 gói bố trí nhanh cho phòng, gồm ba mức nhỏ/vừa/lớn cho bếp, phòng tắm, phòng ngủ và phòng khách; gói mới bỏ qua vị trí đã có đồ thay vì xếp chồng.
 - Trình chỉnh sửa đã có tìm kiếm song ngữ, nhóm thu gọn, xem trước, đổi kích thước, xoay, lật, đặt lên sàn/tường/trần/bề mặt và liên kết entity.
 - Định dạng pack nhập ngoài đã hỗ trợ khối hộp, trụ, khối vát, đèn, màn hình, bề mặt đặt đồ, phương tiện và lỗ cầu thang.
@@ -44,7 +44,7 @@ Trang chính thức đang công bố gói đầy đủ gồm 474 mẫu/phương 
 | Kiến trúc & hoàn thiện | 17 | Có một phần trong công cụ xây dựng | P1 |
 | Sân vườn & hiên | 33 | Hoàn tất độ phủ chức năng (37 mục độc lập) | P1 |
 | Cầu thang & lan can | 12 | Hoàn tất 12/12 mẫu chức năng | P1 |
-| Garage & xưởng | 17 | Chưa có nhóm riêng | P1 |
+| Garage & xưởng | 17 | Hoàn tất 17/17 mẫu chức năng | P1 |
 | Phương tiện | 15 | Có xe máy và chỗ đỗ xe | P1 |
 | Văn phòng & gaming | 25 | Có bộ văn phòng cơ bản | P2 |
 | Phòng trẻ em | 18 | Có giường/cũi và bố trí nhanh | P2 |
@@ -186,7 +186,7 @@ Các biến thể cùng họ, ví dụ sofa 2/3 chỗ, tủ bếp 40/60/80 cm ho
 Mục tiêu: biến hiện trạng thành đường cơ sở có thể đo được.
 
 - [x] Sinh báo cáo tự động từ `FURNITURE_TYPES`, `FURNITURE_GROUPS` và `FURNITURE_SIZE` để phát hiện ID trùng, thiếu tên hoặc thiếu kích thước (`cd frontend && npm run catalog`).
-- [x] Lập bảng ánh xạ các mục hiện tại vào 16 nhóm đích; catalog kiểm kê hiện khóa 312 type, 305 mục thư viện, 7 mục nội bộ và trường hợp `worktop` đang nằm trong hai nhóm. Mỗi mục chỉ được tính một lần trong `REFERENCE_PACK_ITEMS`.
+- [x] Lập bảng ánh xạ các mục hiện tại vào 16 nhóm đích; catalog kiểm kê hiện khóa 329 type, 322 mục thư viện, 7 mục nội bộ và trường hợp `worktop` đang nằm trong hai nhóm. Mỗi mục chỉ được tính một lần trong `REFERENCE_PACK_ITEMS`.
 - [ ] Duyệt toàn bộ ảnh gallery công khai của 16 trang sản phẩm, không chỉ ảnh đại diện ở trang Packs; lập bảng `đã phù hợp / cần sửa hình / cần thêm mới` kèm URL và ngày xem.
 - [ ] Chọn khoảng 10 mẫu hiện có cần sửa hình trước; `fan_ceiling` là mẫu thí điểm và phải giữ nguyên ID.
 - [ ] Chụp bộ ảnh chuẩn ở góc nhìn 2D, 3D và chế độ Day/Neon để so sánh hồi quy.
@@ -268,7 +268,8 @@ Mục tiêu: phủ các hạng mục khó quan sát nhưng quan trọng với m�
   - Đợt 3 đã thêm 12 mẫu cây xanh và bụi cảnh thủ tục; độ phủ đạt 37 mục hữu dụng, vượt mốc tham chiếu 33 mà không dùng biến thể chỉ đổi kích thước.
 - [x] Cầu thang & lan can: thẳng, chữ L, chữ U, xoắn, lan can kính/sắt và tự tạo khoảng mở tầng.
   - Đã hoàn tất 12/12 mẫu: hai mẫu cũ thẳng/chữ U, bốn kiểu thang hình học mới, hai biến thể vật liệu/không gian và bốn loại lan can; mọi loại cầu thang tự lấy cao độ tầng kế tiếp và cắt sàn bằng footprint riêng.
-- [ ] Garage & xưởng: bàn nguội, tủ dụng cụ, giá kho, máy nén, thang, thùng đồ và khu sạc.
+- [x] Garage & xưởng: bàn nguội, tủ dụng cụ, giá kho, máy nén, thang, thùng đồ và khu sạc.
+  - Đã hoàn tất 17/17 mẫu trong module Garage riêng, gồm hai bàn nguội, lưu trữ dụng cụ/kho, máy xưởng, hai loại thang, phụ kiện xe đạp–lốp và khu sạc; kệ tường dùng đúng cao độ gắn 1,25 m.
 - [ ] Phương tiện: xe đạp, xe máy/scooter, sedan, hatchback, SUV, bán tải và xe van; hỗ trợ trạng thái có mặt, khóa và sạc.
 
 Điều kiện hoàn thành: các mẫu gắn tường/trần/bề mặt đúng cao độ, cầu thang cắt sàn đúng và phương tiện không làm giảm rõ rệt FPS.

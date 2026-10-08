@@ -4,6 +4,18 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.22.6
+
+### Added
+
+- Completed the 17-item Garage & Workshop family: workbenches, tool storage, racks, compressor, shop vacuum, ladders, boxes, tyres, bike storage, repair stand, parts bins, utility sink and charging station.
+- Added dedicated procedural models, plan symbols and English, German and Vietnamese names for the complete family.
+
+### Changed
+
+- Expanded the reproducible inventory to 329 declared types and 322 library items, with Garage coverage at 17 of 17.
+- Added geometry and wall-mount regression coverage for workshop fixtures.
+
 ## 1.22.5
 
 ### Added
