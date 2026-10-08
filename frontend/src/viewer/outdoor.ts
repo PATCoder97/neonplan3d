@@ -6,7 +6,7 @@
 
 import { Color } from "three";
 import type { Floor, OutdoorArea, OutdoorType, Vec2 } from "../model.ts";
-import { bounds, groundLevel, isAxisRect, OUTDOOR_TOP, outdoorDrop, outdoorFloorTop, outdoorStanding, pointInPolygon, signedArea } from "../model.ts";
+import { bounds, coveredFrontEdge, groundLevel, isAxisRect, OUTDOOR_TOP, outdoorDrop, outdoorFloorTop, outdoorStanding, pointInPolygon, signedArea } from "../model.ts";
 import { ALWAYS, type GeoBuffer, type LineBuffer, pushPrism, shade, triangulate } from "./geo.ts";
 
 interface Look {
@@ -55,6 +55,9 @@ export interface OutdoorTriRange {
   id: string;
   start: number;
   end: number;
+  /** Triangle range of the roof panel inside this structure. */
+  roofStart?: number;
+  roofEnd?: number;
 }
 
 function ccw(points: Vec2[]): Vec2[] {
@@ -86,7 +89,7 @@ function pushBeam(buf: GeoBuffer, p: Vec2, q: Vec2, w: number, y0: number, y1: n
 }
 
 /** A roof sheet of constant thickness whose top follows a slope. */
-function pushCanopyPanel(buf: GeoBuffer, poly: Vec2[], topAt: (x: number, z: number) => number, thickness: number, side: number, top: number): void {
+function pushCanopyPanel(buf: GeoBuffer, poly: Vec2[], topAt: (x: number, z: number) => number, thickness: number, side: number, top: number, fold = ALWAYS): void {
   const topC = new Color(top);
   const bottomC = new Color(shade(side, 0.72));
   const sideC = new Color(side);
@@ -100,8 +103,8 @@ function pushCanopyPanel(buf: GeoBuffer, poly: Vec2[], topAt: (x: number, z: num
     const ba: [number, number, number] = [ta[0], ta[1] - thickness, ta[2]];
     const bb: [number, number, number] = [tb[0], tb[1] - thickness, tb[2]];
     const bc: [number, number, number] = [tc[0], tc[1] - thickness, tc[2]];
-    buf.tri(ta, tc, tb, topC, topC, topC, undefined, ALWAYS);
-    buf.tri(ba, bb, bc, bottomC, bottomC, bottomC, undefined, ALWAYS);
+    buf.tri(ta, tc, tb, topC, topC, topC, undefined, fold);
+    buf.tri(ba, bb, bc, bottomC, bottomC, bottomC, undefined, fold);
   }
   for (let i = 0; i < poly.length; i++) {
     const p = poly[i];
@@ -110,18 +113,20 @@ function pushCanopyPanel(buf: GeoBuffer, poly: Vec2[], topAt: (x: number, z: num
     const qt: [number, number, number] = [q[0], topAt(q[0], q[1]), q[1]];
     const pb: [number, number, number] = [pt[0], pt[1] - thickness, pt[2]];
     const qb: [number, number, number] = [qt[0], qt[1] - thickness, qt[2]];
-    buf.tri(pb, pt, qt, sideC, sideC, sideC, undefined, ALWAYS);
-    buf.tri(pb, qt, qb, sideC, sideC, sideC, undefined, ALWAYS);
+    buf.tri(pb, pt, qt, sideC, sideC, sideC, undefined, fold);
+    buf.tri(pb, qt, qb, sideC, sideC, sideC, undefined, fold);
   }
 }
 
-export function pushOutdoor(buf: GeoBuffer, lines: LineBuffer, floor: Floor): OutdoorTriRange[] {
+export function pushOutdoor(buf: GeoBuffer, lines: LineBuffer, floor: Floor, roofFold = ALWAYS): OutdoorTriRange[] {
   const ground = groundLevel(floor);
   const areas = floor.outdoor ?? [];
   const ranges: OutdoorTriRange[] = [];
   areas.forEach((a, index) => {
     if (a.points.length < 3) return;
     const start = buf.count;
+    let roofStart: number | undefined;
+    let roofEnd: number | undefined;
     // an area may sit above or below the ground (a driveway down to a lower garage) and fall along one direction
     const g = ground + (a.offset ?? 0);
     const groundAt = (x: number, z: number) => g - outdoorDrop(a, x, z);
@@ -133,13 +138,13 @@ export function pushOutdoor(buf: GeoBuffer, lines: LineBuffer, floor: Floor): Ou
     const edge = shade(look.edge, look.edgeAlpha);
     // fences, pergolas, canopies and verandas may leave their closing edge out (leaning against the house)
     const openEnd = a.open && (a.type === "fence" || a.type === "pergola" || a.type === "canopy" || a.type === "veranda") ? poly.length - 1 : -1;
-    const outline = (yAt: (x: number, z: number) => number) => {
+    const outline = (yAt: (x: number, z: number) => number, fold = ALWAYS) => {
       if (a.outline === false) return;
       for (let i = 0; i < poly.length; i++) {
         if (i === openEnd) continue;
         const p = poly[i];
         const q = poly[(i + 1) % poly.length];
-        lines.seg([p[0], yAt(p[0], p[1]), p[1]], [q[0], yAt(q[0], q[1]), q[1]], edge, ALWAYS);
+        lines.seg([p[0], yAt(p[0], p[1]), p[1]], [q[0], yAt(q[0], q[1]), q[1]], edge, fold);
       }
     };
     switch (a.type) {
@@ -244,8 +249,10 @@ export function pushOutdoor(buf: GeoBuffer, lines: LineBuffer, floor: Floor): Ou
           const y = (roofAt(p[0], p[1]) + roofAt(q[0], q[1])) / 2;
           pushBeam(buf, p, q, 0.12, y - 0.18, y - 0.08, finish.under, finish.roof);
         }
-        pushCanopyPanel(buf, poly, roofAt, 0.08, finish.under, finish.roof);
-        outline((x, z) => roofAt(x, z) + 0.004);
+        roofStart = buf.count;
+        pushCanopyPanel(buf, poly, roofAt, 0.08, finish.under, finish.roof, roofFold);
+        roofEnd = buf.count;
+        outline((x, z) => roofAt(x, z) + 0.004, roofFold);
         break;
       }
       case "veranda": {
@@ -283,33 +290,9 @@ export function pushOutdoor(buf: GeoBuffer, lines: LineBuffer, floor: Floor): Ou
           }
         }
 
-        // The front is the edge farthest from the omitted wall edge. Without an omitted edge, use
-        // the longest edge as the facade. This keeps the two large columns reusable on any rectangle.
-        let front = 0;
-        if (openEnd >= 0) {
-          const wa = poly[openEnd];
-          const wb = poly[(openEnd + 1) % poly.length];
-          const wx = (wa[0] + wb[0]) / 2;
-          const wz = (wa[1] + wb[1]) / 2;
-          let farthest = -1;
-          for (let i = 0; i < poly.length; i++) {
-            if (i === openEnd) continue;
-            const p = poly[i];
-            const q = poly[(i + 1) % poly.length];
-            const dx = (p[0] + q[0]) / 2 - wx;
-            const dz = (p[1] + q[1]) / 2 - wz;
-            const d2 = dx * dx + dz * dz;
-            if (d2 > farthest) [front, farthest] = [i, d2];
-          }
-        } else {
-          let longest = -1;
-          for (let i = 0; i < poly.length; i++) {
-            const p = poly[i];
-            const q = poly[(i + 1) % poly.length];
-            const len = Math.hypot(q[0] - p[0], q[1] - p[1]);
-            if (len > longest) [front, longest] = [i, len];
-          }
-        }
+        // The front is opposite and parallel to the omitted house edge. Without one, use the longest
+        // edge as the facade. This keeps the two large columns correct on wide, shallow verandas too.
+        const front = coveredFrontEdge(poly, openEnd);
         const p = poly[front];
         const q = poly[(front + 1) % poly.length];
         const columns = Math.min(12, Math.max(0, Math.round(a.columns ?? 2)));
@@ -326,7 +309,9 @@ export function pushOutdoor(buf: GeoBuffer, lines: LineBuffer, floor: Floor): Ou
         }
         const topY = (roofAt(p[0], p[1]) + roofAt(q[0], q[1])) / 2;
         pushBeam(buf, p, q, Math.max(0.2, columnHalf * 2.6), topY - 0.28, topY, finish.under, finish.roof);
-        pushCanopyPanel(buf, poly, roofAt, 0.1, finish.under, finish.roof);
+        roofStart = buf.count;
+        pushCanopyPanel(buf, poly, roofAt, 0.1, finish.under, finish.roof, roofFold);
+        roofEnd = buf.count;
         outline((x, z) => baseAt(x, z) + (a.railing === false ? 0.004 : railH + 0.004));
         break;
       }
@@ -349,7 +334,7 @@ export function pushOutdoor(buf: GeoBuffer, lines: LineBuffer, floor: Floor): Ou
         }
       }
     }
-    if (buf.count > start) ranges.push({ id: a.id, start, end: buf.count });
+    if (buf.count > start) ranges.push({ id: a.id, start, end: buf.count, ...(roofStart !== undefined && roofEnd !== undefined ? { roofStart, roofEnd } : {}) });
   });
   return ranges;
 }

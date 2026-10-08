@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { Box3, Vector3 } from "three";
 import { newFloor } from "../model.ts";
-import { cameraFitPlacement, cameraFitRadius, cameraFitView, framingBox, roomFramingBox } from "./framing.ts";
+import { cameraFitPlacement, cameraFitRadius, cameraFitView, coveredRoomViewTheta, framingBox, roomFramingBox } from "./framing.ts";
 
 test("camera framing includes rooms, outdoor structures and free walls", () => {
   const floor = newFloor("ground", "Ground", 0);
@@ -37,6 +37,15 @@ test("room framing includes its true lowest and highest structural points", () =
   assert.deepEqual([box.min.x, box.min.z, box.max.x, box.max.z], [-1, 2, 4, 7]);
   assert.ok(Math.abs(box.min.y - 4.2) < 1e-9);
   assert.ok(Math.abs(box.max.y - 7.4) < 1e-9);
+});
+
+test("a covered room faces the camera towards its rendered front edge", () => {
+  const floor = newFloor("upper", "Upper", 2.8);
+  const veranda = { id: "porch", name: "Porch", area_id: null, kind: "veranda" as const, points: [[0, 0], [0, 1.5], [5.5, 1.5], [5.5, 0]] as [number, number][], floor_material: "tiles", open: true };
+  floor.rooms = [veranda];
+
+  assert.ok(Math.abs(coveredRoomViewTheta(veranda) ?? 1) < 1e-9, "the camera stands outside the +Z front");
+  assert.equal(roomFramingBox(floor, veranda, 0).max.y, floor.elevation + floor.height);
 });
 
 test("camera distance fits a long narrow building at its actual diagonal view", () => {

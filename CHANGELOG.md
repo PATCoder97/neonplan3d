@@ -4,6 +4,13 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.18.19
+
+### Fixed
+
+- Open the roof of a selected veranda or covered room so its devices remain visible and directly tappable.
+- Face the selected covered room from its true front edge, and keep front columns on the edge opposite the house connection for wide, shallow verandas.
+
 ## 1.18.18
 
 ### Added

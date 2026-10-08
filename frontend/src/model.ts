@@ -63,6 +63,44 @@ export function isCoveredRoom(room: Room): room is Room & { kind: "veranda" | "c
   return room.kind === "veranda" || room.kind === "canopy";
 }
 
+/** Front edge of a covered polygon: opposite and parallel to its omitted house edge, else the longest. */
+export function coveredFrontEdge(poly: readonly Vec2[], openEnd: number): number {
+  if (poly.length < 2) return 0;
+  if (openEnd < 0) {
+    let front = 0;
+    let longest = -1;
+    for (let i = 0; i < poly.length; i++) {
+      const p = poly[i];
+      const q = poly[(i + 1) % poly.length];
+      const length = Math.hypot(q[0] - p[0], q[1] - p[1]);
+      if (length > longest) [front, longest] = [i, length];
+    }
+    return front;
+  }
+  const wa = poly[openEnd];
+  const wb = poly[(openEnd + 1) % poly.length];
+  const wdx = wb[0] - wa[0];
+  const wdz = wb[1] - wa[1];
+  const wl = Math.hypot(wdx, wdz) || 1;
+  const wx = (wa[0] + wb[0]) / 2;
+  const wz = (wa[1] + wb[1]) / 2;
+  let front = 0;
+  let best = -1;
+  for (let i = 0; i < poly.length; i++) {
+    if (i === openEnd) continue;
+    const p = poly[i];
+    const q = poly[(i + 1) % poly.length];
+    const dx = q[0] - p[0];
+    const dz = q[1] - p[1];
+    const l = Math.hypot(dx, dz) || 1;
+    const parallel = Math.abs((dx * wdx + dz * wdz) / (l * wl));
+    const distance = Math.abs(wdx * ((p[1] + q[1]) / 2 - wz) - wdz * ((p[0] + q[0]) / 2 - wx)) / wl;
+    const score = distance * parallel;
+    if (score > best) [front, best] = [i, score];
+  }
+  return front;
+}
+
 export type OpeningType = "door" | "window" | "garage";
 
 /** Entity link of an opening: null = assigned automatically by area, "none" = no entity. */

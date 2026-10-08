@@ -45,12 +45,12 @@ import {
 } from "three";
 import type { Building, Floor, Furniture, Room } from "../model.ts";
 import { recolorLamps, SHADE_SENTINEL, shadeFactors } from "./lamp-colors.ts";
-import { centroid, pointInPolygon, openingStyle, WALL_LAMP_Y } from "../model.ts";
+import { centroid, isCoveredRoom, pointInPolygon, openingStyle, WALL_LAMP_Y } from "../model.ts";
 import { roofUnderAt } from "../roof-sections.ts";
-import { buildFloorGeometry, SLAB, stairHoles, type FloorGeometry } from "./build.ts";
+import { buildFloorGeometry, COVERED_ROOF_BUCKET, SLAB, stairHoles, type FloorGeometry } from "./build.ts";
 import { OrbitControls, type OrbitView } from "./controls.ts";
 import { makeFoldable, type FoldMasks } from "./fold.ts";
-import { cameraFitPlacement, cameraFitView, framingBox, roomFramingBox, type CameraFrameInsets } from "./framing.ts";
+import { cameraFitPlacement, cameraFitView, coveredRoomViewTheta, framingBox, roomFramingBox, type CameraFrameInsets } from "./framing.ts";
 import { pushCameraModel, pushFanRotor, pushPackGlow, pushPackLamp, screenRect, pushFridgeDoors } from "./furniture.ts";
 import { mountBase, packItem, setPacks, type FurniturePack } from "../packs.ts";
 import { withVehicles } from "../parking.ts";
@@ -742,10 +742,11 @@ export class FloorplanViewer {
     const room = fv?.floor.rooms.find((r) => r.id === roomId);
     if (!fv || !room) return;
     const box = roomFramingBox(fv.floor, room, fv.ty);
-    const phi = 0.72;
-    const theta = this.controls.view.theta;
+    const front = coveredRoomViewTheta(room);
+    const phi = front === null ? 0.72 : 1.02;
+    const theta = front ?? this.controls.view.theta;
     const placement = cameraFitPlacement(box, theta, phi, this.camera.aspect, this.camera.fov * DEG, this.cameraFrame(), 4);
-    this.controls.flyTo({ target: box.getCenter(new Vector3()).add(placement.offset), radius: placement.radius, phi });
+    this.controls.flyTo({ target: box.getCenter(new Vector3()).add(placement.offset), radius: placement.radius, theta, phi });
   }
 
   setWallMode(mode: WallMode): void {
@@ -2809,8 +2810,12 @@ export class FloorplanViewer {
         const entity = id ? this.pickOpenings.get(id) : undefined;
         if (entity) return { entity };
       } else if (hit.object === fv.wallMesh) {
-        const coveredRoomId = inRange(fv.geo.coveredRoomTris, tri);
-        if (coveredRoomId) return { floorId: fv.floor.id, roomId: coveredRoomId };
+        const coveredRoom = fv.geo.coveredRoomTris.find((range) => tri >= range.start && tri < range.end);
+        if (coveredRoom) {
+          const openCoveredRoom = this.roomId !== null && fv.floor.rooms.some((room) => room.id === this.roomId && isCoveredRoom(room));
+          if (openCoveredRoom && coveredRoom.roofStart !== undefined && coveredRoom.roofEnd !== undefined && tri >= coveredRoom.roofStart && tri < coveredRoom.roofEnd) continue;
+          return { floorId: fv.floor.id, roomId: coveredRoom.id };
+        }
         const outdoorId = inRange(fv.geo.outdoorTris, tri);
         if (outdoorId) return { floorId: fv.floor.id, outdoorId };
         const id = inRange(fv.geo.furnitureTris, tri);
@@ -3487,7 +3492,8 @@ export class FloorplanViewer {
         const facing = normal ? (normal[0] * dx) / l + (normal[1] * dz) / l >= 0.25 : inRoom;
         if (!cut && facing) glass |= 1 << b;
       });
-      fv.mask.standing.value = cut ? 0 : 0xffff;
+      const openCoveredRoom = this.roomId !== null && fv.floor.rooms.some((room) => room.id === this.roomId && isCoveredRoom(room));
+      fv.mask.standing.value = cut ? 0 : openCoveredRoom ? 0xffff & ~(1 << COVERED_ROOF_BUCKET) : 0xffff;
       fv.mask.glass.value = glass;
     }
   }

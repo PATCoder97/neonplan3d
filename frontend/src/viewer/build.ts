@@ -17,7 +17,7 @@ import { generateWalls, locateOpening, openingHost, type Wall } from "../geometr
 import { holeInRoom, insetHole, mergeHoles } from "../geometry/holes.ts";
 import { pushFurniture } from "./furniture.ts";
 import { mountBase, packItem } from "../packs.ts";
-import { pushOutdoor } from "./outdoor.ts";
+import { pushOutdoor, type OutdoorTriRange } from "./outdoor.ts";
 import { pushModules } from "./roof.ts";
 import type { RoofFace } from "../solar.ts";
 import { cutAbove, cutLinesAbove, FURN_OFFSET, ALWAYS, CAP_OFFSET, CUT_OFFSET, EDGE_BASE, EDGE_CUT, EDGE_SOFT, EDGE_TOP, GeoBuffer, LineBuffer, LOWER_OFFSET, pushPrism, triangulate } from "./geo.ts";
@@ -86,12 +86,14 @@ export interface FloorGeometry {
   /** Triangle ranges of furniture in `walls`, for tapping furniture in 3D. */
   furnitureTris: { id: string; start: number; end: number }[];
   /** Composite outdoor structures in `walls`, so they can be selected directly in 3D. */
-  outdoorTris: { id: string; start: number; end: number }[];
+  outdoorTris: OutdoorTriRange[];
   /** Covered rooms in `walls`; tapping these must select a room, not an outdoor area. */
-  coveredRoomTris: { id: string; start: number; end: number }[];
+  coveredRoomTris: OutdoorTriRange[];
 }
 
 export const SLAB = 0.2;
+/** Reserved fold bucket: covered-room roofs disappear while that room is open. */
+export const COVERED_ROOF_BUCKET = 15;
 const BUCKETS = 8;
 const SHADOW_WIDTH = 0.42;
 const SHADOW_DARK = 0.42;
@@ -368,7 +370,7 @@ export function buildFloorGeometry(
     // exactly y=0 of this storey, matching normal rooms and every room-mounted device.
     offset: -groundLevel(floor) - (outdoorFloorTop(room.kind) ?? 0),
   }));
-  const coveredRoomTris = pushOutdoor(wallBuf, lines, { ...floor, outdoor: coveredAreas });
+  const coveredRoomTris = pushOutdoor(wallBuf, lines, { ...floor, outdoor: coveredAreas }, COVERED_ROOF_BUCKET);
   const outdoorTris = pushOutdoor(wallBuf, lines, floor);
   for (const s of solar) pushModules(wallBuf, lines, s.face, s.field, floor.elevation);
 

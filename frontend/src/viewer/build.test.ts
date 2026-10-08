@@ -73,6 +73,10 @@ test("a covered room renders as one selectable room structure without a normal f
   assert.equal(geo.coveredRoomTris.length, 1);
   assert.equal(geo.coveredRoomTris[0].id, "porch");
   assert.ok(geo.coveredRoomTris[0].end > geo.coveredRoomTris[0].start);
+  const roof = geo.coveredRoomTris[0];
+  const folds = geo.walls.getAttribute("fold");
+  assert.ok(roof.roofStart! < roof.roofEnd!);
+  assert.equal(folds.getX(roof.roofStart! * 3), 15, "the roof uses the reserved fold bucket so it can open without hiding devices");
 });
 
 test("a straight outer face across a T-joint gets no corner line", () => {

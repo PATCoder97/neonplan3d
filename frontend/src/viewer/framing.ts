@@ -1,5 +1,5 @@
 import { Box3, Vector3 } from "three";
-import { groundLevel, OUTDOOR_TOP, outdoorFloorTop, outdoorStanding, type Floor, type Room } from "../model.ts";
+import { coveredFrontEdge, groundLevel, isCoveredRoom, OUTDOOR_TOP, outdoorFloorTop, outdoorStanding, signedArea, type Floor, type Room, type Vec2 } from "../model.ts";
 
 export interface FramingFloor {
   floor: Floor;
@@ -40,8 +40,18 @@ export function framingBox(floors: readonly FramingFloor[]): Box3 {
 export function roomFramingBox(floor: Floor, room: Room, ty: number): Box3 {
   const box = new Box3();
   const floorY = floor.elevation + ty;
-  for (const [x, z] of room.points) expandColumn(box, x, z, floorY, floorY + floor.height);
+  for (const [x, z] of room.points) expandColumn(box, x, z, floorY, floorY + (isCoveredRoom(room) ? room.height ?? floor.height : floor.height));
   return box;
+}
+
+/** Camera azimuth outside the front edge of a covered room, matching its rendered front columns. */
+export function coveredRoomViewTheta(room: Room): number | null {
+  if (!isCoveredRoom(room) || room.points.length < 3) return null;
+  const poly: Vec2[] = signedArea(room.points) >= 0 ? room.points : [...room.points].reverse();
+  const front = coveredFrontEdge(poly, (room.open ?? true) ? poly.length - 1 : -1);
+  const p = poly[front];
+  const q = poly[(front + 1) % poly.length];
+  return Math.atan2(q[1] - p[1], p[0] - q[0]);
 }
 
 /** Camera distance that fits an axis-aligned box at the actual orbit angle, instead of a wasteful bounding sphere. */

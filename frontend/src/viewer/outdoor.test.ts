@@ -28,6 +28,10 @@ test("an upper-floor veranda is one object with a slab, railings, front columns 
   assert.ok(heights.some((y) => Math.abs(y - 1.22) < 1e-6), "railing is 1.1 m above the terrace");
   assert.ok(heights.some((y) => Math.abs(y - 2.52) < 1e-6), "columns are 2.4 m above the terrace");
   assert.ok(heights.some((y) => Math.abs(y - 2.4) < 1e-6), "roof falls towards the free edge");
-  assert.deepEqual(ranges, [{ id: "veranda", start: 0, end: solid.count }], "the whole structure has one 3D picking range");
+  assert.equal(ranges.length, 1);
+  assert.equal(ranges[0].id, "veranda");
+  assert.equal(ranges[0].start, 0);
+  assert.equal(ranges[0].end, solid.count, "the whole structure has one 3D picking range");
+  assert.ok(ranges[0].roofStart! < ranges[0].roofEnd!, "the roof has its own range so a selected room can reveal devices below it");
   assert.ok(lines.p.length > 0, "veranda outlines");
 });
