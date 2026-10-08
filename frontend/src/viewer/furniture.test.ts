@@ -3,7 +3,7 @@ import { test } from "node:test";
 import { STRUCTURAL_ONLY_FURNITURE_TYPES } from "../furniture/catalog.ts";
 import type { Furniture } from "../model.ts";
 import { mountBase, setPacks, type FurniturePack } from "../packs.ts";
-import { builtinBase, FURNITURE_SIZE, FURNITURE_TYPES, LAMP_MODEL, newFloor } from "../model.ts";
+import { builtinBase, ELECTRIC_FURNITURE, FURNITURE_SIZE, FURNITURE_TYPES, LAMP_MODEL, newFloor } from "../model.ts";
 import { pushFanRotor, pushFurniture, screenRect } from "./furniture.ts";
 import { GeoBuffer, LineBuffer } from "./geo.ts";
 
@@ -104,6 +104,26 @@ test("pet furniture batch one has bounded geometry and correct wall mounts", () 
   assert.equal(mountBase(floor, { type: "cat_scratch_board_wall", x: 0, z: 0, h: FURNITURE_SIZE.cat_scratch_board_wall[2] }), 0.65);
   assert.equal(mountBase(floor, { type: "cat_wall_perch", x: 0, z: 0, h: FURNITURE_SIZE.cat_wall_perch[2] }), 1.15);
   assert.equal(mountBase(floor, { type: "cat_climbing_steps_wall", x: 0, z: 0, h: FURNITURE_SIZE.cat_climbing_steps_wall[2] }), 0.55);
+});
+
+test("pet furniture batch two has distinct bounded habitats and powered care devices", () => {
+  const types = ["pet_bowls", "pet_feeder_automatic", "pet_water_fountain", "pet_gate", "pet_stairs", "hamster_cage", "small_animal_cage", "rabbit_enclosure_outdoor", "bird_cage", "aquarium_100", "aquarium_240_cabinet", "terrarium"] as const;
+  const complexity = new Map<string, number>();
+  for (const type of types) {
+    const [w, d, h] = FURNITURE_SIZE[type];
+    const buf = new GeoBuffer();
+    const lines = new LineBuffer();
+    const item = { id: type, type, x: 0, z: 0, rotation: 0, w, d, h, variant: null } as Furniture;
+    pushFurniture(buf, lines, new GeoBuffer(), item, builtinBase(item));
+    assert.ok(buf.count > 0 && lines.p.length > 0, `${type}: solid and outline geometry`);
+    assert.ok(buf.p.every(Number.isFinite) && lines.p.every(Number.isFinite), `${type}: finite geometry`);
+    const ys = buf.p.filter((_, index) => index % 3 === 1);
+    assert.ok(Math.min(...ys) >= -1e-6 && Math.max(...ys) <= h + 1e-6, `${type}: geometry stays inside declared height`);
+    complexity.set(type, buf.count + lines.p.length);
+  }
+  assert.ok(complexity.get("aquarium_240_cabinet")! > complexity.get("aquarium_100")!, "large aquarium includes its cabinet");
+  assert.notEqual(complexity.get("terrarium"), complexity.get("aquarium_100"), "dry and aquatic habitats keep distinct interiors");
+  for (const type of ["pet_feeder_automatic", "pet_water_fountain", "aquarium_100", "aquarium_240_cabinet", "terrarium"]) assert.ok(ELECTRIC_FURNITURE.has(type), `${type}: powered capability`);
 });
 
 test("office fixtures have distinct geometry and monitors follow the supporting desk", () => {

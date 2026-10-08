@@ -4,6 +4,18 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.23.4
+
+### Added
+
+- Completed Pets with food/water bowls, an automatic feeder, water fountain, pet gate and stairs, hamster/small-animal/bird cages, an outdoor rabbit enclosure, two aquariums and a terrarium.
+- Added dedicated procedural habitat interiors and plan symbols, plus English, German and Vietnamese names for the second 12-item batch.
+
+### Changed
+
+- Automatic feeders, water fountains, aquariums and terrariums now expose powered-device capability for Home Assistant linking.
+- Expanded the reproducible inventory to 404 declared types and 397 library items, completing Pets coverage at 24 of 24.
+
 ## 1.23.3
 
 ### Added
