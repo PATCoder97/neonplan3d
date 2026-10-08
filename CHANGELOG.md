@@ -4,6 +4,19 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.20.2
+
+### Added
+
+- Added a third Phase 2 living-room batch: Chesterfield, armless, chaise and U-shaped sofas; club, wingback and rocking chairs; a 4×4 cube shelf, room-divider shelf and console table.
+- Added dedicated 2D symbols, reusable low-poly 3D renderers, practical dimensions and German/English/Vietnamese names for all ten items.
+- Added footprint regression checks that distinguish a one-sided chaise from a two-sided U-shaped sofa.
+
+### Changed
+
+- Expanded the reproducible catalog inventory to 163 declared types and 156 library items, with living-room reference coverage now at 43 items.
+- Kept the new furniture in the everyday family registry and reused parameterized seating/grid primitives instead of expanding central renderer switches.
+
 ## 1.20.1
 
 ### Added

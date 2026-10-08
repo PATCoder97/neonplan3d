@@ -48,8 +48,8 @@ test("every non-lamp catalog item builds visible finite 3D geometry", () => {
   }
 });
 
-test("living-room sofa variants keep fixed seats and mirrored corner footprints", () => {
-  const geometry = (type: "sofa_2" | "sofa_3" | "sofa_4" | "sofa_corner_left" | "sofa_corner_right") => {
+test("living-room sofa variants keep fixed seats and distinct corner footprints", () => {
+  const geometry = (type: "sofa_2" | "sofa_3" | "sofa_4" | "sofa_corner_left" | "sofa_corner_right" | "sofa_chaise" | "sofa_u") => {
     const [w, d, h] = FURNITURE_SIZE[type];
     const buf = new GeoBuffer();
     pushFurniture(buf, new LineBuffer(), new GeoBuffer(), { id: type, type, x: 0, z: 0, rotation: 0, w, d, h, variant: null } as Furniture);
@@ -67,6 +67,15 @@ test("living-room sofa variants keep fixed seats and mirrored corner footprints"
       })
       .sort((a, b) => a - b);
   assert.deepEqual(xs("sofa_corner_left", false), xs("sofa_corner_right", true), "left and right corner models mirror exactly");
+
+  const frontSides = (type: "sofa_chaise" | "sofa_u") => {
+    const [, d] = FURNITURE_SIZE[type];
+    const p = geometry(type).p;
+    const xs = Array.from({ length: p.length / 3 }, (_, i) => [p[i * 3], p[i * 3 + 2]]).filter(([, z]) => z > d * 0.35).map(([x]) => x);
+    return { left: xs.some((x) => x < -0.2), right: xs.some((x) => x > 0.2) };
+  };
+  assert.deepEqual(frontSides("sofa_chaise"), { left: true, right: false }, "the chaise projects on one side");
+  assert.deepEqual(frontSides("sofa_u"), { left: true, right: true }, "the U sofa projects on both sides");
 });
 
 test("a U-shaped stair builds two flights and a half-height landing", () => {
