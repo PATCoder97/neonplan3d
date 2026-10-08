@@ -1,8 +1,22 @@
+import { ARCHITECTURE_OUTDOOR_FURNITURE_MODELS } from "./architecture-outdoor.ts";
+import { CLIMATE_FURNITURE_MODELS } from "./climate.ts";
+import { ENERGY_FURNITURE_MODELS } from "./energy.ts";
+import { EVERYDAY_FURNITURE_MODELS } from "./everyday.ts";
+import { KITCHEN_BATH_FURNITURE_MODELS } from "./kitchen-bath.ts";
+import { MISC_FURNITURE_MODELS } from "./misc.ts";
+import { SMART_HOME_FURNITURE_MODELS } from "./smart-home.ts";
 import { UTILITY_FURNITURE_MODELS, UTILITY_FURNITURE_SCREENS } from "./utility.ts";
 import type { FurnitureModelContext, FurnitureModelRenderer, FurnitureScreenRect, FurnitureScreenRenderer } from "./types.ts";
 
 /** Built-in renderers split by functional family. Add new families to this one composition point. */
 const BUILTIN_FURNITURE_MODELS: Readonly<Record<string, FurnitureModelRenderer>> = {
+  ...EVERYDAY_FURNITURE_MODELS,
+  ...KITCHEN_BATH_FURNITURE_MODELS,
+  ...ARCHITECTURE_OUTDOOR_FURNITURE_MODELS,
+  ...CLIMATE_FURNITURE_MODELS,
+  ...SMART_HOME_FURNITURE_MODELS,
+  ...ENERGY_FURNITURE_MODELS,
+  ...MISC_FURNITURE_MODELS,
   ...UTILITY_FURNITURE_MODELS,
 };
 
@@ -11,7 +25,7 @@ const BUILTIN_FURNITURE_SCREENS: Readonly<Record<string, FurnitureScreenRenderer
 };
 
 /** Null means the legacy renderer owns this type; otherwise the result says whether to add a shadow. */
-export function renderRegisteredFurniture(type: string, context: FurnitureModelContext): boolean | null {
+export function renderRegisteredFurniture(type: string, context: FurnitureModelContext): number | false | null {
   const renderer = BUILTIN_FURNITURE_MODELS[type];
   return renderer ? renderer(context) : null;
 }

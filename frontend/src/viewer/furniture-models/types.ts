@@ -9,8 +9,8 @@ export interface FurnitureModelContext {
   variant: string | null;
 }
 
-/** True when the dispatcher should add a floor contact shadow after drawing the model. */
-export type FurnitureModelRenderer = (context: FurnitureModelContext) => boolean;
+/** False means no floor shadow; a number is the requested shadow strength. */
+export type FurnitureModelRenderer = (context: FurnitureModelContext) => number | false;
 
 export interface FurnitureScreenRect {
   x0: number;

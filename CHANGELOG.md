@@ -4,6 +4,13 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.19.13
+
+### Changed
+
+- Split every built-in non-light 3D model out of the 2,082-line central furniture renderer into focused everyday, kitchen/bath, architecture/outdoor, climate, smart-home, energy, utility and miscellaneous family modules.
+- Replaced the legacy model switch with a composed registry, preserved per-model shadow behavior and added a regression check that every non-light catalog type has a family renderer.
+
 ## 1.19.12
 
 ### Changed

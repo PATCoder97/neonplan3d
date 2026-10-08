@@ -62,11 +62,11 @@ function balconySolar(b: FurnitureBuilder, w: number, d: number, h: number): voi
 }
 
 export const UTILITY_FURNITURE_MODELS: Readonly<Record<string, FurnitureModelRenderer>> = {
-  dishwasher: ({ b, w, d, h }) => (dishwasher(b, w, d, h), true),
-  washer: ({ b, w, d, h }) => (laundry(b, w, d, h, false), true),
-  dryer: ({ b, w, d, h }) => (laundry(b, w, d, h, true), true),
-  washer_dryer_tower: ({ b, w, d, h }) => (laundryTower(b, w, d, h), true),
-  balcony_solar: ({ b, w, d, h }) => (balconySolar(b, w, d, h), true),
+  dishwasher: ({ b, w, d, h }) => (dishwasher(b, w, d, h), 0.5),
+  washer: ({ b, w, d, h }) => (laundry(b, w, d, h, false), 0.5),
+  dryer: ({ b, w, d, h }) => (laundry(b, w, d, h, true), 0.5),
+  washer_dryer_tower: ({ b, w, d, h }) => (laundryTower(b, w, d, h), 0.5),
+  balcony_solar: ({ b, w, d, h }) => (balconySolar(b, w, d, h), 0.5),
 };
 
 const laundryScreen: FurnitureScreenRenderer = (w, d, h) => {
