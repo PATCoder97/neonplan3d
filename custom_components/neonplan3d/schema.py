@@ -45,7 +45,9 @@ ROOM_SCHEMA = vol.Schema(
         # veranda railing, or the high fence and gate around a covered yard
         vol.Optional("railing", default=None): vol.Any(None, bool),
         vol.Optional("columns", default=None): vol.Any(None, vol.All(vol.Coerce(int), vol.Range(min=0, max=12))),
-        vol.Optional("column_size", default=None): vol.Any(None, vol.All(vol.Coerce(float), vol.Range(min=0.08, max=0.8))),
+        vol.Optional("column_size", default=None): vol.Any(
+            None, vol.All(vol.Coerce(float), vol.Range(min=0.08, max=0.8))
+        ),
         vol.Optional("height", default=None): vol.Any(None, vol.All(vol.Coerce(float), vol.Range(min=0.1, max=6))),
         vol.Optional("slope", default=None): vol.Any(None, vol.All(vol.Coerce(float), vol.Range(min=0, max=20))),
         vol.Optional("slope_dir", default="x"): vol.In(["x", "-x", "z", "-z"]),
