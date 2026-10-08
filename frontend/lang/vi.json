@@ -260,6 +260,7 @@
   "furn_stairs_landing": "Cầu thang chữ U có chiếu nghỉ",
   "stairs_landing_hint": "Hai vế thang song song có chiếu nghỉ giữa tầng: đi lên ở vế trái về phía sau, quay 180° rồi tiếp tục lên vế phải về phía trước. Cầu thang tự tạo ô mở trên sàn tầng trên.",
   "furn_robot_vacuum": "Robot hút bụi",
+  "furn_robot_mower": "Robot cắt cỏ có garage",
   "furn_inverter": "Bộ biến tần năng lượng mặt trời",
   "furn_home_battery": "Pin lưu trữ gia đình",
   "furn_wallbox": "Bộ sạc xe điện",

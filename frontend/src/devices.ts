@@ -307,6 +307,7 @@ export function isStatusSensor(st: HassEntity | undefined): boolean {
 /** "Active" drives the glow of a device marker: light on, cover open, heating, playing, window open … */
 export function isActive(st: HassEntity | undefined): boolean {
   if (!st) return false;
+  if (domainOf(st.entity_id) === "lawn_mower") return ["mowing", "starting", "returning"].includes(st.state);
   switch (kindOf(st.entity_id)) {
     case "light":
     case "switch":
@@ -670,6 +671,7 @@ export function primaryEntities(hass: HomeAssistant, ids: readonly string[]): st
 /** Name patterns of the entities that belong to electric furniture. */
 const FURNITURE_NAMES: Record<string, RegExp> = {
   robot_vacuum: /(saug|vacuum|robo|roomba|roborock|dreame|ecovacs|deebot)/i,
+  robot_mower: /(mähroboter|robot(?:ic)? ?mower|lawn ?mower|robot cắt cỏ|robot cat co|máy cắt cỏ|may cat co)/i,
   tv_board: /\b(tv|fernseh|television|fire ?tv|apple ?tv|chromecast|shield)/i,
   tv_wall: /\b(tv|fernseh|television|fire ?tv|apple ?tv|chromecast|shield)/i,
   desk: /\b(pc|computer|rechner|desktop|monitor|workstation)/i,
@@ -817,6 +819,11 @@ export function furnitureEntities(hass: HomeAssistant, floors: readonly Floor[])
           // vacuums are no device kind of their own: look them up in the room's area directly
           const area = room?.area_id ?? null;
           entity = Object.keys(hass.entities ?? {}).find((id) => id.startsWith("vacuum.") && !used.has(id) && entityAreaId(hass, id) === area) ?? null;
+        } else if (f.type === "robot_mower") {
+          // A mower lives outdoors and therefore usually has no room/area to resolve through.
+          const candidates = Object.keys(hass.states ?? {}).filter((id) => id.startsWith("lawn_mower.") && !used.has(id));
+          const matches = candidates.filter((id) => pattern.test(name(id)));
+          entity = matches.length === 1 ? matches[0] : candidates.length === 1 ? candidates[0] : null;
         } else if (f.type === "radiator" || f.type === "air_conditioner") {
           const climates = free.filter((id) => kindOf(id) === "climate");
           entity = climates.find((id) => pattern.test(name(id))) ?? climates[0] ?? null;

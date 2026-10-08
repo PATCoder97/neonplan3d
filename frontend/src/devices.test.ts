@@ -697,3 +697,14 @@ test("an outdoor water pump can find a clearly named switch without a room", () 
   const links = furnitureEntities(hass, [{ ...newFloor("eg", "Tầng trệt", 0), furniture: [pump] }]);
   assert.equal(links.get("pump")?.entity, "switch.may_bom_gieng");
 });
+
+test("an outdoor robot mower finds its lawn mower entity and reports mowing states as active", () => {
+  const st = (entity_id: string, state: string, attributes: Record<string, unknown> = {}) => ({ entity_id, state, attributes });
+  const mowerState = st("lawn_mower.robot_cat_co", "mowing", { friendly_name: "Robot cắt cỏ" });
+  const hass = { language: "vi", states: { [mowerState.entity_id]: mowerState }, entities: {}, devices: {}, areas: {} } as unknown as HomeAssistant;
+  const mower = { id: "mower", type: "robot_mower", x: 6, z: 3, w: 0.85, d: 1.15, h: 0.48, rotation: 0, variant: null };
+  const links = furnitureEntities(hass, [{ ...newFloor("eg", "Tầng trệt", 0), furniture: [mower] }]);
+  assert.equal(links.get("mower")?.entity, mowerState.entity_id);
+  assert.equal(isActive(mowerState as never), true);
+  assert.equal(isActive({ ...mowerState, state: "docked" } as never), false);
+});

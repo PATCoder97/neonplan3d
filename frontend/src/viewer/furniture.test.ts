@@ -205,7 +205,7 @@ test("the upright water purifier has a cabinet, top faucet and front status mark
 
 test("smart-home furniture builds recognisable finite geometry at its declared mount", () => {
   const floor = newFloor("eg", "EG", 0);
-  for (const type of ["air_purifier", "smart_speaker", "security_camera", "smart_lock", "smart_curtain", "robot_vacuum"] as const) {
+  for (const type of ["air_purifier", "smart_speaker", "security_camera", "smart_lock", "smart_curtain", "robot_vacuum", "robot_mower"] as const) {
     const [w, d, h] = FURNITURE_SIZE[type];
     const item = { id: type, type, x: 0, z: 0, w, d, h, rotation: 0, variant: null } as Furniture;
     const base = mountBase(floor, item);

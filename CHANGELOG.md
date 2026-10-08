@@ -4,6 +4,13 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.19.5
+
+### Added
+
+- Added a dedicated robot mower with an open low garage, sloped roof, parked mower and live cyan/amber state band based on its Home Assistant `lawn_mower` entity.
+- Added automatic outdoor mower entity matching, editor selection, a distinct 2D symbol, Vietnamese/German/English names and a gallery-backed demo placement.
+
 ## 1.19.4
 
 ### Changed

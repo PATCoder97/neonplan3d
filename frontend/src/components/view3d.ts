@@ -19,7 +19,6 @@ import { carState, carWatched, type CarState, roomClimateValue,
   tempUnit,
   robotRoom,
   robotRoomSensor,
-  isStatusSensor,
   floorControls,
   favoriteCall,
   runButton,
@@ -1531,7 +1530,7 @@ export class Fp3dView3d extends LitElement {
           consumerSensors.add(link.power);
           consumers.push({ id, powerEntity: link.power, floorId: floor.id, x: f.x, z: f.z, power: Math.max(0, power), wallbox: f.type === "wallbox" || undefined });
         }
-        const running = (power ?? 0) > 10 || st?.state === "on" || st?.state === "running" || (isStatusSensor(st) && isActive(st));
+        const running = (power ?? 0) > 10 || st?.state === "on" || st?.state === "running" || isActive(st);
         // Auto Pro: the vehicle in the spot wears a light band in the colour of its charge (brighter while
         // charging) and a warm glow on top while the climate runs; the spot's pin tells charge and range
         if (car && parkedVehicle(hass, f)) {
@@ -1569,6 +1568,8 @@ export class Fp3dView3d extends LitElement {
           screens.set(f.id, { color: f.type === "microwave" ? [1, 0.58, 0.2] : [0.2, 0.78, 1], level: 0.8, plain: true });
         } else if (f.type === "air_purifier" && running) {
           screens.set(f.id, { color: [0.2, 0.9, 0.72], level: 0.85, plain: true });
+        } else if (f.type === "robot_mower" && running) {
+          screens.set(f.id, { color: st?.state === "returning" ? [1, 0.7, 0.25] : [0.2, 0.9, 0.72], level: 0.9, plain: true });
         } else if (f.type === "smart_speaker" && st && ["playing", "on", "paused"].includes(st.state)) {
           screens.set(f.id, { color: appColor(st) ?? [0.22, 0.88, 1], level: st.state === "playing" ? 1 : 0.55, ring: true, plain: true });
         } else if (f.type === "security_camera" && st && !["off", "idle", "unavailable", "unknown"].includes(st.state)) {

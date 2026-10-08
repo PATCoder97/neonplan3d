@@ -1569,6 +1569,7 @@ function builtInScreen(f: Furniture, w: number, d: number, h: number, floor?: Fl
   if (f.type === "microwave") return { x0: -w * 0.4, x1: w * 0.18, y0: h * 0.17, y1: h * 0.82, z: d / 2 + 0.008 };
   if (f.type === "water_purifier") return { x0: -w * 0.28, x1: w * 0.28, y0: h * 0.8 * 0.56, y1: h * 0.8 * 0.64, z: d / 2 + 0.016 };
   if (f.type === "air_purifier") return { x0: -w * 0.11, x1: w * 0.11, y0: h * 0.66, y1: h * 0.74, z: d / 2 + 0.008 };
+  if (f.type === "robot_mower") return { x0: -w * 0.22, x1: w * 0.22, y0: h * 0.16, y1: h * 0.24, z: d * 0.31 + 0.008 };
   if (f.type === "smart_speaker") return { x0: -w * 0.42, x1: w * 0.42, y0: h * 0.9, y1: h + 0.008, z: d * 0.05 };
   if (f.type === "security_camera") return { x0: -w * 0.12, x1: w * 0.12, y0: 1.85 + h * 0.37, y1: 1.85 + h * 0.58, z: d * 0.53 };
   if (f.type === "smart_lock") return { x0: -w * 0.36, x1: w * 0.36, y0: 0.95 + h * 0.43, y1: 0.95 + h * 0.78, z: d / 2 + 0.006 };
@@ -1911,6 +1912,19 @@ function buildFurniture(buf: GeoBuffer, lines: LineBuffer, shadow: GeoBuffer, f:
       // A shallow charging tongue meets the moving robot when it is docked.
       b.box(-w * 0.22, w * 0.22, h * 0.02, h * 0.055, -d * 0.18, d * 0.17, C.dark, C.bodyTop, EDGE_FAINT);
       return;
+    case "robot_mower": {
+      // Open low garage: broad sloped roof on two short side walls, as in the official pack gallery.
+      const t = Math.min(0.055, w * 0.07);
+      b.box(-w * 0.46, -w * 0.39, 0, h * 0.68, -d * 0.46, d * 0.34, C.body, C.bodyTop, EDGE_FURN);
+      b.box(w * 0.39, w * 0.46, 0, h * 0.68, -d * 0.46, d * 0.34, C.body, C.bodyTop, EDGE_FURN);
+      b.box(-w * 0.44, w * 0.44, 0, h * 0.5, -d * 0.48, -d * 0.42, C.body, C.bodyTop, EDGE_FAINT);
+      b.loft([-w / 2, w / 2, -d / 2, d * 0.4], [-w / 2, w / 2, -d / 2, d * 0.4], h * 0.68, h * 0.9, C.body, C.metal, EDGE_FURN);
+      // Compact mower parked nose-out below the shelter.
+      b.loft([-w * 0.31, w * 0.31, -d * 0.18, d * 0.32], [-w * 0.24, w * 0.24, -d * 0.13, d * 0.25], h * 0.04, h * 0.31, C.body, C.bodyTop, EDGE_FURN);
+      b.box(-w * 0.22, w * 0.22, h * 0.16, h * 0.24, d * 0.305, d * 0.325, C.accent, C.accent, EDGE_GLOW);
+      for (const x of [-w * 0.28, w * 0.28]) b.lyingCyl("x", x, d * 0.08, h * 0.01, h * 0.15, t * 2, h * 0.14, C.dark, C.metal, 10, EDGE_FAINT);
+      return;
+    }
     case "radiator":
       radiator(b, w, d, h);
       return; // on the wall, no shadow on the floor

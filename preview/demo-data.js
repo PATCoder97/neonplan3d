@@ -211,6 +211,7 @@ const DEVICES = [
   entity("cover.garagentor", "garage", "open", { friendly_name: "Garagentor", device_class: "garage", current_position: 60, supported_features: 15 }),
   entity("binary_sensor.wohnzimmer_terrasse", "wohnzimmer", "on", { friendly_name: "Terrassentür", device_class: "opening" }),
   entity("vacuum.saugi", "wohnzimmer", "cleaning", { friendly_name: "Saugi", battery_level: 64 }),
+  entity("lawn_mower.robot_cat_co", null, "mowing", { friendly_name: "Robot cắt cỏ", battery_level: 78 }),
   entity("binary_sensor.wohnzimmer_terrasse_2", "wohnzimmer", "off", { friendly_name: "Terrassentür Standflügel", device_class: "opening" }),
   entity("binary_sensor.schlafzimmer_fenster", "schlafzimmer", "on", { friendly_name: "Schlafzimmer Fenster", device_class: "window" }),
   entity("binary_sensor.schlafzimmer_kipp", "schlafzimmer", "on", { friendly_name: "Schlafzimmer Fenster gekippt", device_class: "window" }),
@@ -421,6 +422,7 @@ DEMO_BUILDING.floors[0].furniture = [
   item("stairs", 9.42, 6.3, 1.0, 3.2, 2.75),
   item("wardrobe", 7.1, 6.4, 1.2, 0.4, 2.0, 270),
   { ...item("robot_vacuum", 5.7, 3.2, 0.42, 0.62, 0.72, 270), entity: "vacuum.saugi" },
+  { ...item("robot_mower", 13.8, -4.7, 0.85, 1.15, 0.48, 180), entity: "lawn_mower.robot_cat_co" },
   {
     // along the garage (3.6 m wide, 5.2 m deep): the van fits inside instead of poking through the wall
     ...item("parking", 11.8, 2.6, 2.6, 5.0, 0.02, 0),

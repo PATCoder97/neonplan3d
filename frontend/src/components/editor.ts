@@ -3797,6 +3797,7 @@ export class Fp3dEditor extends LitElement {
       if (kind === "light") return isLamp(t);
       if (kind === "climate") return t === "radiator" || t === "air_conditioner";
       if (entityId.startsWith("vacuum.")) return t === "robot_vacuum";
+      if (entityId.startsWith("lawn_mower.")) return t === "robot_mower";
       if (kind === "media") return hasScreen(t) || (isElectric(t) && speakerish.test(t));
       return isElectric(t) && !isLamp(t);
     };
@@ -6231,6 +6232,8 @@ export class Fp3dEditor extends LitElement {
             ? id.startsWith("climate.")
             : f.type === "robot_vacuum"
               ? id.startsWith("vacuum.")
+              : f.type === "robot_mower"
+                ? id.startsWith("lawn_mower.")
               : // or a status sensor (a 3D printer's print status: running, idle, finish …)
                 /^(switch|media_player|fan|water_heater|input_boolean|climate)\./.test(id) || isStatusSensor(hass.states[id]),
     );
