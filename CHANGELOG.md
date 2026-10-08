@@ -4,6 +4,16 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.19.0
+
+### Added
+
+- Added a typed built-in furniture catalog, deterministic inventory report and CI validation for all 99 built-in types, their dimensions, library groups, translations and 16 reference-pack coverage targets.
+
+### Changed
+
+- Made the furniture picker, type selector and bilingual search read built-in metadata through the catalog while preserving existing IDs, group order and saved-plan compatibility.
+
 ## 1.18.19
 
 ### Fixed

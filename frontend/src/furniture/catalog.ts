@@ -1,0 +1,218 @@
+// Inventory view of the built-in furniture library. The existing exports stay in model.ts for
+// compatibility; this module is the first migration step towards one declarative catalog. It gives
+// tests, reports and future renderers one typed place to inspect every id, size and library group.
+
+import { FURNITURE_GROUPS, FURNITURE_SIZE, FURNITURE_TYPES, type FurnitureType } from "../model.ts";
+
+export type FurnitureGroup = keyof typeof FURNITURE_GROUPS;
+
+/** Built-in types intentionally kept outside the normal library. */
+export const HIDDEN_FURNITURE_TYPES = [
+  "inverter",
+  "home_battery",
+  "wallbox",
+  "meter",
+  "grid_point",
+  "fridge_smart",
+  "stairwell",
+] as const satisfies readonly FurnitureType[];
+
+/** Public pack categories and counts shown by the original project; used only as a coverage target. */
+export const REFERENCE_PACK_TARGETS = {
+  home_cinema: 35,
+  utility: 18,
+  pets: 24,
+  architecture: 17,
+  living: 69,
+  kitchen: 66,
+  bedroom: 41,
+  bathroom: 37,
+  kids: 18,
+  office: 25,
+  garden: 33,
+  garage: 17,
+  fitness: 17,
+  smart_home: 30,
+  vehicles: 15,
+  stairs: 12,
+} as const;
+export type ReferencePack = keyof typeof REFERENCE_PACK_TARGETS;
+
+/**
+ * Primary functional home for every current library item in the 16-category expansion plan. This
+ * differs from the editor groups: an item may be discoverable in several UI groups, but is counted
+ * exactly once here so progress cannot be inflated.
+ */
+export const REFERENCE_PACK_ITEMS: Record<ReferencePack, readonly FurnitureType[]> = {
+  home_cinema: ["tv_board", "tv_wall", "smart_speaker"],
+  utility: ["radiator", "air_conditioner", "water_pump", "water_heater", "drying_rack", "water_purifier", "air_purifier", "water_tank", "washer", "dryer"],
+  pets: [],
+  architecture: ["room_divider", "gate", "fence", "parking"],
+  living: ["altar", "altar_wall", "shoe_cabinet", "shoe_bench", "sofa", "sofa_l", "sofa_bed", "armchair", "stool", "coffee_table", "sideboard", "shelf", "plant", "rug", "coat_rack"],
+  kitchen: [
+    "range_hood", "microwave", "kitchen_corner", "kitchen_display", "table", "table_round", "chair", "bench", "corner_bench", "bar_stool", "kitchen", "kitchen_wall", "kitchen_tall", "island", "worktop", "sink", "stove", "dishwasher", "fridge",
+  ],
+  bedroom: ["vanity", "bed_single", "bed_double", "bed", "nightstand", "wardrobe", "dresser"],
+  bathroom: ["shower_screen", "bathtub", "shower", "wc", "washbasin"],
+  kids: ["crib", "bunk_bed"],
+  office: ["desk", "office_chair", "tall_cabinet"],
+  garden: ["hammock", "stone_table_set", "planter_large"],
+  garage: [],
+  fitness: [],
+  smart_home: [
+    "lamp_ceiling", "lamp_downlight", "lamp_spot", "lamp_panel", "lamp_pendant", "lamp_floor", "lamp_table", "lamp_wall", "led_strip", "lamp_uplight", "lamp_bollard", "lamp_garden", "fan_ceiling", "fan_floor", "security_camera", "smart_lock", "smart_curtain", "robot_vacuum",
+  ],
+  vehicles: ["motorbike"],
+  stairs: ["stairs", "stairs_landing"],
+};
+
+export interface BuiltinFurnitureCatalogEntry {
+  id: FurnitureType;
+  nameKey: `furn_${FurnitureType}`;
+  size: readonly [width: number, depth: number, height: number];
+  /** The first group is primary; later groups are additional places in the current library. */
+  groups: readonly FurnitureGroup[];
+  library: boolean;
+  /** Stable dispatch ids; renderers and symbols can migrate behind these without changing saved plans. */
+  renderer: FurnitureType;
+  symbol: FurnitureType;
+}
+
+const memberships = new Map<FurnitureType, FurnitureGroup[]>();
+for (const [group, types] of Object.entries(FURNITURE_GROUPS) as [FurnitureGroup, FurnitureType[]][]) {
+  for (const type of types) memberships.set(type, [...(memberships.get(type) ?? []), group]);
+}
+
+/** Stable inventory in FURNITURE_TYPES order so reports produce deterministic diffs. */
+export const BUILTIN_FURNITURE_CATALOG: readonly BuiltinFurnitureCatalogEntry[] = FURNITURE_TYPES.map((id) => {
+  const groups = memberships.get(id) ?? [];
+  return Object.freeze({ id, nameKey: `furn_${id}`, size: FURNITURE_SIZE[id], groups: Object.freeze(groups), library: groups.length > 0, renderer: id, symbol: id });
+});
+
+/** Fast lookup used by editor, renderer and symbol migration bridges. */
+export const BUILTIN_FURNITURE_BY_ID: ReadonlyMap<FurnitureType, BuiltinFurnitureCatalogEntry> = new Map(BUILTIN_FURNITURE_CATALOG.map((item) => [item.id, item]));
+
+/** Editor sections generated from the catalog, rather than read directly from the legacy constants. */
+export const FURNITURE_LIBRARY_GROUPS: Readonly<Record<FurnitureGroup, readonly FurnitureType[]>> = Object.freeze(
+  Object.fromEntries(
+    Object.keys(FURNITURE_GROUPS).map((group) => [
+      group,
+      // Preserve the established per-section order while resolving every id through the catalog.
+      Object.freeze(FURNITURE_GROUPS[group].filter((id) => BUILTIN_FURNITURE_BY_ID.get(id)?.groups.includes(group))),
+    ]),
+  ) as Record<FurnitureGroup, readonly FurnitureType[]>,
+);
+
+export function furnitureCatalogEntry(type: string): BuiltinFurnitureCatalogEntry | undefined {
+  return BUILTIN_FURNITURE_BY_ID.get(type as FurnitureType);
+}
+
+export interface FurnitureCatalogSummary {
+  total: number;
+  library: number;
+  hidden: number;
+  memberships: number;
+  groups: Readonly<Record<string, number>>;
+  ungrouped: readonly FurnitureType[];
+  multiGroup: Readonly<Record<string, readonly FurnitureGroup[]>>;
+  referencePacks: Readonly<Record<ReferencePack, { current: number; target: number }>>;
+}
+
+/** Machine-readable counts used by tests and the Markdown inventory report. */
+export function furnitureCatalogSummary(): FurnitureCatalogSummary {
+  const grouped = BUILTIN_FURNITURE_CATALOG.filter((item) => item.library);
+  const multiGroup = Object.fromEntries(grouped.filter((item) => item.groups.length > 1).map((item) => [item.id, item.groups]));
+  return {
+    total: BUILTIN_FURNITURE_CATALOG.length,
+    library: grouped.length,
+    hidden: BUILTIN_FURNITURE_CATALOG.length - grouped.length,
+    memberships: grouped.reduce((sum, item) => sum + item.groups.length, 0),
+    groups: Object.fromEntries(Object.entries(FURNITURE_GROUPS).map(([group, types]) => [group, types.length])),
+    ungrouped: BUILTIN_FURNITURE_CATALOG.filter((item) => !item.library).map((item) => item.id),
+    multiGroup,
+    referencePacks: Object.fromEntries(
+      Object.entries(REFERENCE_PACK_TARGETS).map(([pack, target]) => [pack, { current: REFERENCE_PACK_ITEMS[pack as ReferencePack].length, target }]),
+    ) as Record<ReferencePack, { current: number; target: number }>,
+  };
+}
+
+/** Structural problems that would make the editor, renderer or saved plans disagree. */
+export function furnitureCatalogIssues(): string[] {
+  const issues: string[] = [];
+  const known = new Set<string>();
+  for (const type of FURNITURE_TYPES) {
+    if (known.has(type)) issues.push(`duplicate id: ${type}`);
+    known.add(type);
+    const size = FURNITURE_SIZE[type];
+    if (!size || size.length !== 3 || size.some((value) => !Number.isFinite(value) || value <= 0)) issues.push(`invalid size: ${type}`);
+  }
+  for (const type of Object.keys(FURNITURE_SIZE)) if (!known.has(type)) issues.push(`size without type: ${type}`);
+
+  for (const [group, types] of Object.entries(FURNITURE_GROUPS)) {
+    if (!types.length) issues.push(`empty group: ${group}`);
+    const seen = new Set<string>();
+    for (const type of types) {
+      if (!known.has(type)) issues.push(`unknown type in ${group}: ${type}`);
+      if (seen.has(type)) issues.push(`duplicate type in ${group}: ${type}`);
+      seen.add(type);
+    }
+  }
+
+  const hidden = new Set<string>(HIDDEN_FURNITURE_TYPES);
+  for (const item of BUILTIN_FURNITURE_CATALOG) {
+    if (item.nameKey !== `furn_${item.id}`) issues.push(`invalid name key: ${item.id}`);
+    if (!item.renderer) issues.push(`missing renderer: ${item.id}`);
+    if (!item.symbol) issues.push(`missing symbol: ${item.id}`);
+    if (!item.library && !hidden.has(item.id)) issues.push(`ungrouped type not declared hidden: ${item.id}`);
+    if (item.library && hidden.has(item.id)) issues.push(`hidden type appears in library: ${item.id}`);
+  }
+  for (const [group, types] of Object.entries(FURNITURE_LIBRARY_GROUPS)) {
+    if (types.join("\0") !== FURNITURE_GROUPS[group].join("\0")) issues.push(`catalog group order differs: ${group}`);
+  }
+  for (const type of hidden) if (!known.has(type)) issues.push(`unknown hidden type: ${type}`);
+
+  const assigned = new Map<string, ReferencePack>();
+  for (const [pack, types] of Object.entries(REFERENCE_PACK_ITEMS) as [ReferencePack, readonly FurnitureType[]][]) {
+    for (const type of types) {
+      if (!known.has(type)) issues.push(`unknown type in reference pack ${pack}: ${type}`);
+      if (hidden.has(type)) issues.push(`hidden type in reference pack ${pack}: ${type}`);
+      const previous = assigned.get(type);
+      if (previous) issues.push(`type assigned to reference packs ${previous} and ${pack}: ${type}`);
+      else assigned.set(type, pack);
+    }
+  }
+  for (const item of BUILTIN_FURNITURE_CATALOG) if (item.library && !assigned.has(item.id)) issues.push(`library type without reference pack: ${item.id}`);
+  return issues;
+}
+
+/** Human-readable Phase 0 inventory; generated with `npm run catalog`. */
+export function furnitureCatalogMarkdown(): string {
+  const summary = furnitureCatalogSummary();
+  const rows = Object.entries(summary.groups).map(([group, count]) => `| ${group} | ${count} |`);
+  const packRows = Object.entries(summary.referencePacks).map(([pack, count]) => `| ${pack} | ${count.current} | ${count.target} |`);
+  const duplicateRows = Object.entries(summary.multiGroup).map(([id, groups]) => `- \`${id}\`: ${groups.join(", ")}`);
+  return [
+    "# Built-in furniture inventory",
+    "",
+    `- Declared types: **${summary.total}**`,
+    `- Library items: **${summary.library}**`,
+    `- Hidden/internal items: **${summary.hidden}**`,
+    `- Group memberships: **${summary.memberships}**`,
+    "",
+    "| Group | Items |",
+    "|---|---:|",
+    ...rows,
+    "",
+    `Hidden/internal: ${summary.ungrouped.map((id) => `\`${id}\``).join(", ")}`,
+    "",
+    "Multiple current groups:",
+    ...(duplicateRows.length ? duplicateRows : ["- None"]),
+    "",
+    "## Reference pack coverage",
+    "",
+    "| Pack | Current primary items | Published target |",
+    "|---|---:|---:|",
+    ...packRows,
+    "",
+  ].join("\n");
+}

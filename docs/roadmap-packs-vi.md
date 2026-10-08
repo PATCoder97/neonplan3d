@@ -104,8 +104,8 @@ Các biến thể cùng họ, ví dụ sofa 2/3 chỗ, tủ bếp 40/60/80 cm ho
 
 Mục tiêu: biến hiện trạng thành đường cơ sở có thể đo được.
 
-- [ ] Sinh báo cáo tự động từ `FURNITURE_TYPES`, `FURNITURE_GROUPS` và `FURNITURE_SIZE` để phát hiện ID trùng, thiếu tên hoặc thiếu kích thước.
-- [ ] Lập bảng ánh xạ 92 mục hiện tại vào 16 nhóm đích; một mẫu chỉ có một nhóm chính và có thể có nhiều tag tìm kiếm.
+- [x] Sinh báo cáo tự động từ `FURNITURE_TYPES`, `FURNITURE_GROUPS` và `FURNITURE_SIZE` để phát hiện ID trùng, thiếu tên hoặc thiếu kích thước (`cd frontend && npm run catalog`).
+- [x] Lập bảng ánh xạ 92 mục hiện tại vào 16 nhóm đích; catalog kiểm kê đã khóa đường cơ sở 99 type, 92 mục thư viện, 7 mục nội bộ và trường hợp `worktop` đang nằm trong hai nhóm. Mỗi mục chỉ được tính một lần trong `REFERENCE_PACK_ITEMS`.
 - [ ] Duyệt toàn bộ ảnh gallery công khai của 16 trang sản phẩm, không chỉ ảnh đại diện ở trang Packs; lập bảng `đã phù hợp / cần sửa hình / cần thêm mới` kèm URL và ngày xem.
 - [ ] Chọn khoảng 10 mẫu hiện có cần sửa hình trước; `fan_ceiling` là mẫu thí điểm và phải giữ nguyên ID.
 - [ ] Chụp bộ ảnh chuẩn ở góc nhìn 2D, 3D và chế độ Day/Neon để so sánh hồi quy.
@@ -120,8 +120,8 @@ Mục tiêu: có nền tảng đủ gọn để thêm nhiều mẫu theo lô.
 - [ ] Tách metadata khỏi `frontend/src/model.ts`; giữ export tương thích để chưa phải sửa toàn bộ nơi dùng.
 - [ ] Tách renderer trong `frontend/src/viewer/furniture.ts` thành các họ tái sử dụng.
 - [ ] Chuyển `frontend/src/components/furniture2d.ts` sang registry ký hiệu 2D.
-- [ ] Cho nhóm thư viện, tìm kiếm và tên hiển thị đọc trực tiếp từ catalog.
-- [ ] Thêm validator bắt buộc ID ổn định, kích thước hợp lệ, tên `vi`/`en`, renderer và symbol.
+- [x] Cho nhóm thư viện, tìm kiếm và tên hiển thị đọc trực tiếp từ catalog; các export cũ vẫn được giữ để tương thích.
+- [x] Thêm validator bắt buộc ID ổn định, kích thước hợp lệ, tên `vi`/`en`, renderer và symbol; CI chạy `npm run catalog` ở mỗi push/PR.
 - [ ] Thêm trang gallery phát triển để render toàn bộ catalog trong một lần.
 
 Điều kiện hoàn thành: 92 mục cũ hiển thị tương đương, typecheck/test/build qua và gallery không có mẫu mất hình.

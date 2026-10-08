@@ -33,13 +33,11 @@ import {
   bounds,
   centroid,
   FLOOR_MATERIALS,
-  FURNITURE_GROUPS,
   ENERGY_DEVICES,
   DEFAULT_HOLOGRAM,
   type HologramSettings,
   type StartView,
   FURNITURE_SIZE,
-  FURNITURE_TYPES,
   canLift,
   isFixed,
   isCoveredRoom,
@@ -106,6 +104,7 @@ import { fetchBackup, restoreBackup, type BackupFile } from "../api.ts";
 import { load3d } from "../load3d.ts";
 import type { WallMode } from "../viewer/viewer3d.ts";
 import { furnitureName } from "../furniture-names.ts";
+import { BUILTIN_FURNITURE_CATALOG, FURNITURE_LIBRARY_GROUPS } from "../furniture/catalog.ts";
 import { furnitureSize, isElectric, mountBase, packItem, packItemName, packType, setPacks, type FurniturePack } from "../packs.ts";
 import { EDITOR_TOOL_GROUPS, resolvedFurniturePane, type EditorTool, type FurniturePane } from "../editor-navigation.ts";
 import { planToScreen, screenToPlan, zoomPlanAt } from "../editor-view.ts";
@@ -3790,7 +3789,7 @@ export class Fp3dEditor extends LitElement {
     const kind = kindOf(entityId);
     const lang = this.hass?.language ?? "en";
     const all = [
-      ...FURNITURE_TYPES.map((t) => ({ type: t as string, label: this.t(`furn_${t}` as I18nKey) })),
+      ...BUILTIN_FURNITURE_CATALOG.map((item) => ({ type: item.id as string, label: this.t(item.nameKey as I18nKey) })),
       ...(this.packs ?? []).flatMap((p) => p.items.map((it) => ({ type: packType(p.id, it.id), label: `${packItemName(it, lang)} · ${p.name}` }))),
     ];
     const speakerish = /speaker|sound|subwoofer|receiver|smart_|display|tv|media|turntable|projector|console/;
@@ -5793,7 +5792,7 @@ export class Fp3dEditor extends LitElement {
         <label class="fp3d-field fp3d-wide"
           >${this.t("furniture_type")}
           <select ?disabled=${!admin} @change=${(e: Event) => this.updateFurniture({ type: (e.target as HTMLSelectElement).value })}>
-            ${FURNITURE_TYPES.map((t) => html`<option value=${t} ?selected=${t === f.type}>${this.t(`furn_${t}` as I18nKey)}</option>`)}
+            ${BUILTIN_FURNITURE_CATALOG.map((item) => html`<option value=${item.id} ?selected=${item.id === f.type}>${this.t(item.nameKey as I18nKey)}</option>`)}
             ${(this.packs ?? []).map(
               (pack) => html`<optgroup label=${pack.name}>
                 ${pack.items.map((it) => {
@@ -6451,7 +6450,7 @@ export class Fp3dEditor extends LitElement {
     const words = fold(q).split(/\s+/).filter(Boolean);
     const lang = this.hass?.language ?? "en";
     const all: string[] = [
-      ...Object.entries(FURNITURE_GROUPS).flatMap(([g, types]) => types.map((t) => `${this.t(`furn_${t}` as I18nKey)} ${translate(EN_HASS, `furn_${t}` as I18nKey)} ${t.replace(/_/g, " ")} ${this.t(`furn_group_${g}` as I18nKey)}`)),
+      ...Object.entries(FURNITURE_LIBRARY_GROUPS).flatMap(([g, types]) => types.map((t) => `${this.t(`furn_${t}` as I18nKey)} ${translate(EN_HASS, `furn_${t}` as I18nKey)} ${t.replace(/_/g, " ")} ${this.t(`furn_group_${g}` as I18nKey)}`)),
       ...(this.packs ?? []).flatMap((p) => p.items.map((it) => `${packItemName(it, lang)} ${Object.values(it.name).join(" ")} ${it.id.replace(/_/g, " ")} ${p.name}`)),
     ];
     return all.some((s) => {
@@ -6660,7 +6659,7 @@ export class Fp3dEditor extends LitElement {
         }}
       />
       ${q && !this.libraryHasHits(q) ? html`<p class="fp3d-sub">${this.t("furniture_search_none")}</p>` : nothing}
-      ${Object.entries(FURNITURE_GROUPS).map(([group, types]) =>
+      ${Object.entries(FURNITURE_LIBRARY_GROUPS).map(([group, types]) =>
         this.librarySection(
           `group:${group}`,
           this.t(`furn_group_${group}` as I18nKey),

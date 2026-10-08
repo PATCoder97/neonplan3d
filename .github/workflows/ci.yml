@@ -21,6 +21,8 @@ jobs:
       - run: npm ci
       - run: npm run typecheck
       - run: npm test
+      - name: Validate built-in furniture catalog
+        run: npm run catalog
       - name: Build and check budgets
         run: npm run build
       - name: Committed bundles are up to date
