@@ -5,7 +5,7 @@ import { Box3, Color, LineBasicMaterial, LineSegments, Mesh, MeshBasicMaterial, 
 import type { Furniture } from "../model.ts";
 import { packItem, setPacks, type FurniturePack } from "../packs.ts";
 import { pushFanRotor, pushFurniture, pushPackLamp } from "./furniture.ts";
-import { GeoBuffer, LineBuffer } from "./geo.ts";
+import { GeoBuffer, LineBuffer, pushPrism } from "./geo.ts";
 import { pushLampModel, type LampModel } from "./viewer3d.ts";
 
 let renderer: WebGLRenderer | null = null;
@@ -43,6 +43,21 @@ export function furniturePreview(item: PreviewItem, size = 180, packs?: Furnitur
   } else {
     const f: Furniture = { id: "preview", type: item.type, x: 0, z: 0, rotation: 0, w: item.w, d: item.d, h: item.h, variant: item.variant ?? null, entity: null, power: null };
     pushFurniture(buf, lines, new GeoBuffer(), f);
+    if (item.type === "robot_vacuum") {
+      // The live viewer owns and moves this body separately. Add the same parked silhouette only to
+      // the library thumbnail so the item reads as “robot with station”, as it does in the gallery.
+      const disc = (x: number, z: number, r: number, y0: number, y1: number, side: number, top: number) => {
+        const poly: [number, number][] = Array.from({ length: 20 }, (_, i) => {
+          const a = (i / 20) * Math.PI * 2;
+          return [x + Math.cos(a) * r, z + Math.sin(a) * r];
+        });
+        pushPrism(buf, poly, y0, y1, side, top, { aoFrom: 0, bottom: false });
+      };
+      const z = item.d * 0.28;
+      const r = Math.min(item.w * 0.4, item.d * 0.27);
+      disc(0, z, r, 0.012, 0.08, 0x243049, 0x34425f);
+      disc(0, z, r * 0.32, 0.08, 0.1, 0x3a4a6a, 0x4d5f86);
+    }
     if (item.type === "fan_ceiling" || item.type === "fan_ceiling_light" || item.type === "fan_wall" || item.type === "fan_floor") {
       const p0 = buf.p.length;
       const l0 = lines.p.length;

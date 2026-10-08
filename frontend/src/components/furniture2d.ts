@@ -137,7 +137,7 @@ export function furnitureSymbol(type: string, w: number, d: number): Part[] | ty
     case "modem_router":
       return [rect(-w / 2, -d * 0.3, w / 2, d * 0.35, "fp3d-sym-fill"), line(-w * 0.35, -d * 0.3, -w * 0.46, -d / 2, "fp3d-sym-strong"), line(w * 0.35, -d * 0.3, w * 0.46, -d / 2, "fp3d-sym-strong"), ...[-0.22, 0, 0.22].map((x) => circle(x * w, d * 0.18, Math.min(w, d) * 0.035))];
     case "heat_pump_outdoor":
-      return [rect(-w / 2, -d / 2, w / 2, d / 2, "fp3d-sym-fill"), circle(-w * 0.12, d * 0.08, Math.min(w, d) * 0.3), circle(-w * 0.12, d * 0.08, Math.min(w, d) * 0.08, "fp3d-sym-strong")];
+      return [rect(-w / 2, -d / 2, w / 2, d / 2, "fp3d-sym-fill"), ...Array.from({ length: 5 }, (_, i) => line(-w * 0.4, -d * 0.24 + i * d * 0.12, w * 0.18, -d * 0.24 + i * d * 0.12)), rect(w * 0.31, d * 0.08, w * 0.42, d * 0.28, "fp3d-sym-strong")];
     case "hot_water_tank":
       return [circle(0, 0, Math.min(w, d) * 0.48, "fp3d-sym-fill"), circle(0, d * 0.34, Math.min(w, d) * 0.07, "fp3d-sym-strong")];
     case "ventilation_fan": {
@@ -145,7 +145,7 @@ export function furnitureSymbol(type: string, w: number, d: number): Part[] | ty
       return [rect(-w / 2, -d / 2, w / 2, d / 2), circle(0, 0, r, "fp3d-sym-fill"), ...Array.from({ length: 4 }, (_, i) => line(Math.cos((i * Math.PI) / 2) * r * 0.2, Math.sin((i * Math.PI) / 2) * r * 0.2, Math.cos((i * Math.PI) / 2) * r * 0.82, Math.sin((i * Math.PI) / 2) * r * 0.82))];
     }
     case "humidifier":
-      return [rect(-w / 2, -d / 2, w / 2, d / 2, "fp3d-sym-fill"), circle(0, -d * 0.16, Math.min(w, d) * 0.22), line(-w * 0.2, d * 0.28, w * 0.2, d * 0.28, "fp3d-sym-strong")];
+      return [rect(-w / 2, -d / 2, w / 2, d / 2, "fp3d-sym-fill"), rect(-w * 0.34, -d * 0.3, w * 0.34, d * 0.12), line(-w * 0.35, d * 0.24, w * 0.35, d * 0.24, "fp3d-sym-strong")];
     case "smart_display":
       return [rect(-w / 2, -d * 0.18, w / 2, d * 0.32, "fp3d-sym-fill"), line(-w * 0.16, d * 0.32, w * 0.16, d / 2, "fp3d-sym-strong")];
     case "kitchen_corner":
@@ -291,7 +291,7 @@ export function furnitureSymbol(type: string, w: number, d: number): Part[] | ty
       // dock at the back, the robot resting in front of it
       return [rect(-w * 0.38, -d / 2, w * 0.38, -d * 0.17, "fp3d-sym-fill"), rect(-w * 0.22, -d * 0.17, w * 0.22, d * 0.17), circle(0, d * 0.14, Math.min(w, d) * 0.4)];
     case "robot_mower":
-      return [rect(-w / 2, -d / 2, w / 2, d * 0.4), line(-w * 0.36, d * 0.4, w * 0.36, d * 0.4, "fp3d-sym-strong"), rect(-w * 0.3, -d * 0.18, w * 0.3, d * 0.32, "fp3d-sym-fill")];
+      return [rect(-w / 2, -d / 2, w / 2, d * 0.42, "fp3d-sym-fill"), line(-w * 0.42, -d * 0.42, -w * 0.42, d * 0.28), line(w * 0.42, -d * 0.42, w * 0.42, d * 0.28), rect(-w * 0.31, -d * 0.17, w * 0.31, d * 0.34), line(-w * 0.22, d * 0.34, w * 0.22, d * 0.34, "fp3d-sym-strong")];
     case "radiator": {
       // fins along the front
       const out: Part[] = [];

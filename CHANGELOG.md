@@ -4,6 +4,13 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.19.8
+
+### Changed
+
+- Refined the robot vacuum dock, robot mower garage, heat-pump outdoor unit, humidifier and smart control display to more closely follow their recognizable public-gallery silhouettes.
+- Synchronized the updated 2D symbols, 3D models and library previews while preserving the existing robot movement, docking and live state effects.
+
 ## 1.19.7
 
 ### Added

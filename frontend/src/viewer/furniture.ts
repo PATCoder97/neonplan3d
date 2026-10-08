@@ -1365,13 +1365,13 @@ function modemRouter(b: Builder, w: number, d: number, h: number): void {
 
 function heatPumpOutdoor(b: Builder, w: number, d: number, h: number): void {
   b.box(-w / 2, w / 2, h * 0.04, h, -d / 2, d / 2, C.white, C.whiteTop, EDGE_FURN);
-  const r = Math.min(w * 0.31, h * 0.34);
-  b.lyingCyl("z", -w * 0.12, d * 0.51, h * 0.2, h * 0.2 + r * 2, d * 0.055, r * 2, C.dark, C.bodyTop, 18, EDGE_FURN);
-  for (let i = 0; i < 8; i++) {
-    const a = (i / 8) * Math.PI * 2;
-    b.seg(-w * 0.12, h * 0.2 + r, d * 0.54, -w * 0.12 + Math.cos(a) * r * 0.82, h * 0.2 + r + Math.sin(a) * r * 0.82, d * 0.54, EDGE_FAINT);
+  // The gallery unit reads as a broad black horizontal grille, not as a visible round fan.
+  b.box(-w * 0.42, w * 0.2, h * 0.17, h * 0.82, d * 0.5, d * 0.54, C.dark, C.dark, EDGE_FAINT);
+  for (let i = 0; i < 6; i++) {
+    const y = h * (0.23 + i * 0.09);
+    b.box(-w * 0.4, w * 0.18, y, y + h * 0.025, d * 0.535, d * 0.555, C.bodyTop, C.bodyTop, EDGE_FAINT);
   }
-  b.box(w * 0.3, w * 0.43, h * 0.22, h * 0.78, d * 0.5, d * 0.54, C.body, C.bodyTop, EDGE_FAINT);
+  b.box(w * 0.29, w * 0.43, h * 0.2, h * 0.8, d * 0.5, d * 0.54, C.body, C.bodyTop, EDGE_FAINT);
   b.box(w * 0.32, w * 0.41, h * 0.62, h * 0.69, d * 0.53, d * 0.56, C.accent, C.accent, EDGE_GLOW);
 }
 
@@ -1395,17 +1395,18 @@ function ventilationFan(b: Builder, w: number, d: number, h: number): void {
 }
 
 function humidifier(b: Builder, w: number, d: number, h: number): void {
-  b.pad(-w / 2, w / 2, 0, h, -d / 2, d / 2, C.body, C.bodyTop, Math.min(0.035, w * 0.08), EDGE_FURN);
-  b.box(-w * 0.31, w * 0.31, h * 0.18, h * 0.62, d * 0.48, d * 0.54, C.glass, C.glass, EDGE_FAINT);
-  b.box(-w * 0.22, w * 0.22, h * 0.74, h * 0.8, d * 0.49, d * 0.55, C.accent, C.accent, EDGE_GLOW);
+  b.box(-w / 2, w / 2, 0, h, -d / 2, d / 2, C.body, C.bodyTop, EDGE_FURN);
+  b.box(-w * 0.34, w * 0.34, h * 0.12, h * 0.56, d * 0.49, d * 0.54, C.dark, C.dark, EDGE_FAINT);
+  b.box(-w * 0.35, w * 0.35, h * 0.61, h * 0.69, d * 0.49, d * 0.55, C.accent, C.accent, EDGE_GLOW);
+  b.box(w * 0.12, w * 0.31, h * 0.78, h * 0.84, d * 0.5, d * 0.55, C.accent, C.accent, EDGE_FAINT);
   for (let i = -2; i <= 2; i++) b.seg(i * w * 0.11, h + 0.003, -d * 0.22, i * w * 0.11, h + 0.003, d * 0.18, EDGE_FAINT);
 }
 
 function smartDisplay(b: Builder, w: number, d: number, h: number): void {
-  b.box(-w * 0.42, w * 0.42, h * 0.18, h, -d * 0.18, d * 0.2, C.dark, C.bodyTop, EDGE_FURN);
-  b.box(-w * 0.36, w * 0.36, h * 0.28, h * 0.9, d * 0.19, d * 0.24, C.glass, C.glass, EDGE_GLOW);
-  b.box(-w * 0.16, w * 0.16, h * 0.08, h * 0.2, -d * 0.22, d * 0.05, C.metal, C.metal, EDGE_FAINT);
-  b.box(-w * 0.32, w * 0.32, 0, h * 0.09, -d * 0.36, d * 0.16, C.dark, C.bodyTop, EDGE_FURN);
+  // Landscape control panel with the separate lower bar shown in the public gallery.
+  b.box(-w * 0.48, w * 0.48, h * 0.18, h, -d * 0.2, d * 0.2, C.dark, C.bodyTop, EDGE_FURN);
+  b.box(-w * 0.39, w * 0.39, h * 0.35, h * 0.89, d * 0.19, d * 0.24, C.glass, C.glass, EDGE_GLOW);
+  b.box(-w * 0.28, w * 0.28, h * 0.03, h * 0.17, -d * 0.03, d * 0.25, C.body, C.bodyTop, EDGE_FURN);
 }
 
 function kitchenCorner(b: Builder, w: number, d: number, h: number): void {
@@ -1712,8 +1713,8 @@ function builtInScreen(f: Furniture, w: number, d: number, h: number, floor?: Fl
   if (f.type === "heat_pump_outdoor") return { x0: w * 0.32, x1: w * 0.41, y0: h * 0.62, y1: h * 0.69, z: d * 0.56 };
   if (f.type === "hot_water_tank") return { x0: -w * 0.12, x1: w * 0.12, y0: h * 0.57, y1: h * 0.66, z: d * 0.49 };
   if (f.type === "ventilation_fan") return { x0: -w * 0.12, x1: w * 0.12, y0: 1.8 + h * 0.44, y1: 1.8 + h * 0.58, z: d * 0.45 };
-  if (f.type === "humidifier") return { x0: -w * 0.22, x1: w * 0.22, y0: h * 0.74, y1: h * 0.8, z: d * 0.55 };
-  if (f.type === "smart_display") return { x0: -w * 0.36, x1: w * 0.36, y0: h * 0.28, y1: h * 0.9, z: d * 0.24 };
+  if (f.type === "humidifier") return { x0: -w * 0.35, x1: w * 0.35, y0: h * 0.61, y1: h * 0.69, z: d * 0.55 };
+  if (f.type === "smart_display") return { x0: -w * 0.39, x1: w * 0.39, y0: h * 0.35, y1: h * 0.89, z: d * 0.24 };
   if (f.type === "washer" || f.type === "dryer") {
     const cy = (h - 0.14) / 2 + 0.04;
     const r = Math.min(w * 0.36, (h - 0.2) * 0.42) * 0.8;
@@ -2093,21 +2094,21 @@ function buildFurniture(buf: GeoBuffer, lines: LineBuffer, shadow: GeoBuffer, f:
       b.box(-w * 0.38, w * 0.38, 0, h * 0.05, -d / 2 - d * 0.02, -d * 0.1, C.dark, C.body, EDGE_FAINT);
       b.box(-w * 0.32, w * 0.32, h * 0.04, h * 0.92, -d / 2, -d * 0.18, C.body, C.bodyTop, EDGE_FURN);
       b.box(-w * 0.34, w * 0.34, h * 0.9, h, -d / 2 - d * 0.01, -d * 0.17, C.metal, C.bodyTop, EDGE_FURN);
-      b.box(-w * 0.23, w * 0.23, h * 0.62, h * 0.69, -d * 0.175, -d * 0.15, C.accent, C.accent, EDGE_GLOW);
+      b.box(-w * 0.23, w * 0.23, h * 0.75, h * 0.82, -d * 0.175, -d * 0.15, C.accent, C.accent, EDGE_GLOW);
       // A shallow charging tongue meets the moving robot when it is docked.
       b.box(-w * 0.22, w * 0.22, h * 0.02, h * 0.055, -d * 0.18, d * 0.17, C.dark, C.bodyTop, EDGE_FAINT);
       return;
     case "robot_mower": {
-      // Open low garage: broad sloped roof on two short side walls, as in the official pack gallery.
+      // Broad, almost flat canopy and a light mower nose below it, matching the gallery silhouette.
       const t = Math.min(0.055, w * 0.07);
-      b.box(-w * 0.46, -w * 0.39, 0, h * 0.68, -d * 0.46, d * 0.34, C.body, C.bodyTop, EDGE_FURN);
-      b.box(w * 0.39, w * 0.46, 0, h * 0.68, -d * 0.46, d * 0.34, C.body, C.bodyTop, EDGE_FURN);
-      b.box(-w * 0.44, w * 0.44, 0, h * 0.5, -d * 0.48, -d * 0.42, C.body, C.bodyTop, EDGE_FAINT);
-      b.loft([-w / 2, w / 2, -d / 2, d * 0.4], [-w / 2, w / 2, -d / 2, d * 0.4], h * 0.68, h * 0.9, C.body, C.metal, EDGE_FURN);
-      // Compact mower parked nose-out below the shelter.
-      b.loft([-w * 0.31, w * 0.31, -d * 0.18, d * 0.32], [-w * 0.24, w * 0.24, -d * 0.13, d * 0.25], h * 0.04, h * 0.31, C.body, C.bodyTop, EDGE_FURN);
-      b.box(-w * 0.22, w * 0.22, h * 0.16, h * 0.24, d * 0.305, d * 0.325, C.accent, C.accent, EDGE_GLOW);
-      for (const x of [-w * 0.28, w * 0.28]) b.lyingCyl("x", x, d * 0.08, h * 0.01, h * 0.15, t * 2, h * 0.14, C.dark, C.metal, 10, EDGE_FAINT);
+      b.box(-w * 0.48, w * 0.48, 0, h * 0.045, -d * 0.48, d * 0.4, C.dark, C.bodyTop, EDGE_FAINT);
+      for (const x of [-w * 0.43, w * 0.43]) b.box(x - t / 2, x + t / 2, h * 0.04, h * 0.7, -d * 0.44, d * 0.28, C.body, C.bodyTop, EDGE_FURN);
+      b.box(-w * 0.45, w * 0.45, h * 0.06, h * 0.52, -d * 0.48, -d * 0.42, C.body, C.bodyTop, EDGE_FAINT);
+      b.box(-w / 2, w / 2, h * 0.69, h * 0.84, -d / 2, d * 0.42, C.body, C.metal, EDGE_FURN);
+      // Compact light-coloured mower parked nose-out below the shelter.
+      b.loft([-w * 0.33, w * 0.33, -d * 0.17, d * 0.34], [-w * 0.27, w * 0.27, -d * 0.12, d * 0.27], h * 0.05, h * 0.31, C.white, C.whiteTop, EDGE_FURN);
+      b.box(-w * 0.23, w * 0.23, h * 0.16, h * 0.22, d * 0.325, d * 0.345, C.accent, C.accent, EDGE_GLOW);
+      for (const x of [-w * 0.29, w * 0.29]) b.lyingCyl("x", x, d * 0.08, h * 0.015, h * 0.145, t * 2, h * 0.13, C.dark, C.metal, 10, EDGE_FAINT);
       return;
     }
     case "radiator":
