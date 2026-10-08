@@ -40,6 +40,8 @@ const COVERED_LOOK: Record<CoveredRoomKind, Look> = {
 const CANOPY_FRONT_OVERHANG = 0.35;
 const CORRUGATED_METAL = 0x315166;
 const CORRUGATED_RIDGE = 0x52788c;
+/** Fold kind 5 keeps canopy roofs selectable/foldable while allowing a lighter material opacity. */
+const CANOPY_ROOF_KIND = 5;
 
 /** Room-only render input; covered-room kinds no longer belong to OutdoorArea or its editor. */
 export interface CoveredRenderArea {
@@ -225,17 +227,23 @@ function canopyRoofPolygon(poly: Vec2[], openEnd: number): Vec2[] {
   return poly.map(([x, z], i) => i === front || i === (front + 1) % poly.length ? [x + ox, z + oz] : [x, z]);
 }
 
-/** Intersections of a horizontal/vertical scan line with a polygon, paired into inside spans. */
-function roofScanSpans(poly: Vec2[], alongX: boolean, cross: number): [number, number][] {
+/** Intersections of an oriented scan line with a polygon, paired into inside spans. */
+function roofScanSpans(poly: Vec2[], origin: Vec2, along: Vec2, across: Vec2, cross: number): [number, number][] {
   const hits: number[] = [];
   for (let i = 0; i < poly.length; i++) {
     const p = poly[i];
     const q = poly[(i + 1) % poly.length];
-    const pc = alongX ? p[1] : p[0];
-    const qc = alongX ? q[1] : q[0];
+    const px = p[0] - origin[0];
+    const pz = p[1] - origin[1];
+    const qx = q[0] - origin[0];
+    const qz = q[1] - origin[1];
+    const pc = px * across[0] + pz * across[1];
+    const qc = qx * across[0] + qz * across[1];
     if (!((pc <= cross && qc > cross) || (qc <= cross && pc > cross))) continue;
     const t = (cross - pc) / (qc - pc);
-    hits.push((alongX ? p[0] : p[1]) + ((alongX ? q[0] : q[1]) - (alongX ? p[0] : p[1])) * t);
+    const pa = px * along[0] + pz * along[1];
+    const qa = qx * along[0] + qz * along[1];
+    hits.push(pa + (qa - pa) * t);
   }
   hits.sort((a, b) => a - b);
   const spans: [number, number][] = [];
@@ -243,20 +251,29 @@ function roofScanSpans(poly: Vec2[], alongX: boolean, cross: number): [number, n
   return spans;
 }
 
-/** Raised trapezoidal ribs turn a plain sheet into recognisable Vietnamese corrugated metal. */
-function pushCorrugatedRoof(buf: GeoBuffer, poly: Vec2[], topAt: (x: number, z: number) => number, slopeDir: SlopeDir | undefined, fold: number): void {
-  const alongX = slopeDir === "x" || slopeDir === "-x" || slopeDir === undefined;
-  const b = bounds(poly);
-  const lo = alongX ? b.z0 : b.x0;
-  const hi = alongX ? b.z1 : b.x1;
+/** Raised longitudinal ribs run from the house towards the front drip edge, independently of slope. */
+function pushCorrugatedRoof(buf: GeoBuffer, poly: Vec2[], topAt: (x: number, z: number) => number, front: number, fold: number): void {
+  const frontP = poly[front];
+  const frontQ = poly[(front + 1) % poly.length];
+  const dx = frontQ[0] - frontP[0];
+  const dz = frontQ[1] - frontP[1];
+  const len = Math.hypot(dx, dz);
+  if (len < 1e-6) return;
+  const origin: Vec2 = frontP;
+  // Across follows the front edge; along is its outward normal (house -> drip edge for a CCW polygon).
+  const across: Vec2 = [dx / len, dz / len];
+  const along: Vec2 = [across[1], -across[0]];
+  const crossValues = poly.map(([x, z]) => (x - origin[0]) * across[0] + (z - origin[1]) * across[1]);
+  const lo = Math.min(...crossValues);
+  const hi = Math.max(...crossValues);
   const count = Math.max(1, Math.ceil((hi - lo) / 0.18));
   const side = new Color(CORRUGATED_METAL);
   const crest = new Color(CORRUGATED_RIDGE);
   for (let i = 0; i < count; i++) {
     const cross = lo + ((i + 0.5) * (hi - lo)) / count;
-    for (const [from, to] of roofScanSpans(poly, alongX, cross)) {
-      const p: Vec2 = alongX ? [from, cross] : [cross, from];
-      const q: Vec2 = alongX ? [to, cross] : [cross, to];
+    for (const [from, to] of roofScanSpans(poly, origin, along, across, cross)) {
+      const p: Vec2 = [origin[0] + along[0] * from + across[0] * cross, origin[1] + along[1] * from + across[1] * cross];
+      const q: Vec2 = [origin[0] + along[0] * to + across[0] * cross, origin[1] + along[1] * to + across[1] * cross];
       const dx = q[0] - p[0];
       const dz = q[1] - p[1];
       const len = Math.hypot(dx, dz);
@@ -403,6 +420,8 @@ function pushAreas(buf: GeoBuffer, lines: LineBuffer, floor: Floor, areas: Rende
         const finish = coveredLook(a, look);
         const floorY = g + coveredFloorTop(a.type);
         const roofAt = (x: number, z: number) => floorY + h - outdoorDrop(a, x, z);
+        const front = coveredFrontEdge(poly, openEnd);
+        const canopyRoofFold = roofFold === ALWAYS ? ALWAYS : roofFold + CANOPY_ROOF_KIND * 16;
         const columnHalf = Math.min(0.4, Math.max(0.04, (a.column_size ?? 0.12) / 2));
         for (const [x, z] of poly) {
           const top = roofAt(x, z) - 0.08;
@@ -411,7 +430,6 @@ function pushAreas(buf: GeoBuffer, lines: LineBuffer, floor: Floor, areas: Rende
         }
         if (a.railing !== false && h >= 0.4) {
           const fenceH = Math.min(1.45, h * 0.62);
-          const front = coveredFrontEdge(poly, openEnd);
           for (let i = 0; i < poly.length; i++) {
             if (i === openEnd) continue;
             const p = poly[i];
@@ -445,15 +463,15 @@ function pushAreas(buf: GeoBuffer, lines: LineBuffer, floor: Floor, areas: Rende
         }
         const roofPoly = canopyRoofPolygon(poly, openEnd);
         roofStart = buf.count;
-        pushCanopyPanel(buf, roofPoly, roofAt, 0.045, finish.under, CORRUGATED_METAL, roofFold);
-        pushCorrugatedRoof(buf, roofPoly, roofAt, a.slope_dir, roofFold);
+        pushCanopyPanel(buf, roofPoly, roofAt, 0.045, finish.under, CORRUGATED_METAL, canopyRoofFold);
+        pushCorrugatedRoof(buf, roofPoly, roofAt, front, canopyRoofFold);
         roofEnd = buf.count;
         if (a.outline !== false) {
           for (let i = 0; i < roofPoly.length; i++) {
             if (i === openEnd) continue;
             const p = roofPoly[i];
             const q = roofPoly[(i + 1) % roofPoly.length];
-            lines.seg([p[0], roofAt(p[0], p[1]) + 0.034, p[1]], [q[0], roofAt(q[0], q[1]) + 0.034, q[1]], edge, roofFold);
+            lines.seg([p[0], roofAt(p[0], p[1]) + 0.034, p[1]], [q[0], roofAt(q[0], q[1]) + 0.034, q[1]], edge, canopyRoofFold);
           }
         }
         break;

@@ -22,28 +22,32 @@ export type FoldRole = "plain" | "solid" | "glass" | "roof";
 /** Covered-room roofs stay translucent, but must remain legible against the dark outdoor canvas. */
 export const COVERED_ROOF_BRIGHTNESS = 1.35;
 export const COVERED_ROOF_ALPHA = 0.78;
+/** Corrugated yard roofs stay readable while exposing devices below them in the whole-house view. */
+export const CANOPY_ROOF_ALPHA = 0.42;
 
 export function makeFoldable<T extends Material>(material: T, masks: FoldMasks, role: FoldRole = "plain"): T {
   material.onBeforeCompile = (shader) => {
     shader.uniforms.uStanding = masks.standing;
     shader.uniforms.uGlass = masks.glass;
-    shader.vertexShader = shader.vertexShader.replace("#include <common>", "#include <common>\nattribute float fold;\nuniform int uStanding;\nuniform int uGlass;").replace(
+    shader.vertexShader = shader.vertexShader.replace("#include <common>", "#include <common>\nattribute float fold;\nuniform int uStanding;\nuniform int uGlass;\nvarying float vFp3dCanopy;").replace(
       "#include <project_vertex>",
       `#include <project_vertex>
       {
+        vFp3dCanopy = 0.0;
         bool fp3dShow = ${role === "glass" || role === "roof" ? "false" : "true"};
         if (fold > -0.5) {
           int fp3dFold = int(fold + 0.5);
           int fp3dKind = fp3dFold / 16;
           int fp3dBucket = fp3dFold - fp3dKind * 16;
+          vFp3dCanopy = fp3dKind == 5 ? 1.0 : 0.0;
           bool fp3dStanding = ((uStanding >> fp3dBucket) & 1) == 1;
           bool fp3dGlass = ((uGlass >> fp3dBucket) & 1) == 1;
-          // kinds: 0 upper part, 1 cut edge, 2 lower part, 3 cap at the cut height, 4 furniture above the cut
-          fp3dShow = fp3dKind == 0 || fp3dKind == 4 ? fp3dStanding : fp3dKind == 1 || fp3dKind == 3 ? !fp3dStanding : true;
+          // kinds: 0 upper part, 1 cut edge, 2 lower part, 3 cap, 4 upper furniture, 5 canopy roof
+          fp3dShow = fp3dKind == 0 || fp3dKind == 4 || fp3dKind == 5 ? fp3dStanding : fp3dKind == 1 || fp3dKind == 3 ? !fp3dStanding : true;
           bool fp3dWall = fp3dKind == 0 || fp3dKind == 2;
-          ${role === "solid" ? "if ((fp3dGlass && fp3dWall) || (fp3dBucket == 15 && fp3dKind == 0)) fp3dShow = false;" : ""}
+          ${role === "solid" ? "if ((fp3dGlass && fp3dWall) || (fp3dBucket == 15 && (fp3dKind == 0 || fp3dKind == 5))) fp3dShow = false;" : ""}
           ${role === "glass" ? "fp3dShow = fp3dShow && fp3dGlass && fp3dWall;" : ""}
-          ${role === "roof" ? "fp3dShow = fp3dShow && fp3dBucket == 15 && fp3dKind == 0;" : ""}
+          ${role === "roof" ? "fp3dShow = fp3dShow && fp3dBucket == 15 && (fp3dKind == 0 || fp3dKind == 5);" : ""}
         }
         if (!fp3dShow) gl_Position = vec4(2.0, 2.0, 2.0, 1.0);
       }`,
@@ -57,11 +61,11 @@ export function makeFoldable<T extends Material>(material: T, masks: FoldMasks, 
         diffuseColor.a *= 0.2;`,
       );
     } else if (role === "roof") {
-      shader.fragmentShader = shader.fragmentShader.replace(
+      shader.fragmentShader = shader.fragmentShader.replace("#include <common>", "#include <common>\nvarying float vFp3dCanopy;").replace(
         "#include <color_fragment>",
         `#include <color_fragment>
         diffuseColor.rgb *= ${COVERED_ROOF_BRIGHTNESS.toFixed(2)};
-        diffuseColor.a *= ${COVERED_ROOF_ALPHA.toFixed(2)};`,
+        diffuseColor.a *= mix(${COVERED_ROOF_ALPHA.toFixed(2)}, ${CANOPY_ROOF_ALPHA.toFixed(2)}, vFp3dCanopy);`,
       );
     }
   };

@@ -16,7 +16,8 @@ const hasColor = (buf: GeoBuffer, hex: number) => {
 
 test("a canopy room draws a high fence, front gate, posts, beams and a projecting corrugated roof", () => {
   const floor = newFloor("eg", "EG", 0);
-  const canopy: CoveredRenderArea = { id: "cover", type: "canopy", points: [[0, 0], [4, 0], [4, 3], [0, 3]], height: 2.4, slope: 0.25, slope_dir: "x", open: true, railing: true };
+  // The configured fall runs across the canopy; corrugations must still run longitudinally to the front.
+  const canopy: CoveredRenderArea = { id: "cover", type: "canopy", points: [[0, 0], [4, 0], [4, 3], [0, 3]], height: 2.4, slope: 0.25, slope_dir: "z", open: true, railing: true };
   const solid = new GeoBuffer();
   const lines = new LineBuffer();
   const ranges = pushCovered(solid, lines, floor, [canopy]);
@@ -31,6 +32,23 @@ test("a canopy room draws a high fence, front gate, posts, beams and a projectin
   assert.ok(hasColor(solid, 0x315166) && hasColor(solid, 0x52788c), "the roof uses dark metal sheets with raised lighter corrugations");
   const roofX = solid.p.slice(ranges[0].roofStart! * 9, ranges[0].roofEnd! * 9).filter((_, i) => i % 3 === 0);
   assert.ok(Math.max(...roofX) > 4.34 && Math.max(...roofX) < 4.36, "the sheet projects 35 cm beyond the front posts");
+
+  const crest = new Color(0x52788c);
+  const roofOffset = ranges[0].roofStart! * 9;
+  const roofLimit = ranges[0].roofEnd! * 9;
+  let longitudinalRidge = false;
+  for (let i = roofOffset; i < roofLimit; i += 9) {
+    const colorOffset = i;
+    if (Math.abs(solid.c[colorOffset] - crest.r) > 1e-9 || Math.abs(solid.c[colorOffset + 1] - crest.g) > 1e-9 || Math.abs(solid.c[colorOffset + 2] - crest.b) > 1e-9) continue;
+    const xs = [solid.p[i], solid.p[i + 3], solid.p[i + 6]];
+    const zs = [solid.p[i + 2], solid.p[i + 5], solid.p[i + 8]];
+    if (Math.max(...xs) - Math.min(...xs) > 4 && Math.max(...zs) - Math.min(...zs) < 0.05) longitudinalRidge = true;
+  }
+  assert.ok(longitudinalRidge, "corrugations run from the house to the front edge instead of across the canopy");
+
+  const folded = new GeoBuffer();
+  pushCovered(folded, new LineBuffer(), floor, [canopy], 15);
+  assert.ok(folded.f.some((fold) => fold === 95), "canopy roof uses the translucent canopy fold kind");
 
   const bare = new GeoBuffer();
   const bareLines = new LineBuffer();
