@@ -14,20 +14,23 @@ const hasColor = (buf: GeoBuffer, hex: number) => {
   return false;
 };
 
-test("a canopy room draws a high fence, front gate, posts, beams and a sloped solid roof", () => {
+test("a canopy room draws a high fence, front gate, posts, beams and a projecting corrugated roof", () => {
   const floor = newFloor("eg", "EG", 0);
   const canopy: CoveredRenderArea = { id: "cover", type: "canopy", points: [[0, 0], [4, 0], [4, 3], [0, 3]], height: 2.4, slope: 0.25, slope_dir: "x", open: true, railing: true };
   const solid = new GeoBuffer();
   const lines = new LineBuffer();
-  pushCovered(solid, lines, floor, [canopy]);
+  const ranges = pushCovered(solid, lines, floor, [canopy]);
   assert.ok(solid.count > 0, "solid canopy geometry");
   assert.ok(hasColor(solid, NEON.wall) && hasColor(solid, NEON.wallTop), "canopy structure uses the canonical room wall palette");
   assert.ok(lines.p.length > 0, "roof outline");
   const heights = solid.p.filter((_, i) => i % 3 === 1);
-  assert.ok(Math.max(...heights) > 2.21 && Math.max(...heights) < 2.23, "high roof edge is measured from the paved surface");
+  assert.ok(Math.max(...heights) > 2.24 && Math.max(...heights) < 2.26, "corrugation crests rise slightly above the high roof edge");
   assert.ok(heights.some((y) => y > 1.96 && y < 1.98), "low roof edge follows the slope");
   assert.ok(heights.some((y) => Math.abs(y - 1.27) < 1e-6), "the yard fence reaches 1.45 m above the paved surface");
   assert.ok(heights.some((y) => y > 1.62 && y < 1.75), "the clean gate arch rises above the fence in the centre");
+  assert.ok(hasColor(solid, 0x315166) && hasColor(solid, 0x52788c), "the roof uses dark metal sheets with raised lighter corrugations");
+  const roofX = solid.p.slice(ranges[0].roofStart! * 9, ranges[0].roofEnd! * 9).filter((_, i) => i % 3 === 0);
+  assert.ok(Math.max(...roofX) > 4.34 && Math.max(...roofX) < 4.36, "the sheet projects 35 cm beyond the front posts");
 
   const bare = new GeoBuffer();
   const bareLines = new LineBuffer();
@@ -56,4 +59,20 @@ test("an upper-floor veranda room has railings, front columns and roof", () => {
   assert.ok(ranges[0].roofStart! < ranges[0].roofEnd!, "the roof has its own range so a selected room can reveal devices below it");
   assert.equal(lines.f.filter((fold) => fold === roofFold).length, 6, "the three free roof edges keep their neon outline while the room roof folds away");
   assert.ok(lines.p.length > 300 && lines.p.length < 500, "veranda edges stay visible without a dense four-line outline around every baluster");
+});
+
+test("a balcony under the main roof has structure but no separate roof", () => {
+  const floor = newFloor("og", "OG", 2.8);
+  const balcony: CoveredRenderArea = { id: "balcony", type: "balcony", points: [[0, 0], [0, 1.5], [5.5, 1.5], [5.5, 0]], height: 2.4, slope: 0.12, slope_dir: "z", open: true, railing: true, columns: 2 };
+  const solid = new GeoBuffer();
+  const lines = new LineBuffer();
+  const roofFold = 91;
+  const ranges = pushCovered(solid, lines, floor, [balcony], roofFold);
+  const heights = solid.p.filter((_, i) => i % 3 === 1);
+  assert.ok(solid.count > 100, "the floor, railings, columns and lintel remain visible");
+  assert.ok(heights.some((y) => Math.abs(y - 2.52) < 1e-6), "columns reach the full room height without inheriting a stale roof slope");
+  assert.equal(ranges.length, 1);
+  assert.equal(ranges[0].roofStart, undefined);
+  assert.equal(ranges[0].roofEnd, undefined);
+  assert.equal(lines.f.filter((fold) => fold === roofFold).length, 0, "no separate roof or roof neon outline is generated");
 });

@@ -87,6 +87,18 @@ test("a covered room uses the normal patterned room floor extended to the outsid
   assert.equal(folds.getX(roof.roofStart! * 3), 15, "the roof uses the reserved fold bucket so it can open without hiding devices");
 });
 
+test("a balcony room remains selectable but contributes no separate roof geometry", () => {
+  const balcony: Room = { ...rect("balcony", 0, 0, 4, 2), kind: "balcony", railing: true, columns: 2, open: true };
+  const geo = buildFloorGeometry(floorWith([balcony]), EXT, INT);
+  assert.equal(geo.roomTris.length, 1);
+  assert.equal(geo.walls2d.length, 0);
+  assert.equal(geo.coveredRoomTris.length, 1);
+  assert.equal(geo.coveredRoomTris[0].id, "balcony");
+  assert.ok(geo.coveredRoomTris[0].end > geo.coveredRoomTris[0].start);
+  assert.equal(geo.coveredRoomTris[0].roofStart, undefined);
+  assert.equal(geo.coveredRoomTris[0].roofEnd, undefined);
+});
+
 test("a straight outer face across a T-joint gets no corner line", () => {
   const geo = buildFloorGeometry(floorWith([rect("a", 0, 0, 4, 3), rect("b", 4, 0, 7, 3)]), EXT, INT);
   const corners = segments(geo.lines).filter((s) => vertical(s) && s[6] === -1);

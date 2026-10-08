@@ -34,9 +34,14 @@ const LOOKS: Record<OutdoorType, Look> = {
 const COVERED_LOOK: Record<CoveredRoomKind, Look> = {
   canopy: { color: NEON.wallTop, side: NEON.wall, edge: NEON.edge, edgeAlpha: 0.5 },
   veranda: { color: NEON.wallTop, side: NEON.wall, edge: NEON.edge, edgeAlpha: 0.58 },
+  balcony: { color: NEON.wallTop, side: NEON.wall, edge: NEON.edge, edgeAlpha: 0.58 },
 };
 
-/** Room-only render input; canopy and veranda no longer belong to OutdoorArea or its editor. */
+const CANOPY_FRONT_OVERHANG = 0.35;
+const CORRUGATED_METAL = 0x315166;
+const CORRUGATED_RIDGE = 0x52788c;
+
+/** Room-only render input; covered-room kinds no longer belong to OutdoorArea or its editor. */
 export interface CoveredRenderArea {
   id: string;
   type: CoveredRoomKind;
@@ -57,7 +62,7 @@ export interface CoveredRenderArea {
 
 type RenderArea = OutdoorArea | CoveredRenderArea;
 
-const isCoveredArea = (area: RenderArea): area is CoveredRenderArea => area.type === "canopy" || area.type === "veranda";
+const isCoveredArea = (area: RenderArea): area is CoveredRenderArea => area.type === "canopy" || area.type === "veranda" || area.type === "balcony";
 
 function coveredLook(a: CoveredRenderArea, fallback: Look): { roof: number; under: number } {
   const roof = a.roof_style === "glass" ? 0x315a72 : (a.roomColor ?? fallback.color);
@@ -205,6 +210,79 @@ function pushCanopyPanel(buf: GeoBuffer, poly: Vec2[], topAt: (x: number, z: num
   }
 }
 
+/** Extend the roof past the front posts while keeping the edge against the house unchanged. */
+function canopyRoofPolygon(poly: Vec2[], openEnd: number): Vec2[] {
+  const front = coveredFrontEdge(poly, openEnd);
+  const p = poly[front];
+  const q = poly[(front + 1) % poly.length];
+  const dx = q[0] - p[0];
+  const dz = q[1] - p[1];
+  const len = Math.hypot(dx, dz);
+  if (len < 1e-6) return poly;
+  // `poly` is counter-clockwise, so its outward normal lies to the right of this edge.
+  const ox = (dz / len) * CANOPY_FRONT_OVERHANG;
+  const oz = (-dx / len) * CANOPY_FRONT_OVERHANG;
+  return poly.map(([x, z], i) => i === front || i === (front + 1) % poly.length ? [x + ox, z + oz] : [x, z]);
+}
+
+/** Intersections of a horizontal/vertical scan line with a polygon, paired into inside spans. */
+function roofScanSpans(poly: Vec2[], alongX: boolean, cross: number): [number, number][] {
+  const hits: number[] = [];
+  for (let i = 0; i < poly.length; i++) {
+    const p = poly[i];
+    const q = poly[(i + 1) % poly.length];
+    const pc = alongX ? p[1] : p[0];
+    const qc = alongX ? q[1] : q[0];
+    if (!((pc <= cross && qc > cross) || (qc <= cross && pc > cross))) continue;
+    const t = (cross - pc) / (qc - pc);
+    hits.push((alongX ? p[0] : p[1]) + ((alongX ? q[0] : q[1]) - (alongX ? p[0] : p[1])) * t);
+  }
+  hits.sort((a, b) => a - b);
+  const spans: [number, number][] = [];
+  for (let i = 0; i + 1 < hits.length; i += 2) if (hits[i + 1] - hits[i] > 0.05) spans.push([hits[i], hits[i + 1]]);
+  return spans;
+}
+
+/** Raised trapezoidal ribs turn a plain sheet into recognisable Vietnamese corrugated metal. */
+function pushCorrugatedRoof(buf: GeoBuffer, poly: Vec2[], topAt: (x: number, z: number) => number, slopeDir: SlopeDir | undefined, fold: number): void {
+  const alongX = slopeDir === "x" || slopeDir === "-x" || slopeDir === undefined;
+  const b = bounds(poly);
+  const lo = alongX ? b.z0 : b.x0;
+  const hi = alongX ? b.z1 : b.x1;
+  const count = Math.max(1, Math.ceil((hi - lo) / 0.18));
+  const side = new Color(CORRUGATED_METAL);
+  const crest = new Color(CORRUGATED_RIDGE);
+  for (let i = 0; i < count; i++) {
+    const cross = lo + ((i + 0.5) * (hi - lo)) / count;
+    for (const [from, to] of roofScanSpans(poly, alongX, cross)) {
+      const p: Vec2 = alongX ? [from, cross] : [cross, from];
+      const q: Vec2 = alongX ? [to, cross] : [cross, to];
+      const dx = q[0] - p[0];
+      const dz = q[1] - p[1];
+      const len = Math.hypot(dx, dz);
+      const nx = (-dz / len) * 0.018;
+      const nz = (dx / len) * 0.018;
+      const tx = (-dz / len) * 0.007;
+      const tz = (dx / len) * 0.007;
+      const at = (v: Vec2, extra: number): [number, number, number] => [v[0], topAt(v[0], v[1]) + extra, v[1]];
+      const p0 = at([p[0] + nx, p[1] + nz], 0.004);
+      const p1 = at([p[0] - nx, p[1] - nz], 0.004);
+      const q0 = at([q[0] + nx, q[1] + nz], 0.004);
+      const q1 = at([q[0] - nx, q[1] - nz], 0.004);
+      const pt0 = at([p[0] + tx, p[1] + tz], 0.03);
+      const pt1 = at([p[0] - tx, p[1] - tz], 0.03);
+      const qt0 = at([q[0] + tx, q[1] + tz], 0.03);
+      const qt1 = at([q[0] - tx, q[1] - tz], 0.03);
+      buf.tri(pt0, qt0, qt1, crest, crest, crest, undefined, fold);
+      buf.tri(pt0, qt1, pt1, crest, crest, crest, undefined, fold);
+      buf.tri(p0, q0, qt0, side, side, side, undefined, fold);
+      buf.tri(p0, qt0, pt0, side, side, side, undefined, fold);
+      buf.tri(pt1, qt1, q1, side, side, side, undefined, fold);
+      buf.tri(pt1, q1, p1, side, side, side, undefined, fold);
+    }
+  }
+}
+
 function pushAreas(buf: GeoBuffer, lines: LineBuffer, floor: Floor, areas: RenderArea[], roofFold: number): OutdoorTriRange[] {
   const ground = groundLevel(floor);
   const ranges: OutdoorTriRange[] = [];
@@ -319,7 +397,8 @@ function pushAreas(buf: GeoBuffer, lines: LineBuffer, floor: Floor, areas: Rende
       }
       case "canopy": {
         // A complete covered yard: its own paved surface, high perimeter fence with a front gate,
-        // posts, beams and a solid sloping roof. The last edge may stay open against the house.
+        // posts, beams and a corrugated metal roof projecting past the front posts. The last edge may
+        // stay open against the house.
         const h = look.top;
         const finish = coveredLook(a, look);
         const floorY = g + coveredFloorTop(a.type);
@@ -364,20 +443,32 @@ function pushAreas(buf: GeoBuffer, lines: LineBuffer, floor: Floor, areas: Rende
           pushBeam(buf, p, q, 0.12, y - 0.18, y - 0.08, finish.under, finish.roof);
           outlineBeam(lines, p, q, y - 0.08, edge);
         }
+        const roofPoly = canopyRoofPolygon(poly, openEnd);
         roofStart = buf.count;
-        pushCanopyPanel(buf, poly, roofAt, 0.08, finish.under, finish.roof, roofFold);
+        pushCanopyPanel(buf, roofPoly, roofAt, 0.045, finish.under, CORRUGATED_METAL, roofFold);
+        pushCorrugatedRoof(buf, roofPoly, roofAt, a.slope_dir, roofFold);
         roofEnd = buf.count;
-        outline((x, z) => roofAt(x, z) + 0.004, roofFold);
+        if (a.outline !== false) {
+          for (let i = 0; i < roofPoly.length; i++) {
+            if (i === openEnd) continue;
+            const p = roofPoly[i];
+            const q = roofPoly[(i + 1) % roofPoly.length];
+            lines.seg([p[0], roofAt(p[0], p[1]) + 0.034, p[1]], [q[0], roofAt(q[0], q[1]) + 0.034, q[1]], edge, roofFold);
+          }
+        }
         break;
       }
+      case "balcony":
       case "veranda": {
-        // A complete Vietnamese upper-floor veranda: slab, railing around the free edges, two
-        // substantial front columns, lintel and roof. Its closing edge joins the house.
+        // An upper-floor veranda: slab, railing around the free edges, two substantial front columns
+        // and a lintel. A veranda carries its own roof; a balcony sits under the building's main roof.
         const h = look.top;
+        const ownRoof = a.type === "veranda";
         const finish = coveredLook(a, look);
         const floorY = g + coveredFloorTop(a.type);
         const baseAt = (_x: number, _z: number) => floorY;
         const roofAt = (x: number, z: number) => floorY + h - outdoorDrop(a, x, z);
+        const structureTopAt = ownRoof ? roofAt : (_x: number, _z: number) => floorY + h;
         const railH = Math.min(1.1, h * 0.48);
         const squarePost = (x: number, z: number, half: number, y0: number, y1: number, side = look.side, top = look.color) => {
           pushPrism(buf, ccw([[x - half, z - half], [x + half, z - half], [x + half, z + half], [x - half, z + half]]), y0, y1, side, top);
@@ -423,17 +514,19 @@ function pushAreas(buf: GeoBuffer, lines: LineBuffer, floor: Floor, areas: Rende
           const z = p[1] + (q[1] - p[1]) * t;
           const gy = baseAt(x, z);
           squarePost(x, z, columnHalf * 1.375, gy, gy + 0.28, finish.under, finish.roof);
-          squarePost(x, z, columnHalf, gy + 0.2, roofAt(x, z) - 0.2, finish.under, finish.roof);
-          squarePost(x, z, columnHalf * 1.375, roofAt(x, z) - 0.28, roofAt(x, z), finish.under, finish.roof);
-          lines.seg([x, gy + 0.28, z], [x, roofAt(x, z) - 0.28, z], edge, ALWAYS);
+          squarePost(x, z, columnHalf, gy + 0.2, structureTopAt(x, z) - 0.2, finish.under, finish.roof);
+          squarePost(x, z, columnHalf * 1.375, structureTopAt(x, z) - 0.28, structureTopAt(x, z), finish.under, finish.roof);
+          lines.seg([x, gy + 0.28, z], [x, structureTopAt(x, z) - 0.28, z], edge, ALWAYS);
         }
-        const topY = (roofAt(p[0], p[1]) + roofAt(q[0], q[1])) / 2;
+        const topY = (structureTopAt(p[0], p[1]) + structureTopAt(q[0], q[1])) / 2;
         pushBeam(buf, p, q, Math.max(0.2, columnHalf * 2.6), topY - 0.28, topY, finish.under, finish.roof);
         outlineBeam(lines, p, q, topY, edge);
-        roofStart = buf.count;
-        pushCanopyPanel(buf, poly, roofAt, 0.1, finish.under, finish.roof, roofFold);
-        roofEnd = buf.count;
-        outline((x, z) => roofAt(x, z) + 0.004, roofFold);
+        if (ownRoof) {
+          roofStart = buf.count;
+          pushCanopyPanel(buf, poly, roofAt, 0.1, finish.under, finish.roof, roofFold);
+          roofEnd = buf.count;
+          outline((x, z) => roofAt(x, z) + 0.004, roofFold);
+        }
         outline((x, z) => baseAt(x, z) + (a.railing === false ? 0.004 : railH + 0.004));
         break;
       }

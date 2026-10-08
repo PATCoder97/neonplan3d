@@ -83,6 +83,7 @@ import {
   MARKER_SHOWS,
   type OutdoorArea,
   type OutdoorType,
+  type CoveredRoomKind,
   type RoofType,
   type Placement,
   type Opening,
@@ -2083,7 +2084,7 @@ export class Fp3dEditor extends LitElement {
     if (!this.floor) return;
     const id = uid("room");
     const n = this.floor.rooms.length + 1;
-    const covered = kind === "veranda" || kind === "canopy";
+    const covered = kind === "veranda" || kind === "balcony" || kind === "canopy";
     this.change((_, floor) =>
       floor.rooms.push({
         id,
@@ -2091,7 +2092,7 @@ export class Fp3dEditor extends LitElement {
         area_id: null,
         points: points.map(([x, z]) => [round(x), round(z)]),
         floor_material: covered ? "tiles" : "wood",
-        ...(covered ? { kind, roof_style: "tile" as const, railing: true, columns: 2, column_size: 0.32, open: true } : {}),
+        ...(covered ? { kind, ...(kind === "veranda" ? { roof_style: "tile" as const } : {}), railing: true, columns: 2, column_size: kind === "canopy" ? 0.12 : 0.32, open: true } : {}),
       }),
     );
     this._roomId = id;
@@ -5356,8 +5357,8 @@ export class Fp3dEditor extends LitElement {
         ${covered
           ? html`<label class="fp3d-field fp3d-wide"
               >${this.t("outdoor_type")}
-              <select ?disabled=${!admin} @change=${(e: Event) => this.updateRoom({ kind: (e.target as HTMLSelectElement).value as "veranda" | "canopy" })}>
-                ${(["veranda", "canopy"] as const).map((kind) => html`<option value=${kind} ?selected=${kind === room.kind}>${this.t(`out_${kind}` as I18nKey)}</option>`)}
+              <select ?disabled=${!admin} @change=${(e: Event) => this.updateRoom({ kind: (e.target as HTMLSelectElement).value as CoveredRoomKind })}>
+                ${(["veranda", "balcony", "canopy"] as const).map((kind) => html`<option value=${kind} ?selected=${kind === room.kind}>${this.t(`out_${kind}` as I18nKey)}</option>`)}
               </select></label
             >`
           : nothing}
@@ -5373,32 +5374,36 @@ export class Fp3dEditor extends LitElement {
             ${this.num(this.t("depth"), b.z1 - b.z0, (v) => this.setRect("d", v), 0.01, 0.05)}`
           : nothing}
         ${covered
-          ? html`<label class="fp3d-field fp3d-wide"
-                >${this.t("outdoor_roof_style")}
-                <select ?disabled=${!admin} @change=${(e: Event) => this.updateRoom({ roof_style: (e.target as HTMLSelectElement).value as "solid" | "glass" | "tile" })}>
-                  ${(["solid", "glass", "tile"] as const).map((style) => html`<option value=${style} ?selected=${style === (room.roof_style ?? "solid")}>${this.t(`outdoor_roof_${style}` as I18nKey)}</option>`)}
-                </select></label
-              >
+          ? html`${room.kind === "veranda"
+                ? html`<label class="fp3d-field fp3d-wide"
+                      >${this.t("outdoor_roof_style")}
+                      <select ?disabled=${!admin} @change=${(e: Event) => this.updateRoom({ roof_style: (e.target as HTMLSelectElement).value as "solid" | "glass" | "tile" })}>
+                        ${(["solid", "glass", "tile"] as const).map((style) => html`<option value=${style} ?selected=${style === (room.roof_style ?? "solid")}>${this.t(`outdoor_roof_${style}` as I18nKey)}</option>`)}
+                      </select></label
+                    >`
+                : nothing}
               ${this.num(this.t("outdoor_height"), room.height ?? this.floor?.height ?? 2.5, (v) => this.updateRoom({ height: Math.min(6, Math.max(0.1, round(v))) }), 0.05, 0.1)}
-              ${this.num(this.t("outdoor_slope"), room.slope ?? 0, (v) => this.updateRoom({ slope: Math.min(20, Math.max(0, round(v))) || null }), 0.05, 0)}
-              <label class="fp3d-field"
-                >${this.t("outdoor_slope_dir")}
-                <select ?disabled=${!admin} @change=${(e: Event) => this.updateRoom({ slope_dir: (e.target as HTMLSelectElement).value as SlopeDir })}>
-                  ${SLOPE_DIRS.map((d) => html`<option value=${d} ?selected=${d === (room.slope_dir ?? "x")}>${this.t(`slope_${d.replace("-", "n")}` as I18nKey)}</option>`)}
-                </select></label
-              >
+              ${room.kind !== "balcony"
+                ? html`${this.num(this.t("outdoor_slope"), room.slope ?? 0, (v) => this.updateRoom({ slope: Math.min(20, Math.max(0, round(v))) || null }), 0.05, 0)}
+                    <label class="fp3d-field"
+                      >${this.t("outdoor_slope_dir")}
+                      <select ?disabled=${!admin} @change=${(e: Event) => this.updateRoom({ slope_dir: (e.target as HTMLSelectElement).value as SlopeDir })}>
+                        ${SLOPE_DIRS.map((d) => html`<option value=${d} ?selected=${d === (room.slope_dir ?? "x")}>${this.t(`slope_${d.replace("-", "n")}` as I18nKey)}</option>`)}
+                      </select></label
+                    >`
+                : nothing}
               <label class="fp3d-check fp3d-wide" title=${this.t("outdoor_open_hint")}
                 ><input type="checkbox" .checked=${room.open !== false} ?disabled=${!admin} @change=${(e: Event) => this.updateRoom({ open: (e.target as HTMLInputElement).checked })} />
                 ${this.t("outdoor_open")}</label
               >
-              ${room.kind === "veranda" || room.kind === "canopy"
+              ${room.kind === "veranda" || room.kind === "balcony" || room.kind === "canopy"
                 ? html`<label class="fp3d-check fp3d-wide"
                       ><input type="checkbox" .checked=${room.railing !== false} ?disabled=${!admin} @change=${(e: Event) => this.updateRoom({ railing: (e.target as HTMLInputElement).checked })} />
                       ${this.t(room.kind === "canopy" ? "outdoor_yard_enclosure" : "outdoor_railing")}</label
                     >
-                    ${room.kind === "veranda" ? this.num(this.t("outdoor_columns"), room.columns ?? 2, (v) => this.updateRoom({ columns: Math.min(12, Math.max(0, Math.round(v))) }), 1, 0) : nothing}`
+                    ${room.kind !== "canopy" ? this.num(this.t("outdoor_columns"), room.columns ?? 2, (v) => this.updateRoom({ columns: Math.min(12, Math.max(0, Math.round(v))) }), 1, 0) : nothing}`
                 : nothing}
-              ${this.num(this.t("outdoor_column_size"), room.column_size ?? (room.kind === "veranda" ? 0.32 : 0.12), (v) => this.updateRoom({ column_size: Math.min(0.8, Math.max(0.08, round(v))) }), 0.02, 0.08)}`
+              ${this.num(this.t("outdoor_column_size"), room.column_size ?? (room.kind === "canopy" ? 0.12 : 0.32), (v) => this.updateRoom({ column_size: Math.min(0.8, Math.max(0.08, round(v))) }), 0.02, 0.08)}`
           : nothing}
       </div>
       ${covered ? nothing : this.renderEdgeHeights(room)} ${this.renderRoomClimate(room)}

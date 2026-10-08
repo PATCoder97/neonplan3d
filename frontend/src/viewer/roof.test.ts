@@ -31,6 +31,19 @@ test("a gable roof rises to half the house depth times the slope", () => {
   assert.ok(buildRoof(house("flat"))[0].solid.count > 0);
 });
 
+test("the main roof includes a balcony that has no separate roof", () => {
+  const b = house("gable");
+  b.floors[1].rooms.push({
+    ...rect("balcony", 2, 4),
+    kind: "balcony",
+    points: [[10, 2], [12, 2], [12, 6], [10, 6]],
+  });
+  const p = buildRoof(b)[0].solid.p;
+  let maxX = -Infinity;
+  for (let i = 0; i < p.length; i += 3) maxX = Math.max(maxX, p[i]);
+  assert.ok(Math.abs(maxX - 12.74) < 1e-6, `main roof reaches the balcony edge at ${maxX}`);
+});
+
 test("a gable ridge can run along the short side", () => {
   // highest points of the roof: they lie on the ridge, so their spread shows its direction
   const ridge = (dir?: "long" | "short") => {

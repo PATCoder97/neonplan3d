@@ -5,7 +5,7 @@ import { packItem } from "./packs.ts";
 import type { LampModel } from "./viewer/viewer3d.ts";
 
 export type Vec2 = [number, number];
-export type CoveredRoomKind = "veranda" | "canopy";
+export type CoveredRoomKind = "veranda" | "balcony" | "canopy";
 
 /** Sensors a room's climate is read from (null = automatic, "none" = no value). */
 export interface RoomClimate {
@@ -25,7 +25,7 @@ export interface Room {
   area_id: string | null;
   points: Vec2[];
   floor_material: string;
-  /** A covered, open room keeps room/area/device behaviour but renders as a veranda or canopy. */
+  /** An open room keeps room/area/device behaviour but renders as a veranda, roofless balcony or canopy. */
   kind?: "room" | CoveredRoomKind;
   /** Covered-room roof finish and structural options, rendered with the canonical room palette. */
   roof_style?: "solid" | "glass" | "tile" | null;
@@ -62,7 +62,7 @@ export interface Room {
 }
 
 export function isCoveredRoom(room: Room): room is Room & { kind: CoveredRoomKind } {
-  return room.kind === "veranda" || room.kind === "canopy";
+  return room.kind === "veranda" || room.kind === "balcony" || room.kind === "canopy";
 }
 
 /** Front edge of a covered polygon: opposite and parallel to its omitted house edge, else the longest. */
@@ -597,6 +597,7 @@ export const OUTDOOR_TOP: Record<OutdoorType, number> = {
 export const COVERED_FLOOR_TOP: Record<CoveredRoomKind, number> = {
   canopy: 0.02,
   veranda: 0.12,
+  balcony: 0.12,
 };
 
 export function coveredFloorTop(type: CoveredRoomKind): number {

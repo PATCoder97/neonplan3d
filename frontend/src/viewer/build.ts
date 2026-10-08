@@ -11,7 +11,7 @@
 //   fold = 48 + b    top face of the lower part at the cut height: visible while bucket b is cut
 
 import { Color, type BufferGeometry } from "three";
-import type { Floor, Opening, Room, SolarField, Vec2 } from "../model.ts";
+import type { CoveredRoomKind, Floor, Opening, Room, SolarField, Vec2 } from "../model.ts";
 import { coveredFloorTop, furnitureFootprint, groundLevel, isCoveredRoom, isLamp, pointInPolygon } from "../model.ts";
 import { generateWalls, locateOpening, openingHost, type Wall } from "../geometry/walls.ts";
 import { holeInRoom, insetHole, mergeHoles } from "../geometry/holes.ts";
@@ -623,15 +623,15 @@ function ccw(points: Vec2[]): Vec2[] {
  * A covered room's stored outline runs through its columns. Grow every free edge to the columns'
  * outer face, but keep the final house edge in place so the patterned floor never overlaps indoors.
  */
-function coveredFloorPolygon(room: Room & { kind: "veranda" | "canopy" }): Vec2[] {
+function coveredFloorPolygon(room: Room & { kind: CoveredRoomKind }): Vec2[] {
   const points = room.points;
   const n = points.length;
   if (n < 3) return points;
   let twiceArea = 0;
   for (let i = 0; i < n; i++) twiceArea += points[i][0] * points[(i + 1) % n][1] - points[(i + 1) % n][0] * points[i][1];
   const sign = twiceArea >= 0 ? 1 : -1;
-  const half = (room.column_size ?? (room.kind === "veranda" ? 0.32 : 0.12)) / 2;
-  const extent = room.kind === "veranda" ? half * 1.375 : half;
+  const half = (room.column_size ?? (room.kind === "canopy" ? 0.12 : 0.32)) / 2;
+  const extent = room.kind === "canopy" ? half : half * 1.375;
   const openEnd = room.open !== false ? n - 1 : -1;
   const shifted = points.map((a, i) => {
     const b = points[(i + 1) % n];

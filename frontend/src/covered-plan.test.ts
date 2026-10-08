@@ -1,9 +1,9 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import type { Room } from "./model.ts";
+import type { CoveredRoomKind, Room } from "./model.ts";
 import { coveredPlanStructure } from "./covered-plan.ts";
 
-const covered = (kind: "veranda" | "canopy"): Room => ({
+const covered = (kind: CoveredRoomKind): Room => ({
   id: "covered",
   name: "Covered",
   area_id: null,
@@ -19,6 +19,12 @@ test("a veranda plan shows its three free railings and configured front columns"
   assert.equal(plan.railings.length, 3);
   assert.deepEqual(plan.columns.map((column) => column.at), [[4, 2], [2, 2], [0, 2]]);
   assert.ok(plan.columns.every((column) => column.size === 0.3 && Math.abs((column.baseSize ?? 0) - 0.4125) < 1e-9));
+});
+
+test("a balcony under the main roof keeps the veranda railings and columns", () => {
+  const plan = coveredPlanStructure({ ...covered("balcony"), columns: 2 })!;
+  assert.equal(plan.railings.length, 3);
+  assert.deepEqual(plan.columns.map((column) => column.at), [[4, 2], [0, 2]]);
 });
 
 test("a covered yard plan leaves a centred gate gap and marks every corner column", () => {

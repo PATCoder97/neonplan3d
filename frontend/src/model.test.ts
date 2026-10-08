@@ -114,6 +114,7 @@ test("outdoor lamps stand on the ground, or on a terrace", () => {
 test("covered structures exist only as rooms, not as legacy outdoor types", () => {
   const outdoorTypes = OUTDOOR_TYPES as readonly string[];
   assert.equal(outdoorTypes.includes("veranda"), false);
+  assert.equal(outdoorTypes.includes("balcony"), false);
   assert.equal(outdoorTypes.includes("canopy"), false);
 });
 
