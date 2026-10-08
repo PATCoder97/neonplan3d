@@ -47,7 +47,7 @@ import type { Building, Floor, Furniture, Room } from "../model.ts";
 import { recolorLamps, SHADE_SENTINEL, shadeFactors } from "./lamp-colors.ts";
 import { centroid, isCoveredRoom, pointInPolygon, openingStyle, WALL_LAMP_Y } from "../model.ts";
 import { roofUnderAt } from "../roof-sections.ts";
-import { buildFloorGeometry, COVERED_ROOF_BUCKET, SLAB, stairHoles, type FloorGeometry } from "./build.ts";
+import { buildFloorGeometry, coveredRoofStandingMask, SLAB, stairHoles, type FloorGeometry } from "./build.ts";
 import { OrbitControls, type OrbitView } from "./controls.ts";
 import { makeFoldable, type FoldMasks } from "./fold.ts";
 import { cameraFitPlacement, cameraFitView, framingBox, roomFramingBox, type CameraFrameInsets } from "./framing.ts";
@@ -3499,7 +3499,8 @@ export class FloorplanViewer {
         if (!cut && facing) glass |= 1 << b;
       });
       const openCoveredRoom = this.roomId !== null && fv.floor.rooms.some((room) => room.id === this.roomId && isCoveredRoom(room));
-      fv.mask.standing.value = cut ? 0 : openCoveredRoom ? 0xffff & ~(1 << COVERED_ROOF_BUCKET) : 0xffff;
+      // Like the main roof: covered-room roofs describe the whole house, but must not block a floor view.
+      fv.mask.standing.value = cut ? 0 : coveredRoofStandingMask(this.floorId !== null || openCoveredRoom);
       fv.mask.glass.value = glass;
     }
   }

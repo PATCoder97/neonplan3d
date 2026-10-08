@@ -76,8 +76,12 @@ export interface FloorGeometry {
 }
 
 export const SLAB = 0.2;
-/** Reserved fold bucket: covered-room roofs disappear while that room is open. */
+/** Reserved fold bucket: covered-room roofs disappear in a floor/room view. */
 export const COVERED_ROOF_BUCKET = 15;
+/** Keep every standing part except the covered-room roof bucket when its interior is being viewed. */
+export function coveredRoofStandingMask(hidden: boolean): number {
+  return hidden ? 0xffff & ~(1 << COVERED_ROOF_BUCKET) : 0xffff;
+}
 const BUCKETS = 8;
 const SHADOW_WIDTH = 0.42;
 const SHADOW_DARK = 0.42;

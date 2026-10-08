@@ -3,7 +3,7 @@ import { test } from "node:test";
 import { Color, type BufferGeometry } from "three";
 import type { Floor, Furniture, Opening, Room } from "../model.ts";
 import { furnitureFootprint, newFloor } from "../model.ts";
-import { buildFloorGeometry, clipAlong, FLOOR_LOOK, stairHoles } from "./build.ts";
+import { buildFloorGeometry, clipAlong, coveredRoofStandingMask, COVERED_ROOF_BUCKET, FLOOR_LOOK, stairHoles } from "./build.ts";
 
 const EXT = 0.24;
 const INT = 0.12;
@@ -21,6 +21,11 @@ function opening(type: "door" | "window", room_id: string, edge: number, offset:
 }
 
 const near = (a: number, b: number, eps = 1e-6) => assert.ok(Math.abs(a - b) < eps, `${a} != ${b}`);
+
+test("covered-room roofs show in the whole-house view and fold away in a floor view", () => {
+  assert.notEqual(coveredRoofStandingMask(false) & (1 << COVERED_ROOF_BUCKET), 0, "whole-house view keeps the canopy roof");
+  assert.equal(coveredRoofStandingMask(true) & (1 << COVERED_ROOF_BUCKET), 0, "floor view hides the canopy roof");
+});
 
 /** Line segments as [x0, y0, z0, x1, y1, z1, fold]. */
 function segments(g: BufferGeometry): number[][] {
