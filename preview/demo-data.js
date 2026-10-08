@@ -420,7 +420,7 @@ DEMO_BUILDING.floors[0].furniture = [
   item("coffee_table", 2.4, 2.4, 1.1, 0.6, 0.42),
   item("stairs", 9.42, 6.3, 1.0, 3.2, 2.75),
   item("wardrobe", 7.1, 6.4, 1.2, 0.4, 2.0, 270),
-  { ...item("robot_vacuum", 5.7, 3.2, 0.36, 0.5, 0.1, 270), entity: "vacuum.saugi" },
+  { ...item("robot_vacuum", 5.7, 3.2, 0.42, 0.62, 0.72, 270), entity: "vacuum.saugi" },
   {
     // along the garage (3.6 m wide, 5.2 m deep): the van fits inside instead of poking through the wall
     ...item("parking", 11.8, 2.6, 2.6, 5.0, 0.02, 0),

@@ -4,6 +4,13 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.19.4
+
+### Changed
+
+- Rebuilt the robot vacuum dock from the official Smart Home & Tech gallery as a tall dark charging/emptying station with a cyan status band and charging tongue.
+- Automatically migrate untouched legacy low docks to the new dimensions while preserving manually resized robot stations and the existing cleaning, returning, docked and error animation states.
+
 ## 1.19.3
 
 ### Changed

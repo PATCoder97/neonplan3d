@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { emptyBuilding, floorElevation, FURNITURE_GROUPS, furnitureCorner, furnitureRotationAt, newFloor, openingPreset, openingStyle, normalizeBuilding, OUTDOOR_TYPES, outdoorDrop, outdoorGround, resizeFurniture, roomTiles, sidelightLayout, spotGrid, surfaceHeight, type Furniture } from "./model.ts";
+import { emptyBuilding, floorElevation, FURNITURE_GROUPS, FURNITURE_SIZE, furnitureCorner, furnitureRotationAt, newFloor, openingPreset, openingStyle, normalizeBuilding, OUTDOOR_TYPES, outdoorDrop, outdoorGround, resizeFurniture, roomTiles, sidelightLayout, spotGrid, surfaceHeight, type Furniture } from "./model.ts";
 
 test("furniture is grouped by function instead of a regional collection", () => {
   assert.equal(FURNITURE_GROUPS.vietnam, undefined);
@@ -81,6 +81,16 @@ test("lights placed as devices become lamps of their mount type", () => {
   );
   // normalising again changes nothing
   assert.equal(normalizeBuilding(b).floors[0].furniture.length, 2);
+});
+
+test("the legacy low robot dock upgrades to the gallery-style tower without changing custom sizes", () => {
+  const b = emptyBuilding();
+  const floor = newFloor("eg", "EG", 0);
+  floor.furniture = [item("robot_vacuum", 1, 1, 0.1, { w: 0.36, d: 0.5 }), item("robot_vacuum", 2, 1, 0.2, { w: 0.5, d: 0.7 })];
+  b.floors = [floor];
+  const [legacy, custom] = normalizeBuilding(b).floors[0].furniture;
+  assert.deepEqual([legacy.w, legacy.d, legacy.h], FURNITURE_SIZE.robot_vacuum);
+  assert.deepEqual([custom.w, custom.d, custom.h], [0.5, 0.7, 0.2]);
 });
 
 test("a table lamp stands on the furniture below it", () => {

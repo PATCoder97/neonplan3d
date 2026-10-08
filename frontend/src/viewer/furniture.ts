@@ -1903,8 +1903,13 @@ function buildFurniture(buf: GeoBuffer, lines: LineBuffer, shadow: GeoBuffer, f:
     }
     case "robot_vacuum":
       // only the dock: the robot itself is drawn (and moved) by the viewer
-      b.box(-w * 0.45, w * 0.45, 0, h, -d / 2, -d / 2 + d * 0.3, C.white, C.whiteTop, EDGE_FURN);
-      b.box(-w * 0.2, w * 0.2, h * 0.5, h * 0.62, -d / 2 + d * 0.3, -d / 2 + d * 0.31, C.accent);
+      // Tall dark charging/emptying station from the official Smart Home gallery, with a cyan status bar.
+      b.box(-w * 0.38, w * 0.38, 0, h * 0.05, -d / 2 - d * 0.02, -d * 0.1, C.dark, C.body, EDGE_FAINT);
+      b.box(-w * 0.32, w * 0.32, h * 0.04, h * 0.92, -d / 2, -d * 0.18, C.body, C.bodyTop, EDGE_FURN);
+      b.box(-w * 0.34, w * 0.34, h * 0.9, h, -d / 2 - d * 0.01, -d * 0.17, C.metal, C.bodyTop, EDGE_FURN);
+      b.box(-w * 0.23, w * 0.23, h * 0.62, h * 0.69, -d * 0.175, -d * 0.15, C.accent, C.accent, EDGE_GLOW);
+      // A shallow charging tongue meets the moving robot when it is docked.
+      b.box(-w * 0.22, w * 0.22, h * 0.02, h * 0.055, -d * 0.18, d * 0.17, C.dark, C.bodyTop, EDGE_FAINT);
       return;
     case "radiator":
       radiator(b, w, d, h);

@@ -1184,7 +1184,7 @@ export const FURNITURE_SIZE: Record<FurnitureType, [number, number, number]> = {
   water_tank: [1.25, 1.25, 1.55],
   gate: [3.2, 0.18, 1.8],
   fence: [2.4, 0.16, 1.5],
-  robot_vacuum: [0.36, 0.5, 0.1],
+  robot_vacuum: [0.42, 0.62, 0.72],
   parking: [2.6, 5.2, 0.02],
   lamp_pendant: [0.4, 0.4, 0.8],
   lamp_floor: [0.4, 0.4, 1.7],
@@ -1305,7 +1305,16 @@ export function normalizeBuilding(b: Building): Building {
     f.rooms = f.rooms.map((r) => ({ ...r, panel: r.panel ?? [] }));
     f.ha_floor = f.ha_floor ?? null;
     f.placements = f.placements.map((p) => ({ ...p, mount: p.mount ?? null, rotation: p.rotation ?? 0 }));
-    f.furniture = f.furniture.map((m) => ({ ...m, entity: m.entity ?? null, power: m.power ?? null }));
+    f.furniture = f.furniture.map((m) => {
+      const item = { ...m, entity: m.entity ?? null, power: m.power ?? null };
+      // The original robot entry was only 10 cm high. Upgrade exactly that legacy default to the
+      // tower dock shown by the current model, while preserving every manually resized instance.
+      if (m.type === "robot_vacuum" && Math.abs(m.w - 0.36) < 0.001 && Math.abs(m.d - 0.5) < 0.001 && Math.abs(m.h - 0.1) < 0.001) {
+        const [w, d, h] = FURNITURE_SIZE.robot_vacuum;
+        return { ...item, w, d, h };
+      }
+      return item;
+    });
     // lights placed as devices (before lamps existed) become lamps of their mount type
     const lights = f.placements.filter((p) => p.entity_id.startsWith("light."));
     if (lights.length) {

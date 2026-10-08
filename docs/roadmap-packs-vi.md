@@ -75,7 +75,7 @@ Bảng kiểm kê làm việc nên có các cột: `nhóm`, `nguồn ảnh`, `t�
 | Quạt trần | Đã có `fan_ceiling` | Đã giữ ID và hoạt ảnh, vẽ lại theo dáng nhận diện trong ảnh 3/3: 5 cánh bản thẳng màu tối, motor tròn thấp, ty ngắn và bát áp trần rộng; vẫn có biến thể 3/4 cánh. |
 | Quạt trần có đèn | Đã thêm `fan_ceiling_light` | Dùng cùng họ hình học 5 cánh với chụp đèn đa giác màu vàng dưới tâm, rotor động và hai entity quạt/đèn độc lập. |
 | Quạt treo tường | Đã thêm `fan_wall` | Đã có ký hiệu 2D, thân và lồng quạt 3D gắn tường, chiều cao lắp đặt tùy chỉnh, rotor động và liên kết fan entity. |
-| Robot hút bụi có dock | Mới có robot cơ bản | Giữ `robot_vacuum`, bổ sung variant dock sạc và trạng thái đang sạc/dọn dẹp. |
+| Robot hút bụi có dock | Đã nâng cấp `robot_vacuum` | Đã vẽ trạm sạc/xả rác dạng tháp theo dáng nhận diện ở [ảnh tổng quan 1/3](https://mastershort.de/wp-content/uploads/2026/10/neonplan3d-smarthome-r2-overview.jpg), giữ robot chuyển động và các trạng thái dọn dẹp, quay về dock, đã dock và lỗi. Bản vẽ dùng kích thước mặc định cũ được tự nâng cấp; kích thước tùy chỉnh được giữ nguyên. |
 | Robot cắt cỏ có garage | Chưa có | Thêm một mẫu ngoài trời, hỗ trợ entity lawn mower khi Home Assistant cung cấp. |
 | Tủ mạng/NAS/access point trần | Chưa đủ | Tách thành các mẫu đúng vị trí lắp; thiết bị mạng có thể phát sáng theo trạng thái. |
 | Thermostat, báo khói, còi có đèn | Chưa đủ | Thêm mẫu gắn tường/trần và dùng đúng device class để hiển thị trạng thái cảnh báo. |
@@ -146,6 +146,7 @@ Mục tiêu: hoàn thiện bốn nhóm được dùng nhiều nhất trước, k
 Mục tiêu: đồ vật không chỉ đẹp mà còn phản ánh đúng trạng thái Home Assistant.
 
 - [ ] Smart Home: công tắc, ổ cắm, cảm biến, chuông cửa, khóa, rèm, camera, loa, robot hút bụi có dock, robot cắt cỏ có garage và màn hình điều khiển.
+  - Đã hoàn thành robot hút bụi với trạm sạc dạng tháp và trạng thái động; còn robot cắt cỏ có garage cùng các thiết bị điều khiển/cảm biến chưa có.
 - [ ] Hạ tầng mạng và an toàn theo ảnh kiểm kê: tủ mạng, NAS, access point trần, thermostat, báo khói và còi có đèn chớp.
 - [ ] Kỹ thuật: tủ điện, UPS, modem/router, bơm, bồn nước, bình nước nóng, điều hòa, quạt thông gió và thiết bị năng lượng.
 - [ ] Chuẩn hóa ánh xạ entity theo domain/device class và trạng thái `on`, `open`, `occupied`, `playing`, công suất hoặc mức pin.
