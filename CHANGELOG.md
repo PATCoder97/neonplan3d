@@ -4,6 +4,18 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.23.1
+
+### Added
+
+- Completed Office & Gaming with a gaming chair, sim-racing cockpit, 42U server rack, open and enclosed 3D printers, whiteboard, triple-monitor setup, arcade cabinet, laser printer, office phone booth and wall filament shelf.
+- Added Live Screen surfaces for the monitor family and arcade cabinet, plus dedicated procedural models, plan symbols and three-language names for the second batch.
+
+### Changed
+
+- Office printers and monitors now follow supporting desk surfaces; the whiteboard and filament shelf use fixed wall-mount heights.
+- Expanded the reproducible inventory to 364 declared types and 357 library items, completing Office & Gaming coverage at 25 of 25.
+
 ## 1.23.0
 
 ### Added

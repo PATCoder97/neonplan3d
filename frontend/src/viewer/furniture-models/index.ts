@@ -10,7 +10,7 @@ import { GARAGE_FURNITURE_MODELS } from "./garage.ts";
 import { KITCHEN_BATH_FURNITURE_MODELS } from "./kitchen-bath.ts";
 import { LIVING_FURNITURE_MODELS, LIVING_FURNITURE_SCREENS } from "./living.ts";
 import { MISC_FURNITURE_MODELS } from "./misc.ts";
-import { OFFICE_FURNITURE_MODELS } from "./office.ts";
+import { OFFICE_FURNITURE_MODELS, OFFICE_FURNITURE_SCREENS } from "./office.ts";
 import { SMART_HOME_FURNITURE_MODELS } from "./smart-home.ts";
 import { STAIR_FURNITURE_MODELS } from "./stairs.ts";
 import { UTILITY_FURNITURE_MODELS, UTILITY_FURNITURE_SCREENS } from "./utility.ts";
@@ -44,6 +44,7 @@ const BUILTIN_FURNITURE_SCREENS: Readonly<Record<string, FurnitureScreenRenderer
   ...BEDROOM_FURNITURE_SCREENS,
   ...EVERYDAY_FURNITURE_SCREENS,
   ...LIVING_FURNITURE_SCREENS,
+  ...OFFICE_FURNITURE_SCREENS,
   ...UTILITY_FURNITURE_SCREENS,
 };
 

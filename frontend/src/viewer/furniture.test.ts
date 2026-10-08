@@ -85,7 +85,7 @@ test("garage workshop fixtures have dedicated geometry and the wall shelf uses i
 });
 
 test("office fixtures have distinct geometry and monitors follow the supporting desk", () => {
-  const types = ["desk_l", "desk_corner", "desk_sit_stand", "chair_ergonomic", "chair_visitor", "filing_cabinet", "drawer_unit_office", "bookcase_office", "monitor_single", "monitor_dual", "pc_tower"] as const;
+  const types = ["desk_l", "desk_corner", "desk_sit_stand", "chair_ergonomic", "chair_visitor", "filing_cabinet", "drawer_unit_office", "bookcase_office", "monitor_single", "monitor_dual", "pc_tower", "gaming_chair", "sim_racing_cockpit", "server_rack_42u", "printer_3d_open", "whiteboard_office", "monitor_triple", "arcade_cabinet", "laser_printer", "phone_booth_office", "printer_3d_enclosed", "filament_shelf_wall"] as const;
   const complexity = new Map<string, number>();
   const geometry = new Map<string, string>();
   for (const type of types) {
@@ -99,12 +99,22 @@ test("office fixtures have distinct geometry and monitors follow the supporting 
   }
   assert.notEqual(geometry.get("desk_l"), geometry.get("desk_corner"), "L and corner desks use distinct footprints");
   assert.ok(complexity.get("monitor_dual")! > complexity.get("monitor_single")!, "the dual setup contains a second display");
+  assert.ok(complexity.get("monitor_triple")! > complexity.get("monitor_dual")!, "the triple setup contains a third display");
+  assert.ok(complexity.get("printer_3d_enclosed")! > complexity.get("printer_3d_open")!, "the enclosed printer adds its protective shell");
 
   const floor = newFloor("office", "Office", 0);
   const [w, d, h] = FURNITURE_SIZE.desk_sit_stand;
   floor.furniture.push({ id: "desk", type: "desk_sit_stand", x: 0, z: 0, rotation: 0, w, d, h, variant: null } as Furniture);
   assert.equal(mountBase(floor, { type: "monitor_single", x: 0, z: 0, h: FURNITURE_SIZE.monitor_single[2] }), h);
   assert.equal(mountBase(floor, { type: "monitor_dual", x: 0, z: 0, h: FURNITURE_SIZE.monitor_dual[2] }), h);
+  assert.equal(mountBase(floor, { type: "monitor_triple", x: 0, z: 0, h: FURNITURE_SIZE.monitor_triple[2] }), h);
+  assert.equal(mountBase(floor, { type: "printer_3d_open", x: 0, z: 0, h: FURNITURE_SIZE.printer_3d_open[2] }), h);
+  assert.equal(mountBase(floor, { type: "laser_printer", x: 0, z: 0, h: FURNITURE_SIZE.laser_printer[2] }), h);
+  assert.equal(mountBase(floor, { type: "whiteboard_office", x: 2, z: 2, h: FURNITURE_SIZE.whiteboard_office[2] }), 1.2);
+  assert.equal(mountBase(floor, { type: "filament_shelf_wall", x: 2, z: 2, h: FURNITURE_SIZE.filament_shelf_wall[2] }), 1.1);
+  const [arcadeW, arcadeD, arcadeH] = FURNITURE_SIZE.arcade_cabinet;
+  const arcadeScreen = screenRect({ id: "arcade", type: "arcade_cabinet", x: 0, z: 0, rotation: 0, w: arcadeW, d: arcadeD, h: arcadeH, variant: null } as Furniture, floor)!;
+  assert.ok(arcadeScreen.y0 > 0 && arcadeScreen.y1 < arcadeH && arcadeScreen.z > arcadeD * 0.28, "the live screen sits on the recessed cabinet face");
 });
 
 test("living-room sofa variants keep fixed seats and distinct corner footprints", () => {

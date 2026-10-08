@@ -25,7 +25,7 @@ Nói ngắn gọn: ảnh của họ được dùng để trả lời “cần c�
 
 ## Hiện trạng ngày 09/10/2026
 
-- Thư viện tích hợp hiện có **346 mục** trong 10 nhóm giao diện, gồm các lô hoàn chỉnh cho Giai đoạn 1–4 và lô Văn phòng đầu tiên của Giai đoạn 5; toàn bộ hình học tích hợp được dựng thủ tục trong repository.
+- Thư viện tích hợp hiện có **357 mục** trong 10 nhóm giao diện, gồm các lô hoàn chỉnh cho Giai đoạn 1–4 và nhóm Văn phòng hoàn chỉnh của Giai đoạn 5; toàn bộ hình học tích hợp được dựng thủ tục trong repository.
 - Có 21 gói bố trí nhanh cho phòng, gồm ba mức nhỏ/vừa/lớn cho bếp, phòng tắm, phòng ngủ và phòng khách; gói mới bỏ qua vị trí đã có đồ thay vì xếp chồng.
 - Trình chỉnh sửa đã có tìm kiếm song ngữ, nhóm thu gọn, xem trước, đổi kích thước, xoay, lật, đặt lên sàn/tường/trần/bề mặt và liên kết entity.
 - Định dạng pack nhập ngoài đã hỗ trợ khối hộp, trụ, khối vát, đèn, màn hình, bề mặt đặt đồ, phương tiện và lỗ cầu thang.
@@ -46,7 +46,7 @@ Trang chính thức đang công bố gói đầy đủ gồm 474 mẫu/phương 
 | Cầu thang & lan can | 12 | Hoàn tất 12/12 mẫu chức năng | P1 |
 | Garage & xưởng | 17 | Hoàn tất 17/17 mẫu chức năng | P1 |
 | Phương tiện | 15 | Hoàn tất 15/15 mẫu chức năng | P1 |
-| Văn phòng & gaming | 25 | Đã có 14/25 mẫu chức năng | P2 |
+| Văn phòng & gaming | 25 | Hoàn tất 25/25 mẫu chức năng | P2 |
 | Phòng trẻ em | 18 | Có giường/cũi và bố trí nhanh | P2 |
 | Thú cưng | 24 | Chưa có nhóm riêng | P2 |
 | Fitness | 17 | Chưa có nhóm riêng | P2 |
@@ -145,6 +145,9 @@ Bảng kiểm kê làm việc nên có các cột: `nhóm`, `nguồn ảnh`, `t�
 | Ghế văn phòng | Chỉ có một `office_chair` tổng quát | Thêm ghế công thái học có chân xoay năm nhánh và ghế khách bốn chân với silhouette riêng. |
 | Lưu trữ | Dùng chung tủ/kệ gia đình | Thêm tủ hồ sơ bốn tầng, hộc tủ di động ba ngăn và kệ sách văn phòng mở. |
 | Thiết bị máy tính | Chưa có màn hình hoặc case độc lập | Thêm màn hình đơn, cụm hai màn hình tự đặt lên mặt bàn và case PC có ba quạt nhận diện ở mặt trước. |
+| Gaming và hạ tầng | Thiếu ghế gaming, bộ đua mô phỏng, tủ máy chủ và máy arcade | Thêm bốn model có silhouette riêng; màn hình arcade dùng được Live Screens. |
+| Trình bày và in ấn | Thiếu bảng, máy in văn phòng và máy in 3D | Thêm bảng trắng treo tường, máy in laser cùng máy in 3D khung mở/buồng kín; thiết bị để bàn tự nhận cao độ bề mặt. |
+| Bổ sung nơi làm việc | Chưa có ba màn hình, buồng gọi điện hoặc lưu trữ filament | Thêm cụm ba màn hình có Live Screens, buồng cách âm cỡ một người và kệ filament treo tường tám cuộn. |
 
 ### Đợt đối chiếu: Kiến trúc & hoàn thiện
 
@@ -197,7 +200,7 @@ Các biến thể cùng họ, ví dụ sofa 2/3 chỗ, tủ bếp 40/60/80 cm ho
 Mục tiêu: biến hiện trạng thành đường cơ sở có thể đo được.
 
 - [x] Sinh báo cáo tự động từ `FURNITURE_TYPES`, `FURNITURE_GROUPS` và `FURNITURE_SIZE` để phát hiện ID trùng, thiếu tên hoặc thiếu kích thước (`cd frontend && npm run catalog`).
-- [x] Lập bảng ánh xạ các mục hiện tại vào 16 nhóm đích; catalog kiểm kê hiện khóa 353 type, 346 mục thư viện, 7 mục nội bộ và trường hợp `worktop` đang nằm trong hai nhóm. Mỗi mục chỉ được tính một lần trong `REFERENCE_PACK_ITEMS`.
+- [x] Lập bảng ánh xạ các mục hiện tại vào 16 nhóm đích; catalog kiểm kê hiện khóa 364 type, 357 mục thư viện, 7 mục nội bộ và trường hợp `worktop` đang nằm trong hai nhóm. Mỗi mục chỉ được tính một lần trong `REFERENCE_PACK_ITEMS`.
 - [ ] Duyệt toàn bộ ảnh gallery công khai của 16 trang sản phẩm, không chỉ ảnh đại diện ở trang Packs; lập bảng `đã phù hợp / cần sửa hình / cần thêm mới` kèm URL và ngày xem.
 - [ ] Chọn khoảng 10 mẫu hiện có cần sửa hình trước; `fan_ceiling` là mẫu thí điểm và phải giữ nguyên ID.
 - [ ] Chụp bộ ảnh chuẩn ở góc nhìn 2D, 3D và chế độ Day/Neon để so sánh hồi quy.
@@ -290,8 +293,9 @@ Mục tiêu: phủ các hạng mục khó quan sát nhưng quan trọng với m�
 
 Mục tiêu: hoàn tất độ phủ cả 16 nhóm.
 
-- [ ] Văn phòng & gaming: bàn chữ L, ghế công thái học, tủ hồ sơ, nhiều màn hình, case máy tính và phụ kiện.
+- [x] Văn phòng & gaming: bàn chữ L, ghế công thái học, tủ hồ sơ, nhiều màn hình, case máy tính và phụ kiện.
   - Đợt 1 đã thêm 11 mẫu: ba loại bàn, hai loại ghế, ba loại lưu trữ, màn hình đơn/đôi và case PC; màn hình tự nhận cao độ của mặt bàn, độ phủ đạt 14/25.
+  - Đợt 2 đã thêm 11 mẫu gaming, hạ tầng, trình bày và in ấn; monitor/arcade có Live Screens, máy in nhận mặt bàn và hai mẫu treo tường dùng cao độ riêng, hoàn tất 25/25.
 - [ ] Trẻ em: bàn học, giá đồ chơi, tủ thấp, thảm chơi, giường theo lứa tuổi và đèn ngủ.
 - [ ] Thú cưng: giường, nhà, lồng, khay vệ sinh, bát ăn, trụ mèo và bể cá.
 - [ ] Fitness: máy chạy, xe đạp, ghế tập, tạ, thảm yoga và giàn tập.
