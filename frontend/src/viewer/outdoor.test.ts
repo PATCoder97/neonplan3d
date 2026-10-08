@@ -19,8 +19,10 @@ test("an outdoor canopy draws a paved yard, high fence, front gate, posts, beams
   assert.ok(heights.some((y) => Math.abs(y - 1.27) < 1e-6), "the yard fence reaches 1.45 m above the paved surface");
 
   const bare = new GeoBuffer();
-  pushOutdoor(bare, new LineBuffer(), { ...floor, outdoor: [{ ...canopy, railing: false }] });
+  const bareLines = new LineBuffer();
+  pushOutdoor(bare, bareLines, { ...floor, outdoor: [{ ...canopy, railing: false }] });
   assert.ok(solid.count > bare.count + 100, "the optional fence and two-leaf gate add substantial geometry");
+  assert.ok(lines.p.length > bareLines.p.length + 300, "the gate adds an arched crown, centre medallion and symmetric scrollwork");
 });
 
 test("an upper-floor veranda is one object with a slab, railings, front columns and roof", () => {
