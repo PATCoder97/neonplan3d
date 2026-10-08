@@ -1,9 +1,5 @@
-import { svg } from "lit";
 import type { FurnitureSymbol, FurnitureSymbolRenderer } from "./types.ts";
-
-const rect = (x0: number, z0: number, x1: number, z1: number, cls = "") => svg`<rect class=${cls} x=${Math.min(x0, x1)} y=${Math.min(z0, z1)} width=${Math.abs(x1 - x0)} height=${Math.abs(z1 - z0)} />`;
-const line = (x0: number, z0: number, x1: number, z1: number, cls = "") => svg`<line class=${cls} x1=${x0} y1=${z0} x2=${x1} y2=${z1} />`;
-const circle = (x: number, z: number, r: number, cls = "") => svg`<circle class=${cls} cx=${x} cy=${z} r=${r} />`;
+import { circle, line, rect } from "./common.ts";
 
 const laundry = (w: number, d: number): FurnitureSymbol => [circle(0, 0.05, Math.min(w, d) * 0.3), line(-w / 2, -d / 2 + 0.1, w / 2, -d / 2 + 0.1)];
 
@@ -21,4 +17,3 @@ export const UTILITY_FURNITURE_SYMBOLS: Readonly<Record<string, FurnitureSymbolR
   washer_dryer_tower: (w, d) => [rect(-w / 2, -d / 2, w / 2, d / 2, "fp3d-sym-fill"), circle(0, d * 0.08, Math.min(w, d) * 0.27), line(-w / 2, -d * 0.27, w / 2, -d * 0.27, "fp3d-sym-strong")],
   balcony_solar: balconySolar,
 };
-

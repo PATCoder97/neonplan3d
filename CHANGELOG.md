@@ -4,6 +4,13 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.19.14
+
+### Changed
+
+- Split all 127 existing built-in 2D furniture symbols into everyday, kitchen/bath, architecture/outdoor, climate, smart-home, lighting and utility family registries with shared SVG primitives.
+- Reduced the central 2D furniture facade from 441 to 35 lines, leaving it responsible only for registry lookup and external pack fallbacks, and added complete symbol-registry coverage checks.
+
 ## 1.19.13
 
 ### Changed

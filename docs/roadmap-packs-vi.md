@@ -124,8 +124,8 @@ Mục tiêu: có nền tảng đủ gọn để thêm nhiều mẫu theo lô.
 - [ ] Tách metadata khỏi `frontend/src/model.ts`; giữ export tương thích để chưa phải sửa toàn bộ nơi dùng.
 - [x] Tách renderer trong `frontend/src/viewer/furniture.ts` thành các họ tái sử dụng.
   - Toàn bộ 114 model 3D built-in không phải đèn đã chuyển sang registry theo các họ everyday, kitchen/bath, architecture/outdoor, climate, smart-home, energy, utility và miscellaneous; `furniture.ts` chỉ còn cầu nối dựng hình, màn hình động và pack.
-- [ ] Chuyển `frontend/src/components/furniture2d.ts` sang registry ký hiệu 2D.
-  - Đã có registry symbol theo họ và kiểm thử khóa đồng bộ 2D/3D/live screen; nhóm Utility là lô đầu tiên đã chuyển.
+- [x] Chuyển `frontend/src/components/furniture2d.ts` sang registry ký hiệu 2D.
+  - Toàn bộ 127 symbol built-in hiện có đã chuyển sang registry theo họ và dùng chung primitive SVG; `furniture2d.ts` chỉ còn lookup cùng fallback cho pack nhập ngoài.
 - [x] Cho nhóm thư viện, tìm kiếm và tên hiển thị đọc trực tiếp từ catalog; các export cũ vẫn được giữ để tương thích.
 - [x] Thêm validator bắt buộc ID ổn định, kích thước hợp lệ, tên `vi`/`en`, renderer và symbol; CI chạy `npm run catalog` ở mỗi push/PR.
 - [ ] Thêm trang gallery phát triển để render toàn bộ catalog trong một lần.
@@ -219,7 +219,8 @@ Mỗi PR chỉ nên chứa một họ sản phẩm khoảng 8–20 mẫu: catalo
 - `frontend/src/furniture/`: catalog, renderer và symbol mới.
 - `frontend/src/viewer/furniture-builder.ts` và `frontend/src/viewer/furniture-models/`: primitive dùng chung và renderer theo họ.
 - `frontend/src/viewer/furniture.ts`: cầu nối renderer, màn hình động và pack.
-- `frontend/src/components/furniture2d.ts`: cầu nối ký hiệu 2D.
+- `frontend/src/components/furniture-symbols/`: symbol SVG và registry theo họ.
+- `frontend/src/components/furniture2d.ts`: cầu nối ký hiệu 2D và fallback cho pack.
 - `frontend/src/components/editor.ts`: thư viện, bộ lọc, gallery và xem trước.
 - `frontend/src/devices.ts`: ánh xạ entity và trạng thái động.
 - `frontend/src/packages.ts`: tiếp tục tương thích với pack nhập ngoài, không trộn ID built-in với `pack:*`.
