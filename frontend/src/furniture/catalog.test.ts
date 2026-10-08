@@ -28,18 +28,19 @@ test("built-in furniture catalog has stable complete metadata", () => {
 
 test("catalog inventory locks the Phase 0 baseline", () => {
   const summary = furnitureCatalogSummary();
-  assert.equal(summary.total, 108);
-  assert.equal(summary.library, 101);
+  assert.equal(summary.total, 116);
+  assert.equal(summary.library, 109);
   assert.equal(summary.hidden, 7);
-  assert.equal(summary.memberships, 102);
+  assert.equal(summary.memberships, 110);
   assert.deepEqual(summary.ungrouped, [...HIDDEN_FURNITURE_TYPES]);
   assert.deepEqual(summary.multiGroup, { worktop: ["kitchen", "work"] });
   assert.deepEqual(summary.groups, Object.fromEntries(Object.entries(FURNITURE_GROUPS).map(([group, types]) => [group, types.length])));
   assert.equal(Object.keys(summary.referencePacks).length, 16);
   assert.equal(Object.values(REFERENCE_PACK_TARGETS).reduce((sum, count) => sum + count, 0), 474);
-  assert.equal(Object.values(REFERENCE_PACK_ITEMS).flat().length, 101);
+  assert.equal(Object.values(REFERENCE_PACK_ITEMS).flat().length, 109);
   assert.deepEqual(summary.referencePacks.pets, { current: 0, target: 24 });
-  assert.deepEqual(summary.referencePacks.smart_home, { current: 27, target: 30 });
+  assert.deepEqual(summary.referencePacks.utility, { current: 16, target: 18 });
+  assert.deepEqual(summary.referencePacks.smart_home, { current: 29, target: 30 });
 });
 
 test("every built-in furniture type has English, German and Vietnamese names", () => {

@@ -185,6 +185,14 @@ const DEVICES = [
   entity("climate.wall_thermostat_demo", "arbeitszimmer", "heat", { friendly_name: "Bộ điều nhiệt gắn tường", current_temperature: 20.8, temperature: 22, hvac_action: "heating" }),
   entity("binary_sensor.smoke_demo", "arbeitszimmer", "off", { friendly_name: "Đầu báo khói", device_class: "smoke" }),
   entity("siren.alarm_demo", "arbeitszimmer", "on", { friendly_name: "Còi báo động có đèn chớp" }),
+  entity("switch.electrical_panel_demo", "garage", "on", { friendly_name: "Tủ điện tổng" }),
+  entity("sensor.ups_demo", "arbeitszimmer", "online", { friendly_name: "Bộ lưu điện UPS", device_class: "enum", options: ["online", "offline"] }),
+  entity("device_tracker.modem_router_demo", "arbeitszimmer", "home", { friendly_name: "Modem router" }),
+  entity("climate.heat_pump_demo", "heizung", "heat", { friendly_name: "Dàn nóng bơm nhiệt", current_temperature: 18, temperature: 45, hvac_action: "heating" }),
+  entity("water_heater.hot_water_tank_demo", "bad", "on", { friendly_name: "Bình tích nước nóng", current_temperature: 48, temperature: 55 }),
+  entity("fan.ventilation_demo", "bad", "on", { friendly_name: "Quạt thông gió", percentage: 70 }),
+  entity("humidifier.humidifier_demo", "wohnzimmer", "on", { friendly_name: "Máy tạo ẩm", current_humidity: 48, humidity: 55 }),
+  entity("media_player.smart_display_demo", "arbeitszimmer", "playing", { friendly_name: "Màn hình điều khiển thông minh", media_title: "Nhà thông minh", volume_level: 0.25, entity_picture: COVER }),
   entity("binary_sensor.garage_auto", "garage", "on", { friendly_name: "Auto in der Garage", device_class: "occupancy" }),
   entity("sensor.van_ladestand", "garage", "78", { friendly_name: "Van Ladestand", device_class: "battery", unit_of_measurement: "%" }),
   // helpers standing in for a car without an integration (Auto Pro with input_number / input_boolean)
@@ -369,6 +377,7 @@ DEMO_BUILDING.floors[0].furniture = [
   { ...item("smart_curtain", 4.55, 0.09, 2.0, 0.16, 2.2), entity: "cover.curtain_demo" },
   { ...item("smart_speaker", 2.4, 2.4, 0.14, 0.14, 0.19), entity: "media_player.smart_speaker_demo", mount_y: 0.42 },
   { ...item("air_purifier", 5.65, 4.12, 0.32, 0.32, 0.65, 270), entity: "fan.air_purifier_demo" },
+  { ...item("humidifier", 5.25, 4.12, 0.38, 0.38, 0.8, 270), entity: "humidifier.humidifier_demo" },
   item("plant", 5.55, 0.45, 0.5, 0.5, 1.2),
   item("shelf", 5.8, 2.6, 0.9, 0.35, 1.9, 90),
   item("fridge", 6.35, 0.36, 0.6, 0.66, 1.85),
@@ -443,6 +452,8 @@ DEMO_BUILDING.floors[0].furniture = [
     ],
   },
   { ...item("parking", 16.2, 2.7, 2.6, 5.2, 0.02, 90), entity: "device_tracker.zweitwagen", vehicle: "pack:mastershort.vehicles:compact" },
+  { ...item("electrical_panel", 10.08, 4.25, 0.55, 0.14, 0.8, 270), entity: "switch.electrical_panel_demo" },
+  { ...item("heat_pump_outdoor", 11.2, -0.75, 1.0, 0.48, 0.86, 180), entity: "climate.heat_pump_demo" },
 ];
 // a partition through half of the guest room (a free-standing wall)
 // a half-height wall between the kids' room and the office (edge 1 of the kids' room)
@@ -469,6 +480,11 @@ DEMO_BUILDING.floors[1].furniture = [
   { ...item("wall_thermostat", 4.48, 2.0, 0.18, 0.065, 0.24, 270), entity: "climate.wall_thermostat_demo" },
   { ...item("smoke_detector", 5.6, 2.0, 0.15, 0.15, 0.055), entity: "binary_sensor.smoke_demo" },
   { ...item("siren_alarm", 9.88, 3.2, 0.22, 0.085, 0.28, 90), entity: "siren.alarm_demo" },
+  { ...item("ups_unit", 9.55, 1.45, 0.45, 0.5, 0.72), entity: "sensor.ups_demo" },
+  { ...item("modem_router", 8.05, 0.36, 0.34, 0.22, 0.12), entity: "device_tracker.modem_router_demo" },
+  { ...item("smart_display", 8.75, 0.36, 0.55, 0.16, 0.36), entity: "media_player.smart_display_demo" },
+  { ...item("hot_water_tank", 3.05, 5.2, 0.55, 0.55, 1.3, 270), entity: "water_heater.hot_water_tank_demo" },
+  { ...item("ventilation_fan", 3.32, 6.8, 0.32, 0.14, 0.32, 90), entity: "fan.ventilation_demo" },
 ];
 
 // Invented garden and roof.

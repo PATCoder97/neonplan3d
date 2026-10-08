@@ -1554,7 +1554,7 @@ export class Fp3dView3d extends LitElement {
             const gap = typeof a.temperature === "number" && typeof a.current_temperature === "number" ? a.temperature - a.current_temperature : 1;
             screens.set(f.id, { color: [1, 0.42, 0.1], level: Math.min(1, 0.45 + 0.25 * Math.max(0, gap)) });
           }
-        } else if ((f.type === "air_conditioner" || f.type === "wall_thermostat") && st && kindOf(st.entity_id) === "climate") {
+        } else if ((f.type === "air_conditioner" || f.type === "wall_thermostat" || f.type === "heat_pump_outdoor") && st && kindOf(st.entity_id) === "climate") {
           const action = String(st.attributes.hvac_action ?? st.state);
           if (!["off", "idle", "unavailable", "unknown"].includes(action)) {
             const heating = action === "heating" || action === "heat";
@@ -1562,15 +1562,17 @@ export class Fp3dView3d extends LitElement {
           }
         } else if (f.type === "water_pump" && running) {
           screens.set(f.id, { color: [0.2, 0.78, 1], level: 0.85, plain: true });
-        } else if (f.type === "water_heater" && running) {
+        } else if ((f.type === "water_heater" || f.type === "hot_water_tank") && running) {
           screens.set(f.id, { color: [0.2, 0.78, 1], level: 0.85, plain: true });
         } else if (["range_hood", "microwave", "water_purifier"].includes(f.type) && running) {
           screens.set(f.id, { color: f.type === "microwave" ? [1, 0.58, 0.2] : [0.2, 0.78, 1], level: 0.8, plain: true });
         } else if (f.type === "air_purifier" && running) {
           screens.set(f.id, { color: [0.2, 0.9, 0.72], level: 0.85, plain: true });
+        } else if ((f.type === "ventilation_fan" || f.type === "humidifier") && running) {
+          screens.set(f.id, { color: [0.2, 0.9, 0.72], level: 0.85, plain: true });
         } else if (f.type === "robot_mower" && running) {
           screens.set(f.id, { color: st?.state === "returning" ? [1, 0.7, 0.25] : [0.2, 0.9, 0.72], level: 0.9, plain: true });
-        } else if (["network_cabinet", "nas_server", "access_point"].includes(f.type) && st && !["off", "disconnected", "unavailable", "unknown"].includes(st.state)) {
+        } else if (["network_cabinet", "nas_server", "access_point", "modem_router", "electrical_panel", "ups_unit"].includes(f.type) && st && !["off", "disconnected", "unavailable", "unknown"].includes(st.state)) {
           screens.set(f.id, { color: [0.2, 0.86, 1], level: 0.75, plain: true });
         } else if (f.type === "smoke_detector" && running) {
           screens.set(f.id, { color: [1, 0.18, 0.12], level: 1, plain: true });

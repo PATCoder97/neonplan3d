@@ -162,8 +162,9 @@ export function mountBase(floor: Floor, f: Pick<Furniture, "type" | "x" | "z" | 
   if (f.type === "water_heater") return 1.7;
   if (f.type === "range_hood") return 1.35;
   if (f.type === "microwave") return surfaceHeight(floor, f.x, f.z);
+  if (f.type === "modem_router" || f.type === "smart_display") return surfaceHeight(floor, f.x, f.z);
   // An outdoor pump follows the lawn/terrace below it; inside a room it stays on that floor.
-  if (f.type === "water_pump" && !floor.rooms.some((r) => r.points.length >= 3 && pointInPolygon([f.x, f.z], r.points))) return outdoorGround(floor, f.x, f.z);
+  if ((f.type === "water_pump" || f.type === "heat_pump_outdoor") && !floor.rooms.some((r) => r.points.length >= 3 && pointInPolygon([f.x, f.z], r.points))) return outdoorGround(floor, f.x, f.z);
   switch (item?.mount) {
     case "surface":
       return surfaceHeight(floor, f.x, f.z);

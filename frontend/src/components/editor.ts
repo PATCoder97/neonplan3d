@@ -3795,7 +3795,9 @@ export class Fp3dEditor extends LitElement {
     const speakerish = /speaker|sound|subwoofer|receiver|smart_|display|tv|media|turntable|projector|console/;
     const fits = (t: string): boolean => {
       if (kind === "light") return isLamp(t);
-      if (kind === "climate") return t === "radiator" || t === "air_conditioner" || t === "wall_thermostat";
+      if (kind === "climate") return t === "radiator" || t === "air_conditioner" || t === "wall_thermostat" || t === "heat_pump_outdoor" || t === "hot_water_tank";
+      if (entityId.startsWith("humidifier.")) return t === "humidifier";
+      if (entityId.startsWith("water_heater.")) return t === "hot_water_tank" || t === "water_heater";
       if (entityId.startsWith("vacuum.")) return t === "robot_vacuum";
       if (entityId.startsWith("lawn_mower.")) return t === "robot_mower";
       if (entityId.startsWith("siren.") || entityId.startsWith("alarm_control_panel.")) return t === "siren_alarm";
@@ -6230,7 +6232,7 @@ export class Fp3dEditor extends LitElement {
                   ? id.startsWith("media_player.")
                   : f.type === "air_purifier"
                     ? /^(fan|switch)\./.test(id)
-          : f.type === "radiator" || f.type === "air_conditioner" || f.type === "wall_thermostat"
+          : f.type === "radiator" || f.type === "air_conditioner" || f.type === "wall_thermostat" || f.type === "heat_pump_outdoor"
             ? id.startsWith("climate.")
             : f.type === "smoke_detector"
               ? id.startsWith("binary_sensor.") && hass.states[id]?.attributes.device_class === "smoke"
@@ -6240,6 +6242,16 @@ export class Fp3dEditor extends LitElement {
                   ? /^(switch|sensor|binary_sensor|device_tracker)\./.test(id)
                   : f.type === "network_cabinet" || f.type === "nas_server"
                     ? /^(switch|sensor|binary_sensor)\./.test(id)
+                  : f.type === "electrical_panel" || f.type === "ups_unit"
+                    ? /^(switch|sensor|binary_sensor)\./.test(id)
+                  : f.type === "modem_router"
+                    ? /^(switch|sensor|binary_sensor|device_tracker)\./.test(id)
+                  : f.type === "hot_water_tank"
+                    ? /^(water_heater|climate|switch)\./.test(id)
+                  : f.type === "ventilation_fan"
+                    ? /^(fan|switch)\./.test(id)
+                  : f.type === "humidifier"
+                    ? /^(humidifier|fan|switch)\./.test(id)
             : f.type === "robot_vacuum"
               ? id.startsWith("vacuum.")
               : f.type === "robot_mower"
@@ -6252,7 +6264,7 @@ export class Fp3dEditor extends LitElement {
     return html`<div class="fp3d-form fp3d-links">
         ${f.type === "grid_point"
           ? html`<p class="fp3d-sub fp3d-wide">${this.t("grid_point_hint")}</p>`
-          : this.entitySelect(this.t(f.type === "fan_ceiling_light" ? "furn_entity_fan" : lamp || cabinetLight ? "furn_entity_light" : media ? "furn_entity_tv" : f.type === "radiator" || f.type === "air_conditioner" || f.type === "wall_thermostat" ? "furn_entity_climate" : f.type === "robot_vacuum" ? "furn_entity_vacuum" : "furn_entity"), f.entity ?? null, autoPick("entity"), entities, (v) =>
+          : this.entitySelect(this.t(f.type === "fan_ceiling_light" ? "furn_entity_fan" : lamp || cabinetLight ? "furn_entity_light" : media ? "furn_entity_tv" : f.type === "radiator" || f.type === "air_conditioner" || f.type === "wall_thermostat" || f.type === "heat_pump_outdoor" ? "furn_entity_climate" : f.type === "robot_vacuum" ? "furn_entity_vacuum" : "furn_entity"), f.entity ?? null, autoPick("entity"), entities, (v) =>
               this.updateFurniture({ entity: v }),
             )}
         ${f.type === "fan_ceiling_light"

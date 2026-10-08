@@ -4,6 +4,13 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.19.7
+
+### Added
+
+- Added an eight-item technical and smart-control family: electrical panel, UPS, modem/router, heat-pump outdoor unit, hot-water storage tank, ventilation fan, humidifier and smart control display.
+- Added distinct 2D/3D geometry, appropriate floor/wall/surface mounting, automatic Home Assistant entity matching, live operating indicators, German/English/Vietnamese names and demo placements for the complete family.
+
 ## 1.19.6
 
 ### Added

@@ -1339,6 +1339,75 @@ function sirenAlarm(b: Builder, w: number, d: number, h: number): void {
   b.box(-w * 0.23, w * 0.23, y0 + h * 0.13, y0 + h * 0.25, d * 0.48, d * 0.56, C.accent, C.accent, EDGE_FAINT);
 }
 
+function electricalPanel(b: Builder, w: number, d: number, h: number): void {
+  const y0 = 0.85;
+  b.box(-w / 2, w / 2, y0, y0 + h, -d / 2, d / 2, C.body, C.bodyTop, EDGE_FURN);
+  b.box(-w * 0.43, w * 0.43, y0 + h * 0.07, y0 + h * 0.93, d * 0.47, d * 0.54, C.glass, C.glass, EDGE_FAINT);
+  for (let row = 0; row < 3; row++) for (let col = 0; col < 5; col++) {
+    const x = (col - 2) * w * 0.145;
+    const y = y0 + h * (0.22 + row * 0.25);
+    b.box(x - w * 0.045, x + w * 0.045, y, y + h * 0.075, d * 0.51, d * 0.56, row === 0 ? C.accent : C.metal, C.metal, EDGE_FAINT);
+  }
+}
+
+function upsUnit(b: Builder, w: number, d: number, h: number): void {
+  b.pad(-w / 2, w / 2, 0, h, -d / 2, d / 2, C.dark, C.bodyTop, Math.min(0.025, w * 0.06), EDGE_FURN);
+  b.box(-w * 0.32, w * 0.32, h * 0.58, h * 0.78, d * 0.49, d * 0.54, C.glass, C.glass, EDGE_GLOW);
+  b.cyl(0, d * 0.51, w * 0.045, h * 0.4, h * 0.43, C.accent, C.accent, 10, EDGE_FAINT);
+  for (let i = 0; i < 4; i++) b.seg(-w * 0.28, h * (0.12 + i * 0.06), d * 0.51, w * 0.28, h * (0.12 + i * 0.06), d * 0.51, EDGE_FAINT);
+}
+
+function modemRouter(b: Builder, w: number, d: number, h: number): void {
+  b.pad(-w / 2, w / 2, 0, h * 0.62, -d / 2, d / 2, C.body, C.bodyTop, Math.min(0.018, h * 0.12), EDGE_FURN);
+  for (const x of [-w * 0.38, w * 0.38]) b.cyl(x, -d * 0.35, w * 0.025, h * 0.2, h, C.dark, C.metal, 8, EDGE_FAINT);
+  for (let i = -2; i <= 2; i++) b.cyl(i * w * 0.095, d * 0.48, w * 0.012, h * 0.2, h * 0.23, i === 0 ? C.accent : C.metal, i === 0 ? C.accent : C.metal, 6, EDGE_GLOW);
+}
+
+function heatPumpOutdoor(b: Builder, w: number, d: number, h: number): void {
+  b.box(-w / 2, w / 2, h * 0.04, h, -d / 2, d / 2, C.white, C.whiteTop, EDGE_FURN);
+  const r = Math.min(w * 0.31, h * 0.34);
+  b.lyingCyl("z", -w * 0.12, d * 0.51, h * 0.2, h * 0.2 + r * 2, d * 0.055, r * 2, C.dark, C.bodyTop, 18, EDGE_FURN);
+  for (let i = 0; i < 8; i++) {
+    const a = (i / 8) * Math.PI * 2;
+    b.seg(-w * 0.12, h * 0.2 + r, d * 0.54, -w * 0.12 + Math.cos(a) * r * 0.82, h * 0.2 + r + Math.sin(a) * r * 0.82, d * 0.54, EDGE_FAINT);
+  }
+  b.box(w * 0.3, w * 0.43, h * 0.22, h * 0.78, d * 0.5, d * 0.54, C.body, C.bodyTop, EDGE_FAINT);
+  b.box(w * 0.32, w * 0.41, h * 0.62, h * 0.69, d * 0.53, d * 0.56, C.accent, C.accent, EDGE_GLOW);
+}
+
+function hotWaterTank(b: Builder, w: number, d: number, h: number): void {
+  const r = Math.min(w, d) * 0.45;
+  b.cyl(0, 0, r, h * 0.035, h * 0.94, C.white, C.whiteTop, 18, EDGE_FURN);
+  b.cyl(0, 0, r * 0.88, h * 0.94, h, C.white, C.whiteTop, 18, EDGE_FAINT);
+  b.box(-w * 0.12, w * 0.12, h * 0.57, h * 0.66, d * 0.44, d * 0.49, C.glass, C.glass, EDGE_GLOW);
+  for (const x of [-w * 0.18, w * 0.18]) b.cyl(x, 0, w * 0.035, 0, h * 0.05, C.metal, C.metal, 8, EDGE_FAINT);
+}
+
+function ventilationFan(b: Builder, w: number, d: number, h: number): void {
+  const y0 = 1.8;
+  b.box(-w / 2, w / 2, y0, y0 + h, -d / 2, -d * 0.18, C.white, C.whiteTop, EDGE_FURN);
+  const r = Math.min(w, h) * 0.38;
+  b.lyingCyl("z", 0, d * 0.12, y0 + h * 0.12, y0 + h * 0.12 + r * 2, d * 0.52, r * 2, C.dark, C.bodyTop, 16, EDGE_FURN);
+  for (let i = 0; i < 6; i++) {
+    const y = y0 + h * (0.24 + i * 0.09);
+    b.seg(-w * 0.34, y, d * 0.42, w * 0.34, y, d * 0.42, EDGE_FAINT);
+  }
+}
+
+function humidifier(b: Builder, w: number, d: number, h: number): void {
+  b.pad(-w / 2, w / 2, 0, h, -d / 2, d / 2, C.body, C.bodyTop, Math.min(0.035, w * 0.08), EDGE_FURN);
+  b.box(-w * 0.31, w * 0.31, h * 0.18, h * 0.62, d * 0.48, d * 0.54, C.glass, C.glass, EDGE_FAINT);
+  b.box(-w * 0.22, w * 0.22, h * 0.74, h * 0.8, d * 0.49, d * 0.55, C.accent, C.accent, EDGE_GLOW);
+  for (let i = -2; i <= 2; i++) b.seg(i * w * 0.11, h + 0.003, -d * 0.22, i * w * 0.11, h + 0.003, d * 0.18, EDGE_FAINT);
+}
+
+function smartDisplay(b: Builder, w: number, d: number, h: number): void {
+  b.box(-w * 0.42, w * 0.42, h * 0.18, h, -d * 0.18, d * 0.2, C.dark, C.bodyTop, EDGE_FURN);
+  b.box(-w * 0.36, w * 0.36, h * 0.28, h * 0.9, d * 0.19, d * 0.24, C.glass, C.glass, EDGE_GLOW);
+  b.box(-w * 0.16, w * 0.16, h * 0.08, h * 0.2, -d * 0.22, d * 0.05, C.metal, C.metal, EDGE_FAINT);
+  b.box(-w * 0.32, w * 0.32, 0, h * 0.09, -d * 0.36, d * 0.16, C.dark, C.bodyTop, EDGE_FURN);
+}
+
 function kitchenCorner(b: Builder, w: number, d: number, h: number): void {
   const arm = Math.max(0.42, Math.min(w, d) * 0.46);
   b.box(-w / 2, w / 2, 0, h - 0.04, -d / 2, -d / 2 + arm, C.body, C.bodyTop, EDGE_FURN);
@@ -1637,6 +1706,14 @@ function builtInScreen(f: Furniture, w: number, d: number, h: number, floor?: Fl
   if (f.type === "wall_thermostat") return { x0: -w * 0.37, x1: w * 0.37, y0: 1.35 + h * 0.34, y1: 1.35 + h * 0.82, z: d * 0.54 };
   if (f.type === "smoke_detector") return { x0: -w * 0.1, x1: w * 0.1, y0: h * 0.05, y1: h * 0.22, z: d * 0.47 };
   if (f.type === "siren_alarm") return { x0: -w * 0.32, x1: w * 0.32, y0: 1.85 + h * 0.48, y1: 1.85 + h * 0.82, z: d * 0.58 };
+  if (f.type === "electrical_panel") return { x0: -w * 0.34, x1: w * 0.34, y0: 0.85 + h * 0.2, y1: 0.85 + h * 0.8, z: d * 0.56 };
+  if (f.type === "ups_unit") return { x0: -w * 0.32, x1: w * 0.32, y0: h * 0.58, y1: h * 0.78, z: d * 0.54 };
+  if (f.type === "modem_router") return { x0: -w * 0.25, x1: w * 0.25, y0: h * 0.16, y1: h * 0.3, z: d * 0.54 };
+  if (f.type === "heat_pump_outdoor") return { x0: w * 0.32, x1: w * 0.41, y0: h * 0.62, y1: h * 0.69, z: d * 0.56 };
+  if (f.type === "hot_water_tank") return { x0: -w * 0.12, x1: w * 0.12, y0: h * 0.57, y1: h * 0.66, z: d * 0.49 };
+  if (f.type === "ventilation_fan") return { x0: -w * 0.12, x1: w * 0.12, y0: 1.8 + h * 0.44, y1: 1.8 + h * 0.58, z: d * 0.45 };
+  if (f.type === "humidifier") return { x0: -w * 0.22, x1: w * 0.22, y0: h * 0.74, y1: h * 0.8, z: d * 0.55 };
+  if (f.type === "smart_display") return { x0: -w * 0.36, x1: w * 0.36, y0: h * 0.28, y1: h * 0.9, z: d * 0.24 };
   if (f.type === "washer" || f.type === "dryer") {
     const cy = (h - 0.14) / 2 + 0.04;
     const r = Math.min(w * 0.36, (h - 0.2) * 0.42) * 0.8;
@@ -1798,6 +1875,32 @@ function buildFurniture(buf: GeoBuffer, lines: LineBuffer, shadow: GeoBuffer, f:
     case "siren_alarm":
       sirenAlarm(b, w, d, h);
       return;
+    case "electrical_panel":
+      electricalPanel(b, w, d, h);
+      return;
+    case "ups_unit":
+      upsUnit(b, w, d, h);
+      break;
+    case "modem_router":
+      modemRouter(b, w, d, h);
+      if (base > 0.05) return;
+      break;
+    case "heat_pump_outdoor":
+      heatPumpOutdoor(b, w, d, h);
+      break;
+    case "hot_water_tank":
+      hotWaterTank(b, w, d, h);
+      break;
+    case "ventilation_fan":
+      ventilationFan(b, w, d, h);
+      return;
+    case "humidifier":
+      humidifier(b, w, d, h);
+      break;
+    case "smart_display":
+      smartDisplay(b, w, d, h);
+      if (base > 0.05) return;
+      break;
     case "kitchen_corner":
       kitchenCorner(b, w, d, h);
       break;

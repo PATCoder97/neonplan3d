@@ -307,6 +307,7 @@ export function isStatusSensor(st: HassEntity | undefined): boolean {
 /** "Active" drives the glow of a device marker: light on, cover open, heating, playing, window open … */
 export function isActive(st: HassEntity | undefined): boolean {
   if (!st) return false;
+  if (domainOf(st.entity_id) === "humidifier") return st.state === "on";
   if (domainOf(st.entity_id) === "lawn_mower") return ["mowing", "starting", "returning"].includes(st.state);
   if (domainOf(st.entity_id) === "siren") return st.state === "on";
   if (domainOf(st.entity_id) === "alarm_control_panel") return ["triggered", "pending", "arming"].includes(st.state);
@@ -709,9 +710,17 @@ const FURNITURE_NAMES: Record<string, RegExp> = {
   wall_thermostat: /(wandthermostat|wall ?thermostat|thermostat|bộ điều nhiệt|bo dieu nhiet)/i,
   smoke_detector: /(rauchmelder|smoke ?(detector|alarm)|báo khói|bao khoi|cảm biến khói|cam bien khoi)/i,
   siren_alarm: /(sirene|siren|alarm|còi báo động|coi bao dong|đèn chớp|den chop)/i,
+  electrical_panel: /(sicherungskasten|electrical ?panel|fuse ?box|tủ điện|tu dien)/i,
+  ups_unit: /\b(ups|usv|bộ lưu điện|bo luu dien)\b/i,
+  modem_router: /(modem|router|bộ định tuyến|bo dinh tuyen|bộ phát mạng|bo phat mang)/i,
+  heat_pump_outdoor: /(wärmepumpe|heat ?pump|bơm nhiệt|bom nhiet)/i,
+  hot_water_tank: /(warmwasserspeicher|hot ?water ?tank|bình tích nước nóng|binh tich nuoc nong)/i,
+  ventilation_fan: /(lüfter|exhaust ?fan|ventilation ?fan|quạt thông gió|quat thong gio)/i,
+  humidifier: /(luftbefeuchter|humidifier|máy tạo ẩm|may tao am)/i,
+  smart_display: /(smart ?display|control ?panel|màn hình điều khiển|man hinh dieu khien)/i,
   kitchen_display: /(vitrine|display ?cabinet|cabinet ?light|schranklicht|tủ kính|tu kinh|tủ trưng bày|tu trung bay|đèn tủ|den tu|led tủ|led tu)/i,
 };
-const MEDIA_FURNITURE = new Set(["tv_board", "tv_wall"]);
+const MEDIA_FURNITURE = new Set(["tv_board", "tv_wall", "smart_display"]);
 
 /** Whether a screen picture rule matches now: the state or attribute equals the value, or contains it (3+ chars); "*" always. */
 export function pictureRuleMatches(hass: HomeAssistant, rule: { entity: string; attribute?: string | null; state: string }): boolean {
@@ -832,10 +841,10 @@ export function furnitureEntities(hass: HomeAssistant, floors: readonly Floor[])
           const candidates = Object.keys(hass.states ?? {}).filter((id) => id.startsWith("lawn_mower.") && !used.has(id));
           const matches = candidates.filter((id) => pattern.test(name(id)));
           entity = matches.length === 1 ? matches[0] : candidates.length === 1 ? candidates[0] : null;
-        } else if (f.type === "radiator" || f.type === "air_conditioner" || f.type === "wall_thermostat") {
+        } else if (f.type === "radiator" || f.type === "air_conditioner" || f.type === "wall_thermostat" || f.type === "heat_pump_outdoor") {
           const climates = free.filter((id) => kindOf(id) === "climate");
           entity = climates.find((id) => pattern.test(name(id))) ?? climates[0] ?? null;
-        } else if (["network_cabinet", "nas_server", "access_point", "smoke_detector", "siren_alarm"].includes(f.type)) {
+        } else if (["network_cabinet", "nas_server", "access_point", "smoke_detector", "siren_alarm", "electrical_panel", "ups_unit", "modem_router", "hot_water_tank", "ventilation_fan", "humidifier"].includes(f.type)) {
           const area = room?.area_id ?? null;
           const domains: Record<string, string[]> = {
             network_cabinet: ["switch", "sensor", "binary_sensor"],
@@ -843,6 +852,12 @@ export function furnitureEntities(hass: HomeAssistant, floors: readonly Floor[])
             access_point: ["switch", "sensor", "binary_sensor", "device_tracker"],
             smoke_detector: ["binary_sensor"],
             siren_alarm: ["siren", "alarm_control_panel", "switch", "binary_sensor"],
+            electrical_panel: ["switch", "sensor", "binary_sensor"],
+            ups_unit: ["switch", "sensor", "binary_sensor"],
+            modem_router: ["switch", "sensor", "binary_sensor", "device_tracker"],
+            hot_water_tank: ["water_heater", "climate", "switch"],
+            ventilation_fan: ["fan", "switch"],
+            humidifier: ["humidifier", "fan", "switch"],
           };
           const candidates = Object.keys(hass.states ?? {}).filter((id) => {
             if (used.has(id) || !domains[f.type].includes(domainOf(id))) return false;

@@ -865,6 +865,14 @@ export const FURNITURE_TYPES = [
   "wall_thermostat",
   "smoke_detector",
   "siren_alarm",
+  "electrical_panel",
+  "ups_unit",
+  "modem_router",
+  "heat_pump_outdoor",
+  "hot_water_tank",
+  "ventilation_fan",
+  "humidifier",
+  "smart_display",
   "kitchen_corner",
   "kitchen_display",
   "vanity",
@@ -937,14 +945,14 @@ export const FURNITURE_TYPES = [
 /** Furniture library sections (the editor lists them in this order). */
 export const FURNITURE_GROUPS: Record<string, FurnitureType[]> = {
   lights: ["lamp_ceiling", "lamp_downlight", "lamp_spot", "lamp_panel", "lamp_pendant", "lamp_floor", "lamp_uplight", "lamp_table", "lamp_wall", "led_strip", "lamp_bollard", "lamp_garden"],
-  living: ["sofa", "sofa_l", "sofa_bed", "armchair", "stool", "coffee_table", "tv_board", "tv_wall", "smart_speaker", "smart_curtain", "sideboard", "shelf", "room_divider", "altar", "altar_wall", "plant", "rug"],
+  living: ["sofa", "sofa_l", "sofa_bed", "armchair", "stool", "coffee_table", "tv_board", "tv_wall", "smart_display", "smart_speaker", "smart_curtain", "sideboard", "shelf", "room_divider", "altar", "altar_wall", "plant", "rug"],
   dining: ["table", "table_round", "chair", "bench", "corner_bench", "bar_stool"],
   kitchen: ["kitchen", "kitchen_corner", "kitchen_wall", "kitchen_tall", "kitchen_display", "island", "worktop", "sink", "stove", "range_hood", "microwave", "water_purifier", "dishwasher", "fridge"],
   sleeping: ["bed", "bed_single", "bed_double", "bunk_bed", "crib", "nightstand", "wardrobe", "dresser", "vanity"],
-  bath: ["bathtub", "shower", "shower_screen", "wc", "washbasin", "water_heater", "washer", "dryer", "drying_rack"],
-  climate: ["air_conditioner", "air_purifier", "radiator", "wall_thermostat", "fan_ceiling", "fan_ceiling_light", "fan_wall", "fan_floor"],
+  bath: ["bathtub", "shower", "shower_screen", "wc", "washbasin", "water_heater", "hot_water_tank", "washer", "dryer", "drying_rack"],
+  climate: ["air_conditioner", "heat_pump_outdoor", "air_purifier", "humidifier", "radiator", "wall_thermostat", "ventilation_fan", "fan_ceiling", "fan_ceiling_light", "fan_wall", "fan_floor"],
   outdoor: ["security_camera", "smart_lock", "water_pump", "robot_mower", "hammock", "stone_table_set", "planter_large", "water_tank", "gate", "fence"],
-  work: ["desk", "worktop", "office_chair", "tall_cabinet", "coat_rack", "shoe_cabinet", "shoe_bench", "network_cabinet", "nas_server", "access_point", "smoke_detector", "siren_alarm", "stairs", "stairs_landing", "robot_vacuum"],
+  work: ["desk", "worktop", "office_chair", "tall_cabinet", "coat_rack", "shoe_cabinet", "shoe_bench", "network_cabinet", "nas_server", "modem_router", "electrical_panel", "ups_unit", "access_point", "smoke_detector", "siren_alarm", "stairs", "stairs_landing", "robot_vacuum"],
   vehicles: ["motorbike", "parking"],
 };
 
@@ -1058,6 +1066,10 @@ export function builtinBase(f: Pick<Furniture, "type" | "h"> & { variant?: strin
       return 1.35;
     case "siren_alarm":
       return 1.85;
+    case "electrical_panel":
+      return 0.85;
+    case "ventilation_fan":
+      return 1.8;
     default:
       return 0;
   }
@@ -1096,6 +1108,14 @@ export const ELECTRIC_FURNITURE = new Set<string>([
   "wall_thermostat",
   "smoke_detector",
   "siren_alarm",
+  "electrical_panel",
+  "ups_unit",
+  "modem_router",
+  "heat_pump_outdoor",
+  "hot_water_tank",
+  "ventilation_fan",
+  "humidifier",
+  "smart_display",
   "robot_vacuum",
   "robot_mower",
   "inverter",
@@ -1193,6 +1213,14 @@ export const FURNITURE_SIZE: Record<FurnitureType, [number, number, number]> = {
   wall_thermostat: [0.18, 0.065, 0.24],
   smoke_detector: [0.15, 0.15, 0.055],
   siren_alarm: [0.22, 0.085, 0.28],
+  electrical_panel: [0.55, 0.14, 0.8],
+  ups_unit: [0.45, 0.5, 0.72],
+  modem_router: [0.34, 0.22, 0.12],
+  heat_pump_outdoor: [1.0, 0.48, 0.86],
+  hot_water_tank: [0.55, 0.55, 1.3],
+  ventilation_fan: [0.32, 0.14, 0.32],
+  humidifier: [0.38, 0.38, 0.8],
+  smart_display: [0.55, 0.16, 0.36],
   kitchen_corner: [1.25, 1.25, 0.92],
   kitchen_display: [0.8, 0.42, 2.1],
   vanity: [1.0, 0.45, 1.55],

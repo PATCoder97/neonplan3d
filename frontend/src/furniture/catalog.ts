@@ -45,7 +45,7 @@ export type ReferencePack = keyof typeof REFERENCE_PACK_TARGETS;
  */
 export const REFERENCE_PACK_ITEMS: Record<ReferencePack, readonly FurnitureType[]> = {
   home_cinema: ["tv_board", "tv_wall", "smart_speaker"],
-  utility: ["radiator", "air_conditioner", "water_pump", "water_heater", "drying_rack", "water_purifier", "air_purifier", "water_tank", "washer", "dryer"],
+  utility: ["radiator", "air_conditioner", "water_pump", "water_heater", "drying_rack", "water_purifier", "air_purifier", "water_tank", "washer", "dryer", "electrical_panel", "ups_unit", "heat_pump_outdoor", "hot_water_tank", "ventilation_fan", "humidifier"],
   pets: [],
   architecture: ["room_divider", "gate", "fence", "parking"],
   living: ["altar", "altar_wall", "shoe_cabinet", "shoe_bench", "sofa", "sofa_l", "sofa_bed", "armchair", "stool", "coffee_table", "sideboard", "shelf", "plant", "rug", "coat_rack"],
@@ -60,7 +60,7 @@ export const REFERENCE_PACK_ITEMS: Record<ReferencePack, readonly FurnitureType[
   garage: [],
   fitness: [],
   smart_home: [
-    "lamp_ceiling", "lamp_downlight", "lamp_spot", "lamp_panel", "lamp_pendant", "lamp_floor", "lamp_table", "lamp_wall", "led_strip", "lamp_uplight", "lamp_bollard", "lamp_garden", "fan_ceiling", "fan_ceiling_light", "fan_wall", "fan_floor", "security_camera", "smart_lock", "smart_curtain", "robot_vacuum", "robot_mower", "network_cabinet", "nas_server", "access_point", "wall_thermostat", "smoke_detector", "siren_alarm",
+    "lamp_ceiling", "lamp_downlight", "lamp_spot", "lamp_panel", "lamp_pendant", "lamp_floor", "lamp_table", "lamp_wall", "led_strip", "lamp_uplight", "lamp_bollard", "lamp_garden", "fan_ceiling", "fan_ceiling_light", "fan_wall", "fan_floor", "security_camera", "smart_lock", "smart_curtain", "robot_vacuum", "robot_mower", "network_cabinet", "nas_server", "access_point", "wall_thermostat", "smoke_detector", "siren_alarm", "modem_router", "smart_display",
   ],
   vehicles: ["motorbike"],
   stairs: ["stairs", "stairs_landing"],

@@ -25,7 +25,7 @@ Nói ngắn gọn: ảnh của họ được dùng để trả lời “cần c�
 
 ## Hiện trạng ngày 08/10/2026
 
-- Thư viện tích hợp hiện có **101 mục** trong 10 nhóm giao diện, gồm nhiều đồ dùng đặc trưng tại Việt Nam như bàn thờ, xe máy, bồn nước, võng, tủ giày, giàn phơi, quạt trần có đèn, quạt treo tường, robot cắt cỏ và cụm hạ tầng mạng/an toàn.
+- Thư viện tích hợp hiện có **109 mục** trong 10 nhóm giao diện, gồm nhiều đồ dùng đặc trưng tại Việt Nam như bàn thờ, xe máy, bồn nước, võng, tủ giày, giàn phơi, quạt trần có đèn, quạt treo tường, robot cắt cỏ, cụm hạ tầng mạng/an toàn và cụm thiết bị kỹ thuật/điều khiển thông minh.
 - Có 9 gói bố trí nhanh cho phòng: hai kiểu bếp, phòng tắm, phòng ngủ, phòng khách, phòng ăn, văn phòng, phòng trẻ em và sảnh.
 - Trình chỉnh sửa đã có tìm kiếm song ngữ, nhóm thu gọn, xem trước, đổi kích thước, xoay, lật, đặt lên sàn/tường/trần/bề mặt và liên kết entity.
 - Định dạng pack nhập ngoài đã hỗ trợ khối hộp, trụ, khối vát, đèn, màn hình, bề mặt đặt đồ, phương tiện và lỗ cầu thang.
@@ -79,6 +79,8 @@ Bảng kiểm kê làm việc nên có các cột: `nhóm`, `nguồn ảnh`, `t�
 | Robot cắt cỏ có garage | Đã thêm `robot_mower` | Đã vẽ garage thấp mái nghiêng và robot đỗ hướng ra ngoài theo dáng nhận diện ở ảnh 1/3; hỗ trợ entity `lawn_mower`, tự tìm ngoài khu vực phòng và hiển thị dải trạng thái khi cắt cỏ/quay về. |
 | Tủ mạng/NAS/access point trần | Đã thêm `network_cabinet`, `nas_server`, `access_point` | Mỗi mẫu có hình 2D/3D riêng, đúng kiểu đặt sàn/gắn trần, tự tìm entity theo khu vực và hiển thị dải trạng thái cyan khi trực tuyến. |
 | Thermostat, báo khói, còi có đèn | Đã thêm `wall_thermostat`, `smoke_detector`, `siren_alarm` | Thermostat gắn tường theo climate entity; báo khói gắn trần dùng `device_class: smoke`; còi gắn tường hỗ trợ `siren`/`alarm_control_panel` và chớp đỏ khi cảnh báo. |
+| Màn hình điều khiển, tủ điện, bơm nhiệt, bình tích nước và máy tạo ẩm | Đã thêm `smart_display`, `electrical_panel`, `heat_pump_outdoor`, `hot_water_tank`, `humidifier` | Giữ các đặc điểm nhận diện công năng từ gallery nhưng dựng lại low-poly độc lập; mỗi mẫu có symbol 2D, trạng thái động và bộ lọc entity phù hợp. |
+| UPS, modem/router và quạt thông gió | Đã thêm `ups_unit`, `modem_router`, `ventilation_fan` | Bổ sung theo nhóm kỹ thuật của roadmap để hoàn chỉnh cụm vận hành: UPS dạng tháp, router có anten/đèn mạng và quạt gắn tường có lưới bảo vệ. |
 
 `fan_ceiling_light` cần hai vai trò entity độc lập: fan entity điều khiển chuyển động cánh và light entity điều khiển độ sáng/màu của đèn. Nếu chỉ cấu hình một vai trò thì phần còn lại vẫn hiển thị ở trạng thái tắt, không làm mất cả mô hình. Đây cũng là mẫu thử cho catalog có nhiều capability trên cùng một vật thể.
 
@@ -106,7 +108,7 @@ Các biến thể cùng họ, ví dụ sofa 2/3 chỗ, tủ bếp 40/60/80 cm ho
 Mục tiêu: biến hiện trạng thành đường cơ sở có thể đo được.
 
 - [x] Sinh báo cáo tự động từ `FURNITURE_TYPES`, `FURNITURE_GROUPS` và `FURNITURE_SIZE` để phát hiện ID trùng, thiếu tên hoặc thiếu kích thước (`cd frontend && npm run catalog`).
-- [x] Lập bảng ánh xạ các mục hiện tại vào 16 nhóm đích; catalog kiểm kê hiện khóa 108 type, 101 mục thư viện, 7 mục nội bộ và trường hợp `worktop` đang nằm trong hai nhóm. Mỗi mục chỉ được tính một lần trong `REFERENCE_PACK_ITEMS`.
+- [x] Lập bảng ánh xạ các mục hiện tại vào 16 nhóm đích; catalog kiểm kê hiện khóa 116 type, 109 mục thư viện, 7 mục nội bộ và trường hợp `worktop` đang nằm trong hai nhóm. Mỗi mục chỉ được tính một lần trong `REFERENCE_PACK_ITEMS`.
 - [ ] Duyệt toàn bộ ảnh gallery công khai của 16 trang sản phẩm, không chỉ ảnh đại diện ở trang Packs; lập bảng `đã phù hợp / cần sửa hình / cần thêm mới` kèm URL và ngày xem.
 - [ ] Chọn khoảng 10 mẫu hiện có cần sửa hình trước; `fan_ceiling` là mẫu thí điểm và phải giữ nguyên ID.
 - [ ] Chụp bộ ảnh chuẩn ở góc nhìn 2D, 3D và chế độ Day/Neon để so sánh hồi quy.
@@ -132,7 +134,6 @@ Mục tiêu: có nền tảng đủ gọn để thêm nhiều mẫu theo lô.
 Mục tiêu: hoàn thiện bốn nhóm được dùng nhiều nhất trước, khoảng 100–120 mẫu/biến thể mới.
 
 - [ ] Phòng khách: sofa góc trái/phải, ghế đôn, bàn trà, kệ TV, tủ trang trí, vách lam, tủ thờ và bàn thờ nhiều cỡ.
-- [ ] Nhà bếp: module tủ 40/60/80 cm, tủ góc, bếp từ/bếp gas, chậu đơn/đôi, máy hút mùi, tủ lạnh nhiều kiểu và bàn đảo.
 - [ ] Phòng ngủ: giường đơn/đôi, giường tầng, tủ áo cánh mở/cửa lùa, bàn trang điểm, nôi và tủ đầu giường.
 - [ ] Phòng tắm/giặt: lavabo bàn/treo, bồn cầu, khu tắm kính, bình nóng lạnh, máy giặt cửa trên/cửa trước và giàn phơi.
 - [ ] Đèn và làm mát: sửa hình `fan_ceiling`, thêm `fan_ceiling_light`, quạt treo tường và các kiểu đèn phổ biến; quạt có đèn phải điều khiển riêng phần quạt và phần sáng.
@@ -146,9 +147,10 @@ Mục tiêu: hoàn thiện bốn nhóm được dùng nhiều nhất trước, k
 Mục tiêu: đồ vật không chỉ đẹp mà còn phản ánh đúng trạng thái Home Assistant.
 
 - [ ] Smart Home: công tắc, ổ cắm, cảm biến, chuông cửa, khóa, rèm, camera, loa, robot hút bụi có dock, robot cắt cỏ có garage và màn hình điều khiển.
-  - Đã hoàn thành robot hút bụi với trạm sạc dạng tháp và robot cắt cỏ có garage với entity `lawn_mower`; còn các thiết bị điều khiển/cảm biến chưa có.
+  - Đã hoàn thành robot hút bụi với trạm sạc dạng tháp, robot cắt cỏ có garage với entity `lawn_mower` và màn hình điều khiển thông minh có Live Screen; còn công tắc, ổ cắm, cảm biến và chuông cửa.
 - [x] Hạ tầng mạng và an toàn theo ảnh kiểm kê: tủ mạng, NAS, access point trần, thermostat, báo khói và còi có đèn chớp.
 - [ ] Kỹ thuật: tủ điện, UPS, modem/router, bơm, bồn nước, bình nước nóng, điều hòa, quạt thông gió và thiết bị năng lượng.
+  - Đã hoàn thành tủ điện, UPS, modem/router, dàn nóng bơm nhiệt, bình tích nước nóng, quạt thông gió và máy tạo ẩm; nhóm Utility đạt 16/18 mẫu tham chiếu, còn mở rộng thiết bị năng lượng và các biến thể bơm/bồn.
 - [ ] Chuẩn hóa ánh xạ entity theo domain/device class và trạng thái `on`, `open`, `occupied`, `playing`, công suất hoặc mức pin.
 - [ ] Thêm badge trong thư viện để phân biệt mẫu có đèn, màn hình, chuyển động hoặc liên kết công suất.
 
