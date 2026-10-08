@@ -250,6 +250,69 @@ function coffeeTable(b: Builder, w: number, d: number, h: number): void {
   b.box(-w / 2 + 0.05, w / 2 - 0.05, 0.1, 0.13, -d / 2 + 0.05, d / 2 - 0.05, C.body, C.bodyTop, EDGE_FAINT);
 }
 
+function roundCoffeeTable(b: Builder, w: number, d: number, h: number): void {
+  const r = Math.min(w, d) / 2;
+  b.cyl(0, 0, r * 0.42, 0, 0.035, C.dark, C.dark, 14);
+  b.cyl(0, 0, Math.min(0.075, r * 0.18), 0.03, h - 0.045, C.metal, C.metal, 10);
+  b.cyl(0, 0, r, h - 0.045, h, C.wood, C.woodTop, 24, EDGE_FURN);
+}
+
+function glassCoffeeTable(b: Builder, w: number, d: number, h: number): void {
+  const inset = Math.min(0.1, Math.min(w, d) * 0.15);
+  legs(b, w - inset, d - inset, h - 0.035, 0.025, 0.03, C.metal);
+  b.box(-w / 2, w / 2, h - 0.035, h, -d / 2, d / 2, C.glass, C.glass, EDGE_GLOW);
+  b.box(-w / 2 + inset, w / 2 - inset, h * 0.28, h * 0.31, -d / 2 + inset, d / 2 - inset, C.glass, C.glass, EDGE_FAINT);
+}
+
+function nestingTables(b: Builder, w: number, d: number, h: number): void {
+  const specs = [
+    [-w * 0.22, -d * 0.12, w * 0.58, d * 0.72, h],
+    [w * 0.22, d * 0.12, w * 0.48, d * 0.62, h * 0.82],
+  ] as const;
+  for (const [cx, cz, tw, td, th] of specs) {
+    const leg = 0.025;
+    for (const x of [cx - tw / 2 + leg, cx + tw / 2 - leg]) for (const z of [cz - td / 2 + leg, cz + td / 2 - leg]) b.box(x - leg, x + leg, 0, th - 0.03, z - leg, z + leg, C.metal);
+    b.box(cx - tw / 2, cx + tw / 2, th - 0.03, th, cz - td / 2, cz + td / 2, C.wood, C.woodTop, EDGE_FURN);
+  }
+}
+
+function cubeShelf(b: Builder, w: number, d: number, h: number, cols: number, rows: number): void {
+  const t = Math.min(0.035, Math.min(w / cols, h / rows) * 0.12);
+  for (let col = 0; col <= cols; col++) {
+    const x = -w / 2 + (w * col) / cols;
+    b.box(x - t / 2, x + t / 2, 0, h, -d / 2, d / 2, C.wood, C.woodTop, col === 0 || col === cols ? EDGE_FURN : EDGE_FAINT);
+  }
+  for (let row = 0; row <= rows; row++) {
+    const y = (h * row) / rows;
+    b.box(-w / 2, w / 2, Math.max(0, y - t / 2), Math.min(h, y + t / 2), -d / 2, d / 2, C.wood, C.woodTop, row === 0 || row === rows ? EDGE_FURN : EDGE_FAINT);
+  }
+}
+
+function floatingShelf(b: Builder, w: number, d: number, h: number): void {
+  const y = 1.35;
+  b.box(-w / 2, w / 2, y, y + h, -d / 2, d / 2, C.wood, C.woodTop, EDGE_FURN);
+  for (const x of [-w * 0.34, w * 0.34]) b.box(x - 0.018, x + 0.018, y, y + h, -d / 2 - 0.012, -d * 0.12, C.metal, C.metal, EDGE_FAINT);
+}
+
+function altarTable(b: Builder, w: number, d: number, h: number): void {
+  const top = h * 0.72;
+  legs(b, w, d, top - 0.06, 0.055, 0.04, C.wood, true);
+  b.box(-w / 2, w / 2, top - 0.07, top, -d / 2, d / 2, C.wood, C.woodTop, EDGE_FURN);
+  b.box(-w * 0.43, w * 0.43, top - h * 0.22, top - 0.07, d / 2 - 0.045, d / 2, C.wood, C.woodTop, EDGE_FAINT);
+  b.cyl(0, d * 0.06, Math.min(w, d) * 0.085, top, top + h * 0.07, C.accent, C.woodTop, 12, EDGE_GLOW);
+  b.box(-w * 0.2, w * 0.2, top + h * 0.04, h, -d * 0.35, -d * 0.29, C.wood, C.woodTop, EDGE_FURN);
+}
+
+function altarCabinet(b: Builder, w: number, d: number, h: number): void {
+  const top = h * 0.7;
+  cabinet(b, w, d, top, 3, top * 0.58, true);
+  const front = d / 2 + 0.006;
+  for (const x of [-w * 0.27, 0, w * 0.27]) b.seg(x, top * 0.18, front, x, top * 0.82, front, EDGE_FAINT);
+  b.cyl(0, d * 0.08, Math.min(w, d) * 0.08, top, top + h * 0.06, C.accent, C.woodTop, 12, EDGE_GLOW);
+  b.box(-w * 0.19, w * 0.19, top + h * 0.04, h * 0.9, -d * 0.36, -d * 0.3, C.wood, C.woodTop, EDGE_FURN);
+  b.loft([-w * 0.28, w * 0.28, -d * 0.4, -d * 0.25], [-w * 0.22, w * 0.22, -d * 0.37, -d * 0.28], h * 0.9, h, C.wood, C.woodTop, EDGE_FURN);
+}
+
 function tvWall(b: Builder, w: number, d: number, h: number): void {
   // flat screen on a wall bracket, centred at 1.3 m
   const y0 = 1.3 - h / 2;
@@ -415,6 +478,8 @@ function sofaBed(b: Builder, w: number, d: number, h: number): void {
 
 export const EVERYDAY_FURNITURE_MODELS: Readonly<Record<string, FurnitureModelRenderer>> = {
   altar: ({ b, w, d, h }) => (altar(b, w, d, h), 0.5),
+  altar_table: ({ b, w, d, h }) => (altarTable(b, w, d, h), 0.5),
+  altar_cabinet: ({ b, w, d, h }) => (altarCabinet(b, w, d, h), 0.5),
   altar_wall: ({ b, w, d, h }) => (wallAltar(b, w, d, h), false),
   armchair: ({ b, w, d, h }) => (sofa(b, w, d, h, 1), 0.5),
   bar_stool: ({ b, w, d, h }) => (barStool(b, w, d, h), 0.5),
@@ -426,6 +491,10 @@ export const EVERYDAY_FURNITURE_MODELS: Readonly<Record<string, FurnitureModelRe
   chair: ({ b, w, d, h }) => (chair(b, w, d, h), 0.5),
   coat_rack: ({ b, w, d, h }) => (coatRack(b, w, d, h), 0.5),
   coffee_table: ({ b, w, d, h }) => (coffeeTable(b, w, d, h), 0.5),
+  coffee_table_round: ({ b, w, d, h }) => (roundCoffeeTable(b, w, d, h), 0.5),
+  coffee_table_glass: ({ b, w, d, h }) => (glassCoffeeTable(b, w, d, h), 0.5),
+  nesting_tables: ({ b, w, d, h }) => (nestingTables(b, w, d, h), 0.5),
+  side_table_round: ({ b, w, d, h }) => (roundCoffeeTable(b, w, d, h), 0.5),
   corner_bench: ({ b, w, d, h }) => (bench(b, w, d, h, true), 0.5),
   crib: ({ b, w, d, h }) => (crib(b, w, d, h), 0.5),
   desk: ({ b, w, d, h }) => (desk(b, w, d, h), 0.5),
@@ -441,6 +510,10 @@ export const EVERYDAY_FURNITURE_MODELS: Readonly<Record<string, FurnitureModelRe
   room_divider: ({ b, w, d, h }) => (roomDivider(b, w, d, h), 0.5),
   rug: ({ b, w, d }) => (rug(b, w, d), false),
   shelf: ({ b, w, d, h }) => (shelf(b, w, d, h), 0.5),
+  bookshelf_wide: ({ b, w, d, h }) => (shelf(b, w, d, h), 0.5),
+  cube_shelf_2x2: ({ b, w, d, h }) => (cubeShelf(b, w, d, h, 2, 2), 0.5),
+  cube_shelf_4x2: ({ b, w, d, h }) => (cubeShelf(b, w, d, h, 4, 2), 0.5),
+  floating_shelf: ({ b, w, d, h }) => (floatingShelf(b, w, d, h), false),
   shoe_bench: ({ b, w, d, h }) => (shoeBench(b, w, d, h), 0.5),
   shoe_cabinet: ({ b, w, d, h }) => (shoeCabinet(b, w, d, h), 0.5),
   sideboard: ({ b, w, d, h }) => (sideboard(b, w, d, h), 0.5),

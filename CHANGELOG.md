@@ -4,6 +4,19 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.20.1
+
+### Added
+
+- Added a second Phase 2 living-room batch: round and glass coffee tables, nesting tables, a round side table, a wide bookshelf, 2×2 and 4×2 cube shelves, and a correctly mounted floating wall shelf.
+- Added two independently designed Vietnamese worship-furniture variants: an open altar table and an enclosed altar cabinet.
+- Added dedicated 2D symbols, parameterized low-poly 3D geometry, practical default dimensions and German/English/Vietnamese names for all ten items.
+
+### Changed
+
+- Expanded the reproducible catalog inventory to 153 declared types and 146 library items, with living-room reference coverage now at 33 items.
+- Marked the new table family as valid surfaces for table lamps and documented which additions follow the public Living Room list versus the fork's Vietnam-specific roadmap.
+
 ## 1.20.0
 
 ### Added

@@ -3,7 +3,7 @@
 import { createSymbolRegistry, circle, ellipse, fronts, line, rect, seating, type SymbolPart as Part } from "./common.ts";
 import type { FurnitureSymbol } from "./types.ts";
 
-const TYPES = ["altar","altar_wall","shoe_cabinet","shoe_bench","room_divider","vanity","crib","bed_single","bed_double","sofa_2","sofa_3","sofa_4","sofa_l","sofa_corner_left","sofa_corner_right","sofa_bed","sofa","armchair","ottoman","bench","corner_bench","chair","office_chair","bar_stool","table_round","stool","table","coffee_table","desk","bed","bunk_bed","nightstand","wardrobe","dresser","sideboard","display_cabinet","tall_cabinet","kitchen","kitchen_wall","kitchen_tall","shelf","coat_rack","tv_console","tv_board","tv_wall","plant","rug"] as const;
+const TYPES = ["altar","altar_table","altar_cabinet","altar_wall","shoe_cabinet","shoe_bench","room_divider","vanity","crib","bed_single","bed_double","sofa_2","sofa_3","sofa_4","sofa_l","sofa_corner_left","sofa_corner_right","sofa_bed","sofa","armchair","ottoman","bench","corner_bench","chair","office_chair","bar_stool","table_round","stool","table","coffee_table","coffee_table_round","coffee_table_glass","nesting_tables","side_table_round","desk","bed","bunk_bed","nightstand","wardrobe","dresser","sideboard","display_cabinet","tall_cabinet","kitchen","kitchen_wall","kitchen_tall","shelf","bookshelf_wide","cube_shelf_2x2","cube_shelf_4x2","floating_shelf","coat_rack","tv_console","tv_board","tv_wall","plant","rug"] as const;
 
 function renderSymbol(type: string, w: number, d: number): FurnitureSymbol {
   switch (type) {
@@ -13,6 +13,10 @@ function renderSymbol(type: string, w: number, d: number): FurnitureSymbol {
         rect(-w * 0.42, d * 0.18, w * 0.42, d / 2, "fp3d-sym-fill"),
         circle(0, d * 0.05, Math.min(w, d) * 0.08),
       ];
+    case "altar_table":
+      return [rect(-w / 2, -d / 2, w / 2, d / 2), rect(-w * 0.42, d * 0.2, w * 0.42, d / 2, "fp3d-sym-fill"), circle(0, d * 0.04, Math.min(w, d) * 0.08)];
+    case "altar_cabinet":
+      return [...fronts(w, d, 3), circle(0, d * 0.04, Math.min(w, d) * 0.07)];
     case "altar_wall":
       return [rect(-w / 2, -d / 2, w / 2, d / 2), line(-w * 0.35, d * 0.15, w * 0.35, d * 0.15, "fp3d-sym-strong")];
     case "shoe_cabinet":
@@ -73,16 +77,21 @@ function renderSymbol(type: string, w: number, d: number): FurnitureSymbol {
       return [circle(0, 0.03, Math.min(w, d) * 0.36), rect(-w * 0.35, -d / 2 + 0.02, w * 0.35, -d / 2 + 0.1, "fp3d-sym-fill")];
     case "bar_stool":
     case "table_round":
+    case "coffee_table_round":
+    case "side_table_round":
       return [circle(0, 0, Math.min(w, d) * 0.42)];
     case "stool":
       return [rect(-w / 2 + 0.04, -d / 2 + 0.04, w / 2 - 0.04, d / 2 - 0.04)];
     case "table":
     case "coffee_table":
+    case "coffee_table_glass":
     case "desk": {
       const out = [rect(-w / 2 + 0.05, -d / 2 + 0.05, w / 2 - 0.05, d / 2 - 0.05)];
       if (type === "desk") out.push(line(-0.3, -d / 2 + 0.1, 0.3, -d / 2 + 0.1, "fp3d-sym-strong"));
       return out;
     }
+    case "nesting_tables":
+      return [rect(-w / 2, -d / 2, w * 0.08, d * 0.18), rect(-w * 0.05, -d * 0.15, w / 2, d / 2, "fp3d-sym-fill")];
     case "bed":
     case "bunk_bed": {
       const pillows = w > 1.2 ? 2 : 1;
@@ -101,7 +110,17 @@ function renderSymbol(type: string, w: number, d: number): FurnitureSymbol {
     case "kitchen_wall":
     case "kitchen_tall":
     case "shelf":
+    case "bookshelf_wide":
       return fronts(w, d, type === "nightstand" || type === "tall_cabinet" || type === "kitchen_tall" ? 1 : Math.max(2, Math.round(w / 0.5)));
+    case "cube_shelf_2x2":
+    case "cube_shelf_4x2": {
+      const cols = type === "cube_shelf_2x2" ? 2 : 4;
+      const out: Part[] = [rect(-w / 2, -d / 2, w / 2, d / 2)];
+      for (let i = 1; i < cols; i++) out.push(line(-w / 2 + (w * i) / cols, -d / 2, -w / 2 + (w * i) / cols, d / 2));
+      return out;
+    }
+    case "floating_shelf":
+      return [rect(-w / 2, -d / 2, w / 2, d / 2), line(-w * 0.35, -d / 2, -w * 0.35, d * 0.15), line(w * 0.35, -d / 2, w * 0.35, d * 0.15)];
     case "coat_rack":
       return [rect(-w / 2, -d / 2, w / 2, -d / 2 + 0.03, "fp3d-sym-fill"), ...fronts(w, d, Math.max(2, Math.round(w / 0.5)))];
     case "tv_console":

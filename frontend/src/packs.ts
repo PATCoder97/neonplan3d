@@ -159,6 +159,7 @@ export function mountBase(floor: Floor, f: Pick<Furniture, "type" | "x" | "z" | 
   if (f.type === "access_point" || f.type === "smoke_detector") return Math.max(0, floor.height - Math.max(0.02, f.h));
   if (f.type === "fan_wall") return 1.55;
   if (f.type === "altar_wall") return 1.45;
+  if (f.type === "floating_shelf") return 1.35;
   if (f.type === "water_heater") return 1.7;
   if (f.type === "range_hood") return 1.35;
   if (f.type === "microwave") return surfaceHeight(floor, f.x, f.z);

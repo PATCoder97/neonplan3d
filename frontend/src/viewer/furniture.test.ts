@@ -151,6 +151,11 @@ test("the mount height is absolute: a wall cabinet hangs at 1.45 m and can go lo
   assert.equal(mountBase(floor, cab), 1.45);
   assert.ok(Math.abs(minY(cab) - 1.45) < 1e-6);
   assert.ok(Math.abs(minY({ ...cab, mount_y: 1.0 }) - 1.0) < 1e-6);
+  const [w, d, h] = FURNITURE_SIZE.floating_shelf;
+  const shelf = { id: "floating", type: "floating_shelf", x: 0, z: 0, w, d, h, rotation: 0, variant: null } as Furniture;
+  assert.equal(mountBase(floor, shelf), 1.35);
+  assert.ok(Math.abs(minY(shelf) - 1.35) < 1e-6);
+  assert.ok(Math.abs(minY({ ...shelf, mount_y: 1.0 }) - 1.0) < 1e-6, "custom mount moves the complete shelf assembly");
 });
 
 test("a split air conditioner hangs high on the wall and exposes its outlet as the active face", () => {
