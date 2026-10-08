@@ -151,6 +151,40 @@ test("fitness family has bounded dedicated equipment, wall mounts and a smart li
   for (const type of ["fitness_treadmill", "fitness_rower", "fitness_spin_bike", "fitness_cross_trainer", "fitness_mirror_smart", "fitness_bike_trainer", "fitness_sauna_cabin", "fitness_massage_chair", "fitness_water_station"]) assert.ok(ELECTRIC_FURNITURE.has(type), `${type}: powered capability`);
 });
 
+test("home-cinema batch one has bounded AV geometry, correct mounts and live display surfaces", () => {
+  const types = ["cinema_screen_wall", "cinema_screen_roller", "cinema_projector_ceiling", "cinema_projector_table", "cinema_speaker_tower", "cinema_speaker_bookshelf", "cinema_speaker_center", "cinema_subwoofer", "cinema_soundbar", "cinema_speaker_wall", "cinema_speaker_ceiling", "cinema_av_receiver", "cinema_tv_oled_65", "cinema_tv_oled_85", "cinema_projector_ust", "cinema_screen_floor_rising"] as const;
+  const signatures = new Set<string>();
+  for (const type of types) {
+    const [w, d, h] = FURNITURE_SIZE[type];
+    const buf = new GeoBuffer();
+    const lines = new LineBuffer();
+    const item = { id: type, type, x: 0, z: 0, rotation: 0, w, d, h, variant: null } as Furniture;
+    pushFurniture(buf, lines, new GeoBuffer(), item, builtinBase(item));
+    assert.ok(buf.count > 0 && lines.p.length > 0, `${type}: solid and outline geometry`);
+    assert.ok(buf.p.every(Number.isFinite) && lines.p.every(Number.isFinite), `${type}: finite geometry`);
+    const ys = buf.p.filter((_, index) => index % 3 === 1);
+    assert.ok(Math.min(...ys) >= -1e-6 && Math.max(...ys) <= h + 1e-6, `${type}: geometry stays inside declared height`);
+    signatures.add(`${buf.count}:${lines.p.length}`);
+    assert.ok(ELECTRIC_FURNITURE.has(type), `${type}: powered capability`);
+  }
+  assert.ok(signatures.size >= 8, "cinema models keep varied geometric complexity");
+
+  const floor = newFloor("cinema", "Cinema", 0);
+  assert.equal(mountBase(floor, { type: "cinema_screen_wall", x: 0, z: 0, h: FURNITURE_SIZE.cinema_screen_wall[2] }), 0.65);
+  assert.equal(mountBase(floor, { type: "cinema_screen_roller", x: 0, z: 0, h: FURNITURE_SIZE.cinema_screen_roller[2] }), 0.65);
+  assert.equal(mountBase(floor, { type: "cinema_speaker_wall", x: 0, z: 0, h: FURNITURE_SIZE.cinema_speaker_wall[2] }), 1.2);
+  assert.equal(mountBase(floor, { type: "cinema_projector_ceiling", x: 0, z: 0, h: FURNITURE_SIZE.cinema_projector_ceiling[2] }), floor.height - FURNITURE_SIZE.cinema_projector_ceiling[2]);
+  assert.equal(mountBase(floor, { type: "cinema_speaker_ceiling", x: 0, z: 0, h: FURNITURE_SIZE.cinema_speaker_ceiling[2] }), floor.height - FURNITURE_SIZE.cinema_speaker_ceiling[2]);
+  assert.equal(mountBase(floor, { type: "cinema_tv_oled_65", x: 0, z: 0, h: FURNITURE_SIZE.cinema_tv_oled_65[2] }), 0.75);
+
+  for (const type of ["cinema_screen_wall", "cinema_screen_roller", "cinema_screen_floor_rising", "cinema_tv_oled_65", "cinema_tv_oled_85"] as const) {
+    const [w, d, h] = FURNITURE_SIZE[type];
+    assert.ok(screenRect({ id: type, type, x: 0, z: 0, rotation: 0, w, d, h, variant: null } as Furniture, floor), `${type}: Live Screen surface`);
+  }
+  const [soundbarW, soundbarD, soundbarH] = FURNITURE_SIZE.cinema_soundbar;
+  assert.equal(screenRect({ id: "soundbar", type: "cinema_soundbar", x: 0, z: 0, rotation: 0, w: soundbarW, d: soundbarD, h: soundbarH, variant: null } as Furniture, floor), null);
+});
+
 test("office fixtures have distinct geometry and monitors follow the supporting desk", () => {
   const types = ["desk_l", "desk_corner", "desk_sit_stand", "chair_ergonomic", "chair_visitor", "filing_cabinet", "drawer_unit_office", "bookcase_office", "monitor_single", "monitor_dual", "pc_tower", "gaming_chair", "sim_racing_cockpit", "server_rack_42u", "printer_3d_open", "whiteboard_office", "monitor_triple", "arcade_cabinet", "laser_printer", "phone_booth_office", "printer_3d_enclosed", "filament_shelf_wall"] as const;
   const complexity = new Map<string, number>();

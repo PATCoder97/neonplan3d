@@ -4,6 +4,18 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.23.6
+
+### Added
+
+- Added the first 16-item Home Cinema & Hi-Fi batch: three projection screens, three projectors, six speaker formats, an AV receiver and two OLED TV sizes.
+- Added a dedicated Cinema library group with procedural 3D models, plan symbols and English, German and Vietnamese names.
+
+### Changed
+
+- Cinema displays expose Live Screens; wall-, ceiling- and surface-mounted equipment follows its installation height, while both visual and audio equipment can link to matching Home Assistant media players.
+- Expanded the reproducible inventory to 437 declared types and 430 library items, with Home Cinema & Hi-Fi coverage at 19 of 35.
+
 ## 1.23.5
 
 ### Added

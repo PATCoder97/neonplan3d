@@ -3,6 +3,7 @@ import { ARCHITECTURE_FURNITURE_SYMBOLS } from "./architecture.ts";
 import { BEDROOM_FURNITURE_SYMBOLS } from "./bedroom.ts";
 import { BATHROOM_FURNITURE_SYMBOLS } from "./bathroom.ts";
 import { CLIMATE_FURNITURE_SYMBOLS } from "./climate.ts";
+import { CINEMA_FURNITURE_SYMBOLS } from "./cinema.ts";
 import { EVERYDAY_FURNITURE_SYMBOLS } from "./everyday.ts";
 import { FITNESS_FURNITURE_SYMBOLS } from "./fitness.ts";
 import { GARDEN_FURNITURE_SYMBOLS } from "./garden.ts";
@@ -32,6 +33,7 @@ const BUILTIN_FURNITURE_SYMBOLS: Readonly<Record<string, FurnitureSymbolRenderer
   ...GARDEN_FURNITURE_SYMBOLS,
   ...GARAGE_FURNITURE_SYMBOLS,
   ...CLIMATE_FURNITURE_SYMBOLS,
+  ...CINEMA_FURNITURE_SYMBOLS,
   ...SMART_HOME_FURNITURE_SYMBOLS,
   ...STAIR_FURNITURE_SYMBOLS,
   ...LIGHTING_FURNITURE_SYMBOLS,

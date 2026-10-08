@@ -4,7 +4,7 @@ import { FURNITURE_TYPES } from "../../model.ts";
 import { BUILTIN_FURNITURE_SYMBOLS, registeredFurnitureSymbol } from "../../components/furniture-symbols/index.ts";
 import { BUILTIN_FURNITURE_MODELS, BUILTIN_FURNITURE_SCREENS, registeredFurnitureScreen } from "./index.ts";
 
-const SCREEN_TYPES = ["alarm_sunrise", "arcade_cabinet", "baby_monitor", "balcony_solar", "bathroom_fan", "bed_ambient_180", "dishwasher", "dryer", "electric_towel_heater", "fireplace_builtin", "fitness_mirror_smart", "led_niche", "light_cove", "media_wall_tv", "mirror_80_light", "mirror_cabinet_light", "mirror_led_clock", "mirror_round_light", "monitor_dual", "monitor_single", "monitor_triple", "rain_shower_led", "tv_stand", "vanity_light", "wardrobe_light", "washer", "washer_dryer_tower"];
+const SCREEN_TYPES = ["alarm_sunrise", "arcade_cabinet", "baby_monitor", "balcony_solar", "bathroom_fan", "bed_ambient_180", "cinema_screen_floor_rising", "cinema_screen_roller", "cinema_screen_wall", "cinema_tv_oled_65", "cinema_tv_oled_85", "dishwasher", "dryer", "electric_towel_heater", "fireplace_builtin", "fitness_mirror_smart", "led_niche", "light_cove", "media_wall_tv", "mirror_80_light", "mirror_cabinet_light", "mirror_led_clock", "mirror_round_light", "monitor_dual", "monitor_single", "monitor_triple", "rain_shower_led", "tv_stand", "vanity_light", "wardrobe_light", "washer", "washer_dryer_tower"];
 const SYMBOLLESS_INTERNAL_TYPES = ["fridge_smart", "grid_point", "home_battery", "inverter", "meter", "stairwell", "wallbox", "worktop"];
 
 test("every non-lamp built-in has a family renderer", () => {

@@ -731,6 +731,22 @@ const FURNITURE_NAMES: Record<string, RegExp> = {
   video_doorbell: /(video ?doorbell|doorbell|klingel|chuông cửa|chuong cua)/i,
   kitchen_display: /(vitrine|display ?cabinet|cabinet ?light|schranklicht|tủ kính|tu kinh|tủ trưng bày|tu trung bay|đèn tủ|den tu|led tủ|led tu)/i,
   media_wall_tv: /\b(tv|fernseh|television|fire ?tv|apple ?tv|chromecast|shield)/i,
+  cinema_screen_wall: /(projector|beamer|cinema|theater|kino|máy chiếu|may chieu)/i,
+  cinema_screen_roller: /(projector|beamer|cinema|theater|kino|máy chiếu|may chieu)/i,
+  cinema_projector_ceiling: /(projector|beamer|máy chiếu|may chieu)/i,
+  cinema_projector_table: /(projector|beamer|máy chiếu|may chieu)/i,
+  cinema_projector_ust: /(projector|beamer|máy chiếu|may chieu)/i,
+  cinema_screen_floor_rising: /(projector|beamer|cinema|theater|kino|máy chiếu|may chieu)/i,
+  cinema_speaker_tower: /(speaker|lautsprecher|loa)/i,
+  cinema_speaker_bookshelf: /(speaker|lautsprecher|loa)/i,
+  cinema_speaker_center: /(center|centre|speaker|lautsprecher|loa)/i,
+  cinema_subwoofer: /(subwoofer|sub|bass|siêu trầm|sieu tram)/i,
+  cinema_soundbar: /(soundbar|sound ?bar|loa thanh)/i,
+  cinema_speaker_wall: /(speaker|lautsprecher|loa)/i,
+  cinema_speaker_ceiling: /(speaker|lautsprecher|loa)/i,
+  cinema_av_receiver: /(av ?receiver|receiver|ampli|amplifier|verstärker)/i,
+  cinema_tv_oled_65: /\b(tv|fernseh|television|oled|fire ?tv|apple ?tv|chromecast|shield)/i,
+  cinema_tv_oled_85: /\b(tv|fernseh|television|oled|fire ?tv|apple ?tv|chromecast|shield)/i,
   fireplace_wall_electric: /(fireplace|kamin|lò sưởi|lo suoi)/i,
   bed_ambient_180: /(bed|bett|giường|giuong).*(light|licht|đèn|den)|ambient/i,
   wardrobe_light: /(wardrobe|closet|kleiderschrank|tủ áo|tu ao).*(light|licht|đèn|den)/i,
@@ -748,7 +764,8 @@ const FURNITURE_NAMES: Record<string, RegExp> = {
   led_niche: /(niche|nische|hốc|hoc).*(led|light|licht|đèn|den)/i,
   light_cove: /(cove|voute|khe|hắt|hat).*(light|licht|đèn|den)/i,
 };
-const MEDIA_FURNITURE = new Set(["tv_board", "tv_wall", "tv_stand", "media_wall_tv", "smart_display"]);
+const MEDIA_FURNITURE = new Set(["tv_board", "tv_wall", "tv_stand", "media_wall_tv", "smart_display", "cinema_screen_wall", "cinema_screen_roller", "cinema_screen_floor_rising", "cinema_tv_oled_65", "cinema_tv_oled_85"]);
+const MEDIA_AUDIO = new Set(["cinema_projector_ceiling", "cinema_projector_table", "cinema_projector_ust", "cinema_speaker_tower", "cinema_speaker_bookshelf", "cinema_speaker_center", "cinema_subwoofer", "cinema_soundbar", "cinema_speaker_wall", "cinema_speaker_ceiling", "cinema_av_receiver"]);
 
 /** Whether a screen picture rule matches now: the state or attribute equals the value, or contains it (3+ chars); "*" always. */
 export function pictureRuleMatches(hass: HomeAssistant, rule: { entity: string; attribute?: string | null; state: string }): boolean {
@@ -761,13 +778,13 @@ export function pictureRuleMatches(hass: HomeAssistant, rule: { entity: string; 
   return rule.state.trim() === "*" || value === want || (want.length >= 3 && value.includes(want));
 }
 
-/** Furniture with a screen that shows a media player: the built-in TVs, or a pack item with a screen part. */
+/** Furniture controlled by a media player: screens, projectors, speakers and receivers. */
 export function isMediaFurniture(type: string): boolean {
-  return MEDIA_FURNITURE.has(type) || !!packScreen(type);
+  return MEDIA_FURNITURE.has(type) || MEDIA_AUDIO.has(type) || !!packScreen(type);
 }
-/** Furniture with a screen that can show a media player or a picture rule (media furniture and the desk's monitor). */
+/** Furniture with a visible screen that can show a media player or a picture rule. */
 export function hasScreen(type: string): boolean {
-  return isMediaFurniture(type) || type === "desk" || type === "fridge_smart";
+  return MEDIA_FURNITURE.has(type) || !!packScreen(type) || type === "desk" || type === "fridge_smart";
 }
 
 /** Entities that ask before they are switched: placed devices and furniture links marked "confirm". */

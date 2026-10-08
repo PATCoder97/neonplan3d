@@ -156,7 +156,7 @@ export function mountBase(floor: Floor, f: Pick<Furniture, "type" | "x" | "z" | 
   if (f.type === "lamp_wall" || f.type === "lamp_wall_updown") return WALL_LAMP_Y;
   if (f.type === "led_strip") return Math.max(0, floor.height - 0.04 - Math.max(0.02, f.h));
   if (f.type === "fan_ceiling" || f.type === "fan_ceiling_light") return Math.max(0, floor.height - Math.max(0.05, f.h));
-  if (f.type === "access_point" || f.type === "smoke_detector") return Math.max(0, floor.height - Math.max(0.02, f.h));
+  if (f.type === "access_point" || f.type === "smoke_detector" || f.type === "cinema_projector_ceiling" || f.type === "cinema_speaker_ceiling") return Math.max(0, floor.height - Math.max(0.02, f.h));
   if (f.type === "fan_wall") return 1.55;
   if (f.type === "altar_wall") return 1.45;
   if (f.type === "floating_shelf") return 1.35;
@@ -164,7 +164,7 @@ export function mountBase(floor: Floor, f: Pick<Furniture, "type" | "x" | "z" | 
   if (f.type === "water_heater") return 1.7;
   if (f.type === "range_hood") return 1.35;
   if (f.type === "microwave") return surfaceHeight(floor, f.x, f.z);
-  if (["modem_router", "smart_display", "monitor_single", "monitor_dual", "monitor_triple", "printer_3d_open", "printer_3d_enclosed", "laser_printer", "baby_monitor", "lamp_night_moon", "lamp_star_projector"].includes(f.type)) return surfaceHeight(floor, f.x, f.z);
+  if (["modem_router", "smart_display", "monitor_single", "monitor_dual", "monitor_triple", "printer_3d_open", "printer_3d_enclosed", "laser_printer", "baby_monitor", "lamp_night_moon", "lamp_star_projector", "cinema_projector_table", "cinema_speaker_bookshelf", "cinema_speaker_center", "cinema_soundbar", "cinema_av_receiver", "cinema_projector_ust"].includes(f.type)) return surfaceHeight(floor, f.x, f.z);
   // An outdoor pump follows the lawn/terrace below it; inside a room it stays on that floor.
   if ((f.type === "water_pump" || f.type === "heat_pump_outdoor") && !floor.rooms.some((r) => r.points.length >= 3 && pointInPolygon([f.x, f.z], r.points))) return outdoorGround(floor, f.x, f.z);
   switch (item?.mount) {

@@ -47,7 +47,7 @@ export type ReferencePack = keyof typeof REFERENCE_PACK_TARGETS;
  * exactly once here so progress cannot be inflated.
  */
 export const REFERENCE_PACK_ITEMS: Record<ReferencePack, readonly FurnitureType[]> = {
-  home_cinema: ["tv_board", "tv_wall", "smart_speaker"],
+  home_cinema: ["tv_board", "tv_wall", "smart_speaker", "cinema_screen_wall", "cinema_screen_roller", "cinema_projector_ceiling", "cinema_projector_table", "cinema_speaker_tower", "cinema_speaker_bookshelf", "cinema_speaker_center", "cinema_subwoofer", "cinema_soundbar", "cinema_speaker_wall", "cinema_speaker_ceiling", "cinema_av_receiver", "cinema_tv_oled_65", "cinema_tv_oled_85", "cinema_projector_ust", "cinema_screen_floor_rising"],
   utility: ["radiator", "air_conditioner", "water_pump", "water_heater", "drying_rack", "water_purifier", "air_purifier", "water_tank", "washer", "dryer", "washer_dryer_tower", "balcony_solar", "electrical_panel", "ups_unit", "heat_pump_outdoor", "hot_water_tank", "ventilation_fan", "humidifier"],
   pets: ["cat_tree_large", "cat_scratching_post", "cat_scratch_board_wall", "cat_cave", "cat_bed_round", "cat_wall_perch", "cat_climbing_steps_wall", "litter_box_hood", "litter_box_self_cleaning", "dog_bed", "dog_basket", "dog_house", "pet_bowls", "pet_feeder_automatic", "pet_water_fountain", "pet_gate", "pet_stairs", "hamster_cage", "small_animal_cage", "rabbit_enclosure_outdoor", "bird_cage", "aquarium_100", "aquarium_240_cabinet", "terrarium"],
   architecture: ["room_divider", "shower_screen", "smart_curtain", "column_round", "column_square", "column_steel", "ceiling_beams", "downstand_beam", "chimney_inside", "fireplace_builtin", "sliding_wall", "builtin_shelf_niche", "led_niche", "light_cove", "platform_steps", "gallery_railing_glass", "window_seat"],
