@@ -51,7 +51,7 @@ export const REFERENCE_PACK_ITEMS: Record<ReferencePack, readonly FurnitureType[
   utility: ["radiator", "air_conditioner", "water_pump", "water_heater", "drying_rack", "water_purifier", "air_purifier", "water_tank", "washer", "dryer", "washer_dryer_tower", "balcony_solar", "electrical_panel", "ups_unit", "heat_pump_outdoor", "hot_water_tank", "ventilation_fan", "humidifier"],
   pets: [],
   architecture: ["room_divider", "gate", "fence", "parking"],
-  living: ["altar", "altar_wall", "shoe_cabinet", "shoe_bench", "sofa", "sofa_l", "sofa_bed", "armchair", "stool", "coffee_table", "sideboard", "shelf", "plant", "rug", "coat_rack"],
+  living: ["altar", "altar_wall", "shoe_cabinet", "shoe_bench", "sofa", "sofa_2", "sofa_3", "sofa_4", "sofa_l", "sofa_corner_left", "sofa_corner_right", "sofa_bed", "armchair", "ottoman", "stool", "coffee_table", "tv_console", "sideboard", "display_cabinet", "shelf", "plant", "rug", "coat_rack"],
   kitchen: [
     "range_hood", "microwave", "kitchen_corner", "kitchen_display", "table", "table_round", "chair", "bench", "corner_bench", "bar_stool", "kitchen", "kitchen_wall", "kitchen_tall", "island", "worktop", "sink", "stove", "dishwasher", "fridge",
   ],

@@ -25,7 +25,7 @@ Nói ngắn gọn: ảnh của họ được dùng để trả lời “cần c�
 
 ## Hiện trạng ngày 08/10/2026
 
-- Thư viện tích hợp hiện có **128 mục** trong 10 nhóm giao diện, gồm nhiều đồ dùng đặc trưng tại Việt Nam như bàn thờ, xe máy, bồn nước, võng, tủ giày, giàn phơi, quạt trần có đèn, quạt treo tường, robot cắt cỏ, cụm hạ tầng mạng/an toàn, cụm thiết bị kỹ thuật, bộ điều khiển/cảm biến nhà thông minh và chín kiểu đèn theo gallery công khai.
+- Thư viện tích hợp hiện có **136 mục** trong 10 nhóm giao diện, gồm nhiều đồ dùng đặc trưng tại Việt Nam như bàn thờ, xe máy, bồn nước, võng, tủ giày, giàn phơi, quạt trần có đèn, quạt treo tường, robot cắt cỏ, cụm hạ tầng mạng/an toàn, cụm thiết bị kỹ thuật, bộ điều khiển/cảm biến nhà thông minh, chín kiểu đèn và lô biến thể sofa/phòng khách đầu tiên theo gallery công khai.
 - Có 9 gói bố trí nhanh cho phòng: hai kiểu bếp, phòng tắm, phòng ngủ, phòng khách, phòng ăn, văn phòng, phòng trẻ em và sảnh.
 - Trình chỉnh sửa đã có tìm kiếm song ngữ, nhóm thu gọn, xem trước, đổi kích thước, xoay, lật, đặt lên sàn/tường/trần/bề mặt và liên kết entity.
 - Định dạng pack nhập ngoài đã hỗ trợ khối hộp, trụ, khối vát, đèn, màn hình, bề mặt đặt đồ, phương tiện và lỗ cầu thang.
@@ -85,6 +85,17 @@ Bảng kiểm kê làm việc nên có các cột: `nhóm`, `nguồn ảnh`, `t�
 
 `fan_ceiling_light` cần hai vai trò entity độc lập: fan entity điều khiển chuyển động cánh và light entity điều khiển độ sáng/màu của đèn. Nếu chỉ cấu hình một vai trò thì phần còn lại vẫn hiển thị ở trạng thái tắt, không làm mất cả mô hình. Đây cũng là mẫu thử cho catalog có nhiều capability trên cùng một vật thể.
 
+### Đợt đối chiếu: Phòng khách
+
+Đã xem [trang sản phẩm Living Room](https://mastershort.de/product/neonplan3d-living-room/) và các ảnh overview công khai ngày 08/10/2026. Danh sách công khai xác nhận nhu cầu tách sofa theo số chỗ, hướng góc, ghế đôn, kệ TV thấp và tủ kính; hình học trong fork vẫn được dựng mới bằng primitive và tỷ lệ riêng.
+
+| Họ công năng | Hiện trạng trước đợt | Hành động trong fork |
+|---|---|---|
+| Sofa thẳng | Một ID `sofa` đổi kích thước tự do | Thêm `sofa_2`, `sofa_3`, `sofa_4` với số đệm cố định; giữ `sofa` tương thích. |
+| Sofa góc | Một ID `sofa_l` thiên trái | Thêm `sofa_corner_left` và `sofa_corner_right` có footprint đối xứng; giữ `sofa_l` tương thích. |
+| Ghế đôn | `stool` dạng ghế có chân | Thêm `ottoman` dạng pouf bọc nệm thấp, không thay `stool`. |
+| Kệ và tủ phòng khách | `tv_board` gắn liền TV, `sideboard` kín | Thêm `tv_console` không có TV và `display_cabinet` hai cánh kính. |
+
 ## Kiến trúc cần làm trước
 
 Không tiếp tục thêm hàng trăm nhánh vào các `switch` lớn. Trước đợt nội dung đầu tiên, cần chuyển thư viện tích hợp sang catalog khai báo tập trung:
@@ -109,7 +120,7 @@ Các biến thể cùng họ, ví dụ sofa 2/3 chỗ, tủ bếp 40/60/80 cm ho
 Mục tiêu: biến hiện trạng thành đường cơ sở có thể đo được.
 
 - [x] Sinh báo cáo tự động từ `FURNITURE_TYPES`, `FURNITURE_GROUPS` và `FURNITURE_SIZE` để phát hiện ID trùng, thiếu tên hoặc thiếu kích thước (`cd frontend && npm run catalog`).
-- [x] Lập bảng ánh xạ các mục hiện tại vào 16 nhóm đích; catalog kiểm kê hiện khóa 135 type, 128 mục thư viện, 7 mục nội bộ và trường hợp `worktop` đang nằm trong hai nhóm. Mỗi mục chỉ được tính một lần trong `REFERENCE_PACK_ITEMS`.
+- [x] Lập bảng ánh xạ các mục hiện tại vào 16 nhóm đích; catalog kiểm kê hiện khóa 143 type, 136 mục thư viện, 7 mục nội bộ và trường hợp `worktop` đang nằm trong hai nhóm. Mỗi mục chỉ được tính một lần trong `REFERENCE_PACK_ITEMS`.
 - [ ] Duyệt toàn bộ ảnh gallery công khai của 16 trang sản phẩm, không chỉ ảnh đại diện ở trang Packs; lập bảng `đã phù hợp / cần sửa hình / cần thêm mới` kèm URL và ngày xem.
 - [ ] Chọn khoảng 10 mẫu hiện có cần sửa hình trước; `fan_ceiling` là mẫu thí điểm và phải giữ nguyên ID.
 - [ ] Chụp bộ ảnh chuẩn ở góc nhìn 2D, 3D và chế độ Day/Neon để so sánh hồi quy.
@@ -140,6 +151,7 @@ Mục tiêu: có nền tảng đủ gọn để thêm nhiều mẫu theo lô.
 Mục tiêu: hoàn thiện bốn nhóm được dùng nhiều nhất trước, khoảng 100–120 mẫu/biến thể mới.
 
 - [ ] Phòng khách: sofa góc trái/phải, ghế đôn, bàn trà, kệ TV, tủ trang trí, vách lam, tủ thờ và bàn thờ nhiều cỡ.
+  - Đợt 1 đã thêm sofa 2/3/4 chỗ, sofa góc trái/phải, ghế đôn bọc nệm, kệ TV thấp và tủ trưng bày; các ID cũ `sofa`, `sofa_l`, `stool`, `tv_board` vẫn được giữ nguyên.
 - [ ] Phòng ngủ: giường đơn/đôi, giường tầng, tủ áo cánh mở/cửa lùa, bàn trang điểm, nôi và tủ đầu giường.
 - [ ] Phòng tắm/giặt: lavabo bàn/treo, bồn cầu, khu tắm kính, bình nóng lạnh, máy giặt cửa trên/cửa trước và giàn phơi.
 - [ ] Đèn và làm mát: sửa hình `fan_ceiling`, thêm `fan_ceiling_light`, quạt treo tường và các kiểu đèn phổ biến; quạt có đèn phải điều khiển riêng phần quạt và phần sáng.

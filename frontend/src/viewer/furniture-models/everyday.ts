@@ -353,15 +353,56 @@ function crib(b: Builder, w: number, d: number, h: number): void {
   for (const x of [-w / 2, w / 2]) b.box(x - rail, x + rail, 0, h, -d / 2, d / 2, C.wood, C.woodTop, EDGE_FURN);
 }
 
-function cornerSofa(b: Builder, w: number, d: number, h: number): void {
+function cornerSofa(b: Builder, w: number, d: number, h: number, side: "left" | "right" = "left"): void {
   const depth = Math.min(0.9, d * 0.53);
   const chaise = Math.min(0.9, w * 0.38);
   const seat = h * 0.52;
+  const chaiseX0 = side === "left" ? -w / 2 : w / 2 - chaise;
+  const chaiseX1 = side === "left" ? -w / 2 + chaise : w / 2;
+  const outerX0 = side === "left" ? -w / 2 : w / 2 - Math.min(0.2, chaise * 0.25);
+  const outerX1 = side === "left" ? -w / 2 + Math.min(0.2, chaise * 0.25) : w / 2;
+  const seamX = side === "left" ? chaiseX1 : chaiseX0;
   b.pad(-w / 2, w / 2, 0.08, seat, -d / 2, -d / 2 + depth, C.fabric, C.fabricTop, 0.04, EDGE_FURN);
-  b.pad(-w / 2, -w / 2 + chaise, 0.08, seat, -d / 2 + depth, d / 2, C.fabric, C.fabricTop, 0.04, EDGE_FURN);
+  b.pad(chaiseX0, chaiseX1, 0.08, seat, -d / 2 + depth, d / 2, C.fabric, C.fabricTop, 0.04, EDGE_FURN);
   b.box(-w / 2, w / 2, seat, h, -d / 2, -d / 2 + Math.min(0.2, depth * 0.25), C.fabric, C.fabricTop, EDGE_FURN);
-  b.box(-w / 2, -w / 2 + Math.min(0.2, chaise * 0.25), seat, h, -d / 2 + depth, d / 2, C.fabric, C.fabricTop, EDGE_FURN);
-  b.seg(-w / 2 + chaise, seat + 0.01, -d / 2 + depth * 0.1, -w / 2 + chaise, seat + 0.01, -d / 2 + depth * 0.9, EDGE_FAINT);
+  b.box(outerX0, outerX1, seat, h, -d / 2 + depth, d / 2, C.fabric, C.fabricTop, EDGE_FURN);
+  b.seg(seamX, seat + 0.01, -d / 2 + depth * 0.1, seamX, seat + 0.01, -d / 2 + depth * 0.9, EDGE_FAINT);
+}
+
+function ottoman(b: Builder, w: number, d: number, h: number): void {
+  b.box(-w * 0.42, w * 0.42, 0, h * 0.14, -d * 0.4, d * 0.4, C.dark, C.dark);
+  b.pad(-w / 2, w / 2, h * 0.12, h, -d / 2, d / 2, C.fabric, C.cushion, 0.06, EDGE_FURN);
+  b.seg(0, h + 0.002, -d * 0.42, 0, h + 0.002, d * 0.42, EDGE_FAINT);
+  b.seg(-w * 0.42, h + 0.002, 0, w * 0.42, h + 0.002, 0, EDGE_FAINT);
+}
+
+function tvConsole(b: Builder, w: number, d: number, h: number): void {
+  const legH = Math.min(0.12, h * 0.22);
+  legs(b, w, d, legH, 0.025, 0.04, C.metal);
+  b.box(-w / 2, w / 2, legH, h, -d / 2, d / 2, C.wood, C.woodTop, EDGE_FURN);
+  const nicheW = Math.min(w * 0.38, 0.72);
+  const front = d / 2 + 0.004;
+  b.box(-nicheW / 2, nicheW / 2, legH + h * 0.13, h - h * 0.1, -d / 2 + 0.04, d / 2 + 0.008, C.dark, C.dark, EDGE_FAINT);
+  b.seg(-nicheW / 2, legH + (h - legH) * 0.52, front, nicheW / 2, legH + (h - legH) * 0.52, front, EDGE_FAINT);
+  for (const x of [-nicheW / 2, nicheW / 2]) b.seg(x, legH + 0.03, front, x, h - 0.03, front, EDGE_FURN);
+  for (const x of [-w * 0.34, w * 0.34]) b.seg(x - 0.055, h * 0.53, front, x + 0.055, h * 0.53, front, EDGE_GLOW);
+}
+
+function displayCabinet(b: Builder, w: number, d: number, h: number): void {
+  const frame = Math.min(0.055, w * 0.06);
+  const front = d / 2;
+  b.box(-w / 2, w / 2, 0, frame, -d / 2, front, C.wood, C.woodTop, EDGE_FURN);
+  b.box(-w / 2, w / 2, h - frame, h, -d / 2, front, C.wood, C.woodTop, EDGE_FURN);
+  for (const x of [-w / 2, w / 2 - frame]) b.box(x, x + frame, frame, h - frame, -d / 2, front, C.wood, C.woodTop, EDGE_FURN);
+  b.box(-w / 2 + frame, w / 2 - frame, frame, h - frame, -d / 2, -d / 2 + 0.025, C.body, C.bodyTop);
+  const shelves = Math.max(3, Math.round(h / 0.45));
+  for (let i = 1; i < shelves; i++) {
+    const y = (h * i) / shelves;
+    b.box(-w / 2 + frame, w / 2 - frame, y - 0.018, y + 0.018, -d / 2 + 0.025, front - 0.025, C.glass, C.glass, EDGE_FAINT);
+  }
+  b.box(-w / 2 + frame, -0.012, frame, h - frame, front - 0.025, front, C.glass, C.glass, EDGE_GLOW);
+  b.box(0.012, w / 2 - frame, frame, h - frame, front - 0.025, front, C.glass, C.glass, EDGE_GLOW);
+  for (const x of [-0.035, 0.035]) b.box(x - 0.008, x + 0.008, h * 0.46, h * 0.59, front, front + 0.018, C.metal, C.metal);
 }
 
 function sofaBed(b: Builder, w: number, d: number, h: number): void {
@@ -404,8 +445,16 @@ export const EVERYDAY_FURNITURE_MODELS: Readonly<Record<string, FurnitureModelRe
   shoe_cabinet: ({ b, w, d, h }) => (shoeCabinet(b, w, d, h), 0.5),
   sideboard: ({ b, w, d, h }) => (sideboard(b, w, d, h), 0.5),
   sofa: ({ b, w, d, h }) => (sofa(b, w, d, h, Math.max(1, Math.round((w - 0.4) / 0.62))), 0.5),
+  sofa_2: ({ b, w, d, h }) => (sofa(b, w, d, h, 2), 0.5),
+  sofa_3: ({ b, w, d, h }) => (sofa(b, w, d, h, 3), 0.5),
+  sofa_4: ({ b, w, d, h }) => (sofa(b, w, d, h, 4), 0.5),
   sofa_bed: ({ b, w, d, h }) => (sofaBed(b, w, d, h), 0.5),
   sofa_l: ({ b, w, d, h }) => (cornerSofa(b, w, d, h), 0.5),
+  sofa_corner_left: ({ b, w, d, h }) => (cornerSofa(b, w, d, h, "left"), 0.5),
+  sofa_corner_right: ({ b, w, d, h }) => (cornerSofa(b, w, d, h, "right"), 0.5),
+  ottoman: ({ b, w, d, h }) => (ottoman(b, w, d, h), 0.5),
+  tv_console: ({ b, w, d, h }) => (tvConsole(b, w, d, h), 0.5),
+  display_cabinet: ({ b, w, d, h }) => (displayCabinet(b, w, d, h), 0.5),
   stool: ({ b, w, d, h }) => (stool(b, w, d, h), 0.5),
   table: ({ b, w, d, h }) => (table(b, w, d, h), 0.5),
   table_round: ({ b, w, d, h }) => (roundTable(b, w, d, h), 0.5),
@@ -415,4 +464,3 @@ export const EVERYDAY_FURNITURE_MODELS: Readonly<Record<string, FurnitureModelRe
   vanity: ({ b, w, d, h }) => (vanity(b, w, d, h), 0.5),
   wardrobe: ({ b, w, d, h }) => (cabinet(b, w, d, h, Math.max(2, Math.round(w / 0.5)), h * 0.5), 0.5),
 };
-

@@ -3,7 +3,7 @@
 import { createSymbolRegistry, circle, ellipse, fronts, line, rect, seating, type SymbolPart as Part } from "./common.ts";
 import type { FurnitureSymbol } from "./types.ts";
 
-const TYPES = ["altar","altar_wall","shoe_cabinet","shoe_bench","room_divider","vanity","crib","bed_single","bed_double","sofa_l","sofa_bed","sofa","armchair","bench","corner_bench","chair","office_chair","bar_stool","table_round","stool","table","coffee_table","desk","bed","bunk_bed","nightstand","wardrobe","dresser","sideboard","tall_cabinet","kitchen","kitchen_wall","kitchen_tall","shelf","coat_rack","tv_board","tv_wall","plant","rug"] as const;
+const TYPES = ["altar","altar_wall","shoe_cabinet","shoe_bench","room_divider","vanity","crib","bed_single","bed_double","sofa_2","sofa_3","sofa_4","sofa_l","sofa_corner_left","sofa_corner_right","sofa_bed","sofa","armchair","ottoman","bench","corner_bench","chair","office_chair","bar_stool","table_round","stool","table","coffee_table","desk","bed","bunk_bed","nightstand","wardrobe","dresser","sideboard","display_cabinet","tall_cabinet","kitchen","kitchen_wall","kitchen_tall","shelf","coat_rack","tv_console","tv_board","tv_wall","plant","rug"] as const;
 
 function renderSymbol(type: string, w: number, d: number): FurnitureSymbol {
   switch (type) {
@@ -39,13 +39,23 @@ function renderSymbol(type: string, w: number, d: number): FurnitureSymbol {
       return out;
     }
     case "sofa_l":
+    case "sofa_corner_left":
       return [...seating(w, Math.min(d, 0.9), Math.max(2, Math.round(w / 0.65)), true), rect(-w / 2, -d / 2, -w / 2 + Math.min(0.9, w * 0.36), d / 2, "fp3d-sym-fill")];
+    case "sofa_corner_right":
+      return [...seating(w, Math.min(d, 0.9), Math.max(2, Math.round(w / 0.65)), true), rect(w / 2 - Math.min(0.9, w * 0.36), -d / 2, w / 2, d / 2, "fp3d-sym-fill")];
     case "sofa_bed":
       return [rect(-w / 2, -d / 2, w / 2, d / 2), rect(-w / 2, -d / 2, w / 2, -d / 2 + Math.min(0.24, d * 0.22), "fp3d-sym-fill"), line(0, -d / 2 + Math.min(0.24, d * 0.22), 0, d / 2)];
     case "sofa":
-      return seating(w, d, Math.max(1, Math.round((w - 0.4) / 0.62)), true);
+    case "sofa_2":
+    case "sofa_3":
+    case "sofa_4": {
+      const seats = type === "sofa_2" ? 2 : type === "sofa_3" ? 3 : type === "sofa_4" ? 4 : Math.max(1, Math.round((w - 0.4) / 0.62));
+      return seating(w, d, seats, true);
+    }
     case "armchair":
       return seating(w, d, 1, true);
+    case "ottoman":
+      return [rect(-w / 2, -d / 2, w / 2, d / 2, "fp3d-sym-fill"), line(0, -d / 2, 0, d / 2), line(-w / 2, 0, w / 2, 0)];
     case "bench":
       return [rect(-w / 2, -d / 2, w / 2, -d / 2 + 0.08, "fp3d-sym-fill")];
     case "corner_bench": {
@@ -85,6 +95,7 @@ function renderSymbol(type: string, w: number, d: number): FurnitureSymbol {
     case "wardrobe":
     case "dresser":
     case "sideboard":
+    case "display_cabinet":
     case "tall_cabinet":
     case "kitchen":
     case "kitchen_wall":
@@ -93,6 +104,8 @@ function renderSymbol(type: string, w: number, d: number): FurnitureSymbol {
       return fronts(w, d, type === "nightstand" || type === "tall_cabinet" || type === "kitchen_tall" ? 1 : Math.max(2, Math.round(w / 0.5)));
     case "coat_rack":
       return [rect(-w / 2, -d / 2, w / 2, -d / 2 + 0.03, "fp3d-sym-fill"), ...fronts(w, d, Math.max(2, Math.round(w / 0.5)))];
+    case "tv_console":
+      return [...fronts(w, d, 3), rect(-w * 0.19, d * 0.08, w * 0.19, d / 2, "fp3d-sym-fill")];
     case "tv_board":
       return [line(-Math.min(w * 0.4, 0.72), -d / 2 + 0.14, Math.min(w * 0.4, 0.72), -d / 2 + 0.14, "fp3d-sym-strong"), ...fronts(w, d, Math.max(2, Math.round(w / 0.6)))];
     case "tv_wall":
@@ -108,4 +121,3 @@ function renderSymbol(type: string, w: number, d: number): FurnitureSymbol {
 }
 
 export const EVERYDAY_FURNITURE_SYMBOLS = createSymbolRegistry(TYPES, renderSymbol);
-

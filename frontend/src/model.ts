@@ -846,6 +846,7 @@ const SURFACES = new Set<string>([
   "table",
   "table_round",
   "coffee_table",
+  "tv_console",
   "desk",
   "nightstand",
   "sideboard",

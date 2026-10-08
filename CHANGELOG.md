@@ -4,6 +4,18 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.20.0
+
+### Added
+
+- Added the first Phase 2 living-room batch: fixed 2/3/4-seat sofas, left/right corner sofas, an upholstered pouf, a standalone TV console and a glass display cabinet.
+- Added dedicated 2D symbols, independently designed low-poly 3D geometry, practical default dimensions and German/English/Vietnamese names for all eight items.
+
+### Changed
+
+- Expanded the reproducible catalog inventory to 143 declared types and 136 library items, with the living-room reference coverage now at 23 items.
+- Recorded the public Living Room gallery audit while retaining the existing generic furniture IDs for saved-plan compatibility.
+
 ## 1.19.16
 
 ### Added

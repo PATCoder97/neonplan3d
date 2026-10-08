@@ -48,6 +48,27 @@ test("every non-lamp catalog item builds visible finite 3D geometry", () => {
   }
 });
 
+test("living-room sofa variants keep fixed seats and mirrored corner footprints", () => {
+  const geometry = (type: "sofa_2" | "sofa_3" | "sofa_4" | "sofa_corner_left" | "sofa_corner_right") => {
+    const [w, d, h] = FURNITURE_SIZE[type];
+    const buf = new GeoBuffer();
+    pushFurniture(buf, new LineBuffer(), new GeoBuffer(), { id: type, type, x: 0, z: 0, rotation: 0, w, d, h, variant: null } as Furniture);
+    return buf;
+  };
+  const seats = (["sofa_2", "sofa_3", "sofa_4"] as const).map((type) => geometry(type).count);
+  assert.ok(seats[0] < seats[1] && seats[1] < seats[2], "each larger sofa adds a dedicated cushion");
+
+  const xs = (type: "sofa_corner_left" | "sofa_corner_right", mirror: boolean) =>
+    geometry(type).p
+      .filter((_, index) => index % 3 === 0)
+      .map((x) => {
+        const value = Math.round((mirror ? -x : x) * 1e6) / 1e6;
+        return Object.is(value, -0) ? 0 : value;
+      })
+      .sort((a, b) => a - b);
+  assert.deepEqual(xs("sofa_corner_left", false), xs("sofa_corner_right", true), "left and right corner models mirror exactly");
+});
+
 test("a U-shaped stair builds two flights and a half-height landing", () => {
   const buf = new GeoBuffer();
   const lines = new LineBuffer();
