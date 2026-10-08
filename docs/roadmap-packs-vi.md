@@ -25,7 +25,7 @@ Nói ngắn gọn: ảnh của họ được dùng để trả lời “cần c�
 
 ## Hiện trạng ngày 09/10/2026
 
-- Thư viện tích hợp hiện có **373 mục** trong 10 nhóm giao diện, gồm các lô hoàn chỉnh cho Giai đoạn 1–4 cùng nhóm Văn phòng và Phòng trẻ em của Giai đoạn 5; toàn bộ hình học tích hợp được dựng thủ tục trong repository.
+- Thư viện tích hợp hiện có **385 mục** trong 11 nhóm giao diện, gồm các lô hoàn chỉnh cho Giai đoạn 1–4, Văn phòng, Phòng trẻ em và nửa đầu nhóm Thú cưng của Giai đoạn 5; toàn bộ hình học tích hợp được dựng thủ tục trong repository.
 - Có 21 gói bố trí nhanh cho phòng, gồm ba mức nhỏ/vừa/lớn cho bếp, phòng tắm, phòng ngủ và phòng khách; gói mới bỏ qua vị trí đã có đồ thay vì xếp chồng.
 - Trình chỉnh sửa đã có tìm kiếm song ngữ, nhóm thu gọn, xem trước, đổi kích thước, xoay, lật, đặt lên sàn/tường/trần/bề mặt và liên kết entity.
 - Định dạng pack nhập ngoài đã hỗ trợ khối hộp, trụ, khối vát, đèn, màn hình, bề mặt đặt đồ, phương tiện và lỗ cầu thang.
@@ -48,7 +48,7 @@ Trang chính thức đang công bố gói đầy đủ gồm 474 mẫu/phương 
 | Phương tiện | 15 | Hoàn tất 15/15 mẫu chức năng | P1 |
 | Văn phòng & gaming | 25 | Hoàn tất 25/25 mẫu chức năng | P2 |
 | Phòng trẻ em | 18 | Hoàn tất 18/18 mẫu chức năng | P2 |
-| Thú cưng | 24 | Chưa có nhóm riêng | P2 |
+| Thú cưng | 24 | Đã có 12/24 mẫu và nhóm riêng | P2 |
 | Fitness | 17 | Chưa có nhóm riêng | P2 |
 | Home Cinema & Hi-Fi | 35 | Có TV và loa thông minh cơ bản | P2 |
 
@@ -160,6 +160,17 @@ Bảng kiểm kê làm việc nên có các cột: `nhóm`, `nguồn ảnh`, `t�
 | Ngủ và chiếu sáng | Có giường tầng và cũi | Thêm giường khung nhà, đèn ngủ mặt trăng và máy chiếu sao; hai đèn liên kết light entity và chiếu sáng thực trong 3D. |
 | Lưu trữ và chăm sóc | Dùng chung tủ người lớn | Thêm kệ sáu hộp, ba thùng đồ chơi, tủ quần áo trẻ em, tủ thay tã và baby monitor có Live Screens. |
 
+### Đợt đối chiếu: Thú cưng
+
+Đã xem [trang sản phẩm Pets](https://mastershort.de/product/neonplan3d-pets/) và hai ảnh overview công khai ngày 09/10/2026. Trang đầu gồm 12 chỗ nằm, leo/cào móng và vệ sinh cho chó mèo; fork dựng lại bằng primitive, tỷ lệ và chi tiết riêng, đồng thời tách thành nhóm thư viện Thú cưng.
+
+| Họ công năng | Hiện trạng trước đợt | Hành động trong fork |
+|---|---|---|
+| Leo và cào móng cho mèo | Chưa có mẫu chuyên dụng | Thêm cây mèo lớn, trụ cào, bảng cào treo tường, kệ nằm và bộ bậc leo tường; ba mẫu treo tường có cao độ riêng. |
+| Chỗ nằm cho mèo | Chỉ có đồ mềm dùng chung | Thêm hang mèo và đệm tròn với silhouette 2D/3D riêng. |
+| Vệ sinh cho mèo | Chưa có | Thêm khay có nắp và khay tự làm sạch có khoang trống, cửa vào và cụm điều khiển khác nhau. |
+| Chỗ ở cho chó | Chưa có mẫu chuyên dụng | Thêm đệm chó, giỏ nằm có thành cao và nhà chó mái dốc theo ba footprint độc lập. |
+
 ### Đợt đối chiếu: Kiến trúc & hoàn thiện
 
 Đã xem [trang sản phẩm Architecture & Fit-out](https://mastershort.de/product/neonplan3d-architecture-fit-out/) và gallery công khai ngày 08/10/2026. Danh sách công khai xác nhận 17 cấu kiện; fork dùng model primitive và tỷ lệ riêng.
@@ -211,7 +222,7 @@ Các biến thể cùng họ, ví dụ sofa 2/3 chỗ, tủ bếp 40/60/80 cm ho
 Mục tiêu: biến hiện trạng thành đường cơ sở có thể đo được.
 
 - [x] Sinh báo cáo tự động từ `FURNITURE_TYPES`, `FURNITURE_GROUPS` và `FURNITURE_SIZE` để phát hiện ID trùng, thiếu tên hoặc thiếu kích thước (`cd frontend && npm run catalog`).
-- [x] Lập bảng ánh xạ các mục hiện tại vào 16 nhóm đích; catalog kiểm kê hiện khóa 380 type, 373 mục thư viện, 7 mục nội bộ và trường hợp `worktop` đang nằm trong hai nhóm. Mỗi mục chỉ được tính một lần trong `REFERENCE_PACK_ITEMS`.
+- [x] Lập bảng ánh xạ các mục hiện tại vào 16 nhóm đích; catalog kiểm kê hiện khóa 392 type, 385 mục thư viện, 7 mục nội bộ và trường hợp `worktop` đang nằm trong hai nhóm. Mỗi mục chỉ được tính một lần trong `REFERENCE_PACK_ITEMS`.
 - [ ] Duyệt toàn bộ ảnh gallery công khai của 16 trang sản phẩm, không chỉ ảnh đại diện ở trang Packs; lập bảng `đã phù hợp / cần sửa hình / cần thêm mới` kèm URL và ngày xem.
 - [ ] Chọn khoảng 10 mẫu hiện có cần sửa hình trước; `fan_ceiling` là mẫu thí điểm và phải giữ nguyên ID.
 - [ ] Chụp bộ ảnh chuẩn ở góc nhìn 2D, 3D và chế độ Day/Neon để so sánh hồi quy.
@@ -310,6 +321,7 @@ Mục tiêu: hoàn tất độ phủ cả 16 nhóm.
 - [x] Trẻ em: bàn học, giá đồ chơi, tủ thấp, thảm chơi, giường theo lứa tuổi và đèn ngủ.
   - Đã thêm 16 mẫu học/chơi/ngủ/lưu trữ và chăm sóc; hai đèn ngủ có light entity, baby monitor có Live Screens và đồ để bàn nhận đúng cao độ, hoàn tất 18/18 khi tính `crib`/`bunk_bed` hiện có.
 - [ ] Thú cưng: giường, nhà, lồng, khay vệ sinh, bát ăn, trụ mèo và bể cá.
+  - Đợt 1 đã thêm 12 mẫu chó/mèo: đồ leo–cào, chỗ nằm, hai khay vệ sinh và nhà chó; ba mẫu tường dùng cao độ riêng, độ phủ đạt 12/24.
 - [ ] Fitness: máy chạy, xe đạp, ghế tập, tạ, thảm yoga và giàn tập.
 - [ ] Cinema & Hi-Fi: TV/máy chiếu, màn chiếu, loa thanh, loa đứng, loa surround, ampli, subwoofer và ghế rạp.
 

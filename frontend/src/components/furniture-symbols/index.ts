@@ -10,6 +10,7 @@ import { KITCHEN_BATH_FURNITURE_SYMBOLS } from "./kitchen-bath.ts";
 import { KIDS_FURNITURE_SYMBOLS } from "./kids.ts";
 import { LIGHTING_FURNITURE_SYMBOLS } from "./lighting.ts";
 import { OFFICE_FURNITURE_SYMBOLS } from "./office.ts";
+import { PET_FURNITURE_SYMBOLS } from "./pets.ts";
 import { LIVING_FURNITURE_SYMBOLS } from "./living.ts";
 import { SMART_HOME_FURNITURE_SYMBOLS } from "./smart-home.ts";
 import { STAIR_FURNITURE_SYMBOLS } from "./stairs.ts";
@@ -33,6 +34,7 @@ const BUILTIN_FURNITURE_SYMBOLS: Readonly<Record<string, FurnitureSymbolRenderer
   ...STAIR_FURNITURE_SYMBOLS,
   ...LIGHTING_FURNITURE_SYMBOLS,
   ...OFFICE_FURNITURE_SYMBOLS,
+  ...PET_FURNITURE_SYMBOLS,
   ...UTILITY_FURNITURE_SYMBOLS,
   ...VEHICLE_FURNITURE_SYMBOLS,
 };

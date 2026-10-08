@@ -4,6 +4,18 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.23.3
+
+### Added
+
+- Added the first 12-item Pets batch: three cat scratching/climbing structures, a cat cave, round bed, wall perch, two litter boxes, two dog beds, a dog basket and a dog house.
+- Added a dedicated Pets library group with procedural 3D models, plan symbols and English, German and Vietnamese names.
+
+### Changed
+
+- Cat scratch boards, perches and climbing steps now use dedicated wall-mount heights; regression coverage checks mounts, geometry bounds and the self-cleaning litter-box mechanism.
+- Expanded the reproducible inventory to 392 declared types and 385 library items, with Pets coverage at 12 of 24.
+
 ## 1.23.2
 
 ### Added
