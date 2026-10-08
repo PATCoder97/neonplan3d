@@ -4,6 +4,17 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.23.8
+
+### Added
+
+- Added a reproducible audit of all 16 official public product galleries, recording source URLs, gallery image counts, functional coverage and the remaining Kitchen gap without committing commercial reference images.
+- Added 2D, Neon 3D and Day 3D visual baselines plus an asset-provenance register covering project screenshots, brand assets, fonts and the no-external-mesh policy.
+
+### Changed
+
+- Closed the roadmap's Phase 0 review tasks with a ten-ID compatibility shortlist and explicit outcomes for revised versus retained legacy furniture.
+
 ## 1.23.7
 
 ### Added

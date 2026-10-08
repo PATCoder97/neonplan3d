@@ -254,10 +254,10 @@ Mục tiêu: biến hiện trạng thành đường cơ sở có thể đo đư�
 
 - [x] Sinh báo cáo tự động từ `FURNITURE_TYPES`, `FURNITURE_GROUPS` và `FURNITURE_SIZE` để phát hiện ID trùng, thiếu tên hoặc thiếu kích thước (`cd frontend && npm run catalog`).
 - [x] Lập bảng ánh xạ các mục hiện tại vào 16 nhóm đích; catalog kiểm kê hiện khóa 453 type, 446 mục thư viện, 7 mục nội bộ và trường hợp `worktop` đang nằm trong hai nhóm. Mỗi mục chỉ được tính một lần trong `REFERENCE_PACK_ITEMS`.
-- [ ] Duyệt toàn bộ ảnh gallery công khai của 16 trang sản phẩm, không chỉ ảnh đại diện ở trang Packs; lập bảng `đã phù hợp / cần sửa hình / cần thêm mới` kèm URL và ngày xem.
-- [ ] Chọn khoảng 10 mẫu hiện có cần sửa hình trước; `fan_ceiling` là mẫu thí điểm và phải giữ nguyên ID.
-- [ ] Chụp bộ ảnh chuẩn ở góc nhìn 2D, 3D và chế độ Day/Neon để so sánh hồi quy.
-- [ ] Ghi nguồn và giấy phép cho mọi asset ngoài mã thủ tục, nếu sau này có dùng texture hoặc mesh.
+- [x] Duyệt toàn bộ ảnh gallery công khai của 16 trang sản phẩm, không chỉ ảnh đại diện ở trang Packs; bảng [kiểm kê gallery](furniture-gallery-audit-vi.md) ghi URL, ngày xem, số ảnh và trạng thái `đã phù hợp / cần sửa hình / cần thêm mới`.
+- [x] Chọn khoảng 10 mẫu hiện có cần sửa hình trước; bảng ID tương thích trong kiểm kê ghi kết quả, với `fan_ceiling` và `robot_vacuum` là hai mẫu đã sửa hình nhưng giữ ID.
+- [x] Chụp bộ ảnh chuẩn ở góc nhìn 2D, 3D và chế độ Day/Neon để so sánh hồi quy tại [`docs/images/baseline-v1.23.7`](images/baseline-v1.23.7/README.md).
+- [x] Ghi nguồn và giấy phép cho asset trong [Asset provenance](asset-provenance.md); hiện không có texture/mesh nội thất bên thứ ba trong repository.
 
 Điều kiện hoàn thành: catalog hiện tại có báo cáo kiểm kê tái tạo được trong CI và không thay đổi bản vẽ cũ.
 
