@@ -123,7 +123,9 @@ Mục tiêu: có nền tảng đủ gọn để thêm nhiều mẫu theo lô.
 
 - [ ] Tách metadata khỏi `frontend/src/model.ts`; giữ export tương thích để chưa phải sửa toàn bộ nơi dùng.
 - [ ] Tách renderer trong `frontend/src/viewer/furniture.ts` thành các họ tái sử dụng.
+  - Đã tách `FurnitureBuilder` dùng chung và registry renderer/screen theo họ; nhóm Utility là lô đầu tiên đã rời khỏi switch cũ, các họ còn lại sẽ chuyển dần để giữ diff dễ kiểm tra.
 - [ ] Chuyển `frontend/src/components/furniture2d.ts` sang registry ký hiệu 2D.
+  - Đã có registry symbol theo họ và kiểm thử khóa đồng bộ 2D/3D/live screen; nhóm Utility là lô đầu tiên đã chuyển.
 - [x] Cho nhóm thư viện, tìm kiếm và tên hiển thị đọc trực tiếp từ catalog; các export cũ vẫn được giữ để tương thích.
 - [x] Thêm validator bắt buộc ID ổn định, kích thước hợp lệ, tên `vi`/`en`, renderer và symbol; CI chạy `npm run catalog` ở mỗi push/PR.
 - [ ] Thêm trang gallery phát triển để render toàn bộ catalog trong một lần.

@@ -107,6 +107,7 @@ npm run screenshot  # renders preview/index.html (invented demo data) with a loc
 - **Python tests** run in CI with `pytest-homeassistant-custom-component`.
 - **Furniture pack format**: [docs/packs.md](docs/packs.md) (German).
 - **Built-in furniture roadmap**: [docs/roadmap-packs-vi.md](docs/roadmap-packs-vi.md) (Vietnamese; clean-room expansion across all 16 pack categories).
+- **Furniture development**: [docs/furniture-development.md](docs/furniture-development.md) (family registries, model/symbol structure and required checks).
 - **Neon Honeycomb roadmap**: [docs/roadmap-neon-honeycomb-vi.md](docs/roadmap-neon-honeycomb-vi.md) (Vietnamese; native neon quick menu inspired by Honeycomb Menu).
 
 ## Ideas, questions and bugs

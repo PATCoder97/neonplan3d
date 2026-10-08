@@ -4,6 +4,13 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.19.12
+
+### Changed
+
+- Split shared furniture geometry primitives into a reusable `FurnitureBuilder` and introduced family registries for 3D models, live screen rectangles and 2D symbols.
+- Migrated the complete Utility family to the new structure, added a registry-consistency test and documented the extension workflow so future furniture no longer grows the central renderer switches.
+
 ## 1.19.11
 
 ### Added

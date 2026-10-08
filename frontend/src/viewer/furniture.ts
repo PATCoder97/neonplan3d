@@ -8,202 +8,9 @@ import type { Furniture, Vec2 } from "../model.ts";
 import { builtinBase } from "../model.ts";
 import { mountBase, packItem, packScreen, type PackItem } from "../packs.ts";
 import type { Floor } from "../model.ts";
-import { ALWAYS, DEG, EDGE_TOP, GeoBuffer, LineBuffer, pushLoft, pushLyingCyl, pushPrism, shade } from "./geo.ts";
-
-const C = {
-  body: 0x172238,
-  bodyTop: 0x1d2b47,
-  fabric: 0x1a2644,
-  fabricTop: 0x22325a,
-  cushion: 0x243661,
-  wood: 0x19233c,
-  woodTop: 0x202d4b,
-  white: 0x1d2946,
-  whiteTop: 0x26375e,
-  metal: 0x2a3a60,
-  dark: 0x0b111f,
-  glass: 0x1c3a52,
-  plant: 0x12302e,
-  plantTop: 0x1a4540,
-  pot: 0x1d2640,
-  accent: 0x2b8fb3,
-};
-
-const EDGE_FURN = shade(0x5b7cff, 0.3);
-const EDGE_FAINT = shade(0x5b7cff, 0.17);
-const EDGE_GLOW = shade(0x37e0ff, 0.45);
-
-type Tf = (x: number, z: number) => Vec2;
-
-class Builder {
-  private readonly buf: GeoBuffer;
-  private readonly lines: LineBuffer;
-  private readonly tf: Tf;
-  /** The transform mirrors (negative determinant): parts not wound by ccw() come out inside out. */
-  readonly mirrored: boolean;
-
-  constructor(buf: GeoBuffer, lines: LineBuffer, tf: Tf) {
-    this.buf = buf;
-    this.lines = lines;
-    this.tf = tf;
-    this.mirrored = tfMirrors(tf);
-  }
-
-  /** The same buffers with the local coordinates turned by `deg` around (cx, cz): turned parts of pack items. */
-  rotated(cx: number, cz: number, deg: number): Builder {
-    const a = deg * DEG;
-    const c = Math.cos(a);
-    const s = Math.sin(a);
-    const tf = this.tf;
-    return new Builder(this.buf, this.lines, (x, z) => tf(cx + (x - cx) * c - (z - cz) * s, cz + (x - cx) * s + (z - cz) * c));
-  }
-
-  /** Axis-aligned box in local coordinates; `edges` draws its outline. */
-  box(x0: number, x1: number, y0: number, y1: number, z0: number, z1: number, side: number, top = side, edges: Color | null = null): void {
-    if (x1 - x0 < 1e-4 || z1 - z0 < 1e-4 || y1 - y0 < 1e-4) return;
-    const poly = [this.tf(x0, z0), this.tf(x0, z1), this.tf(x1, z1), this.tf(x1, z0)];
-    pushPrism(this.buf, ccw(poly), y0, y1, side, top, { aoFrom: 0, bottom: y0 > 0.05 });
-    if (edges) this.outline(poly, y0, y1, edges);
-  }
-
-  /** A box whose top face is the rectangle `t` (sloped sides): hoods, windscreens, tapered shades. */
-  loft(b: [number, number, number, number], t: [number, number, number, number], y0: number, y1: number, side: number, top = side, edges: Color | null = null): void {
-    if (y1 - y0 < 1e-4) return;
-    const lo: Vec2[] = [this.tf(b[0], b[2]), this.tf(b[0], b[3]), this.tf(b[1], b[3]), this.tf(b[1], b[2])];
-    const hi: Vec2[] = [this.tf(t[0], t[2]), this.tf(t[0], t[3]), this.tf(t[1], t[3]), this.tf(t[1], t[2])];
-    if (lo !== ccw(lo)) {
-      lo.reverse();
-      hi.reverse();
-    }
-    pushLoft(this.buf, lo, hi, y0, y1, side, top);
-    if (edges) {
-      for (let i = 0; i < 4; i++) {
-        this.line(hi[i], hi[(i + 1) % 4], y1, y1, edges);
-        this.line(lo[i], hi[i], y0, y1, edges);
-      }
-    }
-  }
-
-  /** Box with bevelled top and bottom edges (cushions, mattresses, arm rests). */
-  pad(x0: number, x1: number, y0: number, y1: number, z0: number, z1: number, side: number, top = side, r = 0.03, edges: Color | null = null): void {
-    r = Math.min(r, (x1 - x0) / 2 - 0.005, (z1 - z0) / 2 - 0.005, (y1 - y0) / 2);
-    if (r < 0.008) return this.box(x0, x1, y0, y1, z0, z1, side, top, edges);
-    this.loft([x0 + r, x1 - r, z0 + r, z1 - r], [x0, x1, z0, z1], y0, y0 + r, side);
-    if (y1 - y0 - 2 * r > 0.005) this.box(x0, x1, y0 + r, y1 - r, z0, z1, side, side, edges);
-    this.loft([x0, x1, z0, z1], [x0 + r, x1 - r, z0 + r, z1 - r], y1 - r, y1, side, top);
-  }
-
-  /** A cylinder lying along x or z (wheels, rollers); `edges` draws both rims. */
-  lyingCyl(axis: "x" | "z", cx: number, cz: number, y0: number, y1: number, len: number, dia: number, side: number, cap = side, n = 12, edges: Color | null = null): void {
-    const r = Math.min(dia, y1 - y0) / 2;
-    if (r < 1e-4 || len < 1e-4) return;
-    const cy = (y0 + y1) / 2;
-    const along = axis === "x" ? cx : cz;
-    const across = axis === "x" ? cz : cx;
-    const at = (a: number, c: number): Vec2 => (axis === "x" ? this.tf(a, c) : this.tf(c, a));
-    const p0 = this.buf.p.length;
-    pushLyingCyl(this.buf, at, along - len / 2, along + len / 2, across, cy, r, side, cap, n);
-    if (this.mirrored) flipWinding(this.buf, p0);
-    if (edges) {
-      for (const a of [along - len / 2, along + len / 2]) {
-        for (let i = 0; i < n; i++) {
-          const t0 = (i / n) * Math.PI * 2;
-          const t1 = ((i + 1) / n) * Math.PI * 2;
-          this.line(at(a, across + Math.sin(t0) * r), at(a, across + Math.sin(t1) * r), cy + Math.cos(t0) * r, cy + Math.cos(t1) * r, edges);
-        }
-      }
-    }
-  }
-
-  /** Vertical cylinder with `n` sides. */
-  cyl(cx: number, cz: number, r: number, y0: number, y1: number, side: number, top = side, n = 10, edges: Color | null = null): void {
-    const poly: Vec2[] = [];
-    for (let i = 0; i < n; i++) {
-      const a = (i / n) * Math.PI * 2;
-      poly.push(this.tf(cx + Math.cos(a) * r, cz + Math.sin(a) * r));
-    }
-    pushPrism(this.buf, ccw(poly), y0, y1, side, top, { aoFrom: 0, bottom: y0 > 0.05 });
-    if (edges) for (let i = 0; i < n; i++) this.line(poly[i], poly[(i + 1) % n], y1, y1, edges);
-  }
-
-  /** Polygonal tube following a path in the local y/z plane; useful for curved taps and pipes. */
-  tubeYZ(x: number, path: [y: number, z: number][], r: number, side: number, n = 8, edges: Color | null = null): void {
-    if (path.length < 2 || r < 1e-4) return;
-    const rings = path.map(([y, z], i) => {
-      const prev = path[Math.max(0, i - 1)];
-      const next = path[Math.min(path.length - 1, i + 1)];
-      const dy = next[0] - prev[0];
-      const dz = next[1] - prev[1];
-      const len = Math.hypot(dy, dz) || 1;
-      // One ring axis is local x; the other is perpendicular to the path in the y/z plane.
-      return Array.from({ length: n }, (_, j) => {
-        const a = (j / n) * Math.PI * 2;
-        const lx = x + Math.cos(a) * r;
-        const ly = y - (dz / len) * Math.sin(a) * r;
-        const lz = z + (dy / len) * Math.sin(a) * r;
-        const p = this.tf(lx, lz);
-        return [p[0], ly, p[1]];
-      });
-    });
-    const p0 = this.buf.p.length;
-    const color = new Color(side);
-    for (let i = 0; i < rings.length - 1; i++) {
-      for (let j = 0; j < n; j++) {
-        const k = (j + 1) % n;
-        this.buf.tri(rings[i][j], rings[i + 1][j], rings[i + 1][k], color);
-        this.buf.tri(rings[i][j], rings[i + 1][k], rings[i][k], color);
-      }
-    }
-    const cap = (i: number, reverse: boolean) => {
-      const p = this.tf(x, path[i][1]);
-      const centre = [p[0], path[i][0], p[1]];
-      for (let j = 0; j < n; j++) {
-        const k = (j + 1) % n;
-        this.buf.tri(centre, rings[i][reverse ? k : j], rings[i][reverse ? j : k], color);
-      }
-    };
-    cap(0, true);
-    cap(path.length - 1, false);
-    if (this.mirrored) flipWinding(this.buf, p0);
-    if (edges) for (let i = 0; i < path.length - 1; i++) this.seg(x, path[i][0], path[i][1], x, path[i + 1][0], path[i + 1][1], edges);
-  }
-
-  /** Line between two local points at heights ya and yb. */
-  seg(xa: number, ya: number, za: number, xb: number, yb: number, zb: number, color: Color = EDGE_FURN): void {
-    this.line(this.tf(xa, za), this.tf(xb, zb), ya, yb, color);
-  }
-
-  private line(a: Vec2, b: Vec2, ya: number, yb: number, color: Color): void {
-    this.lines.seg([a[0], ya, a[1]], [b[0], yb, b[1]], color, ALWAYS);
-  }
-
-  private outline(poly: Vec2[], y0: number, y1: number, color: Color): void {
-    for (let i = 0; i < 4; i++) {
-      const a = poly[i];
-      const b = poly[(i + 1) % 4];
-      this.line(a, b, y1, y1, color);
-      this.line(a, a, y0, y1, color);
-    }
-  }
-}
-
-/** Whether a plan transform mirrors (its determinant is negative). */
-function tfMirrors(tf: Tf): boolean {
-  const o = tf(0, 0);
-  const ex = tf(1, 0);
-  const ez = tf(0, 1);
-  return (ex[0] - o[0]) * (ez[1] - o[1]) - (ex[1] - o[1]) * (ez[0] - o[0]) < 0;
-}
-
-function ccw(poly: Vec2[]): Vec2[] {
-  let a = 0;
-  for (let i = 0; i < poly.length; i++) {
-    const p = poly[i];
-    const q = poly[(i + 1) % poly.length];
-    a += p[0] * q[1] - q[0] * p[1];
-  }
-  return a >= 0 ? poly : [...poly].reverse();
-}
+import { C, EDGE_FAINT, EDGE_FURN, EDGE_GLOW, FurnitureBuilder as Builder, flipWinding, transformMirrors, type FurnitureTransform as Tf } from "./furniture-builder.ts";
+import { registeredFurnitureScreen, renderRegisteredFurniture } from "./furniture-models/index.ts";
+import { ALWAYS, DEG, EDGE_TOP, GeoBuffer, LineBuffer, shade } from "./geo.ts";
 
 /** Four legs inside a w × d footprint. */
 function legs(b: Builder, w: number, d: number, h: number, t: number, inset: number, color = C.metal, taper = false): void {
@@ -793,65 +600,6 @@ function island(b: Builder, w: number, d: number, h: number): void {
   fronts(b, -w / 2 + 0.05, w / 2 - 0.05, 0.08, h - 0.04, -d / 2 + inner, Math.max(2, Math.round(w / 0.6)), h - 0.2);
   // worktop overhangs on the front for bar stools
   b.box(-w / 2, w / 2, h - 0.04, h, -d / 2, d / 2, C.whiteTop, C.whiteTop, EDGE_FURN);
-}
-
-function dishwasher(b: Builder, w: number, d: number, h: number): void {
-  b.box(-w / 2, w / 2, 0.02, h - 0.04, -d / 2, d / 2 - 0.02, C.body, C.bodyTop, EDGE_FURN);
-  b.box(-w / 2 + 0.02, w / 2 - 0.02, 0, 0.08, -d / 2 + 0.02, d / 2 - 0.06, C.dark);
-  b.seg(-w / 2 + 0.08, h - 0.12, d / 2 - 0.008, w / 2 - 0.08, h - 0.12, d / 2 - 0.008, EDGE_GLOW);
-  b.box(-w / 2, w / 2, h - 0.04, h, -d / 2, d / 2, C.whiteTop, C.whiteTop, EDGE_FURN);
-}
-
-function laundry(b: Builder, w: number, d: number, h: number, dryer: boolean): void {
-  b.box(-w / 2, w / 2, 0, h, -d / 2, d / 2 - 0.02, C.white, C.whiteTop, EDGE_FURN);
-  const z = d / 2 - 0.012;
-  // control panel line and a round door drawn on the front
-  b.seg(-w / 2, h - 0.14, z, w / 2, h - 0.14, z, EDGE_FAINT);
-  b.seg(w / 2 - 0.16, h - 0.07, z, w / 2 - 0.08, h - 0.07, z, EDGE_GLOW);
-  const cy = (h - 0.14) / 2 + 0.04;
-  const r = Math.min(w * 0.36, (h - 0.2) * 0.42);
-  const n = 20;
-  for (let i = 0; i < n; i++) {
-    const a0 = (i / n) * Math.PI * 2;
-    const a1 = ((i + 1) / n) * Math.PI * 2;
-    b.seg(Math.cos(a0) * r, cy + Math.sin(a0) * r, z, Math.cos(a1) * r, cy + Math.sin(a1) * r, z, EDGE_GLOW);
-    if (!dryer) b.seg(Math.cos(a0) * r * 0.72, cy + Math.sin(a0) * r * 0.72, z, Math.cos(a1) * r * 0.72, cy + Math.sin(a1) * r * 0.72, z, EDGE_FAINT);
-  }
-}
-
-/** A washer and dryer in one stable cabinet, with two independently recognisable front doors. */
-function laundryTower(b: Builder, w: number, d: number, h: number): void {
-  const gap = Math.min(0.035, h * 0.025);
-  const unit = (h - gap) / 2;
-  const z = d / 2 - 0.012;
-  for (let k = 0; k < 2; k++) {
-    const y0 = k * (unit + gap);
-    b.box(-w / 2, w / 2, y0, y0 + unit, -d / 2, d / 2 - 0.02, C.white, C.whiteTop, EDGE_FURN);
-    b.seg(-w / 2, y0 + unit - 0.14, z, w / 2, y0 + unit - 0.14, z, EDGE_FAINT);
-    b.seg(w / 2 - 0.16, y0 + unit - 0.07, z, w / 2 - 0.08, y0 + unit - 0.07, z, EDGE_GLOW);
-    const cy = y0 + (unit - 0.14) / 2 + 0.04;
-    const r = Math.min(w * 0.34, (unit - 0.2) * 0.42);
-    ring(b, 0, cy, r, z, 20);
-    if (k === 0) ring(b, 0, cy, r * 0.72, z + 0.002, 20);
-  }
-  b.box(-w * 0.46, w * 0.46, unit, unit + gap, -d * 0.46, d * 0.46, C.dark, C.metal, EDGE_FAINT);
-}
-
-/** Compact plug-in photovoltaic kit on its own balcony/terrace frame. */
-function balconySolar(b: Builder, w: number, d: number, h: number): void {
-  const post = Math.min(0.045, w * 0.035);
-  for (const x of [-w * 0.4, w * 0.4]) {
-    b.box(x - post, x + post, 0, h * 0.88, -d * 0.32, -d * 0.23, C.metal, C.metal, EDGE_FURN);
-    b.box(x - post, x + post, 0, h * 0.62, d * 0.23, d * 0.32, C.metal, C.metal, EDGE_FURN);
-  }
-  // A broad, shallow panel and its cell grid; the unequal supports suggest the usual balcony tilt.
-  b.loft([-w / 2, w / 2, -d * 0.43, d * 0.43], [-w / 2, w / 2, -d * 0.38, d * 0.48], h * 0.88, h * 0.98, C.dark, C.glass, EDGE_GLOW);
-  const y = h * 0.985;
-  for (let i = 1; i < 6; i++) b.seg(-w / 2 + (w * i) / 6, y, -d * 0.37, -w / 2 + (w * i) / 6, y, d * 0.47, EDGE_FAINT);
-  for (let i = 1; i < 3; i++) b.seg(-w / 2, y, -d * 0.37 + (d * 0.84 * i) / 3, w / 2, y, -d * 0.37 + (d * 0.84 * i) / 3, EDGE_FAINT);
-  // A small micro-inverter below the panel provides a live power indicator.
-  b.box(-w * 0.16, w * 0.16, h * 0.34, h * 0.48, d * 0.2, d * 0.34, C.body, C.bodyTop, EDGE_FURN);
-  b.seg(-w * 0.1, h * 0.43, d * 0.345, w * 0.1, h * 0.43, d * 0.345, EDGE_GLOW);
 }
 
 function bunkBed(b: Builder, w: number, d: number, h: number): void {
@@ -1762,6 +1510,8 @@ function screenRectUnmirrored(f: Furniture, floor?: Floor): { x0: number; x1: nu
 }
 
 function builtInScreen(f: Furniture, w: number, d: number, h: number, floor?: Floor): { x0: number; x1: number; y0: number; y1: number; z: number } | null {
+  const registered = registeredFurnitureScreen(f.type, w, d, h);
+  if (registered !== undefined) return registered;
   if (f.type === "tv_board") {
     const tw = Math.min(w * 0.8, 1.45);
     const th = tw * 0.56;
@@ -1816,14 +1566,6 @@ function builtInScreen(f: Furniture, w: number, d: number, h: number, floor?: Fl
   if (f.type === "water_leak_sensor") return { x0: -w * 0.2, x1: w * 0.2, y0: h * 0.72, y1: h * 1.08, z: d * 0.12 };
   if (f.type === "temperature_humidity_sensor") return { x0: -w * 0.35, x1: w * 0.35, y0: 1.35 + h * 0.3, y1: 1.35 + h * 0.78, z: d * 0.55 };
   if (f.type === "video_doorbell") return { x0: -w * 0.2, x1: w * 0.2, y0: 1.25 + h * 0.06, y1: 1.25 + h * 0.18, z: d * 0.56 };
-  if (f.type === "washer" || f.type === "dryer") {
-    const cy = (h - 0.14) / 2 + 0.04;
-    const r = Math.min(w * 0.36, (h - 0.2) * 0.42) * 0.8;
-    return { x0: -r, x1: r, y0: cy - r, y1: cy + r, z: d / 2 - 0.004 };
-  }
-  if (f.type === "washer_dryer_tower") return { x0: w * 0.22, x1: w * 0.39, y0: h * 0.91, y1: h * 0.96, z: d / 2 - 0.004 };
-  if (f.type === "balcony_solar") return { x0: -w * 0.1, x1: w * 0.1, y0: h * 0.4, y1: h * 0.46, z: d * 0.35 };
-  if (f.type === "dishwasher") return { x0: -w / 2 + 0.06, x1: w / 2 - 0.06, y0: h - 0.16, y1: h - 0.08, z: d / 2 - 0.004 };
   return null;
 }
 
@@ -1844,7 +1586,7 @@ function contactShadow(shadow: GeoBuffer, tf: Tf, w: number, d: number, strength
     shadow.tri(P(inner[i]), P(outer[i]), P(outer[j]), dark, clear, clear);
     shadow.tri(P(inner[i]), P(outer[j]), P(inner[j]), dark, clear, dark);
   }
-  if (tfMirrors(tf)) flipWinding(shadow, s0);
+  if (transformMirrors(tf)) flipWinding(shadow, s0);
 }
 
 export function pushFurniture(buf: GeoBuffer, lines: LineBuffer, shadow: GeoBuffer, f: Furniture, base = 0): void {
@@ -1853,27 +1595,7 @@ export function pushFurniture(buf: GeoBuffer, lines: LineBuffer, shadow: GeoBuff
   pushUpright(buf, lines, shadow, f, base);
 }
 
-/** Swap the second and third vertex of every triangle from `from` on (positions, colours, folds, uvs, tiles). */
-export function flipWinding(buf: GeoBuffer, from: number): void {
-  const swap = (arr: number[] | null, start: number, n: number) => {
-    if (!arr) return;
-    for (let k = 0; k < n; k++) {
-      const i = start + n + k;
-      const j = start + 2 * n + k;
-      const t = arr[i];
-      arr[i] = arr[j];
-      arr[j] = t;
-    }
-  };
-  for (let i = from; i < buf.p.length; i += 9) {
-    const tri = i / 9;
-    swap(buf.p, i, 3);
-    swap(buf.c, i, 3);
-    swap(buf.f, tri * 3, 1);
-    swap(buf.uv, tri * 6, 2);
-    swap(buf.tile, tri * 6, 2);
-  }
-}
+export { flipWinding } from "./furniture-builder.ts";
 
 function pushUpright(buf: GeoBuffer, lines: LineBuffer, shadow: GeoBuffer, f: Furniture, base: number): void {
   // pack items place their parts at `base` themselves; built-in models are drawn on the floor and
@@ -1901,6 +1623,11 @@ function buildFurniture(buf: GeoBuffer, lines: LineBuffer, shadow: GeoBuffer, f:
   const w = Math.max(0.05, f.w);
   const d = Math.max(0.05, f.d);
   const h = Math.max(0.005, f.h);
+  const castsShadow = renderRegisteredFurniture(f.type, { b, w, d, h, base, variant: f.variant ?? null });
+  if (castsShadow !== null) {
+    if (castsShadow) contactShadow(shadow, tf, w, d, 0.5);
+    return;
+  }
   switch (f.type) {
     case "altar":
       altar(b, w, d, h);
@@ -2184,21 +1911,6 @@ function buildFurniture(buf: GeoBuffer, lines: LineBuffer, shadow: GeoBuffer, f:
       // only the 4 cm top at its height, nothing below it (no contact shadow)
       b.box(-w / 2, w / 2, Math.max(0, h - 0.04), h, -d / 2, d / 2, C.whiteTop, C.whiteTop, EDGE_FURN);
       return;
-    case "dishwasher":
-      dishwasher(b, w, d, h);
-      break;
-    case "washer":
-      laundry(b, w, d, h, false);
-      break;
-    case "dryer":
-      laundry(b, w, d, h, true);
-      break;
-    case "washer_dryer_tower":
-      laundryTower(b, w, d, h);
-      break;
-    case "balcony_solar":
-      balconySolar(b, w, d, h);
-      break;
     case "bunk_bed":
       bunkBed(b, w, d, h);
       break;
