@@ -873,6 +873,14 @@ export const FURNITURE_TYPES = [
   "ventilation_fan",
   "humidifier",
   "smart_display",
+  "wall_switch",
+  "wall_outlet",
+  "smart_plug",
+  "motion_sensor",
+  "contact_sensor",
+  "water_leak_sensor",
+  "temperature_humidity_sensor",
+  "video_doorbell",
   "kitchen_corner",
   "kitchen_display",
   "vanity",
@@ -950,9 +958,9 @@ export const FURNITURE_GROUPS: Record<string, FurnitureType[]> = {
   kitchen: ["kitchen", "kitchen_corner", "kitchen_wall", "kitchen_tall", "kitchen_display", "island", "worktop", "sink", "stove", "range_hood", "microwave", "water_purifier", "dishwasher", "fridge"],
   sleeping: ["bed", "bed_single", "bed_double", "bunk_bed", "crib", "nightstand", "wardrobe", "dresser", "vanity"],
   bath: ["bathtub", "shower", "shower_screen", "wc", "washbasin", "water_heater", "hot_water_tank", "washer", "dryer", "drying_rack"],
-  climate: ["air_conditioner", "heat_pump_outdoor", "air_purifier", "humidifier", "radiator", "wall_thermostat", "ventilation_fan", "fan_ceiling", "fan_ceiling_light", "fan_wall", "fan_floor"],
-  outdoor: ["security_camera", "smart_lock", "water_pump", "robot_mower", "hammock", "stone_table_set", "planter_large", "water_tank", "gate", "fence"],
-  work: ["desk", "worktop", "office_chair", "tall_cabinet", "coat_rack", "shoe_cabinet", "shoe_bench", "network_cabinet", "nas_server", "modem_router", "electrical_panel", "ups_unit", "access_point", "smoke_detector", "siren_alarm", "stairs", "stairs_landing", "robot_vacuum"],
+  climate: ["air_conditioner", "heat_pump_outdoor", "air_purifier", "humidifier", "radiator", "wall_thermostat", "temperature_humidity_sensor", "ventilation_fan", "fan_ceiling", "fan_ceiling_light", "fan_wall", "fan_floor"],
+  outdoor: ["security_camera", "video_doorbell", "smart_lock", "water_pump", "robot_mower", "hammock", "stone_table_set", "planter_large", "water_tank", "gate", "fence"],
+  work: ["desk", "worktop", "office_chair", "tall_cabinet", "coat_rack", "shoe_cabinet", "shoe_bench", "wall_switch", "wall_outlet", "smart_plug", "motion_sensor", "contact_sensor", "water_leak_sensor", "network_cabinet", "nas_server", "modem_router", "electrical_panel", "ups_unit", "access_point", "smoke_detector", "siren_alarm", "stairs", "stairs_landing", "robot_vacuum"],
   vehicles: ["motorbike", "parking"],
 };
 
@@ -1070,6 +1078,19 @@ export function builtinBase(f: Pick<Furniture, "type" | "h"> & { variant?: strin
       return 0.85;
     case "ventilation_fan":
       return 1.8;
+    case "wall_switch":
+      return 1.05;
+    case "wall_outlet":
+    case "smart_plug":
+      return 0.3;
+    case "motion_sensor":
+      return 1.9;
+    case "contact_sensor":
+      return 1.1;
+    case "temperature_humidity_sensor":
+      return 1.35;
+    case "video_doorbell":
+      return 1.25;
     default:
       return 0;
   }
@@ -1116,6 +1137,14 @@ export const ELECTRIC_FURNITURE = new Set<string>([
   "ventilation_fan",
   "humidifier",
   "smart_display",
+  "wall_switch",
+  "wall_outlet",
+  "smart_plug",
+  "motion_sensor",
+  "contact_sensor",
+  "water_leak_sensor",
+  "temperature_humidity_sensor",
+  "video_doorbell",
   "robot_vacuum",
   "robot_mower",
   "inverter",
@@ -1221,6 +1250,14 @@ export const FURNITURE_SIZE: Record<FurnitureType, [number, number, number]> = {
   ventilation_fan: [0.32, 0.14, 0.32],
   humidifier: [0.38, 0.38, 0.8],
   smart_display: [0.55, 0.16, 0.36],
+  wall_switch: [0.09, 0.045, 0.09],
+  wall_outlet: [0.09, 0.045, 0.09],
+  smart_plug: [0.1, 0.08, 0.12],
+  motion_sensor: [0.11, 0.08, 0.11],
+  contact_sensor: [0.11, 0.04, 0.05],
+  water_leak_sensor: [0.09, 0.09, 0.035],
+  temperature_humidity_sensor: [0.1, 0.045, 0.1],
+  video_doorbell: [0.055, 0.045, 0.14],
   kitchen_corner: [1.25, 1.25, 0.92],
   kitchen_display: [0.8, 0.42, 2.1],
   vanity: [1.0, 0.45, 1.55],

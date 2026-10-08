@@ -18,6 +18,9 @@ test("furniture is grouped by function instead of a regional collection", () => 
   assert.ok(FURNITURE_GROUPS.climate.includes("heat_pump_outdoor") && FURNITURE_GROUPS.climate.includes("humidifier") && FURNITURE_GROUPS.climate.includes("ventilation_fan"));
   assert.ok(FURNITURE_GROUPS.work.includes("electrical_panel") && FURNITURE_GROUPS.work.includes("ups_unit") && FURNITURE_GROUPS.work.includes("modem_router"));
   assert.ok(FURNITURE_GROUPS.bath.includes("hot_water_tank") && FURNITURE_GROUPS.living.includes("smart_display"));
+  assert.ok(FURNITURE_GROUPS.work.includes("wall_switch") && FURNITURE_GROUPS.work.includes("wall_outlet") && FURNITURE_GROUPS.work.includes("smart_plug"));
+  assert.ok(FURNITURE_GROUPS.work.includes("motion_sensor") && FURNITURE_GROUPS.work.includes("contact_sensor") && FURNITURE_GROUPS.work.includes("water_leak_sensor"));
+  assert.ok(FURNITURE_GROUPS.climate.includes("temperature_humidity_sensor") && FURNITURE_GROUPS.outdoor.includes("video_doorbell"));
 });
 
 test("a sidelight sits opposite the hinge, on the hinge side when asked, and keeps the leaf at least half a metre", () => {

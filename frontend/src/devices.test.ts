@@ -750,3 +750,31 @@ test("smart infrastructure resolves climate, smoke, network, NAS, access point a
   assert.equal(isActive(states["siren.coi_bao_dong"] as never), true);
   assert.equal(isActive(states["humidifier.may_tao_am"] as never), true);
 });
+
+test("smart controls and sensors resolve only their matching Home Assistant device classes", () => {
+  const st = (entity_id: string, state: string, attributes: Record<string, unknown> = {}) => ({ entity_id, state, attributes });
+  const states = {
+    "switch.cong_tac_tuong": st("switch.cong_tac_tuong", "on", { friendly_name: "Công tắc tường" }),
+    "switch.o_cam_tuong": st("switch.o_cam_tuong", "off", { friendly_name: "Ổ cắm tường" }),
+    "switch.o_cam_thong_minh": st("switch.o_cam_thong_minh", "on", { friendly_name: "Ổ cắm thông minh" }),
+    "binary_sensor.chuyen_dong": st("binary_sensor.chuyen_dong", "on", { friendly_name: "Cảm biến chuyển động", device_class: "motion" }),
+    "binary_sensor.cua_so": st("binary_sensor.cua_so", "off", { friendly_name: "Cảm biến cửa sổ", device_class: "window" }),
+    "binary_sensor.ro_nuoc": st("binary_sensor.ro_nuoc", "off", { friendly_name: "Cảm biến rò nước", device_class: "moisture" }),
+    "sensor.nhiet_do": st("sensor.nhiet_do", "26.4", { friendly_name: "Cảm biến nhiệt độ", device_class: "temperature", unit_of_measurement: "°C" }),
+    "camera.chuong_cua": st("camera.chuong_cua", "streaming", { friendly_name: "Chuông cửa có hình" }),
+  };
+  const entities = Object.fromEntries(Object.keys(states).map((entity_id) => [entity_id, { entity_id, area_id: "hall" }]));
+  const hass = { language: "vi", states, entities, devices: {}, areas: { hall: { area_id: "hall", name: "Sảnh" } } } as unknown as HomeAssistant;
+  const room: Room = { id: "hall", name: "Sảnh", area_id: "hall", points: [[0, 0], [8, 0], [8, 3], [0, 3]], floor_material: "tile" };
+  const types = ["wall_switch", "wall_outlet", "smart_plug", "motion_sensor", "contact_sensor", "water_leak_sensor", "temperature_humidity_sensor", "video_doorbell"] as const;
+  const furniture = types.map((type, i) => ({ id: type, type, x: 0.5 + i * 0.7, z: 1, w: FURNITURE_SIZE[type][0], d: FURNITURE_SIZE[type][1], h: FURNITURE_SIZE[type][2], rotation: 0, variant: null }));
+  const links = furnitureEntities(hass, [{ ...newFloor("eg", "Tầng trệt", 0), rooms: [room], furniture }]);
+  assert.equal(links.get("wall_switch")?.entity, "switch.cong_tac_tuong");
+  assert.equal(links.get("wall_outlet")?.entity, "switch.o_cam_tuong");
+  assert.equal(links.get("smart_plug")?.entity, "switch.o_cam_thong_minh");
+  assert.equal(links.get("motion_sensor")?.entity, "binary_sensor.chuyen_dong");
+  assert.equal(links.get("contact_sensor")?.entity, "binary_sensor.cua_so");
+  assert.equal(links.get("water_leak_sensor")?.entity, "binary_sensor.ro_nuoc");
+  assert.equal(links.get("temperature_humidity_sensor")?.entity, "sensor.nhiet_do");
+  assert.equal(links.get("video_doorbell")?.entity, "camera.chuong_cua");
+});

@@ -1409,6 +1409,64 @@ function smartDisplay(b: Builder, w: number, d: number, h: number): void {
   b.box(-w * 0.28, w * 0.28, h * 0.03, h * 0.17, -d * 0.03, d * 0.25, C.body, C.bodyTop, EDGE_FURN);
 }
 
+/** Compact wall controls and sensors. Each keeps a distinct front silhouette at thumbnail scale. */
+function wallSwitch(b: Builder, w: number, d: number, h: number): void {
+  const y0 = 1.05;
+  b.pad(-w / 2, w / 2, y0, y0 + h, -d / 2, d / 2, C.white, C.whiteTop, Math.min(0.012, w * 0.12), EDGE_FURN);
+  b.box(-w * 0.32, w * 0.32, y0 + h * 0.14, y0 + h * 0.82, d * 0.42, d * 0.55, C.body, C.bodyTop, EDGE_FAINT);
+  b.seg(-w * 0.16, y0 + h * 0.2, d * 0.56, w * 0.16, y0 + h * 0.2, d * 0.56, EDGE_GLOW);
+}
+
+function wallOutlet(b: Builder, w: number, d: number, h: number): void {
+  const y0 = 0.3;
+  b.pad(-w / 2, w / 2, y0, y0 + h, -d / 2, d / 2, C.white, C.whiteTop, Math.min(0.012, w * 0.12), EDGE_FURN);
+  for (const x of [-w * 0.17, w * 0.17]) b.cyl(x, d * 0.51, w * 0.065, y0 + h * 0.38, y0 + h * 0.43, C.dark, C.dark, 8, EDGE_FAINT);
+  b.seg(-w * 0.12, y0 + h * 0.18, d * 0.55, w * 0.12, y0 + h * 0.18, d * 0.55, EDGE_GLOW);
+}
+
+function smartPlug(b: Builder, w: number, d: number, h: number): void {
+  const y0 = 0.3;
+  b.pad(-w / 2, w / 2, y0, y0 + h, -d / 2, d / 2, C.body, C.bodyTop, Math.min(0.014, w * 0.12), EDGE_FURN);
+  b.cyl(0, d * 0.49, w * 0.27, y0 + h * 0.28, y0 + h * 0.34, C.dark, C.dark, 14, EDGE_FAINT);
+  b.box(-w * 0.25, w * 0.25, y0 + h * 0.1, y0 + h * 0.17, d * 0.48, d * 0.56, C.accent, C.accent, EDGE_GLOW);
+}
+
+function motionSensor(b: Builder, w: number, d: number, h: number): void {
+  const y0 = 1.9;
+  b.pad(-w / 2, w / 2, y0, y0 + h, -d / 2, d / 2, C.white, C.whiteTop, Math.min(0.014, w * 0.13), EDGE_FURN);
+  b.loft([-w * 0.38, w * 0.38, d * 0.4, d * 0.55], [-w * 0.27, w * 0.27, d * 0.43, d * 0.58], y0 + h * 0.3, y0 + h * 0.78, C.glass, C.glass, EDGE_GLOW);
+  for (let i = 0; i < 3; i++) b.seg(-w * 0.23, y0 + h * (0.39 + i * 0.1), d * 0.59, w * 0.23, y0 + h * (0.39 + i * 0.1), d * 0.59, EDGE_FAINT);
+}
+
+function contactSensor(b: Builder, w: number, d: number, h: number): void {
+  const y0 = 1.1;
+  b.pad(-w / 2, w * 0.12, y0, y0 + h, -d / 2, d / 2, C.white, C.whiteTop, Math.min(0.008, h * 0.14), EDGE_FURN);
+  b.pad(w * 0.24, w / 2, y0 + h * 0.12, y0 + h * 0.88, -d * 0.42, d * 0.42, C.metal, C.metal, Math.min(0.006, h * 0.1), EDGE_FAINT);
+  b.seg(-w * 0.28, y0 + h * 0.16, d * 0.54, -w * 0.03, y0 + h * 0.16, d * 0.54, EDGE_GLOW);
+}
+
+function waterLeakSensor(b: Builder, w: number, d: number, h: number): void {
+  const r = Math.min(w, d) * 0.47;
+  b.cyl(0, 0, r, 0, h, C.white, C.whiteTop, 12, EDGE_FURN);
+  b.cyl(0, d * 0.12, r * 0.2, h, h * 1.08, C.accent, C.accent, 8, EDGE_GLOW);
+  for (const x of [-w * 0.24, w * 0.24]) b.box(x - w * 0.055, x + w * 0.055, 0, h * 0.12, -d * 0.18, d * 0.18, C.metal, C.metal, EDGE_FAINT);
+}
+
+function temperatureHumiditySensor(b: Builder, w: number, d: number, h: number): void {
+  const y0 = 1.35;
+  b.pad(-w / 2, w / 2, y0, y0 + h, -d / 2, d / 2, C.white, C.whiteTop, Math.min(0.012, w * 0.12), EDGE_FURN);
+  b.box(-w * 0.35, w * 0.35, y0 + h * 0.3, y0 + h * 0.78, d * 0.46, d * 0.55, C.glass, C.glass, EDGE_GLOW);
+  b.seg(-w * 0.22, y0 + h * 0.18, d * 0.56, w * 0.22, y0 + h * 0.18, d * 0.56, EDGE_FAINT);
+}
+
+function videoDoorbell(b: Builder, w: number, d: number, h: number): void {
+  const y0 = 1.25;
+  b.pad(-w / 2, w / 2, y0, y0 + h, -d / 2, d / 2, C.dark, C.bodyTop, Math.min(0.012, w * 0.18), EDGE_FURN);
+  b.cyl(0, d * 0.48, w * 0.25, y0 + h * 0.67, y0 + h * 0.7, C.glass, C.glass, 12, EDGE_GLOW);
+  b.cyl(0, d * 0.49, w * 0.2, y0 + h * 0.18, y0 + h * 0.21, C.body, C.bodyTop, 12, EDGE_FAINT);
+  b.seg(-w * 0.18, y0 + h * 0.1, d * 0.56, w * 0.18, y0 + h * 0.1, d * 0.56, EDGE_GLOW);
+}
+
 function kitchenCorner(b: Builder, w: number, d: number, h: number): void {
   const arm = Math.max(0.42, Math.min(w, d) * 0.46);
   b.box(-w / 2, w / 2, 0, h - 0.04, -d / 2, -d / 2 + arm, C.body, C.bodyTop, EDGE_FURN);
@@ -1715,6 +1773,14 @@ function builtInScreen(f: Furniture, w: number, d: number, h: number, floor?: Fl
   if (f.type === "ventilation_fan") return { x0: -w * 0.12, x1: w * 0.12, y0: 1.8 + h * 0.44, y1: 1.8 + h * 0.58, z: d * 0.45 };
   if (f.type === "humidifier") return { x0: -w * 0.35, x1: w * 0.35, y0: h * 0.61, y1: h * 0.69, z: d * 0.55 };
   if (f.type === "smart_display") return { x0: -w * 0.39, x1: w * 0.39, y0: h * 0.35, y1: h * 0.89, z: d * 0.24 };
+  if (f.type === "wall_switch") return { x0: -w * 0.2, x1: w * 0.2, y0: 1.05 + h * 0.13, y1: 1.05 + h * 0.25, z: d * 0.56 };
+  if (f.type === "wall_outlet") return { x0: -w * 0.16, x1: w * 0.16, y0: 0.3 + h * 0.12, y1: 0.3 + h * 0.24, z: d * 0.56 };
+  if (f.type === "smart_plug") return { x0: -w * 0.25, x1: w * 0.25, y0: 0.3 + h * 0.1, y1: 0.3 + h * 0.17, z: d * 0.56 };
+  if (f.type === "motion_sensor") return { x0: -w * 0.27, x1: w * 0.27, y0: 1.9 + h * 0.3, y1: 1.9 + h * 0.78, z: d * 0.59 };
+  if (f.type === "contact_sensor") return { x0: -w * 0.28, x1: -w * 0.03, y0: 1.1 + h * 0.1, y1: 1.1 + h * 0.24, z: d * 0.54 };
+  if (f.type === "water_leak_sensor") return { x0: -w * 0.2, x1: w * 0.2, y0: h * 0.72, y1: h * 1.08, z: d * 0.12 };
+  if (f.type === "temperature_humidity_sensor") return { x0: -w * 0.35, x1: w * 0.35, y0: 1.35 + h * 0.3, y1: 1.35 + h * 0.78, z: d * 0.55 };
+  if (f.type === "video_doorbell") return { x0: -w * 0.2, x1: w * 0.2, y0: 1.25 + h * 0.06, y1: 1.25 + h * 0.18, z: d * 0.56 };
   if (f.type === "washer" || f.type === "dryer") {
     const cy = (h - 0.14) / 2 + 0.04;
     const r = Math.min(w * 0.36, (h - 0.2) * 0.42) * 0.8;
@@ -1902,6 +1968,30 @@ function buildFurniture(buf: GeoBuffer, lines: LineBuffer, shadow: GeoBuffer, f:
       smartDisplay(b, w, d, h);
       if (base > 0.05) return;
       break;
+    case "wall_switch":
+      wallSwitch(b, w, d, h);
+      return;
+    case "wall_outlet":
+      wallOutlet(b, w, d, h);
+      return;
+    case "smart_plug":
+      smartPlug(b, w, d, h);
+      return;
+    case "motion_sensor":
+      motionSensor(b, w, d, h);
+      return;
+    case "contact_sensor":
+      contactSensor(b, w, d, h);
+      return;
+    case "water_leak_sensor":
+      waterLeakSensor(b, w, d, h);
+      break;
+    case "temperature_humidity_sensor":
+      temperatureHumiditySensor(b, w, d, h);
+      return;
+    case "video_doorbell":
+      videoDoorbell(b, w, d, h);
+      return;
     case "kitchen_corner":
       kitchenCorner(b, w, d, h);
       break;

@@ -4,6 +4,13 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.19.9
+
+### Added
+
+- Added eight built-in Smart Home controls and sensors: wall switch, wall outlet, smart plug, motion sensor, door/window contact, water-leak sensor, temperature/humidity sensor and video doorbell.
+- Added distinct 2D/3D geometry, realistic mounting heights, automatic Home Assistant domain/device-class matching, live state indicators, Vietnamese/German/English names and demo placements for the family.
+
 ## 1.19.8
 
 ### Changed

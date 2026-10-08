@@ -74,9 +74,9 @@ function copyFonts() {
   }
 }
 
-// 3D/editor include the procedural Smart Home infrastructure family and its entity controls; the
+// 3D/editor include the procedural Smart Home infrastructure, controls and sensor families; the
 // small explicit budgets still catch accidental dependency or geometry growth on old wall tablets.
-const BUDGET = { "neonplan3d.js": 428 * 1024, "neonplan3d-3d.js": 756 * 1024, "neonplan3d-editor.js": 535 * 1024, "neonplan3d-card-editor.js": 165 * 1024 };
+const BUDGET = { "neonplan3d.js": 432 * 1024, "neonplan3d-3d.js": 760 * 1024, "neonplan3d-editor.js": 540 * 1024, "neonplan3d-card-editor.js": 165 * 1024 };
 
 copyFonts();
 if (watch) {

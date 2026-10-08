@@ -1574,6 +1574,16 @@ export class Fp3dView3d extends LitElement {
           screens.set(f.id, { color: st?.state === "returning" ? [1, 0.7, 0.25] : [0.2, 0.9, 0.72], level: 0.9, plain: true });
         } else if (["network_cabinet", "nas_server", "access_point", "modem_router", "electrical_panel", "ups_unit"].includes(f.type) && st && !["off", "disconnected", "unavailable", "unknown"].includes(st.state)) {
           screens.set(f.id, { color: [0.2, 0.86, 1], level: 0.75, plain: true });
+        } else if (["wall_switch", "wall_outlet", "smart_plug"].includes(f.type) && running) {
+          screens.set(f.id, { color: [0.2, 0.86, 1], level: 0.85, plain: true });
+        } else if (f.type === "motion_sensor" && running) {
+          screens.set(f.id, { color: [1, 0.7, 0.2], level: 1, plain: true });
+        } else if (f.type === "contact_sensor" && running) {
+          screens.set(f.id, { color: [1, 0.45, 0.18], level: 1, plain: true });
+        } else if (f.type === "water_leak_sensor" && running) {
+          screens.set(f.id, { color: [1, 0.15, 0.12], level: 1, plain: true });
+        } else if ((f.type === "temperature_humidity_sensor" || f.type === "video_doorbell") && st && !isUnavailable(st)) {
+          screens.set(f.id, { color: [0.2, 0.86, 1], level: f.type === "video_doorbell" && isActive(st) ? 1 : 0.65, plain: true });
         } else if (f.type === "smoke_detector" && running) {
           screens.set(f.id, { color: [1, 0.18, 0.12], level: 1, plain: true });
         } else if (f.type === "siren_alarm" && running) {

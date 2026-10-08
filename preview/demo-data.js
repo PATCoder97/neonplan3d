@@ -193,6 +193,14 @@ const DEVICES = [
   entity("fan.ventilation_demo", "bad", "on", { friendly_name: "Quạt thông gió", percentage: 70 }),
   entity("humidifier.humidifier_demo", "wohnzimmer", "on", { friendly_name: "Máy tạo ẩm", current_humidity: 48, humidity: 55 }),
   entity("media_player.smart_display_demo", "arbeitszimmer", "playing", { friendly_name: "Màn hình điều khiển thông minh", media_title: "Nhà thông minh", volume_level: 0.25, entity_picture: COVER }),
+  entity("switch.wall_switch_demo", "arbeitszimmer", "on", { friendly_name: "Công tắc gắn tường" }),
+  entity("switch.wall_outlet_demo", "arbeitszimmer", "off", { friendly_name: "Ổ cắm gắn tường" }),
+  entity("switch.smart_plug_demo", "arbeitszimmer", "on", { friendly_name: "Ổ cắm thông minh" }),
+  entity("binary_sensor.motion_demo", "arbeitszimmer", "on", { friendly_name: "Cảm biến chuyển động", device_class: "motion" }),
+  entity("binary_sensor.contact_demo", "arbeitszimmer", "on", { friendly_name: "Cảm biến cửa sổ", device_class: "window" }),
+  entity("binary_sensor.water_leak_demo", "arbeitszimmer", "off", { friendly_name: "Cảm biến rò nước", device_class: "moisture" }),
+  entity("sensor.environment_demo", "arbeitszimmer", "22.6", { friendly_name: "Cảm biến nhiệt độ", device_class: "temperature", unit_of_measurement: "°C" }),
+  entity("camera.video_doorbell_demo", "flur", "streaming", { friendly_name: "Chuông cửa có hình", entity_picture: CAMERA_STILL }),
   entity("binary_sensor.garage_auto", "garage", "on", { friendly_name: "Auto in der Garage", device_class: "occupancy" }),
   entity("sensor.van_ladestand", "garage", "78", { friendly_name: "Van Ladestand", device_class: "battery", unit_of_measurement: "%" }),
   // helpers standing in for a car without an integration (Auto Pro with input_number / input_boolean)
@@ -483,9 +491,17 @@ DEMO_BUILDING.floors[1].furniture = [
   { ...item("ups_unit", 9.55, 1.45, 0.45, 0.5, 0.72), entity: "sensor.ups_demo" },
   { ...item("modem_router", 8.05, 0.36, 0.34, 0.22, 0.12), entity: "device_tracker.modem_router_demo" },
   { ...item("smart_display", 8.75, 0.36, 0.55, 0.16, 0.36), entity: "media_player.smart_display_demo" },
+  { ...item("wall_switch", 7.12, 0.12, 0.09, 0.045, 0.09), entity: "switch.wall_switch_demo" },
+  { ...item("wall_outlet", 7.42, 0.12, 0.09, 0.045, 0.09), entity: "switch.wall_outlet_demo" },
+  { ...item("smart_plug", 7.72, 0.12, 0.1, 0.08, 0.12), entity: "switch.smart_plug_demo" },
+  { ...item("motion_sensor", 9.88, 2.5, 0.11, 0.08, 0.11, 90), entity: "binary_sensor.motion_demo" },
+  { ...item("contact_sensor", 9.88, 2.75, 0.11, 0.04, 0.05, 90), entity: "binary_sensor.contact_demo" },
+  { ...item("water_leak_sensor", 9.35, 2.55, 0.09, 0.09, 0.035), entity: "binary_sensor.water_leak_demo" },
+  { ...item("temperature_humidity_sensor", 9.88, 3.55, 0.1, 0.045, 0.1, 90), entity: "sensor.environment_demo" },
   { ...item("hot_water_tank", 3.05, 5.2, 0.55, 0.55, 1.3, 270), entity: "water_heater.hot_water_tank_demo" },
   { ...item("ventilation_fan", 3.32, 6.8, 0.32, 0.14, 0.32, 90), entity: "fan.ventilation_demo" },
 ];
+DEMO_BUILDING.floors[0].furniture.push({ ...item("video_doorbell", 6.92, 5.0, 0.055, 0.045, 0.14, 90), entity: "camera.video_doorbell_demo" });
 
 // Invented garden and roof.
 const area = (id, type, x0, z0, x1, z1) => ({ id, type, points: [[x0, z0], [x1, z0], [x1, z1], [x0, z1]] });

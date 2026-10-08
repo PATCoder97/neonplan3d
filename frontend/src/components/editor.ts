@@ -6252,6 +6252,20 @@ export class Fp3dEditor extends LitElement {
                     ? /^(fan|switch)\./.test(id)
                   : f.type === "humidifier"
                     ? /^(humidifier|fan|switch)\./.test(id)
+                  : f.type === "wall_switch"
+                    ? /^(switch|input_boolean|light)\./.test(id)
+                  : f.type === "wall_outlet" || f.type === "smart_plug"
+                    ? id.startsWith("switch.")
+                  : f.type === "motion_sensor"
+                    ? id.startsWith("binary_sensor.") && ["motion", "occupancy", "presence"].includes(String(hass.states[id]?.attributes.device_class ?? ""))
+                  : f.type === "contact_sensor"
+                    ? id.startsWith("binary_sensor.") && ["door", "window", "opening"].includes(String(hass.states[id]?.attributes.device_class ?? ""))
+                  : f.type === "water_leak_sensor"
+                    ? id.startsWith("binary_sensor.") && hass.states[id]?.attributes.device_class === "moisture"
+                  : f.type === "temperature_humidity_sensor"
+                    ? id.startsWith("sensor.") && ["temperature", "humidity"].includes(String(hass.states[id]?.attributes.device_class ?? ""))
+                  : f.type === "video_doorbell"
+                    ? /^(camera|binary_sensor)\./.test(id)
             : f.type === "robot_vacuum"
               ? id.startsWith("vacuum.")
               : f.type === "robot_mower"

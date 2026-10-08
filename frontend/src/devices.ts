@@ -718,6 +718,14 @@ const FURNITURE_NAMES: Record<string, RegExp> = {
   ventilation_fan: /(lüfter|exhaust ?fan|ventilation ?fan|quạt thông gió|quat thong gio)/i,
   humidifier: /(luftbefeuchter|humidifier|máy tạo ẩm|may tao am)/i,
   smart_display: /(smart ?display|control ?panel|màn hình điều khiển|man hinh dieu khien)/i,
+  wall_switch: /(wall ?switch|light ?switch|wandschalter|lichtschalter|công tắc|cong tac)/i,
+  wall_outlet: /(wall ?outlet|power ?outlet|socket|steckdose|ổ cắm|o cam)/i,
+  smart_plug: /(smart ?plug|smart ?socket|zwischenstecker|ổ cắm thông minh|o cam thong minh)/i,
+  motion_sensor: /(motion|occupancy|presence|bewegung|präsenz|cảm biến chuyển động|cam bien chuyen dong|hiện diện|hien dien)/i,
+  contact_sensor: /(door|window|contact|öffnung|kontakt|cửa|cua|cảm biến cửa|cam bien cua)/i,
+  water_leak_sensor: /(water ?leak|moisture|wassermelder|leck|rò nước|ro nuoc|ngập|ngap)/i,
+  temperature_humidity_sensor: /(temperature|humidity|thermo|hygro|temperatur|feuchte|nhiệt độ|nhiet do|độ ẩm|do am)/i,
+  video_doorbell: /(video ?doorbell|doorbell|klingel|chuông cửa|chuong cua)/i,
   kitchen_display: /(vitrine|display ?cabinet|cabinet ?light|schranklicht|tủ kính|tu kinh|tủ trưng bày|tu trung bay|đèn tủ|den tu|led tủ|led tu)/i,
 };
 const MEDIA_FURNITURE = new Set(["tv_board", "tv_wall", "smart_display"]);
@@ -844,7 +852,7 @@ export function furnitureEntities(hass: HomeAssistant, floors: readonly Floor[])
         } else if (f.type === "radiator" || f.type === "air_conditioner" || f.type === "wall_thermostat" || f.type === "heat_pump_outdoor") {
           const climates = free.filter((id) => kindOf(id) === "climate");
           entity = climates.find((id) => pattern.test(name(id))) ?? climates[0] ?? null;
-        } else if (["network_cabinet", "nas_server", "access_point", "smoke_detector", "siren_alarm", "electrical_panel", "ups_unit", "modem_router", "hot_water_tank", "ventilation_fan", "humidifier"].includes(f.type)) {
+        } else if (["network_cabinet", "nas_server", "access_point", "smoke_detector", "siren_alarm", "electrical_panel", "ups_unit", "modem_router", "hot_water_tank", "ventilation_fan", "humidifier", "wall_switch", "wall_outlet", "smart_plug", "motion_sensor", "contact_sensor", "water_leak_sensor", "temperature_humidity_sensor", "video_doorbell"].includes(f.type)) {
           const area = room?.area_id ?? null;
           const domains: Record<string, string[]> = {
             network_cabinet: ["switch", "sensor", "binary_sensor"],
@@ -858,11 +866,24 @@ export function furnitureEntities(hass: HomeAssistant, floors: readonly Floor[])
             hot_water_tank: ["water_heater", "climate", "switch"],
             ventilation_fan: ["fan", "switch"],
             humidifier: ["humidifier", "fan", "switch"],
+            wall_switch: ["switch", "input_boolean", "light"],
+            wall_outlet: ["switch"],
+            smart_plug: ["switch"],
+            motion_sensor: ["binary_sensor"],
+            contact_sensor: ["binary_sensor"],
+            water_leak_sensor: ["binary_sensor"],
+            temperature_humidity_sensor: ["sensor"],
+            video_doorbell: ["camera", "binary_sensor"],
           };
           const candidates = Object.keys(hass.states ?? {}).filter((id) => {
             if (used.has(id) || !domains[f.type].includes(domainOf(id))) return false;
             if (area && entityAreaId(hass, id) !== area) return false;
             if (f.type === "smoke_detector" && hass.states[id]?.attributes.device_class !== "smoke") return false;
+            const deviceClass = String(hass.states[id]?.attributes.device_class ?? "");
+            if (f.type === "motion_sensor" && !["motion", "occupancy", "presence"].includes(deviceClass)) return false;
+            if (f.type === "contact_sensor" && !["door", "window", "opening"].includes(deviceClass)) return false;
+            if (f.type === "water_leak_sensor" && deviceClass !== "moisture") return false;
+            if (f.type === "temperature_humidity_sensor" && !["temperature", "humidity"].includes(deviceClass)) return false;
             return pattern.test(name(id));
           });
           entity = room ? (candidates[0] ?? null) : candidates.length === 1 ? candidates[0] : null;

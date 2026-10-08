@@ -148,6 +148,22 @@ export function furnitureSymbol(type: string, w: number, d: number): Part[] | ty
       return [rect(-w / 2, -d / 2, w / 2, d / 2, "fp3d-sym-fill"), rect(-w * 0.34, -d * 0.3, w * 0.34, d * 0.12), line(-w * 0.35, d * 0.24, w * 0.35, d * 0.24, "fp3d-sym-strong")];
     case "smart_display":
       return [rect(-w / 2, -d * 0.18, w / 2, d * 0.32, "fp3d-sym-fill"), line(-w * 0.16, d * 0.32, w * 0.16, d / 2, "fp3d-sym-strong")];
+    case "wall_switch":
+      return [rect(-w / 2, -d / 2, w / 2, d / 2, "fp3d-sym-fill"), line(-w * 0.28, 0, w * 0.28, 0, "fp3d-sym-strong")];
+    case "wall_outlet":
+      return [rect(-w / 2, -d / 2, w / 2, d / 2, "fp3d-sym-fill"), circle(-w * 0.17, 0, w * 0.07), circle(w * 0.17, 0, w * 0.07)];
+    case "smart_plug":
+      return [rect(-w / 2, -d / 2, w / 2, d / 2, "fp3d-sym-fill"), circle(0, 0, Math.min(w, d) * 0.28), line(-w * 0.24, d * 0.32, w * 0.24, d * 0.32, "fp3d-sym-strong")];
+    case "motion_sensor":
+      return [rect(-w / 2, -d / 2, w / 2, d / 2, "fp3d-sym-fill"), ellipse(0, d * 0.08, w * 0.3, d * 0.3, "fp3d-sym-strong")];
+    case "contact_sensor":
+      return [rect(-w / 2, -d / 2, w * 0.12, d / 2, "fp3d-sym-fill"), rect(w * 0.24, -d * 0.36, w / 2, d * 0.36)];
+    case "water_leak_sensor":
+      return [circle(0, 0, Math.min(w, d) * 0.47, "fp3d-sym-fill"), ellipse(0, d * 0.06, w * 0.13, d * 0.2, "fp3d-sym-strong")];
+    case "temperature_humidity_sensor":
+      return [rect(-w / 2, -d / 2, w / 2, d / 2, "fp3d-sym-fill"), rect(-w * 0.34, -d * 0.25, w * 0.34, d * 0.25, "fp3d-sym-strong")];
+    case "video_doorbell":
+      return [rect(-w / 2, -d / 2, w / 2, d / 2, "fp3d-sym-fill"), circle(0, -d * 0.22, Math.min(w, d) * 0.16), circle(0, d * 0.25, Math.min(w, d) * 0.13, "fp3d-sym-strong")];
     case "kitchen_corner":
       return [
         rect(-w / 2, -d / 2, w / 2, -d * 0.05),
