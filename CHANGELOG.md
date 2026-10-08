@@ -4,6 +4,18 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.23.7
+
+### Added
+
+- Completed Home Cinema & Hi-Fi with a turntable, vinyl shelf, game console, equipment rack, individual and three-seat cinema chairs, acoustic treatment, popcorn machine and a controllable star ceiling.
+- Added six focused hi-fi accessories: a surround speaker on its stand, an in-wall speaker, media streamer, Blu-ray player, stereo amplifier and headphone stand.
+
+### Changed
+
+- The star ceiling participates in live Home Assistant lighting and room illumination; the new playback and audio equipment links to matching media players, while tabletop components follow supporting hi-fi furniture.
+- Expanded the reproducible inventory to 453 declared types and 446 library items, completing Home Cinema & Hi-Fi coverage at 35 of 35 and all 16 roadmap groups.
+
 ## 1.23.6
 
 ### Added

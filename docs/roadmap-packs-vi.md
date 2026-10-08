@@ -25,7 +25,7 @@ Nói ngắn gọn: ảnh của họ được dùng để trả lời “cần c�
 
 ## Hiện trạng ngày 09/10/2026
 
-- Thư viện tích hợp hiện có **430 mục** trong 13 nhóm giao diện, gồm các lô hoàn chỉnh cho Giai đoạn 1–4, Văn phòng, Phòng trẻ em, Thú cưng, Fitness và lô đầu Home Cinema & Hi-Fi của Giai đoạn 5; toàn bộ hình học tích hợp được dựng thủ tục trong repository.
+- Thư viện tích hợp hiện có **446 mục** trong 13 nhóm giao diện; toàn bộ 16 nhóm tham chiếu của Giai đoạn 1–5 đã có nội dung hữu dụng và toàn bộ hình học tích hợp được dựng thủ tục trong repository.
 - Có 21 gói bố trí nhanh cho phòng, gồm ba mức nhỏ/vừa/lớn cho bếp, phòng tắm, phòng ngủ và phòng khách; gói mới bỏ qua vị trí đã có đồ thay vì xếp chồng.
 - Trình chỉnh sửa đã có tìm kiếm song ngữ, nhóm thu gọn, xem trước, đổi kích thước, xoay, lật, đặt lên sàn/tường/trần/bề mặt và liên kết entity.
 - Định dạng pack nhập ngoài đã hỗ trợ khối hộp, trụ, khối vát, đèn, màn hình, bề mặt đặt đồ, phương tiện và lỗ cầu thang.
@@ -50,7 +50,7 @@ Trang chính thức đang công bố gói đầy đủ gồm 474 mẫu/phương 
 | Phòng trẻ em | 18 | Hoàn tất 18/18 mẫu chức năng | P2 |
 | Thú cưng | 24 | Hoàn tất 24/24 mẫu chức năng | P2 |
 | Fitness | 17 | Hoàn tất 17/17 mẫu chức năng | P2 |
-| Home Cinema & Hi-Fi | 35 | Đang triển khai, đạt 19/35 mẫu chức năng | P2 |
+| Home Cinema & Hi-Fi | 35 | Hoàn tất 35/35 mẫu chức năng | P2 |
 
 ## Quy trình đối chiếu ảnh công khai
 
@@ -197,6 +197,10 @@ Bảng kiểm kê làm việc nên có các cột: `nhóm`, `nguồn ảnh`, `t�
 | Loa | Chỉ có `smart_speaker` dùng chung | Thêm loa cột, bookshelf, center, subwoofer, soundbar, loa tường và loa trần với footprint và silhouette riêng. |
 | Điều khiển AV | Chưa có | Thêm AV receiver để bàn, có capability cấp điện và liên kết media player. |
 | TV điện ảnh | Có `tv_board`/`tv_wall` tổng quát | Giữ các ID cũ và thêm OLED 65/85 inch có kích thước cố định cùng Live Screen để bố trí chính xác hơn. |
+| Nguồn phát và vinyl | Chưa có thiết bị Hi-Fi độc lập | Thêm mâm đĩa than, kệ đĩa, máy chơi game, kệ thiết bị, streamer và đầu Blu-ray; nguồn phát phù hợp có liên kết media player. |
+| Ghế rạp | Chưa có | Thêm ghế đơn và dãy ba ghế có tựa lưng, tay vịn cùng hốc cốc riêng, giữ footprint hữu dụng khi bố trí lối đi. |
+| Xử lý âm học | Chưa có | Thêm tấm tiêu âm treo tường và bẫy âm trầm góc phòng với silhouette 2D/3D khác nhau. |
+| Phụ kiện và trải nghiệm | Chưa có | Thêm máy bỏng ngô, trần sao điều khiển bằng light entity, loa surround có chân, loa âm tường, ampli stereo và giá tai nghe; mỗi mục có lý do công năng riêng. |
 
 ### Đợt đối chiếu: Kiến trúc & hoàn thiện
 
@@ -249,7 +253,7 @@ Các biến thể cùng họ, ví dụ sofa 2/3 chỗ, tủ bếp 40/60/80 cm ho
 Mục tiêu: biến hiện trạng thành đường cơ sở có thể đo được.
 
 - [x] Sinh báo cáo tự động từ `FURNITURE_TYPES`, `FURNITURE_GROUPS` và `FURNITURE_SIZE` để phát hiện ID trùng, thiếu tên hoặc thiếu kích thước (`cd frontend && npm run catalog`).
-- [x] Lập bảng ánh xạ các mục hiện tại vào 16 nhóm đích; catalog kiểm kê hiện khóa 437 type, 430 mục thư viện, 7 mục nội bộ và trường hợp `worktop` đang nằm trong hai nhóm. Mỗi mục chỉ được tính một lần trong `REFERENCE_PACK_ITEMS`.
+- [x] Lập bảng ánh xạ các mục hiện tại vào 16 nhóm đích; catalog kiểm kê hiện khóa 453 type, 446 mục thư viện, 7 mục nội bộ và trường hợp `worktop` đang nằm trong hai nhóm. Mỗi mục chỉ được tính một lần trong `REFERENCE_PACK_ITEMS`.
 - [ ] Duyệt toàn bộ ảnh gallery công khai của 16 trang sản phẩm, không chỉ ảnh đại diện ở trang Packs; lập bảng `đã phù hợp / cần sửa hình / cần thêm mới` kèm URL và ngày xem.
 - [ ] Chọn khoảng 10 mẫu hiện có cần sửa hình trước; `fan_ceiling` là mẫu thí điểm và phải giữ nguyên ID.
 - [ ] Chụp bộ ảnh chuẩn ở góc nhìn 2D, 3D và chế độ Day/Neon để so sánh hồi quy.
@@ -352,8 +356,9 @@ Mục tiêu: hoàn tất độ phủ cả 16 nhóm.
   - Đợt 2 đã thêm 12 mẫu ăn/uống, hỗ trợ di chuyển, lồng/chuồng và sinh cảnh kính; năm mẫu điện có capability tương ứng, hoàn tất 24/24.
 - [x] Fitness: máy chạy, xe đạp, ghế tập, tạ, thảm yoga và giàn tập.
   - Đã thêm đủ 17 mẫu theo hai trang overview: cardio, sức mạnh/boxing, tập nhẹ, thiết bị tường, phục hồi và trạm nước; gương thông minh có Live Screen, hoàn tất 17/17.
-- [ ] Cinema & Hi-Fi: TV/máy chiếu, màn chiếu, loa thanh, loa đứng, loa surround, ampli, subwoofer và ghế rạp.
+- [x] Cinema & Hi-Fi: TV/máy chiếu, màn chiếu, loa thanh, loa đứng, loa surround, ampli, subwoofer và ghế rạp.
   - Đợt 1 đã thêm 16 mẫu màn chiếu, máy chiếu, loa, AV receiver và TV OLED; năm màn hình có Live Screen, thiết bị hình/âm thanh liên kết media player, độ phủ đạt 19/35 khi tính ba mẫu tương thích hiện có.
+  - Đợt 2 đã thêm 16 mẫu nguồn phát, vinyl, ghế rạp, xử lý âm học, tiện ích và phụ kiện Hi-Fi; trần sao dùng light entity/chiếu sáng phòng, hoàn tất 35/35 và toàn bộ Giai đoạn 5.
 
 Điều kiện hoàn thành: tất cả 16 nhóm có nội dung hữu dụng; TV, máy chiếu và màn hình hỗ trợ Live Screens; thiết bị âm thanh liên kết media player.
 

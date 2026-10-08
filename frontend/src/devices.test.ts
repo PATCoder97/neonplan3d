@@ -259,9 +259,24 @@ test("a TV on a stand participates in media-player linking", () => {
   assert.equal(isMediaFurniture("tv_stand"), true);
   assert.equal(isMediaFurniture("media_wall_tv"), true);
   assert.equal(isMediaFurniture("cinema_soundbar"), true);
+  assert.equal(isMediaFurniture("cinema_turntable"), true);
+  assert.equal(isMediaFurniture("cinema_bluray_player"), true);
   assert.equal(hasScreen("cinema_soundbar"), false);
+  assert.equal(hasScreen("cinema_game_console"), false);
   assert.equal(hasScreen("cinema_tv_oled_65"), true);
   assert.equal(isMediaFurniture("wood_stove"), false);
+});
+
+test("the cinema star ceiling resolves a matching room light", () => {
+  const hass = hassWith();
+  hass.states["light.star_ceiling"] = { entity_id: "light.star_ceiling", state: "on", attributes: { friendly_name: "Star ceiling" } };
+  hass.entities!["light.star_ceiling"] = { entity_id: "light.star_ceiling", area_id: "wohnen" };
+  const floor: Floor = {
+    ...newFloor("cinema", "Cinema", 0),
+    rooms: [{ ...room, area_id: "wohnen" }],
+    furniture: [{ id: "stars", type: "lamp_cinema_star_ceiling", x: 2, z: 1.5, rotation: 0, w: 2.4, d: 2.4, h: 0.04, variant: null, entity: null, power: null }],
+  };
+  assert.equal(furnitureEntities(hass, [floor]).get("stars")?.entity, "light.star_ceiling");
 });
 
 test("lamps take a light of their room, preferring one whose name fits", () => {

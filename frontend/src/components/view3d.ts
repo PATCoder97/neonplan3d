@@ -1919,6 +1919,7 @@ export class Fp3dView3d extends LitElement {
       cube: base + f.h + 0.16,
       kids_moon: base + f.h + 0.16,
       star_projector: base + f.h + 0.16,
+      star_ceiling: H - 0.25,
       round_panel: H - 0.25,
       garden_set: base + f.h + 0.2,
       wall_updown: base + f.h + 0.2,

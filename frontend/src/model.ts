@@ -833,7 +833,7 @@ export const WALL_LAMP_Y = 1.75;
 
 /** Items that can be lifted off the floor (a wall cabinet, a shelf, a wall light, an LED strip): everything but lamps hung from the ceiling and the ceiling-mounted pack items. */
 export function canLift(f: Pick<Furniture, "type">): boolean {
-  if (["lamp_ceiling", "lamp_downlight", "lamp_spot", "lamp_panel", "lamp_panel_round", "lamp_pendant", "fan_ceiling", "fan_ceiling_light", "access_point", "smoke_detector", "cinema_projector_ceiling", "cinema_speaker_ceiling", "stairwell", "parking"].includes(f.type) || STAIR_TYPES.has(f.type)) return false;
+  if (["lamp_ceiling", "lamp_downlight", "lamp_spot", "lamp_panel", "lamp_panel_round", "lamp_pendant", "lamp_cinema_star_ceiling", "fan_ceiling", "fan_ceiling_light", "access_point", "smoke_detector", "cinema_projector_ceiling", "cinema_speaker_ceiling", "stairwell", "parking"].includes(f.type) || STAIR_TYPES.has(f.type)) return false;
   return packItem(f.type)?.mount !== "ceiling";
 }
 
@@ -892,6 +892,8 @@ const SURFACES = new Set<string>([
   "dishwasher",
   "washer",
   "dryer",
+  "cinema_vinyl_shelf",
+  "cinema_hifi_rack",
 ]);
 
 /**
@@ -957,7 +959,10 @@ export function builtinBase(f: Pick<Furniture, "type" | "h"> & { variant?: strin
     case "cinema_screen_roller":
       return 0.65;
     case "cinema_speaker_wall":
+    case "cinema_speaker_inwall":
       return 1.2;
+    case "cinema_acoustic_panel":
+      return 0.65;
     case "cinema_tv_oled_65":
     case "cinema_tv_oled_85":
       return 0.75;
@@ -1252,6 +1257,7 @@ export const LAMP_MODEL: Record<string, LampModel> = {
   lamp_wall_updown: "wall_updown",
   lamp_night_moon: "kids_moon",
   lamp_star_projector: "star_projector",
+  lamp_cinema_star_ceiling: "star_ceiling",
   lamp_pendant: "pendant",
   lamp_floor: "floor",
   lamp_table: "table",

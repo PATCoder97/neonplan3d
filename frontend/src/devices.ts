@@ -747,6 +747,15 @@ const FURNITURE_NAMES: Record<string, RegExp> = {
   cinema_av_receiver: /(av ?receiver|receiver|ampli|amplifier|verstärker)/i,
   cinema_tv_oled_65: /\b(tv|fernseh|television|oled|fire ?tv|apple ?tv|chromecast|shield)/i,
   cinema_tv_oled_85: /\b(tv|fernseh|television|oled|fire ?tv|apple ?tv|chromecast|shield)/i,
+  cinema_turntable: /(turntable|record ?player|plattenspieler|mâm đĩa|mam dia|đĩa than|dia than)/i,
+  cinema_game_console: /(game|console|playstation|xbox|nintendo|spielkonsole|máy chơi game|may choi game)/i,
+  cinema_hifi_rack: /(hi-?fi|stereo|audio|receiver|ampli)/i,
+  cinema_popcorn_machine: /(popcorn|bỏng ngô|bong ngo)/i,
+  cinema_surround_speaker_stand: /(surround|rear ?speaker|lautsprecher|loa)/i,
+  cinema_speaker_inwall: /(in.?wall|wall ?speaker|lautsprecher|loa âm tường|loa am tuong)/i,
+  cinema_media_streamer: /(media ?stream|streamer|apple ?tv|chromecast|shield)/i,
+  cinema_bluray_player: /(blu.?ray|disc ?player|player)/i,
+  cinema_stereo_amplifier: /(stereo|amplifier|verstärker|ampli)/i,
   fireplace_wall_electric: /(fireplace|kamin|lò sưởi|lo suoi)/i,
   bed_ambient_180: /(bed|bett|giường|giuong).*(light|licht|đèn|den)|ambient/i,
   wardrobe_light: /(wardrobe|closet|kleiderschrank|tủ áo|tu ao).*(light|licht|đèn|den)/i,
@@ -765,7 +774,7 @@ const FURNITURE_NAMES: Record<string, RegExp> = {
   light_cove: /(cove|voute|khe|hắt|hat).*(light|licht|đèn|den)/i,
 };
 const MEDIA_FURNITURE = new Set(["tv_board", "tv_wall", "tv_stand", "media_wall_tv", "smart_display", "cinema_screen_wall", "cinema_screen_roller", "cinema_screen_floor_rising", "cinema_tv_oled_65", "cinema_tv_oled_85"]);
-const MEDIA_AUDIO = new Set(["cinema_projector_ceiling", "cinema_projector_table", "cinema_projector_ust", "cinema_speaker_tower", "cinema_speaker_bookshelf", "cinema_speaker_center", "cinema_subwoofer", "cinema_soundbar", "cinema_speaker_wall", "cinema_speaker_ceiling", "cinema_av_receiver"]);
+const MEDIA_AUDIO = new Set(["cinema_projector_ceiling", "cinema_projector_table", "cinema_projector_ust", "cinema_speaker_tower", "cinema_speaker_bookshelf", "cinema_speaker_center", "cinema_subwoofer", "cinema_soundbar", "cinema_speaker_wall", "cinema_speaker_ceiling", "cinema_av_receiver", "cinema_turntable", "cinema_game_console", "cinema_hifi_rack", "cinema_surround_speaker_stand", "cinema_speaker_inwall", "cinema_media_streamer", "cinema_bluray_player", "cinema_stereo_amplifier"]);
 
 /** Whether a screen picture rule matches now: the state or attribute equals the value, or contains it (3+ chars); "*" always. */
 export function pictureRuleMatches(hass: HomeAssistant, rule: { entity: string; attribute?: string | null; state: string }): boolean {
@@ -842,6 +851,7 @@ const LAMP_NAMES: Record<string, RegExp> = {
   lamp_panel_round: /((rund|round|tròn|tron).*(panel|decke|ceiling|ốp trần|op tran)|(panel|decke|ceiling|ốp trần|op tran).*(rund|round|tròn|tron))/i,
   lamp_garden_spots: /((garten|garden|outdoor|sân vườn|san vuon).*(spot|rọi|roi)|(spot|rọi|roi).*(garten|garden|outdoor|sân vườn|san vuon))/i,
   lamp_wall_updown: /(up.*down|außenwand|outdoor wall|tường.*hai hướng|tuong.*hai huong)/i,
+  lamp_cinema_star_ceiling: /(star|stern|cinema|kino|sao|điện ảnh|dien anh)/i,
 };
 
 export interface FurnitureLinks {
