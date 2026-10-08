@@ -4,7 +4,7 @@ import { FURNITURE_TYPES } from "../../model.ts";
 import { BUILTIN_FURNITURE_SYMBOLS, registeredFurnitureSymbol } from "../../components/furniture-symbols/index.ts";
 import { BUILTIN_FURNITURE_MODELS, BUILTIN_FURNITURE_SCREENS, registeredFurnitureScreen } from "./index.ts";
 
-const SCREEN_TYPES = ["alarm_sunrise", "balcony_solar", "bathroom_fan", "bed_ambient_180", "dishwasher", "dryer", "electric_towel_heater", "media_wall_tv", "mirror_80_light", "mirror_cabinet_light", "mirror_led_clock", "mirror_round_light", "rain_shower_led", "tv_stand", "vanity_light", "wardrobe_light", "washer", "washer_dryer_tower"];
+const SCREEN_TYPES = ["alarm_sunrise", "balcony_solar", "bathroom_fan", "bed_ambient_180", "dishwasher", "dryer", "electric_towel_heater", "fireplace_builtin", "media_wall_tv", "mirror_80_light", "mirror_cabinet_light", "mirror_led_clock", "mirror_round_light", "rain_shower_led", "tv_stand", "vanity_light", "wardrobe_light", "washer", "washer_dryer_tower"];
 const SYMBOLLESS_INTERNAL_TYPES = ["fridge_smart", "grid_point", "home_battery", "inverter", "meter", "stairwell", "wallbox", "worktop"];
 
 test("every non-lamp built-in has a family renderer", () => {

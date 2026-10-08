@@ -744,6 +744,7 @@ const FURNITURE_NAMES: Record<string, RegExp> = {
   washer_vanity: /(washer|washing|wasch|máy giặt|may giat)/i,
   rain_shower_led: /(shower|dusche|sen).*(led|light|licht|đèn|den)/i,
   mirror_led_clock: /(mirror|spiegel|gương|guong).*(led|clock|uhr|đồng hồ|dong ho)/i,
+  fireplace_builtin: /(fireplace|kamin|lò sưởi|lo suoi)/i,
 };
 const MEDIA_FURNITURE = new Set(["tv_board", "tv_wall", "tv_stand", "media_wall_tv", "smart_display"]);
 

@@ -50,7 +50,7 @@ export const REFERENCE_PACK_ITEMS: Record<ReferencePack, readonly FurnitureType[
   home_cinema: ["tv_board", "tv_wall", "smart_speaker"],
   utility: ["radiator", "air_conditioner", "water_pump", "water_heater", "drying_rack", "water_purifier", "air_purifier", "water_tank", "washer", "dryer", "washer_dryer_tower", "balcony_solar", "electrical_panel", "ups_unit", "heat_pump_outdoor", "hot_water_tank", "ventilation_fan", "humidifier"],
   pets: [],
-  architecture: ["room_divider", "gate", "fence", "parking", "shower_screen"],
+  architecture: ["room_divider", "shower_screen", "smart_curtain", "column_round", "column_square", "column_steel", "ceiling_beams", "downstand_beam", "chimney_inside", "fireplace_builtin", "sliding_wall"],
   living: ["altar", "altar_table", "altar_cabinet", "altar_wall", "shoe_cabinet", "shoe_bench", "sofa", "sofa_2", "sofa_3", "sofa_4", "sofa_l", "sofa_corner_left", "sofa_corner_right", "sofa_chesterfield", "sofa_velvet_3", "sofa_modular_5", "sofa_armless", "sofa_chaise", "sofa_u", "sofa_bed", "chaise_longue", "armchair", "club_chair", "cocktail_chair", "wingback_chair", "recliner", "rocking_chair", "bean_bag", "ottoman", "stool", "chair_upholstered", "chair_shell", "coffee_table", "coffee_table_round", "coffee_table_glass", "nesting_tables", "side_table_round", "console_table", "table_120", "table_160", "table_200", "table_solid_220", "bench_dining_160", "tv_console", "lowboard_120", "lowboard_160", "lowboard_200", "tv_stand", "sideboard", "highboard", "chest_drawers_3", "display_cabinet", "shelf", "bookshelf_wide", "cube_shelf_2x2", "cube_shelf_4x2", "cube_shelf_4x4", "room_divider_shelf", "floating_shelf", "wood_stove", "plant", "rug", "coat_rack", "media_wall_tv", "piano_upright", "vase_pampas", "plant_monstera", "rug_round", "fireplace_wall_electric"],
   kitchen: [
     "range_hood", "microwave", "kitchen_corner", "kitchen_display", "table", "table_round", "chair", "bench", "corner_bench", "bar_stool", "kitchen", "kitchen_wall", "kitchen_tall", "island", "worktop", "sink", "stove", "dishwasher", "fridge",
@@ -59,13 +59,13 @@ export const REFERENCE_PACK_ITEMS: Record<ReferencePack, readonly FurnitureType[
   bathroom: ["bathtub", "shower", "wc", "washbasin", "vanity_60", "vanity_80", "vanity_100", "double_vanity_120", "pedestal_basin", "bathtub_builtin", "bathtub_corner", "shower_corner_90", "shower_niche_120", "shower_walkin_140", "toilet_close_coupled", "toilet_wall_hung", "bidet", "bathroom_cabinet_tall", "bathroom_cabinet_mid", "mirror_round_light", "mirror_80_light", "bathroom_wall_shelf", "towel_rail", "bathtub_freestanding", "sauna", "towel_radiator", "whirlpool_indoor", "washing_machine_cabinet", "laundry_basket", "ladder_shelf_towels", "mirror_cabinet_light", "electric_towel_heater", "bathroom_fan", "washer_vanity", "rain_shower_led", "mirror_led_clock", "laundry_cabinet_basket"],
   kids: ["crib", "bunk_bed"],
   office: ["desk", "office_chair", "tall_cabinet"],
-  garden: ["hammock", "stone_table_set", "planter_large"],
+  garden: ["hammock", "stone_table_set", "planter_large", "gate", "fence"],
   garage: [],
   fitness: [],
   smart_home: [
-    "lamp_ceiling", "lamp_downlight", "lamp_spot", "lamp_panel", "lamp_pendant", "lamp_floor", "lamp_table", "lamp_wall", "led_strip", "lamp_uplight", "lamp_bollard", "lamp_garden", "lamp_column", "lamp_tv_bars", "lamp_orb_table", "lamp_portable", "lamp_ambient_spot", "lamp_cube", "lamp_panel_round", "lamp_garden_spots", "lamp_wall_updown", "fan_ceiling", "fan_ceiling_light", "fan_wall", "fan_floor", "security_camera", "smart_lock", "smart_curtain", "robot_vacuum", "robot_mower", "network_cabinet", "nas_server", "access_point", "wall_thermostat", "smoke_detector", "siren_alarm", "modem_router", "smart_display", "wall_switch", "wall_outlet", "smart_plug", "motion_sensor", "contact_sensor", "water_leak_sensor", "temperature_humidity_sensor", "video_doorbell",
+    "lamp_ceiling", "lamp_downlight", "lamp_spot", "lamp_panel", "lamp_pendant", "lamp_floor", "lamp_table", "lamp_wall", "led_strip", "lamp_uplight", "lamp_bollard", "lamp_garden", "lamp_column", "lamp_tv_bars", "lamp_orb_table", "lamp_portable", "lamp_ambient_spot", "lamp_cube", "lamp_panel_round", "lamp_garden_spots", "lamp_wall_updown", "fan_ceiling", "fan_ceiling_light", "fan_wall", "fan_floor", "security_camera", "smart_lock", "robot_vacuum", "robot_mower", "network_cabinet", "nas_server", "access_point", "wall_thermostat", "smoke_detector", "siren_alarm", "modem_router", "smart_display", "wall_switch", "wall_outlet", "smart_plug", "motion_sensor", "contact_sensor", "water_leak_sensor", "temperature_humidity_sensor", "video_doorbell",
   ],
-  vehicles: ["motorbike"],
+  vehicles: ["motorbike", "parking"],
   stairs: ["stairs", "stairs_landing"],
 };
 

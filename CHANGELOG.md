@@ -4,6 +4,18 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.22.0
+
+### Added
+
+- Added the first Architecture & Fit-out batch: round, square and steel columns, a five-beam ceiling, downstand beam, indoor chimney, built-in fireplace and sliding wall.
+- Added a focused Architecture 2D/3D family, localized names and a live light surface for the built-in fireplace.
+
+### Changed
+
+- Reclassified gates and fences under Garden and parking under Vehicles; the existing motorised curtain and glass partition now count toward Architecture.
+- Expanded the reproducible catalog inventory to 264 declared types and 257 library items, with Architecture coverage at 11 of 17.
+
 ## 1.21.0
 
 ### Added
