@@ -1,2 +1,3 @@
 * text=auto eol=lf
 *.png binary
+custom_components/neonplan3d/frontend/neonplan3d-honeycomb.js -whitespace

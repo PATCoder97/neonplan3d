@@ -155,9 +155,15 @@ export interface HoneycombInsets {
 export function placeHoneycomb(stageWidth: number, stageHeight: number, x: number, y: number, panelOpen = false, safe: HoneycombInsets = {}): HoneycombPlacement {
   const size = HONEYCOMB_GEOMETRY.cluster;
   const inset = 8;
+  // Room details occupy the right-hand side on desktop and the lower 55% on
+  // phones/portrait tablets. Treat that panel as an inset instead of forcing
+  // every room menu into the detached dock layout.
+  const bottomPanel = panelOpen && (stageWidth <= 700 || (stageHeight > stageWidth && stageWidth <= 1000));
+  const panelBottom = bottomPanel ? stageHeight * 0.55 + 8 : 0;
+  const panelRight = panelOpen && !bottomPanel ? 374 : 0;
   const topInset = inset + Math.max(0, safe.top ?? 0);
-  const rightInset = inset + Math.max(0, safe.right ?? 0);
-  const bottomInset = inset + Math.max(0, safe.bottom ?? 0);
+  const rightInset = inset + Math.max(0, safe.right ?? 0, panelRight);
+  const bottomInset = inset + Math.max(0, safe.bottom ?? 0, panelBottom);
   const leftInset = inset + Math.max(0, safe.left ?? 0);
   const availableWidth = Math.max(0, stageWidth - leftInset - rightInset);
   const availableHeight = Math.max(0, stageHeight - topInset - bottomInset);
@@ -166,7 +172,7 @@ export function placeHoneycomb(stageWidth: number, stageHeight: number, x: numbe
   const height = sheet ? Math.min(180, availableHeight) : size;
   const maxLeft = Math.max(leftInset, stageWidth - size - rightInset);
   const maxTop = Math.max(topInset, stageHeight - size - bottomInset);
-  const dock = sheet || panelOpen;
+  const dock = sheet;
   const left = sheet ? leftInset : dock ? Math.max(leftInset, Math.min(maxLeft, (stageWidth - size) / 2)) : Math.max(leftInset, Math.min(maxLeft, x - size / 2));
   const top = sheet ? Math.max(topInset, stageHeight - height - bottomInset) : dock ? maxTop : Math.max(topInset, Math.min(maxTop, y - size / 2));
   return { left, top, width, height, anchorX: x - left, anchorY: y - top, dock, sheet };

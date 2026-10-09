@@ -6,6 +6,12 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 
 ## Unreleased
 
+## 1.24.6
+
+### Fixed
+
+- Kept Neon Honeycomb centred on its device while zoomed into a room, using the actual desktop or portrait room-panel obstruction instead of detaching sparse menus into the bottom dock.
+
 ## 1.24.5
 
 ### Fixed

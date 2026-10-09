@@ -58,7 +58,7 @@ test("golden-frame progress preserves clockwise stagger at 0, 25, 50, 75 and 100
   assert.deepEqual(Array.from({ length: 6 }, (_, i) => honeycombFrameProgress(100, i)), [1, 1, 1, 1, 1, 1]);
 });
 
-test("placement clamps to the real stage, docks around panels and falls back to a bottom sheet", () => {
+test("placement clamps to the real stage, avoids room panels and falls back to a bottom sheet", () => {
   assert.deepEqual(placeHoneycomb(800, 600, 10, 10), { left: 8, top: 8, width: 225, height: 225, anchorX: 2, anchorY: 2, dock: false, sheet: false });
   const edge = placeHoneycomb(800, 600, 795, 590);
   assert.equal(edge.left, 567);
@@ -69,9 +69,15 @@ test("placement clamps to the real stage, docks around panels and falls back to 
   assert.equal(narrow.left, 8);
   assert.equal(narrow.top, 312);
   assert.deepEqual({ width: narrow.width, height: narrow.height }, { width: 204, height: 180 });
-  const panelDock = placeHoneycomb(800, 600, 400, 300, true);
-  assert.equal(panelDock.dock, true);
-  assert.equal(panelDock.sheet, false);
+  const panelAware = placeHoneycomb(800, 600, 400, 300, true);
+  assert.equal(panelAware.dock, false);
+  assert.equal(panelAware.sheet, false);
+  assert.equal(panelAware.left + panelAware.width <= 800 - 374, true);
+  const portraitPanel = placeHoneycomb(729, 742, 462, 142, true, { bottom: 52 });
+  assert.equal(portraitPanel.dock, false);
+  assert.equal(portraitPanel.sheet, false);
+  assert.equal(portraitPanel.left + portraitPanel.width / 2, 462);
+  assert.equal(portraitPanel.top + portraitPanel.height / 2, 142);
   assert.deepEqual(placeHoneycomb(800, 600, 4, 596, false, { top: 20, right: 12, bottom: 34, left: 16 }), { left: 24, top: 333, width: 225, height: 225, anchorX: -20, anchorY: 263, dock: false, sheet: false });
 });
 
