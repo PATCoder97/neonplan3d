@@ -250,6 +250,16 @@ const shots = [
   { name: "tablet-portrait-house", query: "", width: 800, height: 1280 },
   { name: "tablet-portrait-room", query: "", width: 800, height: 1280, click: "Erdgeschoss", then: "Wohnzimmer" },
   { name: "phone-floor", query: "", width: 420, height: 800, click: "Erdgeschoss" },
+  // Release matrix: all supported viewport classes at Auto, internal Low (labelled Tablet) and High.
+  { name: "matrix-desktop-auto", query: "?fp3d_stats", width: 1440, height: 900, click: "Erdgeschoss", viewScript: "v.quality = 'auto';", expectQuality: "auto" },
+  { name: "matrix-desktop-tablet", query: "?fp3d_stats", width: 1440, height: 900, click: "Erdgeschoss", viewScript: "v.quality = 'low';", expectQuality: "low" },
+  { name: "matrix-desktop-high", query: "?fp3d_stats", width: 1440, height: 900, click: "Erdgeschoss", viewScript: "v.quality = 'high';", expectQuality: "high" },
+  { name: "matrix-tablet-auto", query: "?fp3d_stats", width: 800, height: 1280, click: "Erdgeschoss", viewScript: "v.quality = 'auto';", expectQuality: "auto" },
+  { name: "matrix-tablet-tablet", query: "?fp3d_stats", width: 800, height: 1280, click: "Erdgeschoss", viewScript: "v.quality = 'low';", expectQuality: "low" },
+  { name: "matrix-tablet-high", query: "?fp3d_stats", width: 800, height: 1280, click: "Erdgeschoss", viewScript: "v.quality = 'high';", expectQuality: "high" },
+  { name: "matrix-mobile-auto", query: "?fp3d_stats", width: 420, height: 800, click: "Erdgeschoss", viewScript: "v.quality = 'auto';", expectQuality: "auto" },
+  { name: "matrix-mobile-tablet", query: "?fp3d_stats", width: 420, height: 800, click: "Erdgeschoss", viewScript: "v.quality = 'low';", expectQuality: "low" },
+  { name: "matrix-mobile-high", query: "?fp3d_stats", width: 420, height: 800, click: "Erdgeschoss", viewScript: "v.quality = 'high';", expectQuality: "high" },
   { name: "card-portrait-room", query: "?card&floor=eg", width: 700, height: 1000, click: "Wohnzimmer" },
   { name: "view-alert-banner", query: "?alerts", width: 1280, height: 800, click: "Erdgeschoss" },
   { name: "view-garden-trees", query: "", width: 1280, height: 800, editor: true, editorScript: "e.fit();", then3d: "Alle Etagen", then3dAlso: ["Gestapelt"], camera: { theta: 0.35, phi: 1.15, radius: 30, target: { x: 7, y: 0, z: -1 } } },
@@ -371,6 +381,16 @@ for (const shot of shots.filter((s) => !only || only.includes(s.name))) {
       new Function("v", code)(v);
     }, shot.viewScript);
     await new Promise((r) => setTimeout(r, 1500));
+  }
+  if (shot.expectQuality) {
+    const state = await page.evaluate(() => {
+      const view = document.querySelector("neonplan3d-panel").shadowRoot.querySelector("fp3d-view3d");
+      const canvas = view.shadowRoot.querySelector("canvas");
+      return { quality: view.quality, low: view.viewer?.low ?? null, high: view.viewer?.highQuality ?? null, width: canvas?.width ?? 0, height: canvas?.height ?? 0 };
+    });
+    const validTier = shot.expectQuality === "low" ? state.low === true : shot.expectQuality === "high" ? state.high === true && state.low === false : true;
+    if (state.quality !== shot.expectQuality || !validTier || state.width < 1 || state.height < 1) throw new Error(`${shot.name}: quality assertion failed: ${JSON.stringify(state)}`);
+    console.log(`verified ${shot.name}: ${state.quality}, ${state.width}×${state.height}`);
   }
   if (shot.editorScript) {
     await page.evaluate((code) => {

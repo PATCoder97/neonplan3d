@@ -370,7 +370,8 @@ Mục tiêu: hoàn tất độ phủ cả 16 nhóm.
   - Bộ lọc tổ hợp áp dụng cho cả catalog tích hợp và pack nhập; test khóa phân loại mount/capability/style cùng truy vấn tiếng Việt không dấu.
 - [x] Lazy-build hoặc chia cache hình học để thời gian mở editor và dung lượng bundle không tăng tuyến tính theo số mẫu.
   - Hình học chỉ dựng khi mẫu thực sự xuất hiện và được tái dùng qua cache LRU 256 khóa; vị trí chỉ dịch chuyển buffer đã có, còn hướng/mirror/cao độ/pack version vẫn tách khóa để giữ kết quả chính xác.
-- [ ] Kiểm thử trên desktop, tablet, điện thoại và chất lượng Low/Tablet/High.
+- [x] Kiểm thử trên desktop, tablet, điện thoại và chất lượng Low/Tablet/High.
+  - Ma trận 3 × 3 chạy bằng WebGL headless, assert tier/canvas và kiểm tra trực quan; xem `docs/testing-device-matrix-vi.md` cùng contact sheet đã lưu.
 - [ ] Cập nhật manual, ảnh minh họa, changelog và quy trình đóng góp mẫu mới.
 
 Điều kiện hoàn thành: thư viện đầy đủ vẫn tải nhanh trên tablet, bản vẽ cũ không lỗi và mọi mẫu đều vượt qua Definition of Done bên dưới.

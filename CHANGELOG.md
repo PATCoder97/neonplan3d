@@ -4,6 +4,17 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.24.2
+
+### Added
+
+- Added a reproducible nine-case release matrix covering desktop, portrait tablet and mobile viewports at Auto, Tablet/Low and High quality.
+- Added runtime assertions for the applied renderer tier and non-zero responsive canvas, a visual contact sheet and a Vietnamese test report.
+
+### Changed
+
+- The screenshot harness now verifies quality state instead of relying on filenames or visual inference alone; all nine cases pass without application, WebGL or layout failures.
+
 ## 1.24.1
 
 ### Added
