@@ -8,49 +8,54 @@
     "role": "dialog",
     "cells": [
       {
-        "x": 0,
-        "y": -92,
-        "width": 56,
-        "height": 56
+        "x": -33,
+        "y": -57.157684326171875,
+        "width": 64,
+        "height": 72
       },
       {
-        "x": 79.67433166503906,
-        "y": -46,
-        "width": 55.999969482421875,
-        "height": 56
+        "x": 33,
+        "y": -57.157684326171875,
+        "width": 64,
+        "height": 72
       },
       {
-        "x": 79.67433166503906,
-        "y": 46,
-        "width": 55.999969482421875,
-        "height": 56
+        "x": 66,
+        "y": 0,
+        "width": 64,
+        "height": 72
       },
       {
-        "x": 0,
-        "y": 92,
-        "width": 56,
-        "height": 56
+        "x": 33,
+        "y": 57.157684326171875,
+        "width": 64,
+        "height": 72
       },
       {
-        "x": -79.67434692382812,
-        "y": 46,
-        "width": 56,
-        "height": 56
+        "x": -33,
+        "y": 57.157684326171875,
+        "width": 64,
+        "height": 72
       },
       {
-        "x": -79.67434692382812,
-        "y": -46,
-        "width": 56,
-        "height": 56
+        "x": -66,
+        "y": 0,
+        "width": 64,
+        "height": 72
       }
     ],
+    "center": {
+      "width": 64,
+      "height": 72
+    },
+    "clipPath": "polygon(50% 0px, 100% 25%, 100% 75%, 50% 100%, 0px 75%, 0px 25%)",
     "nodes": 39
   },
   "keyboard": {
     "start": "Living room",
     "tab": "Power",
     "shiftTab": "Living room",
-    "right": "Details",
+    "right": "Colour",
     "closeEvents": 1
   },
   "paging": {
@@ -86,29 +91,29 @@
       }
     ],
     "ended": [
-      197.7,
-      247.5,
-      297.5,
-      330.8,
-      380.9,
-      430.9
+      184.2,
+      232.2,
+      265.4,
+      315.4,
+      365.3,
+      415.4
     ],
     "reducedDuration": 80
   },
   "performance": {
     "nodes": 39,
     "frames": 73,
-    "elapsed": 1200.7999999970198,
-    "fps": 60.8
+    "elapsed": 1203,
+    "fps": 60.7
   },
   "pad": {
-    "events": 6,
-    "elapsed": 408.3,
+    "events": 5,
+    "elapsed": 415.6,
     "maximum": 7,
     "final": {
       "value": 97,
       "final": true,
-      "at": 514
+      "at": 564.4000000022352
     },
     "centerActions": 1
   },
@@ -116,7 +121,7 @@
     {
       "id": "companion-android",
       "point": {
-        "x": 200,
+        "x": 199.5,
         "y": 575
       },
       "contained": true,
@@ -142,80 +147,80 @@
     "scrollable": true,
     "cells": [
       {
-        "width": 72,
+        "width": 64,
         "height": 72
       },
       {
         "width": 56,
-        "height": 56
+        "height": 64
       },
       {
         "width": 56,
-        "height": 56
+        "height": 64
       },
       {
         "width": 56,
-        "height": 56
+        "height": 64
       },
       {
         "width": 56,
-        "height": 56
+        "height": 64
       },
       {
         "width": 56,
-        "height": 56
+        "height": 64
       },
       {
         "width": 56,
-        "height": 56
+        "height": 64
       }
     ]
   },
   "goldenFrames": {
     "desktop-1-p000.png": "620bba5ff685fbece1a7a2a08268f61b8ef4a2396b02f8fca4b15f527c422eee",
-    "desktop-1-p025.png": "75a755b2892e40ed7f2fad29f65fb16fcbae52cc1dda8922ee2fa90c9ba2d4dc",
-    "desktop-1-p050.png": "d17a2471924a07d1e763314b1a9b622e6bf50a88a4be581e35051d0aa7970536",
-    "desktop-1-p075.png": "92107528ae7e759ef3521c44c954d7b64b04b14324992cb9ac4a3d96895944b6",
-    "desktop-1-p100.png": "1fb45c39a52aee1ac03dbd9ec0da3a2f5b7f4ee4e04ff7ac21fa579c5561d13c",
+    "desktop-1-p025.png": "72ed708d94efc0518ed1658400e7daf6a7c1071bbadb5d01917938b54e280aeb",
+    "desktop-1-p050.png": "bca9ac3e9239d4c3803deb2600e450a4484108b87decafceb426ed73b9e420a0",
+    "desktop-1-p075.png": "fc189d1b07632795a46fbdfcbf4f98cd0c701991f915c37b420ee911dc0b7393",
+    "desktop-1-p100.png": "ce0fde546c78fceb57ffc0b70dc1befeccedc3c5a28ce04752be7010ecce75c1",
     "desktop-3-p000.png": "b46eef620b73ab99ba51c8cb6dc02d0b9c66c8d0d1f61313f853fd57dea90c19",
-    "desktop-3-p025.png": "82d10aec75a78fd84b2e91ea605ded519b9b443bbffee2e77aeb6611cadbbb6f",
-    "desktop-3-p050.png": "d83df6986221b750f80c30a9a4ce6883da3e0812457398e2183a65178c0f6e6d",
-    "desktop-3-p075.png": "9f65ca05009ffc3a61146cde41abcdec9d41bcaf3ceb21c406a4c89bfd915efc",
-    "desktop-3-p100.png": "7dc490e22d18de55e2015180990210e0f0a6cbbbeaf0aa1cdadb9dfd9f7b4439",
+    "desktop-3-p025.png": "c32e0377b7a8218f5d6b3d458fb985d8abddaeed9f8b08b9743d3df5bd810f76",
+    "desktop-3-p050.png": "1ef1771c86a2e2f1a3d7e8e1a15311b50cb38d13f9027719192c3c20b8b2b5ab",
+    "desktop-3-p075.png": "d1439ae5b850778a0916527838bc9d7f98d54f5a34fa63b13afc1f80c4dfac0a",
+    "desktop-3-p100.png": "8f42b844250683f2874c52eb19d2da7b7e7c19015830134de2933105d1a75fb0",
     "desktop-6-p000.png": "165100c68e79dce8c486070f0e66877222555aae6b48bf1d7ccae21f0b315a55",
-    "desktop-6-p025.png": "11847a466974c5c64f43b2961c22b27d0c3623d5853505dfa60e86c120cdc663",
-    "desktop-6-p050.png": "840f56e6dfb32e967c264e7b78c75538ff23c66ee20f842bc56266a3c3bdf294",
-    "desktop-6-p075.png": "93a58404c2c5b5a79dd13916823cbfee3304af95168a50e0c2a6b7301a20c977",
-    "desktop-6-p100.png": "4df014c2ee44ac6772c29eb682662ea3963e934191b26c114dceee39e2410283",
+    "desktop-6-p025.png": "a00282cfe362c6a6cf7cbfedc69263766e833a525b4dd3ca22a2d11de4296307",
+    "desktop-6-p050.png": "5394a91e94b37f6e487bfe0e240c601de27ec8a64b0f5172caa63a49e870b1cd",
+    "desktop-6-p075.png": "cd2e21953c18a37d79b0cdee44fc20da6bca19383e35cee605834fe3711cf975",
+    "desktop-6-p100.png": "22e71b5b7d3f83a1903d6836dbad0e2a5f3f5a5818c954287387cee6f8694bb6",
     "tablet-1-p000.png": "8bf78b6ee5866a9f7c791e044afca212a2d197c7421553dfb191ac3e7f2b000e",
-    "tablet-1-p025.png": "ad55ec85432edf03453db5f7c6863521a4c7d9573dce6a599666af89e340d647",
-    "tablet-1-p050.png": "4c062f7d266d3f91842c10163a2fc766fb707336b97d4b0c1ddc3ca566475cf0",
-    "tablet-1-p075.png": "f4100444b26b911b79966adff8cbfeb6bd96b264ff6578d9a38957a7628faf82",
-    "tablet-1-p100.png": "b29b5789a31ef9e10497ca8bb7849ddd1a21e2542ffadb78ba2d94fa4a8c101d",
+    "tablet-1-p025.png": "269d950f46a5c830977fe3efa937aeaf4707e492d8e91afc6e1896103a92a782",
+    "tablet-1-p050.png": "78d2fd49ee10eab82d300b310ca165fe20167f6c7e90cae715299801c6f9d584",
+    "tablet-1-p075.png": "10af1dcd272f045b5d2dc89ebb0b6b952927adf9136bd544ff4411fd83a16d0d",
+    "tablet-1-p100.png": "0a3cc8fe7b9d1eadec66d7fc1422890b6efcdb375351ae518f36c0d44ed39650",
     "tablet-3-p000.png": "d07962c1941b95b25915676aa71accda760a0f0a792e57901fbd398f0897ef9d",
-    "tablet-3-p025.png": "2335d5077c99e8b839308b928292939890078b4f04903b1ea2d1f38c9b811187",
-    "tablet-3-p050.png": "8db1695b5850d04e24c813da554b01e8642c7ab44edb7aafb7cc3af8d1f4ea17",
-    "tablet-3-p075.png": "81bff692dd86d590fcd40686828a028ae1004e134103ded3d1fe4fa72c8f783b",
-    "tablet-3-p100.png": "8b4a51022548f263e8994bf90405311fb649bf01e6a28649189a952762afbf65",
+    "tablet-3-p025.png": "121409cd7339ef6a5e7f03a2712a7c7fcc5406186ee74a3a7fda3d16e8ae1654",
+    "tablet-3-p050.png": "183e81831223f043f79452353588b66ea15c92800ec32715d8187c30a36611b4",
+    "tablet-3-p075.png": "cbb1ecc5d95770046fd3c893107d68cae3b4c602a57678a9a64e38f5bf1fed90",
+    "tablet-3-p100.png": "99332f0f86a48ed4c9806f5a20e63066cfd9c54884a3d39df50f860df7a4e6f0",
     "tablet-6-p000.png": "ebf43ab88202c9a31e4f90dd26d564cf2db6f0ec58600c923fe7774a2b471152",
-    "tablet-6-p025.png": "f989f84fe6658d50e5e3215e15c331c299c15d1fced65e5aa0cf4a60bb07d14d",
-    "tablet-6-p050.png": "960e336a30d91f4fad6fbb10719f020b6f3e2e20f1938f96db4f5006cd3efb8e",
-    "tablet-6-p075.png": "a0e6c6dd8fae77e51b5902eccfdbbef795982be578cddbd918d48b406143ba9a",
-    "tablet-6-p100.png": "5b1b8e7fe8fe0d0d2a3c232c610453c27d38d5e7da18b4a563cdb60cd6e58d5c",
+    "tablet-6-p025.png": "3c33a2bdf3d62c604e378b4feae3de8eee606577fccb28babe539362997af543",
+    "tablet-6-p050.png": "64796815dd19db9368c49ed44a57cee2fa6f5b14bfdc6e55a50f2bc436daeb7c",
+    "tablet-6-p075.png": "1d90a1ccb1ebf3a3133d3eadd5f35f52c5d8a456d46f81c113f460a40d2229cc",
+    "tablet-6-p100.png": "3bf46617865c282762ed0f1fd112493d8e1c3608b01cb39ba7a5cc123d9278c3",
     "narrow-1-p000.png": "690454c43c0c783be3c6af42ca5de99aaa80cd1161c9d000c23fb16b0297978a",
-    "narrow-1-p025.png": "52036f9be31dc75c0b23c60e0d3ef9b9d91c4f853a3ab779bc4c56e0bd599d8c",
-    "narrow-1-p050.png": "78b6690c422a5b109cf47c2c4b8ec62e324156ff4b9112a50badaac12ef7ec4d",
-    "narrow-1-p075.png": "c98e0825919a04f73916e34920c621c6308b08724c9e6a7be597f90f63ffc252",
-    "narrow-1-p100.png": "405e81d5a137f91472729549e84dddfee48d58364e1cfc732110c687582210ad",
+    "narrow-1-p025.png": "84ac60dce1dc7f05323560c3d1a6613f1485757960925345d94c7620cc8c544d",
+    "narrow-1-p050.png": "7203538e2e84f10754ec025856d56ed61da9a02d2bd2b10600cb38791a939074",
+    "narrow-1-p075.png": "732f31f4dfaed98fbdd88de6d3684450a109b6f4e1c7475a2c15edc30c1c8dc9",
+    "narrow-1-p100.png": "2e79cc63d139d3df2259d6c7fa3b2b8f583242094c949aa5c0643e0cbb40e913",
     "narrow-3-p000.png": "bc7da684c90a2594f53c144dfa1251a164a7938a5b06ac1f1f0489d53f405c9c",
-    "narrow-3-p025.png": "8711b5da2aae2be7b54def5a54a57c0e7c785b858ca4dc797cdf2640aeb44c69",
-    "narrow-3-p050.png": "fe4926b3f150600aa09c8943bc19e9de58fe0cde416037e8864d31b1bed6ffc7",
-    "narrow-3-p075.png": "56833e23f0a5d91aa3d2efacf57579add95924995bae53b60854cb84527be47a",
-    "narrow-3-p100.png": "0ca78963c06d93c09bdc75dcc0d01acbc6a1b2ecc02b0d8476db41bebbbfbf9d",
+    "narrow-3-p025.png": "e091339950dd3279a0f99afdf955c4b7ab79a3fba6c60d529c23e7825198c399",
+    "narrow-3-p050.png": "7e794e3a8b477fb820f7192a6b55a964dc785b8979e11b262812546e89f5d4d1",
+    "narrow-3-p075.png": "328d85599a39a44aa8f7c07c85122693136c3bd42d5dffb068b1710bc8a84a30",
+    "narrow-3-p100.png": "9a94a51d1e5f9da200461d24cf444089717a4e5b40e476008d83072d5ee765fd",
     "narrow-6-p000.png": "80376ada16b8688afea6242e367c42dfccfe32d438baa9dcacda78b1072a4fab",
-    "narrow-6-p025.png": "a72ca1281d31bf22acbadbea7bf0324f4ccc488c585213340f779487f23ddd95",
-    "narrow-6-p050.png": "72e63cebbc7552a272f4d9406201ef972f54101f9c9fb74817bb5bc9241ced4e",
-    "narrow-6-p075.png": "17f0413cbb1ba5c366002e012528ceabc8fc13577fe58b33848efb984680c97a",
-    "narrow-6-p100.png": "81df8e378d542cabacb15cf31aa3afb9fd7abc41a16dfa0ed57e9b3e89855114"
+    "narrow-6-p025.png": "fb0d26d7c18dc2431b08134eb0dfcd986078d6e2a2a94defa9b39fb2cd817496",
+    "narrow-6-p050.png": "1df04d9eac4ccb4844c66c3ce45774a1ddb31d0daf7d2df0abcb36fd8ede5dba",
+    "narrow-6-p075.png": "cc6edc482a039c36a2e214cd2f0500c4eb916c60d092503eab6a6bc0531b5433",
+    "narrow-6-p100.png": "b64ab0dcee2c0c52c8e165c394e1af86ebe363b6512e29e8b378306630a9629b"
   }
 }

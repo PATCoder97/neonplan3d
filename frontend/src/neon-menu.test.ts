@@ -22,16 +22,20 @@ test("honeycomb geometry uses fixed 60 degree slots and minimum touch targets", 
   const points = honeycombPoints(6);
   assert.equal(points.length, 6);
   assert.ok(HONEYCOMB_GEOMETRY.size >= 48 && HONEYCOMB_GEOMETRY.minTarget >= 48);
+  assert.equal(HONEYCOMB_GEOMETRY.centerSize, HONEYCOMB_GEOMETRY.size);
+  assert.equal(HONEYCOMB_GEOMETRY.centerHeight, HONEYCOMB_GEOMETRY.height);
   for (const p of points) assert.ok(Math.abs(Math.hypot(p.x, p.y) - HONEYCOMB_GEOMETRY.radius) < 1e-9);
-  assert.ok(Math.abs(points[0].x) < 1e-9 && Math.abs(points[0].y + HONEYCOMB_GEOMETRY.radius) < 1e-9);
-  assert.ok(Math.abs(points[1].x - HONEYCOMB_GEOMETRY.radius * Math.sqrt(3) / 2) < 1e-9);
+  assert.equal(HONEYCOMB_GEOMETRY.radius - HONEYCOMB_GEOMETRY.size, HONEYCOMB_GEOMETRY.spacing);
+  assert.ok(Math.abs(points[0].x + HONEYCOMB_GEOMETRY.radius / 2) < 1e-9);
+  assert.ok(Math.abs(points[0].y + HONEYCOMB_GEOMETRY.radius * Math.sqrt(3) / 2) < 1e-9);
+  assert.ok(Math.abs(points[1].x - HONEYCOMB_GEOMETRY.radius / 2) < 1e-9);
 });
 
 test("directional focus selects the nearest cell in the requested geometric half-plane", () => {
   const points = [{ x: 0, y: 0 }, ...honeycombPoints(6)];
   assert.equal(nextDirectionalIndex(points, 0, "up"), 1);
-  assert.equal(nextDirectionalIndex(points, 0, "right"), 2);
-  assert.equal(nextDirectionalIndex(points, 0, "down"), 4);
+  assert.equal(nextDirectionalIndex(points, 0, "right"), 3);
+  assert.ok([4, 5].includes(nextDirectionalIndex(points, 0, "down")));
   assert.ok([5, 6].includes(nextDirectionalIndex(points, 0, "left")));
   assert.equal(nextDirectionalIndex(points, 1, "down"), 0);
 });
@@ -55,20 +59,20 @@ test("golden-frame progress preserves clockwise stagger at 0, 25, 50, 75 and 100
 });
 
 test("placement clamps to the real stage, docks around panels and falls back to a bottom sheet", () => {
-  assert.deepEqual(placeHoneycomb(800, 600, 10, 10), { left: 8, top: 8, width: 276, height: 276, anchorX: 2, anchorY: 2, dock: false, sheet: false });
+  assert.deepEqual(placeHoneycomb(800, 600, 10, 10), { left: 8, top: 8, width: 225, height: 225, anchorX: 2, anchorY: 2, dock: false, sheet: false });
   const edge = placeHoneycomb(800, 600, 795, 590);
-  assert.equal(edge.left, 516);
-  assert.equal(edge.top, 316);
-  const narrow = placeHoneycomb(260, 500, 20, 30);
+  assert.equal(edge.left, 567);
+  assert.equal(edge.top, 367);
+  const narrow = placeHoneycomb(220, 500, 20, 30);
   assert.equal(narrow.dock, true);
   assert.equal(narrow.sheet, true);
   assert.equal(narrow.left, 8);
   assert.equal(narrow.top, 312);
-  assert.deepEqual({ width: narrow.width, height: narrow.height }, { width: 244, height: 180 });
+  assert.deepEqual({ width: narrow.width, height: narrow.height }, { width: 204, height: 180 });
   const panelDock = placeHoneycomb(800, 600, 400, 300, true);
   assert.equal(panelDock.dock, true);
   assert.equal(panelDock.sheet, false);
-  assert.deepEqual(placeHoneycomb(800, 600, 4, 596, false, { top: 20, right: 12, bottom: 34, left: 16 }), { left: 24, top: 282, width: 276, height: 276, anchorX: -20, anchorY: 314, dock: false, sheet: false });
+  assert.deepEqual(placeHoneycomb(800, 600, 4, 596, false, { top: 20, right: 12, bottom: 34, left: 16 }), { left: 24, top: 333, width: 225, height: 225, anchorX: -20, anchorY: 263, dock: false, sheet: false });
 });
 
 test("action validation rejects unknown commands and unsafe service names", () => {

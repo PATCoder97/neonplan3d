@@ -71,12 +71,18 @@ export interface NeonMenuModel {
 }
 
 export const HONEYCOMB_GEOMETRY = {
-  size: 56,
-  centerSize: 72,
-  radius: 92,
-  startAngle: -90,
+  /** Width of a reference-proportioned, point-up outer hexagon. */
+  size: 64,
+  height: 72,
+  centerSize: 64,
+  centerHeight: 72,
+  /** Outer centres are one cell width plus the reference 2 px spacing apart. */
+  radius: 66,
+  spacing: 2,
+  /** Six slots are NW, NE, E, SE, SW and W, matching the public reference. */
+  startAngle: -120,
   minTarget: 48,
-  cluster: 276,
+  cluster: 225,
 } as const;
 
 export const HONEYCOMB_MOTION = {

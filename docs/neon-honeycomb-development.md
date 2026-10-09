@@ -14,7 +14,7 @@ The public visual references were pinned on 2026-10-09 to reference commit `16a2
 - [XY pad example](https://raw.githubusercontent.com/Sian-Lee-SA/honeycomb-menu/16a2ac09a98c6837cb092603696e97e3a6102b45/examples/example-xypad.gif)
 - [Public demonstration video](https://www.youtube.com/watch?v=oJ9Yr2dSqUk)
 
-These links are the saved reference manifest; the GPL media is not copied into the MIT source tree. Review at 1× playback in an 800 × 600 reference stage. Compare the opening at 0%, 25%, 50%, 75% and 100%, starting at the top cell and proceeding clockwise. The Neon fixture exposes the same pauses with `npm run honeycomb` (port 4174) and `?pause=0`, `25`, `50`, `75` or `100`; `?low` exercises Low/Tablet rendering.
+These links are the saved reference manifest; the GPL media is not copied into the MIT source tree. Review at 1× playback in an 800 × 600 reference stage. Compare the opening at 0%, 25%, 50%, 75% and 100%, starting at the north-west cell and proceeding clockwise. The Neon fixture exposes the same pauses with `npm run honeycomb` (port 4174) and `?pause=0`, `25`, `50`, `75` or `100`; `?low` exercises Low/Tablet rendering.
 
 The resulting Neon motion record is generated from those five committed checkpoints:
 
@@ -46,7 +46,7 @@ The baseline and the new policies are asserted in `frontend/src/neon-menu.test.t
 
 ## Visual and input acceptance
 
-The geometry and motion constants live in `frontend/src/neon-menu.ts`: 56 px outer targets, 72 px centre, a 92 px radius, 60° spacing, 160 ms per cell, 45 ms stagger, 0.72 start scale and 0.92 press scale. Unit tests lock these values to the roadmap ranges and lock the five golden-frame progress points.
+The geometry and motion constants live in `frontend/src/neon-menu.ts`. The reference-aligned ring uses a 225 px footprint, seven equal 64 × 72 px point-up targets, 2 px spacing, a 66 px centre radius and NW/NE/E/SE/SW/W slots at 60° intervals. Motion stays at 160 ms per cell, 45 ms stagger, 0.72 start scale and 0.92 press scale. Unit tests lock the geometry, roadmap motion ranges and five golden-frame progress points.
 
 The component uses a dialog semantic, keeps focus inside while open, restores the opener, supports Escape and arrow keys, prevents click-through, and exposes pad values as a slider. Pointer capture is held by the actual pad surface and cancelled on pointer cancellation, loss of capture or disconnect; a final commit is emitted for every completed or cancelled gesture. Reduced motion removes stagger/translation and limits the fade to 80 ms. Low/Tablet removes the multi-layer drop shadow. Narrow or obstructed stages first dock the six actions in a compact 3 × 2 honeycomb above the centre control. If the stage is still too small, a contained, scrollable bottom sheet preserves every touch target at 48 px or larger.
 
@@ -71,6 +71,6 @@ The pad keeps the centre action available, and the smallest-stage fallback uses 
 - `npm run honeycomb:webkit`: WebKit geometry, keyboard, pagination, pad and Low/Tablet checks with a Playwright WebKit installation.
 - `npm run honeycomb:media`: reproducibly rebuilds the documentation GIF from the committed desktop golden frames.
 
-The recorded 2026-10-09 matrix is in [`browser-matrix.json`](assets/neon-honeycomb/browser-matrix.json): Chrome 148 and Firefox 157 passed the full suite; WebKit 26 passed layout and interaction checks. Chrome Low/Tablet measured 39 shadow-DOM nodes, an opening completion within the 450 ms budget, about 60 FPS, and a throttled pad stream with a final commit. Android Companion and Fire Tablet profiles were exercised with coarse-pointer/touch emulation, their respective viewport/user-agent shapes and no stage overflow. The WebKit WPE headless frame clock is software/offscreen and is recorded for diagnostics, not treated as physical Safari FPS.
+The recorded 2026-10-09 matrix is in [`browser-matrix.json`](assets/neon-honeycomb/browser-matrix.json). Chrome 148 verifies the current `reference-225-point-up` geometry, full interaction suite, 39 shadow-DOM nodes, an opening completion within the 450 ms budget, about 60 FPS and a throttled pad stream with a final commit. The retained Firefox 157 and WebKit 26 entries are explicitly marked `legacy-276-flat-top`; they prove the earlier interaction baseline, not the new geometry. Android Companion and Fire Tablet profiles were exercised with coarse-pointer/touch emulation, their respective viewport/user-agent shapes and no stage overflow. The WebKit WPE headless frame clock is software/offscreen and is recorded for diagnostics, not treated as physical Safari FPS.
 
 A static screenshot proves geometry only. Timing acceptance uses actual `animationend` timestamps as well as computed tokens. The reference GIF and the generated Neon GIF were reviewed at 1×: both reveal the centre first and expand the surrounding cells outward; Neon deliberately keeps its clockwise stagger, dark glass palette and tighter 385 ms token timeline rather than copying the reference styling.

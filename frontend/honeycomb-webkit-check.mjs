@@ -47,6 +47,8 @@ try {
     return {
       role: root.querySelector("[role=dialog]").getAttribute("role"),
       nodes: root.querySelectorAll("*").length,
+      center: { width: centerRect.width, height: centerRect.height },
+      clipPath: getComputedStyle(root.querySelector(".hex-shape")).clipPath,
       cells: [...root.querySelectorAll("button.outer")].map((button) => {
         const rect = button.getBoundingClientRect();
         return { x: rect.left + rect.width / 2 - center.x, y: rect.top + rect.height / 2 - center.y, width: rect.width, height: rect.height };
@@ -54,11 +56,13 @@ try {
     };
   });
   assert(geometry.role === "dialog" && geometry.cells.length === 6, "WebKit did not render the six-cell dialog");
-  const expected = Array.from({ length: 6 }, (_, i) => ({ x: Math.cos((-90 + i * 60) * Math.PI / 180) * 92, y: Math.sin((-90 + i * 60) * Math.PI / 180) * 92 }));
+  const expected = Array.from({ length: 6 }, (_, i) => ({ x: Math.cos((-120 + i * 60) * Math.PI / 180) * 66, y: Math.sin((-120 + i * 60) * Math.PI / 180) * 66 }));
   geometry.cells.forEach((cell, i) => {
     assert(Math.hypot(cell.x - expected[i].x, cell.y - expected[i].y) <= 2, `WebKit cell ${i} misses geometry tolerance`);
-    assert(cell.width >= 48 && cell.height >= 48, `WebKit cell ${i} is below 48 px`);
+    assert(Math.abs(cell.width - 64) <= 1 && Math.abs(cell.height - 72) <= 1, `WebKit cell ${i} is not 64 x 72 px`);
   });
+  assert(Math.abs(geometry.center.width - 64) <= 1 && Math.abs(geometry.center.height - 72) <= 1, "WebKit centre control does not match the 64 x 72 px outer cells");
+  assert(geometry.clipPath.includes("50% 0px") && geometry.clipPath.includes("100% 25%"), "WebKit cells are not point-up hexagons");
 
   const interaction = await page.evaluate(async () => {
     const menu = document.querySelector("honeycomb-gallery").shadowRoot.querySelector("neon-honeycomb");
@@ -73,7 +77,7 @@ try {
     await menu.updateComplete;
     return { arrow, tab, page: root.querySelector("[role=dialog]").getAttribute("aria-label") };
   });
-  assert(interaction.arrow === "Details" && interaction.tab && interaction.page === "Second page", "WebKit keyboard or paging check failed");
+  assert(interaction.arrow === "Colour" && interaction.tab && interaction.page === "Second page", "WebKit keyboard or paging check failed");
 
   await open("count=6&width=600&height=600&animate&low");
   const performance = await page.evaluate(async () => {
@@ -125,7 +129,7 @@ try {
 
   const result = {
     engine: "webkit",
-    geometry: { cells: geometry.cells.length, nodes: geometry.nodes, tolerancePx: 2 },
+    geometry: { layout: "reference-225-point-up", cells: geometry.cells.length, nodes: geometry.nodes, outerWidth: 64, outerHeight: 72, radius: 66, tolerancePx: 2 },
     interaction,
     fps: Math.round(performance.fps * 10) / 10,
     padEvents: pad.length,

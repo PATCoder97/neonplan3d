@@ -102,6 +102,8 @@ try {
       stage: { width: stage.getBoundingClientRect().width, height: stage.getBoundingClientRect().height },
       role: root.querySelector("[role=dialog]")?.getAttribute("role"),
       cells,
+      center: (() => { const rect = root.querySelector("button.center").getBoundingClientRect(); return { width: rect.width, height: rect.height }; })(),
+      clipPath: getComputedStyle(root.querySelector(".hex-shape")).clipPath,
       nodes: root.querySelectorAll("*").length,
     };
   });
@@ -109,13 +111,15 @@ try {
   assert(geometry.role === "dialog", "Honeycomb is not exposed as a dialog");
   assert(geometry.cells.length === 6, "Six-cell fixture did not render six outer cells");
   const expected = Array.from({ length: 6 }, (_, i) => {
-    const angle = (-90 + i * 60) * Math.PI / 180;
-    return { x: Math.cos(angle) * 92, y: Math.sin(angle) * 92 };
+    const angle = (-120 + i * 60) * Math.PI / 180;
+    return { x: Math.cos(angle) * 66, y: Math.sin(angle) * 66 };
   });
   geometry.cells.forEach((cell, i) => {
     assert(Math.hypot(cell.x - expected[i].x, cell.y - expected[i].y) <= 2, `Cell ${i} misses golden geometry tolerance`);
-    assert(cell.width >= 48 && cell.height >= 48, `Cell ${i} has a touch target below 48 px`);
+    assert(Math.abs(cell.width - 64) <= 1 && Math.abs(cell.height - 72) <= 1, `Cell ${i} is not the reference-proportioned 64 x 72 px target`);
   });
+  assert(Math.abs(geometry.center.width - 64) <= 1 && Math.abs(geometry.center.height - 72) <= 1, "Centre control does not match the 64 x 72 px outer cells");
+  assert(geometry.clipPath.includes("50% 0px") && geometry.clipPath.includes("100% 25%"), "Cells are not point-up hexagons");
 
   const keyboard = await page.evaluate(async () => {
     const menu = document.querySelector("honeycomb-gallery").shadowRoot.querySelector("neon-honeycomb");
@@ -386,7 +390,7 @@ try {
     matrix.engines[key] = {
       engine: key,
       version,
-      geometry: { cells: geometry.cells.length, nodes: geometry.nodes, tolerancePx: 2 },
+      geometry: { layout: "reference-225-point-up", cells: geometry.cells.length, nodes: geometry.nodes, outerWidth: 64, outerHeight: 72, radius: 66, tolerancePx: 2 },
       keyboard,
       paging,
       motion: { duration: 160, stagger: 45, measuredEnd: Math.round(Math.max(...motion.ended) * 10) / 10, reducedDuration },

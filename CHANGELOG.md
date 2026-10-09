@@ -6,6 +6,8 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 
 ## Unreleased
 
+## 1.24.4
+
 ### Added
 
 - Added the clean-room Neon Honeycomb device overlay with six-direction geometry, paginated typed actions, one-axis pointer pads, focus trapping, reduced motion, stage-edge docking and a classic rollback option.
@@ -15,6 +17,7 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 ### Changed
 
 - New and normalized plans default to Neon Honeycomb; `menu_style: classic` remains available at plan or card level.
+- Refined Neon Honeycomb to the public reference's compact 225 px footprint: seven equal 64 × 72 px point-up hexagons, 2 px inter-cell spacing and a tightly joined NW/NE/E/SE/SW/W ring, while retaining NeonPlan's dark glass and cyan glow theme.
 
 ## 1.24.3
 

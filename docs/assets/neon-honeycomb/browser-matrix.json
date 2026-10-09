@@ -4,15 +4,19 @@
       "engine": "chromium",
       "version": "Chrome/148.0.7778.96",
       "geometry": {
+        "layout": "reference-225-point-up",
         "cells": 6,
         "nodes": 39,
+        "outerWidth": 64,
+        "outerHeight": 72,
+        "radius": 66,
         "tolerancePx": 2
       },
       "keyboard": {
         "start": "Living room",
         "tab": "Power",
         "shiftTab": "Living room",
-        "right": "Details",
+        "right": "Colour",
         "closeEvents": 1
       },
       "paging": {
@@ -23,12 +27,12 @@
       "motion": {
         "duration": 160,
         "stagger": 45,
-        "measuredEnd": 430.8,
+        "measuredEnd": 415.4,
         "reducedDuration": 80
       },
-      "fps": 60.6,
+      "fps": 60.7,
       "pad": {
-        "events": 6,
+        "events": 5,
         "final": true,
         "value": 97,
         "centerActions": 1
@@ -53,6 +57,7 @@
       "engine": "firefox",
       "version": "firefox/157.0.1",
       "geometry": {
+        "layout": "legacy-276-flat-top",
         "cells": 6,
         "nodes": 39,
         "tolerancePx": 2
@@ -88,6 +93,7 @@
     "webkit": {
       "engine": "webkit",
       "geometry": {
+        "layout": "legacy-276-flat-top",
         "cells": 6,
         "nodes": 39,
         "tolerancePx": 2

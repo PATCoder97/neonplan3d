@@ -4,9 +4,9 @@ Roadmap này lấy cảm hứng từ [Honeycomb Menu for Home Assistant](https:/
 
 Trong NeonPlan 3D, **Neon Honeycomb** là một component native được viết mới, dùng dữ liệu và luồng điều khiển hiện có của dự án. Việc chuyển đổi phải diễn ra theo từng nhóm thiết bị, luôn giữ menu cũ làm fallback cho đến khi nhóm đó đạt parity và ổn định qua ít nhất một chu kỳ phát hành.
 
-Mục tiêu hình ảnh chính thức là: **giữ cơ chế bố trí và nhịp chuyển động đặc trưng của Honeycomb Menu, nhưng thể hiện hoàn toàn bằng ngôn ngữ NeonPlan**. Không cam kết sao chép từng pixel; phần được nghiệm thu là hình học, thứ tự chuyển động, cảm giác mở/đóng và phản hồi tương tác.
+Mục tiêu hình ảnh chính thức là: **bám sát kích thước, hình lục giác, khe và cách ghép vòng của Honeycomb Menu, nhưng thể hiện hoàn toàn bằng màu sắc và hiệu ứng NeonPlan**. Phần được nghiệm thu là cụm 225 px, lục giác đỉnh nhọn, khe 2 px, thứ tự/chuyển động và phản hồi tương tác; nền kính xanh đen, viền cyan và glow vẫn là thiết kế NeonPlan.
 
-> **Trạng thái 2026-10-09:** toàn bộ 55 hạng mục đã hoàn tất trên nhánh `feature/neon-honeycomb`. Bộ nghiệm thu gồm 45 golden frames, GIF chuyển động, ảnh mouse/touch/keyboard, Chrome 148, Firefox 157, WebKit 26, profile cảm ứng Android Companion/Fire Tablet, timing thực, 39 DOM nodes, pad throttling/final commit và khoảng 60 FPS ở Low/Tablet. Kết quả máy có thể đọc nằm trong `docs/assets/neon-honeycomb/browser-report.json` và `browser-matrix.json`; Companion/Fire dùng touch/user-agent/viewport emulation, không được mô tả là kiểm thử phần cứng vật lý.
+> **Trạng thái 2026-10-09:** toàn bộ 55 hạng mục đã hoàn tất trên nhánh `feature/neon-honeycomb`. Bố cục mới `reference-225-point-up` có 45 golden frames, GIF chuyển động, ảnh mouse/touch/keyboard, Chrome 148, profile cảm ứng Android Companion/Fire Tablet, timing thực, 39 DOM nodes, pad throttling/final commit và khoảng 60 FPS ở Low/Tablet. Các bản ghi Firefox 157 và WebKit 26 trong ma trận thuộc bố cục cũ `legacy-276-flat-top`, không được dùng để chứng minh hình học mới. Kết quả máy có thể đọc nằm trong `docs/assets/neon-honeycomb/browser-report.json` và `browser-matrix.json`; Companion/Fire dùng touch/user-agent/viewport emulation, không được mô tả là kiểm thử phần cứng vật lý.
 
 ## Quyết định kiến trúc và giấy phép
 
@@ -99,7 +99,7 @@ Các thay đổi chính sách phải được ghi riêng, không gọi là parit
 ### Kích thước và responsive
 
 - Vùng chạm mỗi ô tối thiểu 48 × 48 px, mục tiêu 56 px trên tablet.
-- Cụm chuẩn khoảng 240–280 px; chỉ scale khi vẫn giữ được vùng chạm tối thiểu.
+- Cụm chuẩn 225 px như mặc định công khai của Honeycomb Menu; chỉ scale khi vẫn giữ được vùng chạm tối thiểu.
 - Khi stage không đủ chỗ, chuyển sang bố cục tổ ong 2 × 3 ở giữa cạnh dưới.
 - Nếu vẫn không đủ chỗ do bàn phím hoặc panel, dùng bottom sheet gọn thay vì thu nhỏ dưới 48 px.
 - Tính vị trí theo bounds thực của `.fp3d-stage`, safe-area inset và panel đang mở; không dựa vào kích thước cửa sổ toàn cục.
@@ -108,8 +108,8 @@ Các thay đổi chính sách phải được ghi riêng, không gọi là parit
 
 “Giống Honeycomb” trong roadmap này có nghĩa là giống các đặc trưng quan sát được từ demo công khai, không phải sao chép code hoặc CSS:
 
-- Một tâm điều khiển cố định và tối đa sáu ô nằm trên sáu hướng cách nhau 60°.
-- Các ô ngoài tạo thành một vòng liền mạch, cùng bán kính và cùng hướng lục giác.
+- Một tâm điều khiển cố định cùng kích thước 64 × 72 px với tối đa sáu ô nằm trên sáu hướng cách nhau 60°.
+- Các ô ngoài là lục giác đỉnh nhọn 64 × 72 px, đặt ở bán kính 66 px theo thứ tự tây-bắc, đông-bắc, đông, đông-nam, tây-nam, tây; nhờ đó vòng gần liền mạch với khe 2 px như tham chiếu.
 - Khi mở, tâm/pad xuất hiện trước; các ô ngoài bung lần lượt theo thứ tự vị trí với stagger đều.
 - Mỗi ô vừa fade vừa đi từ gần tâm ra vị trí cuối, kèm scale nhẹ; không bay từ ngoài viewport vào.
 - Khi đóng, chuỗi chạy ngược hoặc co đồng thời về tâm tùy nguyên nhân đóng, nhưng không biến mất đột ngột.
@@ -131,7 +131,7 @@ Các giá trị dưới đây là token của NeonPlan và có thể tinh chỉn
 | Tổng thời gian mở sáu ô | khoảng 385 ms | không quá 450 ms |
 
 - Easing mở dùng một đường cong ease-out có overshoot rất nhẹ; đóng nhanh hơn và không overshoot.
-- Thứ tự mặc định bắt đầu ở ô trên cùng rồi đi theo chiều kim đồng hồ; page mới giữ cùng thứ tự để không gây mất phương hướng.
+- Thứ tự mặc định bắt đầu ở ô tây-bắc rồi đi theo chiều kim đồng hồ; page mới giữ cùng thứ tự để không gây mất phương hướng.
 - `prefers-reduced-motion` bỏ translate/scale/stagger, chỉ fade tối đa 100 ms.
 - Low/Tablet giữ translate/scale/stagger nhưng bỏ blur động và glow nhiều lớp.
 

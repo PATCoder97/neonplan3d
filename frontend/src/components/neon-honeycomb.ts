@@ -171,20 +171,20 @@ export class NeonHoneycomb extends LitElement {
   }
 
   static styles = [honeycombTokens, css`
-    :host { display:block; width:${HONEYCOMB_GEOMETRY.cluster}px; height:${HONEYCOMB_GEOMETRY.cluster}px; --hex-size:${HONEYCOMB_GEOMETRY.size}px; --motion:${HONEYCOMB_MOTION.duration}ms; --stagger:${HONEYCOMB_MOTION.stagger}ms; color:var(--fp3d-menu-text,#e6eefc);font-family:var(--fp3d-font,system-ui,sans-serif); }
+    :host { display:block; width:${HONEYCOMB_GEOMETRY.cluster}px; height:${HONEYCOMB_GEOMETRY.cluster}px; --hex-width:${HONEYCOMB_GEOMETRY.size}px; --hex-height:${HONEYCOMB_GEOMETRY.height}px; --motion:${HONEYCOMB_MOTION.duration}ms; --stagger:${HONEYCOMB_MOTION.stagger}ms; color:var(--fp3d-menu-text,#e6eefc);font-family:var(--fp3d-font,system-ui,sans-serif); }
     .dialog,.cluster { position:relative; width:100%; height:100%; }
     .cluster { display:grid; place-items:center; filter:drop-shadow(0 14px 28px rgba(0,0,0,.48)); }
     .center-wrap { position:absolute; z-index:3; animation:center-in var(--motion) cubic-bezier(.18,.86,.28,1.12) both; }
     .pad-stack { display:flex; flex-direction:column; align-items:center; gap:0; }
     .pad-stack neon-pad { height:72px; }
-    .pad-stack .hex.center { width:48px; height:48px; --hex-size:48px; }
+    .pad-stack .hex.center { width:48px; height:54px; --hex-width:48px; --hex-height:54px; }
     .pad-stack .center .label { max-width:38px; font-size:8px; }
     .pad-stack .center b { font-size:9px; }
-    .at { position:absolute; left:50%; top:50%; width:var(--hex-size); height:var(--hex-size); margin:calc(var(--hex-size) / -2); transform:translate(var(--x),var(--y)); z-index:2; }
-    .hex { width:var(--hex-size); height:var(--hex-size); padding:0; border:0; background:transparent; color:var(--fp3d-menu-text,#e6eefc); cursor:pointer; font:inherit; -webkit-tap-highlight-color:transparent; }
-    .hex.center { width:${HONEYCOMB_GEOMETRY.centerSize}px; height:${HONEYCOMB_GEOMETRY.centerSize}px; --hex-size:${HONEYCOMB_GEOMETRY.centerSize}px; }
+    .at { position:absolute; left:50%; top:50%; width:var(--hex-width); height:var(--hex-height); margin-left:calc(var(--hex-width) / -2); margin-top:calc(var(--hex-height) / -2); transform:translate(var(--x),var(--y)); z-index:2; }
+    .hex { width:var(--hex-width); height:var(--hex-height); padding:0; border:0; background:transparent; color:var(--fp3d-menu-text,#e6eefc); cursor:pointer; font:inherit; -webkit-tap-highlight-color:transparent; }
+    .hex.center { width:${HONEYCOMB_GEOMETRY.centerSize}px; height:${HONEYCOMB_GEOMETRY.centerHeight}px; --hex-width:${HONEYCOMB_GEOMETRY.centerSize}px; --hex-height:${HONEYCOMB_GEOMETRY.centerHeight}px; }
     .hex.outer { animation:item-in var(--motion) cubic-bezier(.18,.86,.28,1.12) calc(var(--i) * var(--stagger)) both; }
-    .hex-shape { box-sizing:border-box; width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px; padding:8px; clip-path:polygon(25% 3%,75% 3%,100% 50%,75% 97%,25% 97%,0 50%); border:1px solid var(--fp3d-honeycomb-border); background:linear-gradient(145deg,var(--fp3d-honeycomb-glass-a),var(--fp3d-honeycomb-glass-b)); position:relative; isolation:isolate; transition:filter 120ms ease,transform 100ms ease;color:var(--item-color,var(--fp3d-accent,#37e0ff)); }
+    .hex-shape { box-sizing:border-box; width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px; padding:8px; clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%); border:1px solid var(--fp3d-honeycomb-border); background:linear-gradient(145deg,var(--fp3d-honeycomb-glass-a),var(--fp3d-honeycomb-glass-b)); position:relative; isolation:isolate; transition:filter 120ms ease,transform 100ms ease;color:var(--item-color,var(--fp3d-accent,#37e0ff)); }
     .hex-shape::before { content:"";position:absolute;inset:1px;clip-path:inherit;background:linear-gradient(145deg,color-mix(in srgb,currentColor 45%,transparent),rgba(40,120,160,.08));z-index:-2; }
     .hex-shape::after { content:"";position:absolute;inset:2px;clip-path:inherit;background:linear-gradient(145deg,var(--fp3d-honeycomb-core-a),var(--fp3d-honeycomb-core-b));z-index:-1; }
     .hex-shape.has-image { background-size:cover;background-position:center; }
@@ -196,7 +196,7 @@ export class NeonHoneycomb extends LitElement {
     .center b { font-size:12px; }
     .hex:hover .hex-shape,.hex:focus-visible .hex-shape { filter:brightness(1.28) drop-shadow(0 0 8px currentColor); }
     .hex:focus-visible { outline:none; }
-    .hex:focus-visible .hex-shape { outline:2px solid #fff;outline-offset:-5px; }
+    .hex:focus-visible .hex-shape::before { background:currentColor; }
     .hex:active .hex-shape { transform:scale(${HONEYCOMB_MOTION.pressScale}); }
     .hex.active .hex-shape { filter:brightness(1.24) drop-shadow(0 0 10px var(--item-color,var(--fp3d-accent,#37e0ff))); }
     .hex:disabled { opacity:.38;cursor:not-allowed; }
@@ -207,16 +207,18 @@ export class NeonHoneycomb extends LitElement {
     .paused .center-wrap { animation-delay:calc(var(--pause) * -1 * var(--motion));animation-play-state:paused; }
     .paused .hex.outer { animation-delay:var(--paused-delay);animation-play-state:paused; }
     .sr { position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0; }
-    :host([dock]) .center-wrap { left:102px; top:auto; bottom:0; }
+    :host([dock]) { --hex-width:56px; --hex-height:64px; }
+    :host([dock]) .center-wrap { left:80px; top:auto; bottom:0; }
     :host([dock]) .at { left:0; top:0; margin:0; transform:none; }
-    :host([dock]) .at:nth-child(2) { left:54px; top:24px; }
-    :host([dock]) .at:nth-child(3) { left:110px; top:24px; }
-    :host([dock]) .at:nth-child(4) { left:166px; top:24px; }
-    :host([dock]) .at:nth-child(5) { left:82px; top:78px; }
-    :host([dock]) .at:nth-child(6) { left:138px; top:78px; }
-    :host([dock]) .at:nth-child(7) { left:194px; top:78px; }
+    :host([dock]) .at:nth-child(2) { left:0; top:20px; }
+    :host([dock]) .at:nth-child(3) { left:58px; top:20px; }
+    :host([dock]) .at:nth-child(4) { left:116px; top:20px; }
+    :host([dock]) .at:nth-child(5) { left:29px; top:69px; }
+    :host([dock]) .at:nth-child(6) { left:87px; top:69px; }
+    :host([dock]) .at:nth-child(7) { left:145px; top:69px; }
     :host([sheet]) { overflow:auto; overscroll-behavior:contain; border-radius:18px 18px 0 0; background:color-mix(in srgb,var(--fp3d-honeycomb-core-b) 88%,transparent); box-shadow:0 -10px 32px rgba(0,0,0,.34); }
     :host([sheet]) .dialog,:host([sheet]) .cluster { width:max(260px,100%); min-width:260px; height:max(180px,100%); min-height:180px; }
+    :host([sheet]) { --hex-width:56px; --hex-height:64px; }
     :host([sheet]) .center-wrap { left:10px; top:54px; bottom:auto; }
     :host([sheet]) .center-wrap.has-pad { top:30px; }
     :host([sheet]) .at:nth-child(2) { left:92px; top:28px; }
