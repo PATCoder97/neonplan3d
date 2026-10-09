@@ -6,6 +6,12 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 
 ## Unreleased
 
+## 1.24.5
+
+### Fixed
+
+- Corrected the directional-navigation regression coverage for the new point-up Honeycomb geometry so the CI suite validates the nearest cell below the north-west button.
+
 ## 1.24.4
 
 ### Added

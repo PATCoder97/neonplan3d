@@ -37,7 +37,7 @@ test("directional focus selects the nearest cell in the requested geometric half
   assert.equal(nextDirectionalIndex(points, 0, "right"), 3);
   assert.ok([4, 5].includes(nextDirectionalIndex(points, 0, "down")));
   assert.ok([5, 6].includes(nextDirectionalIndex(points, 0, "left")));
-  assert.equal(nextDirectionalIndex(points, 1, "down"), 0);
+  assert.equal(nextDirectionalIndex(points, 1, "down"), 5);
 });
 
 test("motion tokens stay inside the roadmap acceptance window", () => {
