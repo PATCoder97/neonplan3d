@@ -99,7 +99,13 @@ async def test_save_and_get_building(hass: HomeAssistant, hass_ws_client) -> Non
     got = await client.receive_json()
     assert got["result"]["revision"] == 1
     assert got["result"]["building"]["floors"][0]["rooms"][0]["name"] == "Living"
+    assert got["result"]["building"]["settings"]["menu_style"] == "honeycomb"
     assert got["result"]["version"]
+
+    invalid = copy.deepcopy(BUILDING)
+    invalid["settings"]["menu_style"] = "javascript"
+    await client.send_json_auto_id({"type": "neonplan3d/building/save", "building": invalid})
+    assert not (await client.receive_json())["success"]
 
 
 async def test_opening_fields_get_defaults(hass: HomeAssistant, hass_ws_client) -> None:

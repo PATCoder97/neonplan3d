@@ -12,6 +12,7 @@ import type { CardConfig, CardControl } from "./card-config.ts";
 import { nightActive } from "./kiosk.ts";
 import { loadCardEditor } from "./load-card-editor.ts";
 import type { WallMode } from "./viewer/viewer3d.ts";
+import { normalizeMenuStyle } from "./model.ts";
 
 type HeatMode = NonNullable<CardConfig["heatmap"]>;
 
@@ -231,6 +232,7 @@ clearTimeout(this.cleanTimer);
               .explode=${explode}
               .keepRoof=${c?.roof_fade === false}
               .quality=${this._config?.quality ?? "auto"}
+              .menuStyle=${normalizeMenuStyle(this._config?.menu_style ?? b.settings.menu_style)}
               ?showStats=${this._config?.stats ?? false}
               .markerMode=${this._config?.markers ?? "important"}
               .markerNames=${this._config?.marker_names === true}

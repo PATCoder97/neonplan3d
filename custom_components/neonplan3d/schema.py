@@ -503,6 +503,8 @@ FLOOR_SCHEMA = vol.Schema(
 
 SETTINGS_SCHEMA = vol.Schema(
     {
+        # device quick menu; classic remains available for rollback
+        vol.Optional("menu_style", default="honeycomb"): vol.In(["classic", "honeycomb"]),
         vol.Required("wall_exterior"): vol.All(vol.Coerce(float), vol.Range(min=0.02, max=1)),
         vol.Required("wall_interior"): vol.All(vol.Coerce(float), vol.Range(min=0.02, max=1)),
         vol.Required("grid"): vol.All(vol.Coerce(float), vol.Range(min=0.01, max=1)),
@@ -632,7 +634,7 @@ def empty_building() -> dict:
     return {
         "version": 1,
         "floors": [],
-        "settings": {"wall_exterior": 0.24, "wall_interior": 0.12, "grid": 0.05},
+        "settings": {"menu_style": "honeycomb", "wall_exterior": 0.24, "wall_interior": 0.12, "grid": 0.05},
         "energy": dict(ENERGY_DEFAULTS),
         "presence": [],
     }

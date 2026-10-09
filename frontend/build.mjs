@@ -20,6 +20,7 @@ const common = {
 };
 
 const viewerConfig = { ...common, entryPoints: ["src/viewer/viewer3d.ts"], outfile: `${out}/neonplan3d-3d.js` };
+const honeycombConfig = { ...common, entryPoints: ["src/honeycomb.ts"], outfile: `${out}/neonplan3d-honeycomb.js` };
 // the card's visual editor only loads in the dashboard's card dialog
 // the language files (lang/*.json) are fetched with a hash of their content, so a new text is never stale
 const LANGS = ["fr", "es", "nl", "it", "hu", "vi"];
@@ -30,22 +31,23 @@ const langHash = createHash("sha256")
 const cardEditorConfig = { ...common, entryPoints: ["src/card-editor.ts"], outfile: `${out}/neonplan3d-card-editor.js`, define: { __FP3D_LANG_HASH__: JSON.stringify(langHash) } };
 // the editor is only needed by admins who open it, so it is a bundle of its own as well
 // (it draws furniture previews with the 3D bundle, so it knows that bundle's hash too)
-const editorConfig = (viewerHash) => ({
+const editorConfig = (viewerHash, honeycombHash) => ({
   ...common,
   entryPoints: ["src/components/editor.ts"],
   outfile: `${out}/neonplan3d-editor.js`,
-  define: { __FP3D_VIEWER_HASH__: JSON.stringify(viewerHash), __FP3D_LANG_HASH__: JSON.stringify(langHash) },
+  define: { __FP3D_VIEWER_HASH__: JSON.stringify(viewerHash), __FP3D_HONEYCOMB_HASH__: JSON.stringify(honeycombHash), __FP3D_LANG_HASH__: JSON.stringify(langHash) },
 });
 // The main bundle loads the 3D bundle with a hash of its content in the URL, so a new 3D bundle is
 // never taken from the browser cache (the integration version only changes after a restart).
 // the frontend knows its own version, to notice a backend that still runs an older one
 const version = JSON.parse(readFileSync("../custom_components/neonplan3d/manifest.json", "utf8")).version;
-const mainConfig = (viewerHash, editorHash, cardEditorHash) => ({
+const mainConfig = (viewerHash, honeycombHash, editorHash, cardEditorHash) => ({
   ...common,
   entryPoints: ["src/main.ts"],
   outfile: `${out}/neonplan3d.js`,
   define: {
     __FP3D_VIEWER_HASH__: JSON.stringify(viewerHash),
+    __FP3D_HONEYCOMB_HASH__: JSON.stringify(honeycombHash),
     __FP3D_EDITOR_HASH__: JSON.stringify(editorHash),
     __FP3D_CARD_EDITOR_HASH__: JSON.stringify(cardEditorHash),
     __FP3D_VERSION__: JSON.stringify(version),
@@ -76,18 +78,22 @@ function copyFonts() {
 
 // 3D/editor include the procedural Smart Home infrastructure, controls and sensor families; the
 // small explicit budgets still catch accidental dependency or geometry growth on old wall tablets.
-const BUDGET = { "neonplan3d.js": 487 * 1024, "neonplan3d-3d.js": 868 * 1024, "neonplan3d-editor.js": 640 * 1024, "neonplan3d-card-editor.js": 195 * 1024 };
+// Honeycomb itself is lazy (75 KB budget); the main/card-editor increases are limited to the loader,
+// host/config plumbing and localized menu-style labels rather than carrying the component eagerly.
+const BUDGET = { "neonplan3d.js": 494 * 1024, "neonplan3d-3d.js": 868 * 1024, "neonplan3d-honeycomb.js": 75 * 1024, "neonplan3d-editor.js": 643 * 1024, "neonplan3d-card-editor.js": 197 * 1024 };
 
 copyFonts();
 if (watch) {
   // in watch mode the hash is not tracked; a dev reload fetches the bundle anyway
-  for (const c of [viewerConfig, editorConfig("dev"), cardEditorConfig, mainConfig("dev", "dev", "dev")]) await (await context(c)).watch();
+  for (const c of [viewerConfig, honeycombConfig, editorConfig("dev", "dev"), cardEditorConfig, mainConfig("dev", "dev", "dev", "dev")]) await (await context(c)).watch();
 } else {
   await build(viewerConfig);
-  const editor = editorConfig(hashOf(viewerConfig.outfile));
+  await build(honeycombConfig);
+  const honeycombHash = hashOf(honeycombConfig.outfile);
+  const editor = editorConfig(hashOf(viewerConfig.outfile), honeycombHash);
   await build(editor);
   await build(cardEditorConfig);
-  await build(mainConfig(hashOf(viewerConfig.outfile), hashOf(editor.outfile), hashOf(cardEditorConfig.outfile)));
+  await build(mainConfig(hashOf(viewerConfig.outfile), honeycombHash, hashOf(editor.outfile), hashOf(cardEditorConfig.outfile)));
   let over = false;
   for (const [file, limit] of Object.entries(BUDGET)) {
     const size = statSync(`${out}/${file}`).size;

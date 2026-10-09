@@ -72,6 +72,10 @@ import { hasFeature, manualUrl, shopUrl, type Feature } from "../features.ts";
 import { searchIndex, searchItems, type SearchItem } from "../search.ts";
 import { coverPositionable, lightAbilities } from "./quick-menu.ts";
 import "./quick-menu.ts";
+import type { NeonMenuItem } from "../neon-menu.ts";
+import type { NeonHoneycomb } from "./neon-honeycomb.ts";
+import type { NeonPadDetail } from "./neon-pad.ts";
+import { loadHoneycomb, type HoneycombModule } from "../load-honeycomb.ts";
 import { load3d } from "../load3d.ts";
 import { detectionKind, buildMarkers, cameraMotionSensors, openMoreInfo, placedEntities, stateText, toggleEntity } from "../markers.ts";
 import { furnitureFootprint, isLamp, LAMP_MODEL, outdoorGround, pointInPolygon, surfaceHeight, type Building, type Furniture, type StartView } from "../model.ts";
@@ -129,6 +133,7 @@ export class Fp3dView3d extends LitElement {
     _holoShow: { state: true },
     _swipe: { state: true },
     _menu: { state: true },
+    menuStyle: { attribute: false },
     _through: { state: true },
     _blend: { state: true },
     _wallBig: { state: true },
@@ -243,6 +248,8 @@ export class Fp3dView3d extends LitElement {
   private declare _swipe: { entity: string; kind: "light" | "cover"; start: number; value: number; x: number; y: number } | null;
   /** Quick menu at a device (long press). */
   private declare _menu: { entity: string; x: number; y: number; car?: CarState } | null;
+  /** Device overlay style. Classic remains available as a release-safe fallback. */
+  declare menuStyle: "classic" | "honeycomb";
   /** Looking through a camera: its live picture lies over the 3D view; `back` is the view to return to. */
   private declare _through: { entity: string; back: ReturnType<FloorplanViewer["getView"]> } | null;
   /** Camera wall: the camera shown big (null: all tiles). */
@@ -310,6 +317,8 @@ export class Fp3dView3d extends LitElement {
   declare buttons: CustomButton[] | null;
   private swipeSent = 0;
   private swipeTimer: ReturnType<typeof setTimeout> | undefined;
+  private honeycombModule: HoneycombModule | null = null;
+  private honeycombLoading = false;
   /** Energy cables from the meter to the consumers (off unless switched on; kept per browser). */
   private declare _flows: boolean;
 
@@ -372,6 +381,7 @@ export class Fp3dView3d extends LitElement {
     this._holoOn = false;
     this._swipe = null;
     this._menu = null;
+    this.menuStyle = "classic";
     this._through = null;
     this._wallBig = null;
     this._blend = 0.6;
@@ -410,6 +420,7 @@ export class Fp3dView3d extends LitElement {
 
   connectedCallback(): void {
     super.connectedCallback();
+    this.addEventListener("neonplan3d-open-menu", this.onExternalMenu as EventListener);
     if (this.hasUpdated) {
       this.observeStage();
       if (!this.viewer) void this.start();
@@ -417,6 +428,7 @@ export class Fp3dView3d extends LitElement {
   }
 
   disconnectedCallback(): void {
+    this.removeEventListener("neonplan3d-open-menu", this.onExternalMenu as EventListener);
     super.disconnectedCallback();
     this.resizeObs?.disconnect();
     this.resizeObs = null;
@@ -434,6 +446,18 @@ export class Fp3dView3d extends LitElement {
     this.viewer?.dispose();
     this.viewer = null;
   }
+
+  /** Stable, namespaced local API for another NeonPlan component; unknown entities are ignored. */
+  private readonly onExternalMenu = (event: CustomEvent<{ entity?: unknown; x?: unknown; y?: unknown }>): void => {
+    if (!this.hass) return;
+    const entity = event.detail?.entity;
+    if (typeof entity !== "string" || !this.hass.states[entity]) return;
+    const stage = this.renderRoot.querySelector(".fp3d-stage") as HTMLElement | null;
+    const x = typeof event.detail.x === "number" && Number.isFinite(event.detail.x) ? event.detail.x : (stage?.clientWidth ?? 800) / 2;
+    const y = typeof event.detail.y === "number" && Number.isFinite(event.detail.y) ? event.detail.y : (stage?.clientHeight ?? 600) / 2;
+    event.stopPropagation();
+    this.onDeviceHold(entity, x, y);
+  };
 
   protected firstUpdated(): void {
     this.observeStage();
@@ -2051,6 +2075,7 @@ export class Fp3dView3d extends LitElement {
 
   /** Long press: the quick menu at the device, or the details for devices without one. */
   private onDeviceHold(entityId: string, x: number, y: number): void {
+    this._central = false;
     // Auto Pro: a long press on the parking spot's pin opens the car's menu (lock, climate, charging)
     if (hasFeature("auto_pro") && this.hass && this.building) {
       for (const floor of this.building.floors)
@@ -2065,7 +2090,7 @@ export class Fp3dView3d extends LitElement {
         }
     }
     const kind = kindOf(entityId);
-    if (kind === "light" || kind === "cover" || kind === "switch" || kind === "fan" || kind === "lock" || kind === "camera") this._menu = { entity: entityId, x, y };
+    if (kind === "light" || kind === "cover" || kind === "switch" || kind === "fan" || kind === "lock" || kind === "camera" || kind === "media" || kind === "climate") this._menu = { entity: entityId, x, y };
     else openMoreInfo(this, entityId);
   }
 
@@ -2204,6 +2229,7 @@ export class Fp3dView3d extends LitElement {
       aria-expanded=${this._central}
       @click=${() => {
         this._central = !this._central;
+        if (this._central) this._menu = null;
         this._armed = null;
       }}
     >
@@ -2234,6 +2260,33 @@ export class Fp3dView3d extends LitElement {
       </button>`;
     const favorites = (b.settings.favorites ?? []).filter((id) => hass.states[id]);
     const own = this.buttons ?? b.settings.buttons ?? [];
+    if (this.menuStyle === "honeycomb") {
+      const neon = this.honeycomb();
+      if (!neon) return star;
+      const stage = this.renderRoot.querySelector(".fp3d-stage") as HTMLElement | null;
+      const w = stage?.clientWidth ?? 800;
+      const h = stage?.clientHeight ?? 600;
+      const p = neon.placeHoneycomb(w, h, w / 2, h / 2, this.panelOpen, this.honeycombInsets(stage));
+      const centralModel = neon.menuForCentral(hass, {
+        label: floor ? floor.name : t("central_house"),
+        lights,
+        covers,
+        favorites,
+        buttons: own,
+        confirmWholeHouse: house,
+        t: (key, fallback) => translate(hass, key as I18nKey) || fallback,
+      });
+      return html`${star}<div class="fp3d-menu-backdrop" @click=${() => this.closeHoneycomb()}></div>
+        <neon-honeycomb
+          style="left:${p.left}px;top:${p.top}px;width:${p.width}px;height:${p.height}px"
+          .model=${centralModel}
+          ?low=${this._low}
+          ?dock=${p.dock}
+          ?sheet=${p.sheet}
+          @close=${() => (this._central = false)}
+          @neon-action=${this.onNeonAction}
+        ></neon-honeycomb>`;
+    }
     return html`${star}
       <div class="fp3d-central" role="dialog" aria-label=${t("central")}>
         <b>${floor ? floor.name : t("central_house")}</b>
@@ -2513,6 +2566,43 @@ export class Fp3dView3d extends LitElement {
     const stage = this.renderRoot.querySelector(".fp3d-stage") as HTMLElement | null;
     const w = stage?.clientWidth ?? 800;
     const h = stage?.clientHeight ?? 600;
+    if (this.menuStyle === "honeycomb") {
+      const neon = this.honeycomb();
+      let model;
+      try {
+        model = neon?.menuForEntity(this.hass, m.entity, {
+          confirm: this.confirmSet.has(m.entity),
+          car: m.car ?? null,
+          presets: hasFeature("sound") ? (this.building?.settings.media_presets ?? []) : [],
+          cameraPro: hasFeature("camera_cockpit"),
+          t: (key) => translate(this.hass, key as I18nKey),
+        });
+      } catch {
+        // A malformed entity must never strand the user: the proven classic menu remains the fallback.
+        console.warn("NeonPlan: Honeycomb model could not be created; using classic menu");
+        model = null;
+      }
+      if (model) {
+        const p = neon!.placeHoneycomb(w, h, m.x, m.y, this.panelOpen, this.honeycombInsets(stage));
+        const cx = p.left + p.width / 2;
+        const cy = p.top + p.height / 2;
+        const shifted = Math.hypot(cx - m.x, cy - m.y) > 20;
+        return html`<div class="fp3d-menu-backdrop" @click=${() => this.closeHoneycomb()}></div>
+          ${shifted
+            ? svg`<svg class="fp3d-menu-anchor" viewBox="0 0 ${w} ${h}" aria-hidden="true"><line x1=${m.x} y1=${m.y} x2=${cx} y2=${cy}></line><circle cx=${m.x} cy=${m.y} r="3"></circle></svg>`
+            : nothing}
+          <neon-honeycomb
+            style="left:${p.left}px;top:${p.top}px;width:${p.width}px;height:${p.height}px"
+            .model=${model}
+            ?low=${this._low}
+            ?dock=${p.dock}
+            ?sheet=${p.sheet}
+            @close=${() => (this._menu = null)}
+            @neon-action=${this.onNeonAction}
+            @neon-pad-change=${this.onNeonPad}
+          ></neon-honeycomb>`;
+      }
+    }
     const left = Math.max(8, Math.min(w - 240, m.x - 116));
     const top = Math.max(8, Math.min(h - 360, m.y - 170));
     return html`<div class="fp3d-menu-backdrop" @click=${() => (this._menu = null)}></div>
@@ -2530,6 +2620,85 @@ export class Fp3dView3d extends LitElement {
       ></fp3d-quick-menu>`;
   }
 
+  private closeHoneycomb(): void {
+    const menu = this.renderRoot.querySelector("neon-honeycomb") as NeonHoneycomb | null;
+    if (menu) menu.requestClose();
+    else this._menu = null;
+  }
+
+  private honeycombInsets(stage: HTMLElement | null): { top: number; right: number; bottom: number; left: number } {
+    if (!stage) return { top: 0, right: 0, bottom: 0, left: 0 };
+    const style = getComputedStyle(stage);
+    const px = (name: string) => {
+      const value = Number.parseFloat(style.getPropertyValue(name));
+      return Number.isFinite(value) ? Math.max(0, value) : 0;
+    };
+    return {
+      top: px("--fp3d-safe-top"),
+      right: px("--fp3d-safe-right"),
+      bottom: px("--fp3d-safe-bottom") + px("--fp3d-bottom-inset"),
+      left: px("--fp3d-safe-left"),
+    };
+  }
+
+  private honeycomb(): HoneycombModule | null {
+    if (!this.honeycombModule && !this.honeycombLoading) {
+      this.honeycombLoading = true;
+      void loadHoneycomb().then(
+        (module) => {
+          this.honeycombModule = module;
+          this.honeycombLoading = false;
+          this.requestUpdate();
+        },
+        () => {
+          this.honeycombLoading = false;
+          console.warn("NeonPlan: Honeycomb bundle could not be loaded; using classic menu");
+        },
+      );
+    }
+    return this.honeycombModule;
+  }
+
+  private readonly onNeonAction = async (event: CustomEvent<{ item: NeonMenuItem }>): Promise<void> => {
+    event.stopPropagation();
+    const item = event.detail.item;
+    const result = await this.honeycombModule?.dispatchNeonAction(item, {
+      hass: this.hass,
+      source: this,
+      toggle: (entity) => toggleEntity(this.hass, entity),
+      moreInfo: (entity) => openMoreInfo(this, entity),
+      confirm: () => confirm(translate(this.hass, "confirm_switch", { name: item.label })),
+      local: (command, value) => {
+        if (command === "close") this.closeHoneycomb();
+        else if (command === "camera_look" && typeof value === "string") this.lookThrough(value);
+      },
+      navigate: (path) => {
+        history.pushState(null, "", path);
+        window.dispatchEvent(new CustomEvent("location-changed", { detail: { replace: false } }));
+      },
+      runButton: (button) => runButton(this.hass, this, button),
+    });
+    if (result?.close) this.closeHoneycomb();
+  };
+
+  private readonly onNeonPad = async (event: CustomEvent<NeonPadDetail>): Promise<void> => {
+    event.stopPropagation();
+    const { axis, value } = event.detail;
+    const item: NeonMenuItem = {
+      id: "pad",
+      label: axis.valueKey,
+      icon: "mdi:tune-vertical",
+      close: false,
+      action: { ...axis.action, data: { ...(axis.action.data ?? {}), [axis.valueKey]: value } },
+    };
+    await this.honeycombModule?.dispatchNeonAction(item, {
+      hass: this.hass,
+      source: this,
+      toggle: (entity) => toggleEntity(this.hass, entity),
+      moreInfo: (entity) => openMoreInfo(this, entity),
+    });
+  };
+
   private onDeviceTap(entityId: string, x = 0, y = 0): void {
     // trail pins and lamps without a light are drawn, but nothing of Home Assistant stands behind them
     if (entityId.startsWith("trail:") || entityId.startsWith("lamp:")) return;
@@ -2541,6 +2710,7 @@ export class Fp3dView3d extends LitElement {
     const kind = kindOf(entityId);
     // blinds have no single on/off: a tap opens their quick menu (up, positions, stop, down); a camera shows its picture
     if (kind === "cover" || kind === "camera") {
+      this._central = false;
       this._menu = { entity: entityId, x, y };
       return;
     }
@@ -2772,6 +2942,10 @@ export class Fp3dView3d extends LitElement {
         }
       }
       .fp3d-stage {
+        --fp3d-safe-top: env(safe-area-inset-top, 0px);
+        --fp3d-safe-right: env(safe-area-inset-right, 0px);
+        --fp3d-safe-bottom: env(safe-area-inset-bottom, 0px);
+        --fp3d-safe-left: env(safe-area-inset-left, 0px);
         position: absolute;
         inset: 0;
         overflow: hidden;
@@ -3465,6 +3639,27 @@ export class Fp3dView3d extends LitElement {
       fp3d-quick-menu {
         position: absolute;
         z-index: 6;
+      }
+      neon-honeycomb {
+        position: absolute;
+        z-index: 7;
+      }
+      .fp3d-menu-anchor {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 6;
+        pointer-events: none;
+      }
+      .fp3d-menu-anchor line {
+        stroke: var(--fp3d-accent);
+        stroke-width: 1;
+        stroke-dasharray: 3 4;
+        opacity: 0.66;
+      }
+      .fp3d-menu-anchor circle {
+        fill: var(--fp3d-accent);
       }
       .fp3d-dev-found {
         animation: fp3d-found 0.6s ease-in-out 4;

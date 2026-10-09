@@ -18,6 +18,8 @@ export interface CardConfig {
   /** The roof lifts and fades while zooming in (default true); false keeps it on the house. */
   roof_fade?: boolean;
   quality?: Quality;
+  /** Override the plan's device menu style. */
+  menu_style?: "classic" | "honeycomb";
   /** Show the performance display (frames per second, draw calls). */
   stats?: boolean;
   /** HTML markers: none | important (default) | all. */

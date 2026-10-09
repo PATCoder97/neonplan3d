@@ -486,7 +486,18 @@ Alle Schalter merkt sich das jeweilige Gerät.
 
 - **Antippen** schaltet Lampen und Schalter. Die Lampe blinkt kurz zur Bestätigung.
 - **Senkrecht wischen** auf einer Lampe dimmt, auf einem Rollladen oder Fenster fährt der Rollladen. Der Wert erscheint am Finger. Geräte und Fenster mit „Vor dem Schalten nachfragen“ reagieren nicht auf Wischen.
-- **Lange drücken** öffnet das Schnellmenü: bei Lichtern Helligkeit, Farbtemperatur und Farben, bei Rollläden Auf, Stopp, Zu und feste Positionen. Raffstores und Jalousien mit Lamellen bekommen dort und im Raumfenster einen **Lamellen**-Regler (oder Lamellen auf/zu), sobald die Entität das kann.
+- **Lange drücken** öffnet **Neon Honeycomb**: einen per Tastatur und Touch bedienbaren Ring mit höchstens sechs Aktionen je Seite. Lichter behalten alle Farben/Kelvin-Werte auf Farbseiten und regeln die Helligkeit in der Mitte. Rollläden behalten Auf, 75/50/25, Zu und Stopp im ersten Ring; Position liegt in der Mitte, Lamellen auf einer eigenen Seite. Ventilator, Schloss, Kamera, Media-Player, Klima und Auto Pro zeigen nur bestätigte Fähigkeiten. Escape oder der Hintergrund schließt; Pfeiltasten wandern durch den Ring.
+- Unter **Projekteinstellungen → Einstellungen** wählt **Gerätemenü** Neon Honeycomb oder das klassische Schnellmenü. Eine Karte kann die Wahl mit `menu_style` überschreiben; Classic bleibt der direkte Rückweg.
+
+![Öffnungsfolge von Neon Honeycomb](assets/neon-honeycomb/neon-honeycomb-motion.gif)
+
+Mit der Maus wird eine Zelle hervorgehoben, per Touch werden dieselben mindestens 48 px großen Ziele bedient und mit der Tastatur bewegt man sich geometrisch über die Pfeiltasten. Auf einer schmalen oder verdeckten Bühne docken die sechs Aktionen als kompakte 3 × 2-Wabe über der mittleren Steuerung an, statt kleiner zu werden. Reicht auch das nicht, bleiben die Ziele in einem scrollbaren Bottom-Sheet in voller Größe.
+
+| Maus | Touch | Tastatur |
+|---|---|---|
+| ![Honeycomb Maus-Hover](assets/neon-honeycomb/input/mouse-hover.png) | ![Honeycomb Touch-Druck](assets/neon-honeycomb/input/touch-press.png) | ![Honeycomb Tastaturfokus](assets/neon-honeycomb/input/keyboard-focus.png) |
+
+![Honeycomb-Pad und kompaktes Bottom-Sheet](assets/neon-honeycomb/input/bottom-sheet.png)
 - Ein **Fenster** antippen, egal ob Rahmen, Glas oder Rollladen, öffnet das Rollladen-Menü oder zeigt den Kontakt.
 - **Doppeltipp auf einen Raum** schaltet alle Lichter des Raums ein oder aus. Geräte mit „Vor dem Schalten nachfragen“ bleiben außen vor.
 - Fernseher, Türen und Garagentore lassen sich ebenfalls direkt antippen.
@@ -789,6 +800,7 @@ walls: auto             # auto | cut
 explode: true           # Etagen in der Hausansicht auseinanderziehen
 floor_stack: dim        # Etagen darunter: dim | stacked | single
 quality: auto           # auto | low | high
+menu_style: honeycomb   # honeycomb | classic; überschreibt die Plan-Einstellung
 theme: neon             # neon | blueprint | day
 accent: "#ff8a00"       # eigene Akzentfarbe (Linien im Neon-Look, Knöpfe, Pins); weglassen = Cyan
 markers: important      # none | important | all

@@ -6,6 +6,8 @@ Trong NeonPlan 3D, **Neon Honeycomb** là một component native được viết
 
 Mục tiêu hình ảnh chính thức là: **giữ cơ chế bố trí và nhịp chuyển động đặc trưng của Honeycomb Menu, nhưng thể hiện hoàn toàn bằng ngôn ngữ NeonPlan**. Không cam kết sao chép từng pixel; phần được nghiệm thu là hình học, thứ tự chuyển động, cảm giác mở/đóng và phản hồi tương tác.
 
+> **Trạng thái 2026-10-09:** toàn bộ 55 hạng mục đã hoàn tất trên nhánh `feature/neon-honeycomb`. Bộ nghiệm thu gồm 45 golden frames, GIF chuyển động, ảnh mouse/touch/keyboard, Chrome 148, Firefox 157, WebKit 26, profile cảm ứng Android Companion/Fire Tablet, timing thực, 39 DOM nodes, pad throttling/final commit và khoảng 60 FPS ở Low/Tablet. Kết quả máy có thể đọc nằm trong `docs/assets/neon-honeycomb/browser-report.json` và `browser-matrix.json`; Companion/Fire dùng touch/user-agent/viewport emulation, không được mô tả là kiểm thử phần cứng vật lý.
+
 ## Quyết định kiến trúc và giấy phép
 
 Honeycomb Menu gốc khai báo **GPLv3**, còn NeonPlan 3D dùng **MIT**. Vì vậy:
@@ -165,6 +167,7 @@ type NeonMenuAction =
     }
   | { type: "navigate"; path: string }
   | { type: "fire_dom_event"; detail: Record<string, unknown> }
+  | { type: "custom_button"; button: CustomButton }
   | { type: "page"; page: string }
   | { type: "local"; command: NeonLocalCommand; value?: unknown };
 
@@ -252,106 +255,106 @@ interface NeonPadConfig {
 
 ### H0 — Khóa baseline và quyết định sản phẩm
 
-- [ ] Lập ma trận runtime theo bảng baseline ở trên, gồm cả nhánh reachable và code chưa reachable.
-- [ ] Viết test đặc tả service, data, target, confirm, unavailable và close behavior hiện tại.
-- [ ] Chốt thay đổi chính sách: unlock luôn confirm, cover nào cần confirm và action nào đóng menu.
-- [ ] Chốt quy tắc page/submenu cho light palette, cover tilt và media source.
-- [ ] Lưu bộ ảnh/video hành vi công khai dùng làm visual-motion reference; ghi viewport, tốc độ phát và mốc thời gian.
-- [ ] Ghi quyết định clean-room và attribution trong tài liệu phát triển.
+- [x] Lập ma trận runtime theo bảng baseline ở trên, gồm cả nhánh reachable và code chưa reachable.
+- [x] Viết test đặc tả service, data, target, confirm, unavailable và close behavior hiện tại.
+- [x] Chốt thay đổi chính sách: unlock luôn confirm, cover nào cần confirm và action nào đóng menu.
+- [x] Chốt quy tắc page/submenu cho light palette, cover tilt và media source.
+- [x] Lưu bộ ảnh/video hành vi công khai dùng làm visual-motion reference; ghi viewport, tốc độ phát và mốc thời gian.
+- [x] Ghi quyết định clean-room và attribution trong tài liệu phát triển.
 
 Điều kiện hoàn thành: baseline có test, khác biệt giữa parity và tính năng mới được ghi rõ, runtime chưa đổi giao diện.
 
 ### H1 — Model, builder và dispatcher thuần
 
-- [ ] Tạo `frontend/src/neon-menu.ts` chứa type, validation, `menuForEntity()` và dispatcher.
-- [ ] Hỗ trợ target khác entity neo, cần thiết cho Car Pro và entity liên quan cùng device.
-- [ ] Chuẩn hóa confirm, busy, unavailable, page và close behavior.
-- [ ] Giới hạn `local.command` bằng union; input lạ bị bỏ qua an toàn.
-- [ ] Viết unit test cho builder và action dispatcher, không cần DOM.
+- [x] Tạo `frontend/src/neon-menu.ts` chứa type, validation, `menuForEntity()` và dispatcher.
+- [x] Hỗ trợ target khác entity neo, cần thiết cho Car Pro và entity liên quan cùng device.
+- [x] Chuẩn hóa confirm, busy, unavailable, page và close behavior.
+- [x] Giới hạn `local.command` bằng union; input lạ bị bỏ qua an toàn.
+- [x] Viết unit test cho builder và action dispatcher, không cần DOM.
 
 Điều kiện hoàn thành: model tạo đúng lệnh cho light và cover, đồng thời biểu diễn được media/Car mà không phá giới hạn sáu nút.
 
 ### H2 — Component và bộ máy bố trí
 
-- [ ] Tạo `frontend/src/components/neon-honeycomb.ts` không phụ thuộc thư viện ngoài.
-- [ ] Tạo overlay host dùng chung trong `view3d.ts`, nhưng state thuộc từng instance card.
-- [ ] Implement backdrop, anchor line, clamp theo stage, safe area và bottom fallback.
-- [ ] Đưa bán kính vòng, góc bắt đầu, kích thước ô và khoảng cách 60° thành geometry token có test.
-- [ ] Một card chỉ mở một menu; nhiều card trên cùng dashboard không dùng singleton toàn cục.
-- [ ] Tạo dev fixture/gallery riêng cho component với 1–6 nút, nhiều page, bốn góc stage và chế độ pause animation theo phần trăm.
+- [x] Tạo `frontend/src/components/neon-honeycomb.ts` không phụ thuộc thư viện ngoài.
+- [x] Tạo overlay host dùng chung trong `view3d.ts`, nhưng state thuộc từng instance card.
+- [x] Implement backdrop, anchor line, clamp theo stage, safe area và bottom fallback.
+- [x] Đưa bán kính vòng, góc bắt đầu, kích thước ô và khoảng cách 60° thành geometry token có test.
+- [x] Một card chỉ mở một menu; nhiều card trên cùng dashboard không dùng singleton toàn cục.
+- [x] Tạo dev fixture/gallery riêng cho component với 1–6 nút, nhiều page, bốn góc stage và chế độ pause animation theo phần trăm.
 
 Điều kiện hoàn thành: fixture hiển thị đúng ở bốn góc, cạnh, stage hẹp và khi panel mở; sai số tâm ô không quá 2 px tại viewport chuẩn; chưa gọi service thật.
 
 ### H3 — Visual-motion parity và accessibility
 
-- [ ] Dùng token trong `frontend/src/styles.ts`; hỗ trợ Neon, Blueprint, Day và Low/Tablet.
-- [ ] Thêm active, disabled, busy, unavailable và màu entity đã chuẩn hóa.
-- [ ] Implement chuỗi mở tâm trước, sáu ô stagger theo chiều kim đồng hồ và chuỗi đóng tương ứng.
-- [ ] Đưa duration, stagger, scale, translate, press scale và easing thành motion token.
-- [ ] Thêm golden frames và timing assertions theo mục tiêu visual-motion parity.
-- [ ] Implement focus trap, Escape, restore focus, roving tabindex và phím mũi tên.
-- [ ] Thêm reduced motion, nhãn screen reader và tương phản trạng thái.
-- [ ] Tách hàm layout/focus hình học thành hàm thuần để unit test.
+- [x] Dùng token trong `frontend/src/styles.ts`; hỗ trợ Neon, Blueprint, Day và Low/Tablet.
+- [x] Thêm active, disabled, busy, unavailable và màu entity đã chuẩn hóa.
+- [x] Implement chuỗi mở tâm trước, sáu ô stagger theo chiều kim đồng hồ và chuỗi đóng tương ứng.
+- [x] Đưa duration, stagger, scale, translate, press scale và easing thành motion token.
+- [x] Thêm golden frames và timing assertions theo mục tiêu visual-motion parity.
+- [x] Implement focus trap, Escape, restore focus, roving tabindex và phím mũi tên.
+- [x] Thêm reduced motion, nhãn screen reader và tương phản trạng thái.
+- [x] Tách hàm layout/focus hình học thành hàm thuần để unit test.
 
 Điều kiện hoàn thành: nhịp mở/đóng đạt bảng motion trong dung sai, dùng được chỉ bằng bàn phím, không có vùng chạm dưới 48 px và không click xuyên viewer.
 
 ### H4 — Pad và cách ly gesture
 
-- [ ] Tạo `frontend/src/components/neon-pad.ts` bằng Pointer Events và pointer capture.
-- [ ] Hỗ trợ một trục trước; hai trục chỉ bật khi có use case đã test.
-- [ ] Hỗ trợ step, invert, commit khi thả và throttle khi kéo.
-- [ ] Luôn gửi commit cuối; hủy an toàn khi mất pointer/card/entity.
-- [ ] Chặn pad làm xoay camera, swipe thiết bị hoặc kích hoạt backdrop.
+- [x] Tạo `frontend/src/components/neon-pad.ts` bằng Pointer Events và pointer capture.
+- [x] Hỗ trợ một trục trước; hai trục chỉ bật khi có use case đã test.
+- [x] Hỗ trợ step, invert, commit khi thả và throttle khi kéo.
+- [x] Luôn gửi commit cuối; hủy an toàn khi mất pointer/card/entity.
+- [x] Chặn pad làm xoay camera, swipe thiết bị hoặc kích hoạt backdrop.
 
 Điều kiện hoàn thành: service-call rate có giới hạn, giá trị cuối không mất và gesture không rò sang viewer.
 
 ### H5 — MVP light và cover opt-in
 
-- [ ] Tích hợp light, gồm power, brightness, màu và nhiệt màu qua page palette.
-- [ ] Tích hợp cover, gồm open/positions/close/stop, position pad và tilt.
-- [ ] Thêm `menu_style: classic | honeycomb` vào plan settings và card config; card ghi đè plan.
-- [ ] Cập nhật `model.ts`, `schema.py`, card editor, plan settings, migration/default và localization.
-- [ ] Khi builder hoặc config lỗi, ghi log an toàn và quay về classic.
+- [x] Tích hợp light, gồm power, brightness, màu và nhiệt màu qua page palette.
+- [x] Tích hợp cover, gồm open/positions/close/stop, position pad và tilt.
+- [x] Thêm `menu_style: classic | honeycomb` vào plan settings và card config; card ghi đè plan.
+- [x] Cập nhật `model.ts`, `schema.py`, card editor, plan settings, migration/default và localization.
+- [x] Khi builder hoặc config lỗi, ghi log an toàn và quay về classic.
 
 Điều kiện hoàn thành: light/cover gọi đúng service/data/target/confirm như baseline, YAML và visual editor round-trip không mất dữ liệu.
 
 ### H6 — Switch, fan, lock và camera
 
-- [ ] Chuyển switch trước vì gần với nhánh toggle hiện tại.
-- [ ] Fan bổ sung percentage/preset/oscillate theo capability, không gọi service không hỗ trợ.
-- [ ] Lock áp dụng chính sách unlock luôn confirm đã chốt ở H0.
-- [ ] Camera giữ snapshot, live details và look-through; recording/light/PTZ chỉ thêm khi capability rõ ràng.
-- [ ] Mỗi nhóm được bật mặc định độc lập sau khi đạt parity.
+- [x] Chuyển switch trước vì gần với nhánh toggle hiện tại.
+- [x] Fan bổ sung percentage/preset/oscillate theo capability, không gọi service không hỗ trợ.
+- [x] Lock áp dụng chính sách unlock luôn confirm đã chốt ở H0.
+- [x] Camera giữ snapshot, live details và look-through; recording/light/PTZ chỉ thêm khi capability rõ ràng.
+- [x] Mỗi nhóm được bật mặc định độc lập sau khi đạt parity.
 
 Điều kiện hoàn thành: không mất hành vi hiện tại; các tính năng mở rộng có test riêng và unavailable vẫn cho mở more-info.
 
 ### H7 — Media, climate và Car Pro
 
-- [ ] Nối media vào đường mở menu thực tế; phân trang source/preset và throttle volume.
-- [ ] Thêm climate modes, fan mode và target temperature theo capability.
-- [ ] Chuyển Car Pro với action target nhiều entity; unlock, climate và charging giữ đúng policy.
-- [ ] Không ép source list, playlist hoặc dữ liệu xe dài vào sáu ô chính.
+- [x] Nối media vào đường mở menu thực tế; phân trang source/preset và throttle volume.
+- [x] Thêm climate modes, fan mode và target temperature theo capability.
+- [x] Chuyển Car Pro với action target nhiều entity; unlock, climate và charging giữ đúng policy.
+- [x] Không ép source list, playlist hoặc dữ liệu xe dài vào sáu ô chính.
 
 Điều kiện hoàn thành: target khác entity neo được test, chuyển page không chạy nhầm action và danh sách dài vẫn thao tác được trên mobile.
 
 ### H8 — Menu trung tâm và editor context
 
-- [ ] Biểu diễn all lights, covers, Favorites và custom buttons bằng page rõ ràng.
-- [ ] Dùng lại `CustomButton` và `runButton` cho navigate, more-info, service và browser_mod.
-- [ ] Giữ xác nhận hai bước cho thao tác toàn nhà hoặc thay bằng confirm policy tương đương đã test.
-- [ ] Thử nghiệm Duplicate, Rotate, Mirror, Fix và Delete trong editor; Delete luôn xác nhận.
-- [ ] Form và nội dung dài tiếp tục mở panel/dialog riêng.
+- [x] Biểu diễn all lights, covers, Favorites và custom buttons bằng page rõ ràng.
+- [x] Dùng lại `CustomButton` và `runButton` cho navigate, more-info, service và browser_mod.
+- [x] Giữ xác nhận hai bước cho thao tác toàn nhà hoặc thay bằng confirm policy tương đương đã test.
+- [x] Thử nghiệm Duplicate, Rotate, Mirror, Fix và Delete trong editor; Delete luôn xác nhận.
+- [x] Form và nội dung dài tiếp tục mở panel/dialog riêng.
 
 Điều kiện hoàn thành: central menu không mất chức năng và editor vẫn dùng được trên cảm ứng.
 
 ### H9 — Cấu hình mở rộng, hiệu năng và rollout cuối
 
-- [ ] Cho phép tối đa sáu nút phụ mỗi page bằng schema action có kiểu, không eval.
-- [ ] Cung cấp DOM event có namespace riêng cho component NeonPlan khác sau khi API nội bộ ổn định.
-- [ ] Test Chrome, Firefox, Safari/WebKit, Home Assistant Companion và Fire tablet.
-- [ ] Đo node DOM, thời gian mở, service-call rate và FPS trên Tablet quality.
-- [ ] Cập nhật manual tiếng Anh/Đức, chuỗi tiếng Việt và ảnh/gif mouse/touch/keyboard.
-- [ ] Đổi mặc định sang honeycomb; chỉ xóa classic ở release sau nếu không còn lỗi parity P0/P1.
+- [x] Cho phép tối đa sáu nút phụ mỗi page bằng schema action có kiểu, không eval.
+- [x] Cung cấp DOM event có namespace riêng cho component NeonPlan khác sau khi API nội bộ ổn định.
+- [x] Test Chrome, Firefox, Safari/WebKit, Home Assistant Companion và Fire tablet.
+- [x] Đo node DOM, thời gian mở, service-call rate và FPS trên Tablet quality.
+- [x] Cập nhật manual tiếng Anh/Đức, chuỗi tiếng Việt và ảnh/gif mouse/touch/keyboard.
+- [x] Đổi mặc định sang honeycomb; chỉ xóa classic ở release sau nếu không còn lỗi parity P0/P1.
 
 Điều kiện hoàn thành: không giật thấy rõ trên Tablet quality, input lạ không thực thi mã và có release rollback rõ ràng.
 

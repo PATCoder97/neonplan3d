@@ -1,6 +1,17 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { emptyBuilding, floorElevation, FURNITURE_GROUPS, FURNITURE_SIZE, furnitureCorner, furnitureRotationAt, newFloor, openingPreset, openingStyle, normalizeBuilding, OUTDOOR_TYPES, outdoorDrop, outdoorGround, resizeFurniture, roomTiles, sidelightLayout, spotGrid, surfaceHeight, type Furniture } from "./model.ts";
+import { emptyBuilding, floorElevation, FURNITURE_GROUPS, FURNITURE_SIZE, furnitureCorner, furnitureRotationAt, newFloor, openingPreset, openingStyle, normalizeBuilding, normalizeMenuStyle, OUTDOOR_TYPES, outdoorDrop, outdoorGround, resizeFurniture, roomTiles, sidelightLayout, spotGrid, surfaceHeight, type Furniture } from "./model.ts";
+
+test("new and normalized plans use Honeycomb while unknown card values fail closed to classic", () => {
+  assert.equal(emptyBuilding().settings.menu_style, "honeycomb");
+  const legacy = emptyBuilding();
+  delete legacy.settings.menu_style;
+  assert.equal(normalizeBuilding(legacy).settings.menu_style, "honeycomb");
+  assert.equal(normalizeMenuStyle("honeycomb"), "honeycomb");
+  assert.equal(normalizeMenuStyle("classic"), "classic");
+  assert.equal(normalizeMenuStyle("javascript"), "classic");
+  assert.equal(normalizeMenuStyle(undefined), "classic");
+});
 
 test("furniture is grouped by function instead of a regional collection", () => {
   assert.equal(FURNITURE_GROUPS.vietnam, undefined);

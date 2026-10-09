@@ -7,6 +7,12 @@
     "catalog": "node catalog-report.mjs",
     "gallery": "node gallery.mjs --serve",
     "gallery:check": "node gallery.mjs",
+    "honeycomb": "node honeycomb-gallery.mjs --serve",
+    "honeycomb:check": "node honeycomb-gallery.mjs",
+    "honeycomb:browser": "node honeycomb-browser-check.mjs",
+    "honeycomb:golden": "node honeycomb-browser-check.mjs --update",
+    "honeycomb:media": "node honeycomb-media.mjs",
+    "honeycomb:webkit": "node honeycomb-webkit-check.mjs",
     "watch": "node build.mjs --watch",
     "test": "node --experimental-strip-types --test \"src/**/*.test.ts\"",
     "typecheck": "tsc --noEmit",
@@ -23,6 +29,9 @@
     "@types/node": "^26.6.3",
     "@types/three": "^0.186.0",
     "esbuild": "^0.28.2",
+    "gifenc": "^1.0.3",
+    "playwright-core": "^1.55.0",
+    "pngjs": "^7.0.0",
     "puppeteer-core": "^25.12.0",
     "typescript": "^7.0.2"
   }

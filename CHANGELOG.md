@@ -4,6 +4,18 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## Unreleased
+
+### Added
+
+- Added the clean-room Neon Honeycomb device overlay with six-direction geometry, paginated typed actions, one-axis pointer pads, focus trapping, reduced motion, stage-edge docking and a classic rollback option.
+- Added capability-driven controls for lights, covers, switches, fans, locks, cameras, media players, climate entities and Car Pro, including cross-entity service targets and mandatory unlock confirmation.
+- Added a standalone Honeycomb visual fixture, 45 golden frames, mouse/touch/keyboard media, Chromium/Firefox/WebKit acceptance scripts, geometry/motion/service regression tests, and the clean-room baseline and attribution record.
+
+### Changed
+
+- New and normalized plans default to Neon Honeycomb; `menu_style: classic` remains available at plan or card level.
+
 ## 1.24.3
 
 ### Changed

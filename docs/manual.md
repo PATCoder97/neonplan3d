@@ -493,7 +493,18 @@ Each device remembers these switches.
 
 - **Tap** switches lamps and switches. The lamp flashes briefly to confirm.
 - **Swipe up or down** on a lamp dims it; on a blind or window it moves the blind. The value appears at your finger. Devices and windows with "Ask before switching" do not react to a swipe.
-- **Long press** opens the quick menu: brightness, colour temperature and colours for lights; up, stop, down and fixed positions for blinds. Venetian blinds and Raffstores get a **Slats** slider there and in the room panel (or slats open/closed) as soon as the entity supports it.
+- **Long press** opens **Neon Honeycomb**: a keyboard- and touch-friendly ring with at most six actions per page. Lights keep all colours/Kelvin choices on palette pages and use the centre pad for brightness. Blinds keep open, 75/50/25, close and stop on the first ring, with position in the centre and slats on their own page. Fan, lock, camera, media-player, climate and Car Pro actions appear only when their entity supports them. Escape or the backdrop closes; arrow keys move around the ring.
+- Under **Project settings → Settings**, **Device menu** selects Neon Honeycomb or the classic quick menu. A card can override it with `menu_style`; classic remains the immediate rollback path.
+
+![Neon Honeycomb opening sequence](assets/neon-honeycomb/neon-honeycomb-motion.gif)
+
+Mouse users can hover a cell, touch users press the same 48 px-or-larger targets, and keyboard users move geometrically with the arrow keys. On a narrow or obstructed stage, the six actions dock as a compact 3 × 2 honeycomb above the centre control instead of shrinking. If even that does not fit, a scrollable bottom sheet keeps the targets full-sized.
+
+| Mouse | Touch | Keyboard |
+|---|---|---|
+| ![Honeycomb mouse hover](assets/neon-honeycomb/input/mouse-hover.png) | ![Honeycomb touch press](assets/neon-honeycomb/input/touch-press.png) | ![Honeycomb keyboard focus](assets/neon-honeycomb/input/keyboard-focus.png) |
+
+![Honeycomb pad and compact bottom-sheet layouts](assets/neon-honeycomb/input/bottom-sheet.png)
 - Tap a **window** – frame, glass or blind – to open the blind menu or show the contact.
 - **Double tap a room** switches all its lights on or off. Devices with "Ask before switching" stay out.
 - TVs, doors and garage doors can be tapped directly as well.
@@ -796,6 +807,7 @@ walls: auto             # auto | cut
 explode: true           # pull floors apart in the house view
 floor_stack: dim        # floors below: dim | stacked | single
 quality: auto           # auto | low | high
+menu_style: honeycomb   # honeycomb | classic; overrides the plan setting
 theme: neon             # neon | blueprint | day
 accent: "#ff8a00"       # an accent colour of your own (neon lines, buttons, pins); leave out for cyan
 markers: important      # none | important | all

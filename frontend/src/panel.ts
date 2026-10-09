@@ -6,7 +6,7 @@ import { loadEditor } from "./load-editor.ts";
 import "./components/room-panel.ts";
 import "./components/view3d.ts";
 import { languageReady, loadLanguage, translate, type I18nKey } from "./i18n.ts";
-import type { Building } from "./model.ts";
+import { normalizeMenuStyle, type Building } from "./model.ts";
 import { controls, tokens } from "./styles.ts";
 import type { HomeAssistant } from "./types.ts";
 import type { MarkerMode } from "./components/view3d.ts";
@@ -677,6 +677,7 @@ export class Floorplan3dPanel extends LitElement {
           @device-select=${(e: CustomEvent<{ id: string | null }>) => (this._selDevice = e.detail.id)}
           @device-move=${this.moveDevice}
           .quality=${this._quality}
+          .menuStyle=${normalizeMenuStyle(b.settings.menu_style)}
           ?showStats=${this._stats}
           @room-tap=${this.onRoomTap}
           @floor-tap=${(e: CustomEvent<{ floorId: string | null }>) => {

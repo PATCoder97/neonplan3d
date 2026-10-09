@@ -15,6 +15,7 @@ const DEFAULTS: Partial<CardConfig> = {
   roof_fade: true,
   camera_wall: false,
   quality: "auto",
+  menu_style: undefined,
   stats: false,
   markers: "important",
   heatmap: "none",
@@ -297,6 +298,17 @@ export class Floorplan3dCardEditor extends LitElement {
         </label>
         ${this.select("walls", "card_walls", [["auto", "walls_auto"], ["cut", "walls_cut"]], v.walls)}
         ${this.select("quality", "quality", [["auto", "quality_auto"], ["low", "quality_low"], ["high", "quality_high"]], v.quality)}
+        <label class="field"
+          >${this.t("menu_style")}
+          <select @change=${(e: Event) => {
+            const value = (e.target as HTMLSelectElement).value;
+            this.set("menu_style", value === "plan" ? undefined : value as "classic" | "honeycomb");
+          }}>
+            <option value="plan" ?selected=${this._config.menu_style === undefined}>${this.t("menu_style_plan")}</option>
+            <option value="honeycomb" ?selected=${this._config.menu_style === "honeycomb"}>${this.t("menu_style_honeycomb")}</option>
+            <option value="classic" ?selected=${this._config.menu_style === "classic"}>${this.t("menu_style_classic")}</option>
+          </select></label
+        >
         ${this.select("floor_stack", "card_floor_stack", [["dim", "floor_stack_dim"], ["stacked", "floor_stack_stacked"], ["single", "floor_stack_single"]], v.floor_stack)}
       </div>
       ${v.fill ? html`<p class="hint">${this.t("card_fill_hint")}</p>` : nothing}

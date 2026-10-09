@@ -538,6 +538,8 @@ export interface MediaPreset {
 }
 
 export interface BuildingSettings {
+  /** Device quick menu. Classic remains selectable as a rollback path. */
+  menu_style?: "classic" | "honeycomb";
   /** Stations and playlists for the speakers' quick menu (Klang & Kino). */
   media_presets?: MediaPreset[];
   /** Favourites of the house: scenes, scripts, automations, buttons and switches in the central menu of the 3D view (#145). */
@@ -743,7 +745,12 @@ export const FLOOR_MATERIALS = ["wood", "oak", "tiles", "carpet", "stone", "conc
 
 export const DEFAULT_ROOF: RoofSettings = { type: "none", pitch: 35, overhang: 0.4 };
 
-export const DEFAULT_SETTINGS: BuildingSettings = { wall_exterior: 0.24, wall_interior: 0.12, grid: 0.05, north: 0, roof: { ...DEFAULT_ROOF } };
+export const DEFAULT_SETTINGS: BuildingSettings = { menu_style: "honeycomb", wall_exterior: 0.24, wall_interior: 0.12, grid: 0.05, north: 0, roof: { ...DEFAULT_ROOF } };
+
+/** Unknown or missing persisted values fail closed to the proven classic menu. */
+export function normalizeMenuStyle(value: unknown): "classic" | "honeycomb" {
+  return value === "honeycomb" ? "honeycomb" : "classic";
+}
 
 export function emptyBuilding(): Building {
   return { version: 1, floors: [], settings: { ...DEFAULT_SETTINGS }, energy: { ...DEFAULT_ENERGY }, presence: [] };

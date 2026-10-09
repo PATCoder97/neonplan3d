@@ -1,0 +1,106 @@
+{
+  "engines": {
+    "chromium": {
+      "engine": "chromium",
+      "version": "Chrome/148.0.7778.96",
+      "geometry": {
+        "cells": 6,
+        "nodes": 39,
+        "tolerancePx": 2
+      },
+      "keyboard": {
+        "start": "Living room",
+        "tab": "Power",
+        "shiftTab": "Living room",
+        "right": "Details",
+        "closeEvents": 1
+      },
+      "paging": {
+        "before": "6 actions",
+        "after": "Second page",
+        "buttons": 4
+      },
+      "motion": {
+        "duration": 160,
+        "stagger": 45,
+        "measuredEnd": 430.8,
+        "reducedDuration": 80
+      },
+      "fps": 60.6,
+      "pad": {
+        "events": 6,
+        "final": true,
+        "value": 97,
+        "centerActions": 1
+      },
+      "touchProfiles": [
+        {
+          "id": "companion-android",
+          "contained": true,
+          "coarse": true,
+          "actions": 1
+        },
+        {
+          "id": "fire-tablet",
+          "contained": true,
+          "coarse": true,
+          "actions": 1
+        }
+      ],
+      "errors": []
+    },
+    "firefox": {
+      "engine": "firefox",
+      "version": "firefox/157.0.1",
+      "geometry": {
+        "cells": 6,
+        "nodes": 39,
+        "tolerancePx": 2
+      },
+      "keyboard": {
+        "start": "Living room",
+        "tab": "Power",
+        "shiftTab": "Living room",
+        "right": "Details",
+        "closeEvents": 1
+      },
+      "paging": {
+        "before": "6 actions",
+        "after": "Second page",
+        "buttons": 4
+      },
+      "motion": {
+        "duration": 160,
+        "stagger": 45,
+        "measuredEnd": 408,
+        "reducedDuration": null
+      },
+      "fps": 52.6,
+      "pad": {
+        "events": 3,
+        "final": true,
+        "value": 97,
+        "centerActions": 1
+      },
+      "touchProfiles": [],
+      "errors": []
+    },
+    "webkit": {
+      "engine": "webkit",
+      "geometry": {
+        "cells": 6,
+        "nodes": 39,
+        "tolerancePx": 2
+      },
+      "interaction": {
+        "arrow": "Details",
+        "tab": "Colour",
+        "page": "Second page"
+      },
+      "fps": 61.6,
+      "padEvents": 2,
+      "padCenterActions": 1,
+      "errors": []
+    }
+  }
+}

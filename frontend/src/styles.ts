@@ -24,6 +24,18 @@ export const tokens = css`
   }
 `;
 
+/** Neon Honeycomb glass tokens; themes may override these without replacing component CSS. */
+export const honeycombTokens = css`
+  :host {
+    --fp3d-menu-text: #e6eefc;
+    --fp3d-honeycomb-glass-a: rgba(18, 38, 58, 0.96);
+    --fp3d-honeycomb-glass-b: rgba(6, 16, 30, 0.94);
+    --fp3d-honeycomb-core-a: rgba(15, 31, 49, 0.97);
+    --fp3d-honeycomb-core-b: rgba(4, 12, 24, 0.98);
+    --fp3d-honeycomb-border: rgba(120, 210, 255, 0.42);
+  }
+`;
+
 /** Segmented buttons, chips and form controls. */
 export const controls = css`
   .fp3d-seg {

@@ -21,6 +21,7 @@ import type { SurfaceGrab, SurfaceRay } from "../viewer/viewer3d.ts";
 import { storedImageIds } from "../transfer.ts";
 import { type CarLinks, type Background, OUTDOOR_TOP, sidelightLayout, DEFAULT_WEATHER_EFFECTS, WEATHER_EFFECTS,
   normalizeBuilding,
+  normalizeMenuStyle,
   furnitureFootprint,
   type FreeWall,
 } from "../model.ts";
@@ -718,6 +719,7 @@ export class Fp3dEditor extends LitElement {
         .selectedFurniture=${this._furnitureId}
         .selectedDevice=${this._deviceId}
         .quality=${"auto"}
+        .menuStyle=${normalizeMenuStyle(this._doc3d.settings.menu_style)}
         .floorThumbs=${false}
         .roomLabels=${true}
         .floorStack=${this.houseTool ? "stacked" : "single"}
@@ -1968,9 +1970,9 @@ export class Fp3dEditor extends LitElement {
     this.change((_, floor) => Object.assign((floor.walls ?? []).find((w) => w.id === id)!, patch));
   }
 
-  private deleteFreeWall(): void {
+  private deleteFreeWall(confirmed = false): void {
     const id = this._wallId;
-    if (!id || !this.isAdmin || !this.confirmFixedDelete("wall", id)) return;
+    if (!id || !this.isAdmin || (!confirmed && !this.confirmFixedDelete("wall", id))) return;
     this.change((_, floor) => {
       floor.walls = (floor.walls ?? []).filter((w) => w.id !== id);
       floor.openings = floor.openings.filter((o) => o.wall !== id);
@@ -2079,9 +2081,9 @@ export class Fp3dEditor extends LitElement {
     this.updateOutdoor({ points: area.points.filter((_, i) => i !== index) });
   }
 
-  private deleteOutdoor(): void {
+  private deleteOutdoor(confirmed = false): void {
     const id = this._outdoorId;
-    if (!id || !this.isAdmin || !this.confirmFixedDelete("outdoor", id)) return;
+    if (!id || !this.isAdmin || (!confirmed && !this.confirmFixedDelete("outdoor", id))) return;
     this.change((_, floor) => (floor.outdoor = floor.outdoor.filter((o) => o.id !== id)));
     this._outdoorId = null;
   }
@@ -2297,9 +2299,9 @@ export class Fp3dEditor extends LitElement {
     this._roomId = null;
   }
 
-  private deleteRoom(): void {
+  private deleteRoom(confirmed = false): void {
     const id = this._roomId;
-    if (!id || !this.isAdmin || !this.confirmFixedDelete("room", id)) return;
+    if (!id || !this.isAdmin || (!confirmed && !this.confirmFixedDelete("room", id))) return;
     this.change((_, floor) => {
       const room = floor.rooms.find((r) => r.id === id);
       floor.rooms = floor.rooms.filter((r) => r.id !== id);
@@ -3617,19 +3619,19 @@ export class Fp3dEditor extends LitElement {
     this._ctx = { x: local[0], y: local[1], kind, id };
   }
 
-  private deleteItem(kind: FixKind, id: string): void {
+  private deleteItem(kind: FixKind, id: string, confirmed = false): void {
     if (kind === "device") {
-      if (!this.confirmFixedDelete(kind, id)) return;
+      if (!confirmed && !this.confirmFixedDelete(kind, id)) return;
       this.removeDevice(id);
       this._deviceId = null;
       return;
     }
     // the delete methods ask themselves for fixed items
-    if (kind === "room") this.deleteRoom();
-    else if (kind === "opening") this.deleteOpening();
-    else if (kind === "furniture") this.deleteFurniture();
-    else if (kind === "wall") this.deleteFreeWall();
-    else this.deleteOutdoor();
+    if (kind === "room") this.deleteRoom(confirmed);
+    else if (kind === "opening") this.deleteOpening(confirmed);
+    else if (kind === "furniture") this.deleteFurniture(confirmed);
+    else if (kind === "wall") this.deleteFreeWall(confirmed);
+    else this.deleteOutdoor(confirmed);
   }
 
   private renderContext() {
@@ -3638,13 +3640,15 @@ export class Fp3dEditor extends LitElement {
     const fixed = this.isFixedItem(c.kind, c.id);
     const wrap = this.renderRoot.querySelector(".fp3d-canvas-wrap") as HTMLElement | null;
     // keep the menu inside the plan
-    const x = Math.max(4, Math.min(c.x, (wrap?.clientWidth ?? 800) - 190));
-    const y = Math.max(4, Math.min(c.y, (wrap?.clientHeight ?? 600) - 190));
+    const honeycomb = this._doc.settings.menu_style === "honeycomb";
+    const menuSize = honeycomb ? 240 : 190;
+    const x = Math.max(4, Math.min(c.x, (wrap?.clientWidth ?? 800) - menuSize));
+    const y = Math.max(4, Math.min(c.y, (wrap?.clientHeight ?? 600) - menuSize));
     const run = (fn: () => void) => () => {
       this._ctx = null;
       fn();
     };
-    return html`<div class="fp3d-ctx" style=${`left:${x}px;top:${y}px`} @pointerdown=${(e: Event) => e.stopPropagation()} @contextmenu=${(e: Event) => e.preventDefault()}>
+    return html`<div class="fp3d-ctx ${honeycomb ? "fp3d-ctx-honeycomb" : ""}" style=${`left:${x}px;top:${y}px`} @pointerdown=${(e: Event) => e.stopPropagation()} @contextmenu=${(e: Event) => e.preventDefault()}>
       ${c.kind === "furniture" || c.kind === "device"
         ? html`<button title=${this.t("fix_hint")} @click=${run(() => this.toggleFixed(c.kind, c.id))}>${fixed ? `🔓 ${this.t("unfix")}` : `🔒 ${this.t("fix")}`}</button>`
         : html`<button title=${this.t("lock_plan_hint")} @click=${run(() => this.toggleLockPlan())}>${this._doc.settings.lock_plan ? `🔓 ${this.t("plan_unlock")}` : `🔒 ${this.t("plan_lock")}`}</button>`}
@@ -3654,7 +3658,7 @@ export class Fp3dEditor extends LitElement {
             <button ?disabled=${fixed} @click=${run(() => this.rotateFurniture(90))}>↻ ${this.t("ctx_rotate")}</button>
             <button ?disabled=${fixed} @click=${run(() => this.mirrorFurniture())}>⇋ ${this.t("furn_mirror")}</button>`
         : nothing}
-      <button class="fp3d-ctx-danger" @click=${run(() => this.deleteItem(c.kind, c.id))}>✕ ${this.t("delete")}</button>
+      <button class="fp3d-ctx-danger" @click=${run(() => confirm(this.t("editor_delete_confirm")) && this.deleteItem(c.kind, c.id, true))}>✕ ${this.t("delete")}</button>
     </div>`;
   }
 
@@ -3792,9 +3796,9 @@ export class Fp3dEditor extends LitElement {
     this.change((_, floor) => Object.assign(floor.openings.find((o) => o.id === id)!, patch));
   }
 
-  private deleteOpening(): void {
+  private deleteOpening(confirmed = false): void {
     const id = this._openingId;
-    if (!id || !this.isAdmin || !this.confirmFixedDelete("opening", id)) return;
+    if (!id || !this.isAdmin || (!confirmed && !this.confirmFixedDelete("opening", id))) return;
     this.change((_, floor) => (floor.openings = floor.openings.filter((o) => o.id !== id)));
     this._openingId = null;
   }
@@ -3920,9 +3924,9 @@ export class Fp3dEditor extends LitElement {
     this.updateFurniture({ rotation: (((f.rotation + delta) % 360) + 360) % 360 });
   }
 
-  private deleteFurniture(): void {
+  private deleteFurniture(confirmed = false): void {
     const id = this._furnitureId;
-    if (!id || !this.isAdmin || !this.confirmFixedDelete("furniture", id)) return;
+    if (!id || !this.isAdmin || (!confirmed && !this.confirmFixedDelete("furniture", id))) return;
     this.change((_, floor) => (floor.furniture = floor.furniture.filter((f) => f.id !== id)));
     this._furnitureId = null;
   }
@@ -7321,6 +7325,13 @@ export class Fp3dEditor extends LitElement {
         ${this.num(this.t("grid"), s.grid, (v) => set({ grid: Math.min(1, Math.max(0.01, v)) }), 0.01, 0.01)}
         ${this.num(this.t("north"), s.north, (v) => set({ north: ((Math.round(v) % 360) + 360) % 360 }), 1)}
         <label class="fp3d-field fp3d-wide"
+          >${this.t("menu_style")}
+          <select @change=${(e: Event) => set({ menu_style: (e.target as HTMLSelectElement).value as "classic" | "honeycomb" })}>
+            <option value="honeycomb" ?selected=${s.menu_style === "honeycomb"}>${this.t("menu_style_honeycomb")}</option>
+            <option value="classic" ?selected=${s.menu_style !== "honeycomb"}>${this.t("menu_style_classic")}</option>
+          </select></label
+        >
+        <label class="fp3d-field fp3d-wide"
           >${this.t("roof")}
           <select
             @change=${(e: Event) => {
@@ -8642,6 +8653,42 @@ export class Fp3dEditor extends LitElement {
       .fp3d-ctx-danger {
         color: var(--fp3d-danger, #ff6b7a) !important;
       }
+      .fp3d-ctx-honeycomb {
+        width: 240px;
+        height: 240px;
+        min-width: 0;
+        padding: 0;
+        border: 0;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(8, 21, 38, 0.82), rgba(8, 21, 38, 0) 68%);
+        box-shadow: none;
+      }
+      .fp3d-ctx-honeycomb button {
+        position: absolute;
+        left: 92px;
+        top: 92px;
+        box-sizing: border-box;
+        width: 56px;
+        height: 56px;
+        min-height: 56px;
+        padding: 7px;
+        border: 1px solid var(--fp3d-accent);
+        clip-path: polygon(25% 3%, 75% 3%, 100% 50%, 75% 97%, 25% 97%, 0 50%);
+        background: linear-gradient(145deg, rgba(18, 38, 58, .98), rgba(6, 16, 30, .98));
+        font-size: 10px;
+        line-height: 1.1;
+        text-align: center;
+        white-space: normal;
+        animation: fp3d-ctx-in 160ms cubic-bezier(.18,.86,.28,1.12) both;
+      }
+      .fp3d-ctx-honeycomb button:nth-child(1) { transform: translate(0, -78px); animation-delay: 0ms; }
+      .fp3d-ctx-honeycomb button:nth-child(2) { transform: translate(68px, -39px); animation-delay: 45ms; }
+      .fp3d-ctx-honeycomb button:nth-child(3) { transform: translate(68px, 39px); animation-delay: 90ms; }
+      .fp3d-ctx-honeycomb button:nth-child(4) { transform: translate(0, 78px); animation-delay: 135ms; }
+      .fp3d-ctx-honeycomb button:nth-child(5) { transform: translate(-68px, 39px); animation-delay: 180ms; }
+      .fp3d-ctx-honeycomb button:nth-child(6) { transform: translate(-68px, -39px); animation-delay: 225ms; }
+      @keyframes fp3d-ctx-in { from { opacity: 0; scale: .72; } to { opacity: 1; scale: 1; } }
+      @media (prefers-reduced-motion: reduce) { .fp3d-ctx-honeycomb button { animation-duration: 80ms; animation-delay: 0ms !important; } }
       .fp3d-edge-hi {
         stroke: var(--fp3d-accent);
         stroke-width: 6;
