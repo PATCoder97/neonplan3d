@@ -218,9 +218,11 @@ Rollläden und Kontakte ordnet NeonPlan 3D über den Bereich automatisch zu. Du 
 
 ### 4.8 Möbel
 
-![Die Möbelbibliothek](images/editor-library.jpg)
+![Die Möbelbibliothek mit kombinierten Filtern](images/editor-library.jpg)
 
-Das Werkzeug **Möbel** öffnet rechts die Bibliothek mit 40 eingebauten Modellen in den Abschnitten Leuchten, Wohnen, Essen, Küche, Schlafen, Bad & Hauswirtschaft und Arbeiten & Sonstiges. Darunter folgen deine installierten Möbel-Packs. Die **Arbeitsplatte** (Küche sowie Arbeiten & Sonstiges) ist eine freie Platte ohne Unterbau, für Lücken in der Küche oder einen selbst gebauten Schreibtisch; ihre **Höhe** ist die Oberkante, voreingestellt 91 cm. Das Suchfeld oben filtert alle Abschnitte und bleibt beim Scrollen stehen; es findet deutsche und englische Namen und den Pack-Namen, mehrere Wörter in beliebiger Reihenfolge („sofa ecke“), Escape leert es. Die Abschnitte klappen auf und zu. Fährst du mit der Maus über einen Eintrag, zeigt eine kleine 3D-Vorschau das Möbel.
+Das Werkzeug **Möbel** öffnet 458 eingebaute Bibliothekseinträge in 13 Abschnitten: Leuchten, Wohnen, Essen, Küche, Schlafen, Bad & Hauswirtschaft, Klima, Garten & Terrasse, Arbeit & Büro, Haustiere, Fitness, Heimkino und Fahrzeuge. Importierte Möbel-Packs erscheinen in derselben Bibliothek. Die **Arbeitsplatte** (Küche sowie Arbeit & Büro) ist eine freie Platte ohne Unterbau, für Lücken in der Küche oder einen selbst gebauten Schreibtisch; ihre **Höhe** ist die Oberkante, voreingestellt 91 cm.
+
+Das Suchfeld bleibt beim Scrollen stehen, akzeptiert mehrere Wörter in beliebiger Reihenfolge und ignoriert Akzente. Es durchsucht Namen in der aktuellen Oberflächensprache und auf Englisch, Begriffe aus der stabilen ID sowie Pack-Namen. Vier Filter lassen sich kombinieren: **Raum / Gruppe**, **Montage** (Boden, auf Möbeln, Wand oder Decke), **Funktion** (statisch, Licht, Bildschirm, Strom/Entität oder Bewegung) und **Stil** (modern, klassisch, natürlich oder technisch). **Filter zurücksetzen** zeigt wieder die ganze Bibliothek, Escape leert die Suche. Die Abschnitte klappen auf und zu; beim Überfahren zeigt eine kleine 3D-Vorschau das Möbel. Für importierte Packs gelten dieselben Filter, wenn ihre Metadaten Montage und Funktionen angeben.
 
 **Symbole an den Einträgen:**
 

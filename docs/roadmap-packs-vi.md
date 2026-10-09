@@ -372,7 +372,8 @@ Mục tiêu: hoàn tất độ phủ cả 16 nhóm.
   - Hình học chỉ dựng khi mẫu thực sự xuất hiện và được tái dùng qua cache LRU 256 khóa; vị trí chỉ dịch chuyển buffer đã có, còn hướng/mirror/cao độ/pack version vẫn tách khóa để giữ kết quả chính xác.
 - [x] Kiểm thử trên desktop, tablet, điện thoại và chất lượng Low/Tablet/High.
   - Ma trận 3 × 3 chạy bằng WebGL headless, assert tier/canvas và kiểm tra trực quan; xem `docs/testing-device-matrix-vi.md` cùng contact sheet đã lưu.
-- [ ] Cập nhật manual, ảnh minh họa, changelog và quy trình đóng góp mẫu mới.
+- [x] Cập nhật manual, ảnh minh họa, changelog và quy trình đóng góp mẫu mới.
+  - Manual Anh/Đức và README đã đồng bộ catalog 458 mẫu/13 nhóm, giải thích bốn bộ lọc tổ hợp; ảnh thư viện được chụp lại từ preview hiện tại. `docs/furniture-development.md` nay chứa checklist đầy đủ cho ID, metadata, i18n, 3D/2D, entity, test, provenance và phát hành.
 
 Điều kiện hoàn thành: thư viện đầy đủ vẫn tải nhanh trên tablet, bản vẽ cũ không lỗi và mọi mẫu đều vượt qua Definition of Done bên dưới.
 

@@ -4,6 +4,15 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/PATCoder97/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/PATCoder97/neonplan3d/discussions/categories/ideas).
 
+## 1.24.3
+
+### Changed
+
+- Updated the English and German manuals and README from the old 40/128-item descriptions to the audited 458-item, 13-group built-in library.
+- Replaced the library illustration with the current combined room, mounting, capability and style filters.
+- Expanded the built-in furniture contribution guide with stable-ID, metadata, translation, renderer, symbol, entity, test, provenance and release checklists.
+- Marked the furniture-pack roadmap complete and linked its gallery audit and device/quality release report.
+
 ## 1.24.2
 
 ### Added

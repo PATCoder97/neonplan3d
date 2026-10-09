@@ -16,7 +16,7 @@
 |---|---|
 | ![Editor](docs/images/editor-split-3d.jpg) | **Plan editor in Home Assistant** – floors, rooms as rectangles or free shapes, automatic walls and free-standing partitions, doors, windows, garage doors, stairs and floor openings, outdoor areas and a roof. The 3D view runs next to the plan while you draw. |
 | ![Room](docs/images/view-room-panel.jpg) | **Live 3D view** – tap a lamp to switch it, swipe to dim, long press for colours; blinds follow their position, windows tilt and open, doors swing. A room panel lists everything of the room's area. |
-| ![Library](docs/images/editor-library.jpg) | **Furniture and lamps** – 128 built-in library items plus furniture packs. Lamps light their room in their own colour, TVs, washing machines and radiators glow while they run. |
+| ![Library filters](docs/images/editor-library.jpg) | **Furniture and lamps** – 458 built-in library items across 13 editor groups, plus imported furniture packs. Search is accent-insensitive and filters combine room, mounting, capability and style. Lamps light their room in their own colour; screens, appliances and moving items can follow Home Assistant entities. |
 | ![Camera](docs/images/view-camera-model.jpg) | **Cameras** – mounted on walls or ceilings with their field of view on the floor, red while they see motion; a tap shows the snapshot. |
 | ![Alerts](docs/images/view-alert-banner.jpg) | **Wall tablet ready** – warnings for smoke, gas, water, alarm and windows open in the rain, a kiosk mode with idle return and night dimming, scene buttons, and a *Tablet* quality level for Fire tablets. |
 | ![Card](docs/images/card-og-dim.jpg) | **Dashboard card** – `custom:neonplan3d-card` with a visual editor, loaded automatically. |
@@ -108,6 +108,7 @@ npm run screenshot  # renders preview/index.html (invented demo data) with a loc
 - **Furniture pack format**: [docs/packs.md](docs/packs.md) (German).
 - **Built-in furniture roadmap**: [docs/roadmap-packs-vi.md](docs/roadmap-packs-vi.md) (Vietnamese; clean-room expansion across all 16 pack categories).
 - **Furniture development**: [docs/furniture-development.md](docs/furniture-development.md) (family registries, model/symbol structure and required checks).
+- **Catalog audit and release matrix**: [gallery audit](docs/furniture-gallery-audit-vi.md) · [desktop/tablet/mobile test report](docs/testing-device-matrix-vi.md).
 - **Neon Honeycomb roadmap**: [docs/roadmap-neon-honeycomb-vi.md](docs/roadmap-neon-honeycomb-vi.md) (Vietnamese; native neon quick menu inspired by Honeycomb Menu).
 
 ## Ideas, questions and bugs

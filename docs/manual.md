@@ -216,14 +216,25 @@ NeonPlan 3D matches covers and contacts through the area automatically. You can 
 
 ### 4.8 Furniture
 
-![The furniture library](images/editor-library.jpg)
+![The furniture library with combined filters](images/editor-library.jpg)
 
-The **Furniture** tool opens the library with 40 built-in models in the sections Lights, Living, Dining, Kitchen, Sleeping, Bath & laundry and Work & other. Your installed furniture packs follow below. The **Worktop** (Kitchen and Work & other) is a free top without a base, for gaps in the kitchen or a self-built desk; its **height** is the top edge, 91 cm by default. The search field filters all sections and stays put while you scroll; it finds English and German names and the pack name, several words in any order ("corner sofa"), Escape clears it. Sections fold open and closed. Hover over an entry for a small 3D preview.
+The **Furniture** tool opens 458 built-in library items in 13 sections: Lights, Living, Dining, Kitchen, Sleeping, Bath & laundry, Climate, Garden & terrace, Work & office, Pets, Fitness, Home cinema and Vehicles. Imported furniture packs join the same library. The **Worktop** (Kitchen and Work & office) is a free top without a base, for gaps in the kitchen or a self-built desk; its **height** is the top edge, 91 cm by default.
+
+The search field stays put while you scroll, accepts several words in any order and ignores accents (for example, `ca phe` finds Vietnamese names containing `cà phê` when the interface is Vietnamese). It searches names in the current interface language and English, stable-ID keywords and pack names. The four filters can be combined:
+
+- **Room / group** narrows the functional section.
+- **Mounting** selects floor, surface, wall or ceiling items.
+- **Capability** selects static, light, screen, powered/entity-linked or moving items.
+- **Style** selects modern, classic, natural or technical items.
+
+**Reset filters** restores the whole library, and Escape clears the search. Sections fold open and closed. Hover over an entry for a small 3D preview. The same filtering rules apply to imported packs when their metadata declares mounting and capabilities.
 
 **Symbols on the entries:**
 
 - 💡 A **lamp**: it links to a light and switches in 3D.
 - ⚡ An **electric item**: it takes an entity and a power sensor, e.g. a TV, a washing machine or a thermostat.
+- A **screen badge** marks a live surface that can show linked camera or media imagery.
+- A **motion badge** marks an item that follows an entity, for example a fan rotor or robot.
 
 **Placing and editing:**
 
