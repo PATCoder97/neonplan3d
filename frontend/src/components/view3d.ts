@@ -247,7 +247,8 @@ export class Fp3dView3d extends LitElement {
   /** A running swipe on a lamp or blind: the value shown next to the finger. */
   private declare _swipe: { entity: string; kind: "light" | "cover"; start: number; value: number; x: number; y: number } | null;
   /** Quick menu at a device (long press). */
-  private declare _menu: { entity: string; x: number; y: number; car?: CarState } | null;
+  /** `quick` forces the compact Classic popup, currently used by a normal camera tap. */
+  private declare _menu: { entity: string; x: number; y: number; car?: CarState; quick?: boolean } | null;
   /** Device overlay style. Classic remains available as a release-safe fallback. */
   declare menuStyle: "classic" | "honeycomb";
   /** Looking through a camera: its live picture lies over the 3D view; `back` is the view to return to. */
@@ -2566,7 +2567,7 @@ export class Fp3dView3d extends LitElement {
     const stage = this.renderRoot.querySelector(".fp3d-stage") as HTMLElement | null;
     const w = stage?.clientWidth ?? 800;
     const h = stage?.clientHeight ?? 600;
-    if (this.menuStyle === "honeycomb") {
+    if (this.menuStyle === "honeycomb" && !m.quick) {
       const neon = this.honeycomb();
       const pairedEntity = this.pairedFanLight(m.entity);
       let model;
@@ -2721,19 +2722,16 @@ export class Fp3dView3d extends LitElement {
     }
     const kind = kindOf(entityId);
     const tapAction = deviceTapAction(kind);
-    // Blinds have no single on/off: a tap opens their quick menu (up, positions, stop, down).
+    // Blinds open their controls; cameras show the compact Classic preview at the device.
     if (tapAction === "menu") {
       this._central = false;
-      this._menu = { entity: entityId, x, y };
+      this._menu = { entity: entityId, x, y, quick: kind === "camera" };
       return;
     }
     if (tapAction === "toggle") {
       if (this.confirmSet.has(entityId) && !confirm(translate(this.hass, "confirm_switch", { name: entityName(this.hass, entityId) }))) return;
       void toggleEntity(this.hass, entityId);
-    } else {
-      // Cameras open Home Assistant's live popup here; long press still opens their Honeycomb.
-      openMoreInfo(this, entityId);
-    }
+    } else openMoreInfo(this, entityId);
   }
 
   /** The start view: the card's own, else the one remembered in the editor. */

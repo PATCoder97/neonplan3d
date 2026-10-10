@@ -6,6 +6,12 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 
 ## Unreleased
 
+## 1.24.11
+
+### Fixed
+
+- Opened the compact Classic camera preview beside its 3D marker on a normal tap, while keeping the full Honeycomb menu on long press.
+
 ## 1.24.10
 
 ### Fixed

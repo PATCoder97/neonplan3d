@@ -77,7 +77,7 @@ export type DeviceTapAction = "toggle" | "menu" | "details";
 
 /** Normal 3D taps stay immediate; richer controls remain available on long press. */
 export function deviceTapAction(kind: DeviceKind | null): DeviceTapAction {
-  if (kind === "cover") return "menu";
+  if (kind === "cover" || kind === "camera") return "menu";
   return kind !== null && TOGGLE_KINDS.has(kind) ? "toggle" : "details";
 }
 

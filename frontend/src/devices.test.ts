@@ -31,8 +31,8 @@ test("a fan opens its details on tap instead of toggling immediately", () => {
   assert.equal(TOGGLE_KINDS.has("switch"), true);
 });
 
-test("camera taps open details while only covers need the quick menu", () => {
-  assert.equal(deviceTapAction("camera"), "details");
+test("camera taps open a local menu like covers", () => {
+  assert.equal(deviceTapAction("camera"), "menu");
   assert.equal(deviceTapAction("cover"), "menu");
   assert.equal(deviceTapAction("light"), "toggle");
   assert.equal(deviceTapAction("fan"), "details");
