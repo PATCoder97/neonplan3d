@@ -80,7 +80,7 @@ function copyFonts() {
 // small explicit budgets still catch accidental dependency or geometry growth on old wall tablets.
 // Honeycomb itself is lazy (75 KB budget); the main/card-editor increases are limited to the loader,
 // host/config plumbing and localized menu-style labels rather than carrying the component eagerly.
-const BUDGET = { "neonplan3d.js": 494 * 1024, "neonplan3d-3d.js": 868 * 1024, "neonplan3d-honeycomb.js": 75 * 1024, "neonplan3d-editor.js": 643 * 1024, "neonplan3d-card-editor.js": 197 * 1024 };
+const BUDGET = { "neonplan3d.js": 494 * 1024, "neonplan3d-3d.js": 868 * 1024, "neonplan3d-honeycomb.js": 75 * 1024, "neonplan3d-editor.js": 644 * 1024, "neonplan3d-card-editor.js": 197 * 1024 };
 
 copyFonts();
 if (watch) {

@@ -2568,10 +2568,13 @@ export class Fp3dView3d extends LitElement {
     const h = stage?.clientHeight ?? 600;
     if (this.menuStyle === "honeycomb") {
       const neon = this.honeycomb();
+      const pairedEntity = this.pairedFanLight(m.entity);
       let model;
       try {
         model = neon?.menuForEntity(this.hass, m.entity, {
           confirm: this.confirmSet.has(m.entity),
+          pairedEntity,
+          pairedConfirm: pairedEntity ? this.confirmSet.has(pairedEntity) : false,
           car: m.car ?? null,
           presets: hasFeature("sound") ? (this.building?.settings.media_presets ?? []) : [],
           cameraPro: hasFeature("camera_cockpit"),
@@ -2618,6 +2621,15 @@ export class Fp3dView3d extends LitElement {
         @close=${() => (this._menu = null)}
         @camera-look=${(e: CustomEvent<{ entity: string }>) => this.lookThrough(e.detail.entity)}
       ></fp3d-quick-menu>`;
+  }
+
+  /** The combined ceiling fan model has separate HA entities for its motor and lamp. */
+  private pairedFanLight(entity: string): string | null {
+    for (const link of this.furnitureLinks.values()) {
+      if (link.entity === entity && link.light && kindOf(entity) === "fan" && kindOf(link.light) === "light") return link.light;
+      if (link.light === entity && link.entity && kindOf(entity) === "light" && kindOf(link.entity) === "fan") return link.entity;
+    }
+    return null;
   }
 
   private closeHoneycomb(): void {

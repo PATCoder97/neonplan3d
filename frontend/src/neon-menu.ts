@@ -8,7 +8,7 @@ export type NeonServiceTarget = {
   area_id?: string | string[];
 };
 
-export type NeonLocalCommand = "close" | "camera_look" | "cycle_light_mode" | "cycle_fan_light";
+export type NeonLocalCommand = "close" | "camera_look";
 
 export type NeonMenuAction =
   | { type: "toggle"; entity: string }
@@ -178,7 +178,7 @@ export function placeHoneycomb(stageWidth: number, stageHeight: number, x: numbe
   return { left, top, width, height, anchorX: x - left, anchorY: y - top, dock, sheet };
 }
 
-const LOCAL_COMMANDS = new Set<NeonLocalCommand>(["close", "camera_look", "cycle_light_mode", "cycle_fan_light"]);
+const LOCAL_COMMANDS = new Set<NeonLocalCommand>(["close", "camera_look"]);
 const SAFE_NAME = /^[a-z0-9_]+$/;
 
 export function validNeonAction(value: unknown): value is NeonMenuAction {
@@ -235,6 +235,8 @@ export async function dispatchNeonAction(item: NeonMenuItem, context: NeonDispat
 
 export interface MenuBuildOptions {
   confirm?: boolean;
+  pairedEntity?: string | null;
+  pairedConfirm?: boolean;
   car?: CarState | null;
   presets?: { id: string; label: string; type: string; content: string }[];
   cameraPro?: boolean;
@@ -334,6 +336,43 @@ function finiteNumber(value: unknown, fallback: number, min = -Infinity, max = I
   return Number.isFinite(number) ? Math.max(min, Math.min(max, number)) : fallback;
 }
 
+function stepperPage(
+  id: string,
+  title: string,
+  backPage: string,
+  entity: string,
+  domain: string,
+  serviceName: string,
+  valueKey: string,
+  value: number,
+  min: number,
+  max: number,
+  step: number,
+  format: (value: number) => string,
+  disabled = false,
+  confirm = false,
+): NeonMenuPage {
+  const current = finiteNumber(value, min, min, max);
+  const safeStep = finiteNumber(step, 1, 0.001, Math.max(0.001, max - min));
+  const offset = current - min;
+  const clean = (candidate: number) => Math.round(Math.max(min, Math.min(max, candidate)) * 1000) / 1000;
+  let down = clean(min + Math.floor(offset / safeStep - 1e-6) * safeStep);
+  let up = clean(min + Math.ceil(offset / safeStep + 1e-6) * safeStep);
+  if (max - up < safeStep / 2) up = max;
+  if (down - min < safeStep / 2) down = min;
+  const center = page(`${id}-back`, title, "mdi:arrow-left", backPage);
+  center.value = format(current);
+  return {
+    id,
+    title,
+    center,
+    items: [
+      service(`${id}-minus`, "−", "mdi:minus", entity, domain, serviceName, { [valueKey]: down }, { value: format(down), disabled: disabled || current <= min, confirm, close: false }),
+      service(`${id}-plus`, "+", "mdi:plus", entity, domain, serviceName, { [valueKey]: up }, { value: format(up), disabled: disabled || current >= max, confirm, close: false }),
+    ],
+  };
+}
+
 export function menuForEntity(hass: Pick<HomeAssistant, "states">, entity: string, options: MenuBuildOptions = {}): NeonMenuModel | null {
   const st = hass.states[entity];
   if (!st) return null;
@@ -343,6 +382,21 @@ export function menuForEntity(hass: Pick<HomeAssistant, "states">, entity: strin
   const name = String(st.attributes.friendly_name ?? entity);
   const commonDetails = details(entity, t("details", "Details"), unavailable);
   const model = (pages: NeonMenuPage[], initialPage = pages[0]?.id ?? "main"): NeonMenuModel => ({ id: `neon-${entity}`, entity, initialPage, pages });
+  const pairedState = options.pairedEntity ? hass.states[options.pairedEntity] : undefined;
+  const pairedDomain = options.pairedEntity?.split(".", 1)[0];
+  const paired = pairedState && ((domain === "fan" && pairedDomain === "light") || (domain === "light" && pairedDomain === "fan"))
+    ? {
+        id: `paired-${pairedDomain}`,
+        label: String(pairedState.attributes.friendly_name ?? options.pairedEntity),
+        icon: pairedDomain === "light" ? "mdi:lightbulb" : "mdi:fan",
+        value: pairedState.state === "on" ? t("state_on", "On") : t("state_off", "Off"),
+        active: pairedState.state === "on",
+        disabled: pairedState.state === "unavailable" || pairedState.state === "unknown",
+        confirm: options.pairedConfirm,
+        close: false,
+        action: { type: "toggle", entity: options.pairedEntity! },
+      } satisfies NeonMenuItem
+    : null;
 
   if (options.car) return carMenu(entity, options.car, commonDetails, model, t);
 
@@ -359,13 +413,11 @@ export function menuForEntity(hass: Pick<HomeAssistant, "states">, entity: strin
         ? KELVINS.map((k) => service(`kelvin-${k}`, `${k} K`, "mdi:thermometer", entity, "light", "turn_on", { color_temp_kelvin: k }, { close: false }))
         : [];
     const center: NeonMenuItem = { id: "power", label: name, icon: "mdi:power", value: on ? `${pct} %` : t("qm_off", "Off"), active: on, disabled: unavailable, confirm: options.confirm, close: false, color: stateColor(st), action: { type: "toggle", entity } };
-    const items = [commonDetails, ...(palette.length ? [page("palette", t("honeycomb_color", "Colour"), "mdi:palette", "palette-1")] : [])];
-    const main: NeonMenuPage = {
-      id: "main", title: name, center, items,
-      pad: dim && !unavailable ? { y: { min: 1, max: 100, step: 1, value: Math.max(1, pct), invert: true, commit: "move", throttleMs: 100, action: { type: "service", domain: "light", service: "turn_on", target: { entity_id: entity } }, valueKey: "brightness_pct" } } : undefined,
-    };
+    const items = [...(paired ? [paired] : []), ...(dim ? [page("brightness", t("brightness", "Brightness"), "mdi:brightness-6", "light-brightness")] : []), commonDetails, ...(palette.length ? [page("palette", t("honeycomb_color", "Colour"), "mdi:palette", "palette-1")] : [])];
+    const main: NeonMenuPage = { id: "main", title: name, center, items };
+    const brightnessPage = dim ? [stepperPage("light-brightness", t("brightness", "Brightness"), "main", entity, "light", "turn_on", "brightness_pct", pct, 0, 100, 10, (v) => `${Math.round(v)} %`, unavailable, !!options.confirm)] : [];
     const palettePages = palette.length ? paginate("palette", t("honeycomb_color", "Colour"), page("back", name, "mdi:arrow-left", "main"), palette, t) : [];
-    return model([main, ...palettePages]);
+    return model([main, ...brightnessPage, ...palettePages]);
   }
 
   if (domain === "cover") {
@@ -375,25 +427,31 @@ export function menuForEntity(hass: Pick<HomeAssistant, "states">, entity: strin
     const setPos = !!(f & COVER_SET_POSITION) && pos !== null;
     const at = (n: number) => pos !== null && Math.abs(pos - n) < 3;
     const confirm = !!options.confirm;
-    const items = [
+    const items: NeonMenuItem[] = [
       service("open", t("cover_open", "Open"), "mdi:arrow-up", entity, "cover", "open_cover", undefined, { active: at(100), disabled: unavailable, confirm }),
-      ...(setPos ? [75, 50].map((n) => service(`position-${n}`, `${n} %`, "mdi:blinds-horizontal", entity, "cover", "set_cover_position", { position: n }, { active: at(n), disabled: unavailable, confirm })) : []),
       service("close", t("cover_close", "Close"), "mdi:arrow-down", entity, "cover", "close_cover", undefined, { active: at(0), disabled: unavailable, confirm }),
-      ...(setPos ? [25].map((n) => service(`position-${n}`, `${n} %`, "mdi:blinds-horizontal", entity, "cover", "set_cover_position", { position: n }, { active: at(n), disabled: unavailable, confirm })) : []),
       service("stop", t("cover_stop", "Stop"), "mdi:stop", entity, "cover", "stop_cover", undefined, { active: moving, disabled: unavailable }),
-    ].slice(0, 6);
+    ];
     const tiltItems: NeonMenuItem[] = [];
     if (f & COVER_OPEN_TILT) tiltItems.push(service("tilt-open", t("cover_tilt_open", "Tilt open"), "mdi:unfold-more-horizontal", entity, "cover", "open_cover_tilt", undefined, { disabled: unavailable }));
     if (f & COVER_CLOSE_TILT) tiltItems.push(service("tilt-close", t("cover_tilt_close", "Tilt close"), "mdi:unfold-less-horizontal", entity, "cover", "close_cover_tilt", undefined, { disabled: unavailable }));
     const tilt = typeof st.attributes.current_tilt_position === "number" ? (st.attributes.current_tilt_position as number) : 0;
     const hasTilt = !!(f & (COVER_OPEN_TILT | COVER_CLOSE_TILT | COVER_SET_TILT));
-    const center = hasTilt ? page("tilt", t("cover_tilt", "Tilt"), "mdi:blinds-horizontal", "tilt") : commonDetails;
+    const center = setPos ? page("position", t("position", "Position"), "mdi:blinds-horizontal", "cover-position") : hasTilt ? page("tilt", t("cover_tilt", "Tilt"), "mdi:blinds-horizontal", "tilt") : commonDetails;
     center.value = pos === null ? st.state : `${Math.round(pos)} %`;
     center.busy = moving;
-    const main: NeonMenuPage = { id: "main", title: name, center, items, pad: setPos && !unavailable ? { y: { min: 0, max: 100, step: 1, value: pos ?? 0, invert: true, commit: "release", action: { type: "service", domain: "cover", service: "set_cover_position", target: { entity_id: entity } }, valueKey: "position" } } : undefined };
-    if (!hasTilt) main.items = [...items.slice(0, 5), commonDetails];
+    if (hasTilt && setPos) items.push(page("tilt", t("cover_tilt", "Tilt"), "mdi:unfold-more-horizontal", "tilt"));
+    if (center !== commonDetails) items.push(commonDetails);
+    const main: NeonMenuPage = { id: "main", title: name, center, items };
     const pages = [main];
-    if (hasTilt) pages.push({ id: "tilt", title: t("cover_tilt", "Tilt"), center: page("back", name, "mdi:arrow-left", "main"), items: [...tiltItems, commonDetails], pad: f & COVER_SET_TILT && !unavailable ? { y: { min: 0, max: 100, step: 1, value: tilt, invert: true, commit: "release", action: { type: "service", domain: "cover", service: "set_cover_tilt_position", target: { entity_id: entity } }, valueKey: "tilt_position" } } : undefined });
+    if (setPos) pages.push(stepperPage("cover-position", t("position", "Position"), "main", entity, "cover", "set_cover_position", "position", pos ?? 0, 0, 100, 10, (v) => `${Math.round(v)} %`, unavailable, confirm));
+    if (hasTilt) {
+      const tiltPage = f & COVER_SET_TILT
+        ? stepperPage("tilt", t("cover_tilt", "Tilt"), "main", entity, "cover", "set_cover_tilt_position", "tilt_position", tilt, 0, 100, 10, (v) => `${Math.round(v)} %`, unavailable, confirm)
+        : { id: "tilt", title: t("cover_tilt", "Tilt"), center: page("back", name, "mdi:arrow-left", "main"), items: [] } satisfies NeonMenuPage;
+      tiltPage.items.push(...tiltItems, commonDetails);
+      pages.push(tiltPage);
+    }
     return model(pages);
   }
 
@@ -409,7 +467,7 @@ export function menuForEntity(hass: Pick<HomeAssistant, "states">, entity: strin
     return model([{ id: "main", title: name, center, items: [commonDetails] }]);
   }
 
-  if (domain === "fan") return fanMenu(entity, st, commonDetails, model, t, unavailable);
+  if (domain === "fan") return fanMenu(entity, st, commonDetails, paired, model, t, unavailable);
   if (domain === "media_player") return mediaMenu(entity, st, options.presets ?? [], commonDetails, model, t, unavailable);
   if (domain === "climate") return climateMenu(entity, st, commonDetails, model, t, unavailable);
   if (domain === "camera") {
@@ -419,16 +477,21 @@ export function menuForEntity(hass: Pick<HomeAssistant, "states">, entity: strin
   return null;
 }
 
-function fanMenu(entity: string, st: HassEntity, commonDetails: NeonMenuItem, model: (p: NeonMenuPage[]) => NeonMenuModel, t: (k: string, f: string) => string, unavailable: boolean): NeonMenuModel {
+function fanMenu(entity: string, st: HassEntity, commonDetails: NeonMenuItem, paired: NeonMenuItem | null, model: (p: NeonMenuPage[]) => NeonMenuModel, t: (k: string, f: string) => string, unavailable: boolean): NeonMenuModel {
   const f = Number(st.attributes.supported_features ?? 0) | 0;
   const on = st.state === "on";
   const pct = typeof st.attributes.percentage === "number" ? finiteNumber(st.attributes.percentage, on ? 100 : 0, 0, 100) : on ? 100 : 0;
   const rawPercentageStep = finiteNumber(st.attributes.percentage_step, 1);
   const percentageStep = rawPercentageStep > 0 ? Math.min(100, rawPercentageStep) : 1;
-  const items: NeonMenuItem[] = [commonDetails];
+  const items: NeonMenuItem[] = [...(paired ? [paired] : []), commonDetails];
   if (f & FAN_OSCILLATE) items.unshift(service("oscillate", t("honeycomb_oscillate", "Oscillate"), "mdi:rotate-orbit", entity, "fan", "oscillate", { oscillating: !st.attributes.oscillating }, { active: st.attributes.oscillating === true, disabled: unavailable, close: false }));
+  const speed = !!(f & FAN_SET_SPEED);
+  if (speed) items.unshift(page("speed", t("speed", "Speed"), "mdi:speedometer", "fan-speed"));
   const presets = Array.isArray(st.attributes.preset_modes) ? (st.attributes.preset_modes as string[]) : [];
-  const pages: NeonMenuPage[] = [{ id: "main", title: String(st.attributes.friendly_name ?? entity), center: { id: "power", label: String(st.attributes.friendly_name ?? entity), icon: "mdi:fan", value: `${Math.round(pct)} %`, active: on, disabled: unavailable, close: false, action: { type: "toggle", entity } }, items: [...items, ...(f & FAN_PRESET && presets.length ? [page("presets", t("honeycomb_presets", "Presets"), "mdi:fan-chevron-down", "fan-presets-1")] : [])], pad: f & FAN_SET_SPEED && !unavailable ? { y: { min: 0, max: 100, step: percentageStep, value: pct, invert: true, commit: "move", throttleMs: 120, action: { type: "service", domain: "fan", service: "set_percentage", target: { entity_id: entity } }, valueKey: "percentage" } } : undefined }];
+  const pages: NeonMenuPage[] = [{ id: "main", title: String(st.attributes.friendly_name ?? entity), center: { id: "power", label: String(st.attributes.friendly_name ?? entity), icon: "mdi:fan", value: `${Math.round(pct)} %`, active: on, disabled: unavailable, close: false, action: { type: "toggle", entity } }, items: [...items, ...(f & FAN_PRESET && presets.length ? [page("presets", t("honeycomb_presets", "Presets"), "mdi:fan-chevron-down", "fan-presets-1")] : [])] }];
+  if (speed) {
+    pages.push(stepperPage("fan-speed", t("speed", "Speed"), "main", entity, "fan", "set_percentage", "percentage", pct, 0, 100, Math.max(10, percentageStep), (v) => `${Math.round(v)} %`, unavailable));
+  }
   if (f & FAN_PRESET && presets.length) pages.push(...paginate("fan-presets", t("honeycomb_presets", "Presets"), page("back", t("back", "Back"), "mdi:arrow-left", "main"), presets.map((p) => service(`preset-${p}`, p, "mdi:fan", entity, "fan", "set_preset_mode", { preset_mode: p }, { active: st.attributes.preset_mode === p, disabled: unavailable })), t));
   return model(pages);
 }
@@ -442,7 +505,8 @@ function mediaMenu(entity: string, st: HassEntity, presets: MenuBuildOptions["pr
   const sources = Array.isArray(st.attributes.source_list) ? st.attributes.source_list as string[] : [];
   if (sources.length) pickers.push(page("sources", t("honeycomb_sources", "Sources"), "mdi:audio-input-rca", "media-sources-1"));
   if (presets?.length) pickers.push(page("presets", t("honeycomb_presets", "Presets"), "mdi:playlist-music", "media-presets-1"));
-  const pages: NeonMenuPage[] = [{ id: "main", title: String(st.attributes.friendly_name ?? entity), center, items: [service("previous", t("previous", "Previous"), "mdi:skip-previous", entity, "media_player", "media_previous_track", undefined, { disabled: off || unavailable, close: false }), service("next", t("next", "Next"), "mdi:skip-next", entity, "media_player", "media_next_track", undefined, { disabled: off || unavailable, close: false }), ...pickers, commonDetails], pad: unavailable ? undefined : { y: { min: 0, max: 1, step: 0.01, value: volume, invert: true, commit: "move", throttleMs: 120, action: { type: "service", domain: "media_player", service: "volume_set", target: { entity_id: entity } }, valueKey: "volume_level" } } }];
+  const pages: NeonMenuPage[] = [{ id: "main", title: String(st.attributes.friendly_name ?? entity), center, items: [service("previous", t("previous", "Previous"), "mdi:skip-previous", entity, "media_player", "media_previous_track", undefined, { disabled: off || unavailable, close: false }), service("next", t("next", "Next"), "mdi:skip-next", entity, "media_player", "media_next_track", undefined, { disabled: off || unavailable, close: false }), page("volume", t("volume", "Volume"), "mdi:volume-high", "media-volume"), ...pickers, commonDetails] }];
+  pages.push(stepperPage("media-volume", t("volume", "Volume"), "main", entity, "media_player", "volume_set", "volume_level", volume, 0, 1, 0.1, (v) => `${Math.round(v * 100)} %`, unavailable));
   if (sources.length) pages.push(...paginate("media-sources", t("honeycomb_sources", "Sources"), page("back", t("back", "Back"), "mdi:arrow-left", "main"), sources.map((s) => service(`source-${s}`, s, "mdi:music", entity, "media_player", "select_source", { source: s }, { active: st.attributes.source === s, disabled: unavailable })), t));
   if (presets?.length) pages.push(...paginate("media-presets", t("honeycomb_presets", "Presets"), page("back", t("back", "Back"), "mdi:arrow-left", "main"), presets.map((p) => service(`preset-${p.id}`, p.label, "mdi:playlist-play", entity, "media_player", "play_media", { media_content_type: p.type, media_content_id: p.content }, { disabled: unavailable })), t));
   return model(pages);
@@ -454,12 +518,13 @@ function climateMenu(entity: string, st: HassEntity, commonDetails: NeonMenuItem
   const min = finiteNumber(st.attributes.min_temp, 7, -100, 100);
   const candidateMax = finiteNumber(st.attributes.max_temp, 35, -100, 100);
   const max = candidateMax > min ? candidateMax : min + 1;
-  const step = finiteNumber(st.attributes.target_temp_step, 0.5, 0.1, max - min);
+  const step = Math.max(1, finiteNumber(st.attributes.target_temp_step, 1, 0.1, max - min));
   const value = finiteNumber(st.attributes.temperature ?? st.attributes.current_temperature, min, min, max);
   const center = service("toggle", String(st.attributes.friendly_name ?? entity), "mdi:thermostat", entity, "climate", st.state === "off" ? "turn_on" : "turn_off", undefined, { value: `${value} °`, active: st.state !== "off", disabled: unavailable, close: false });
   const modeItems = modes.map((m) => service(`mode-${m}`, m, "mdi:thermostat", entity, "climate", "set_hvac_mode", { hvac_mode: m }, { active: st.state === m, disabled: unavailable }));
   const fanItems = fanModes.map((m) => service(`fan-mode-${m}`, m, "mdi:fan", entity, "climate", "set_fan_mode", { fan_mode: m }, { active: st.attributes.fan_mode === m, disabled: unavailable }));
-  const pages: NeonMenuPage[] = [{ id: "main", title: String(st.attributes.friendly_name ?? entity), center, items: [...(modeItems.length ? [page("modes", t("honeycomb_modes", "Modes"), "mdi:thermostat", "climate-modes-1")] : []), ...(fanItems.length ? [page("fan-modes", t("honeycomb_fan", "Fan"), "mdi:fan", "climate-fan-modes-1")] : []), commonDetails], pad: unavailable ? undefined : { y: { min, max, step, value, invert: true, commit: "release", action: { type: "service", domain: "climate", service: "set_temperature", target: { entity_id: entity } }, valueKey: "temperature" } } }];
+  const pages: NeonMenuPage[] = [{ id: "main", title: String(st.attributes.friendly_name ?? entity), center, items: [page("temperature", t("target_temp", "Target"), "mdi:thermometer", "climate-temperature"), ...(modeItems.length ? [page("modes", t("honeycomb_modes", "Modes"), "mdi:thermostat", "climate-modes-1")] : []), ...(fanItems.length ? [page("fan-modes", t("honeycomb_fan", "Fan"), "mdi:fan", "climate-fan-modes-1")] : []), commonDetails] }];
+  pages.push(stepperPage("climate-temperature", t("target_temp", "Target"), "main", entity, "climate", "set_temperature", "temperature", value, min, max, step, (v) => `${v} °`, unavailable));
   if (modeItems.length) pages.push(...paginate("climate-modes", t("honeycomb_modes", "Modes"), page("back", t("back", "Back"), "mdi:arrow-left", "main"), modeItems, t));
   if (fanItems.length) pages.push(...paginate("climate-fan-modes", t("honeycomb_fan", "Fan"), page("back", t("back", "Back"), "mdi:arrow-left", "main"), fanItems, t));
   return model(pages);

@@ -111,22 +111,24 @@ test("dispatcher blocks disabled actions and cancelled confirmation", async () =
   assert.equal(calls, 0);
 });
 
-test("light keeps all eight colours through paginated pages and a throttled brightness pad", () => {
+test("light keeps all eight colours and adjusts brightness in ten-percent steps", () => {
   const model = menuForEntity(hass(state("light.desk", "on", { friendly_name: "Desk", brightness: 161, supported_color_modes: ["brightness", "rgb"] })), "light.desk")!;
   assert.equal(model.initialPage, "main");
-  assert.equal(model.pages[0].pad?.y?.value, 63);
+  const brightness = model.pages.find((page) => page.id === "light-brightness")!;
+  assert.equal(brightness.center.value, "63 %");
+  assert.deepEqual(brightness.items.map((item) => item.action.type === "service" ? item.action.data?.brightness_pct : undefined), [60, 70]);
   const colours = model.pages.flatMap((p) => p.items).filter((i) => i.id.startsWith("rgb-"));
   assert.equal(colours.length, 8);
   assert.ok(model.pages.every((p) => p.items.length <= 6));
 });
 
-test("cover keeps open, 75, 50, close, 25 and stop while tilt has its own page", () => {
+test("cover keeps open, close and stop while position and tilt use ten-percent steppers", () => {
   const model = menuForEntity(hass(state("cover.blind", "opening", { friendly_name: "Blind", supported_features: 4 | 16 | 32 | 128, current_position: 50, current_tilt_position: 30 })), "cover.blind", { confirm: true })!;
-  assert.deepEqual(model.pages[0].items.map((i) => i.id), ["open", "position-75", "position-50", "close", "position-25", "stop"]);
+  assert.deepEqual(model.pages[0].items.map((i) => i.id), ["open", "close", "stop", "tilt", "details"]);
   assert.equal(model.pages[0].items.find((i) => i.id === "stop")?.confirm, undefined);
   assert.equal(model.pages[0].items.find((i) => i.id === "close")?.confirm, true);
-  assert.equal(model.pages[0].pad?.y?.commit, "release");
-  assert.ok(model.pages.some((p) => p.id === "tilt" && p.pad?.y?.valueKey === "tilt_position"));
+  assert.deepEqual(model.pages.find((p) => p.id === "cover-position")?.items.slice(0, 2).map((i) => i.action.type === "service" ? i.action.data?.position : undefined), [40, 60]);
+  assert.deepEqual(model.pages.find((p) => p.id === "tilt")?.items.slice(0, 2).map((i) => i.action.type === "service" ? i.action.data?.tilt_position : undefined), [20, 40]);
 });
 
 test("unavailable controls are disabled but more-info remains reachable", () => {
@@ -148,13 +150,14 @@ test("unlock always confirms, regardless of placement policy", () => {
 test("media and climate lists paginate without exceeding six outer cells", () => {
   const media = menuForEntity(hass(state("media_player.room", "playing", { source_list: Array.from({ length: 13 }, (_, i) => `S${i}`), volume_level: 0.42 })), "media_player.room")!;
   assert.equal(media.pages.flatMap((p) => p.items).filter((i) => i.id.startsWith("source-")).length, 13);
-  assert.equal(media.pages[0].pad?.y?.value, 0.42);
+  assert.deepEqual(media.pages.find((p) => p.id === "media-volume")?.items.map((i) => i.action.type === "service" ? i.action.data?.volume_level : undefined), [0.4, 0.5]);
   const climate = menuForEntity(hass(state("climate.room", "heat", { hvac_modes: ["off", "heat", "cool", "auto", "dry", "fan_only", "heat_cool"], fan_modes: ["auto", "low", "medium", "high", "turbo"], fan_mode: "medium", temperature: 23 })), "climate.room")!;
   assert.equal(climate.pages.flatMap((p) => p.items).filter((i) => i.id.startsWith("mode-")).length, 7);
   const climateFanModes = climate.pages.flatMap((p) => p.items).filter((i) => i.id.startsWith("fan-mode-"));
   assert.equal(climateFanModes.length, 5);
   assert.equal(climateFanModes.find((i) => i.id === "fan-mode-medium")?.active, true);
   assert.deepEqual(climateFanModes[0].action, { type: "service", domain: "climate", service: "set_fan_mode", target: { entity_id: "climate.room" }, data: { fan_mode: "auto" } });
+  assert.deepEqual(climate.pages.find((p) => p.id === "climate-temperature")?.items.map((i) => i.action.type === "service" ? i.action.data?.temperature : undefined), [22, 24]);
   assert.ok([...media.pages, ...climate.pages].every((p) => p.items.length <= 6));
 });
 
@@ -164,9 +167,28 @@ test("fan exposes only confirmed capabilities", () => {
   assert.equal(basic.pages.some((p) => p.id.startsWith("fan-presets")), false);
   assert.equal(basic.pages.flatMap((p) => p.items).some((i) => i.id === "oscillate"), false);
   const full = menuForEntity(hass(state("fan.full", "on", { supported_features: 1 | 2 | 8, percentage: 40, oscillating: false, preset_modes: ["sleep"] })), "fan.full")!;
-  assert.equal(full.pages[0].pad?.y?.valueKey, "percentage");
+  assert.equal(full.pages[0].pad, undefined);
+  assert.deepEqual(full.pages.find((p) => p.id === "fan-speed")?.items.map((i) => i.action.type === "service" ? i.action.data?.percentage : undefined), [30, 50]);
   assert.ok(full.pages.some((p) => p.id === "fan-presets-1"));
   assert.ok(full.pages[0].items.some((i) => i.id === "oscillate"));
+  const threeStep = menuForEntity(hass(state("fan.three", "on", { supported_features: 1, percentage: 66, percentage_step: 33 })), "fan.three")!;
+  assert.deepEqual(threeStep.pages.find((p) => p.id === "fan-speed")?.items.map((i) => i.action.type === "service" ? i.action.data?.percentage : undefined), [33, 100]);
+});
+
+test("a combined fan and light expose the other entity from either Honeycomb marker", () => {
+  const combined = hass(
+    state("fan.ceiling", "on", { friendly_name: "Ceiling fan", supported_features: 1, percentage: 40 }),
+    state("light.ceiling", "off", { friendly_name: "Fan light", supported_color_modes: ["brightness"] }),
+  );
+  const fan = menuForEntity(combined, "fan.ceiling", { pairedEntity: "light.ceiling", pairedConfirm: true })!;
+  const lightFromFan = fan.pages[0].items.find((item) => item.id === "paired-light")!;
+  assert.deepEqual(lightFromFan.action, { type: "toggle", entity: "light.ceiling" });
+  assert.equal(lightFromFan.active, false);
+  assert.equal(lightFromFan.confirm, true);
+  const light = menuForEntity(combined, "light.ceiling", { pairedEntity: "fan.ceiling" })!;
+  const fanFromLight = light.pages[0].items.find((item) => item.id === "paired-fan")!;
+  assert.deepEqual(fanFromLight.action, { type: "toggle", entity: "fan.ceiling" });
+  assert.equal(fanFromLight.active, true);
 });
 
 test("camera keeps details and look-through while rejecting an unsafe picture URL", () => {
@@ -178,11 +200,13 @@ test("camera keeps details and look-through while rejecting an unsafe picture UR
   assert.equal(withoutPro.pages[0].items.find((i) => i.id === "look")?.disabled, true);
 });
 
-test("malformed numeric attributes cannot create non-finite pad values", () => {
+test("malformed numeric attributes cannot create non-finite controls", () => {
   const fan = menuForEntity(hass(state("fan.bad", "on", { supported_features: 1, percentage: Number.NaN, percentage_step: 0 })), "fan.bad")!;
-  assert.deepEqual({ value: fan.pages[0].pad?.y?.value, step: fan.pages[0].pad?.y?.step }, { value: 100, step: 1 });
+  assert.equal(fan.pages[0].center.value, "100 %");
+  const fanLevels = fan.pages.find((page) => page.id === "fan-speed")?.items.map((item) => item.action.type === "service" ? item.action.data?.percentage : undefined);
+  assert.deepEqual(fanLevels, [90, 100]);
   const climate = menuForEntity(hass(state("climate.bad", "heat", { min_temp: 30, max_temp: 10, target_temp_step: Number.NaN, temperature: Infinity })), "climate.bad")!;
-  assert.deepEqual({ min: climate.pages[0].pad?.y?.min, max: climate.pages[0].pad?.y?.max, value: climate.pages[0].pad?.y?.value }, { min: 30, max: 31, value: 30 });
+  assert.deepEqual(climate.pages.find((page) => page.id === "climate-temperature")?.items.map((item) => item.action.type === "service" ? item.action.data?.temperature : undefined), [30, 31]);
 });
 
 test("Car Pro actions keep cross-entity targets and require confirmation before unlock", () => {

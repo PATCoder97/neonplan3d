@@ -6,6 +6,13 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 
 ## Unreleased
 
+## 1.24.7
+
+### Fixed
+
+- Added the paired fan or light entity to Neon Honeycomb for combined ceiling fans, so either 3D marker can control both roles without losing each entity's state and confirmation policy.
+- Replaced continuous Honeycomb pads with compact `−`/`+` pages: lights, fans, covers and media use ten-percent steps, while climate targets use one-degree steps within each entity's supported range.
+
 ## 1.24.6
 
 ### Fixed
