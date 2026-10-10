@@ -6,6 +6,13 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 
 ## Unreleased
 
+## 1.24.9
+
+### Changed
+
+- Added a two-phase Honeycomb page transition: the current cells now fold away before a submenu opens, with a shorter accessible transition when reduced motion is requested.
+- Filled paginated Honeycomb rings efficiently by using the centre button to return to the preceding page, leaving up to five outer cells plus `Next` instead of reserving a redundant outer `Previous` slot.
+
 ## 1.24.8
 
 ### Fixed

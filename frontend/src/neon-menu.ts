@@ -88,6 +88,8 @@ export const HONEYCOMB_GEOMETRY = {
 export const HONEYCOMB_MOTION = {
   duration: 160,
   closeDuration: 130,
+  /** Complete reverse-stagger exit before replacing one menu page with another. */
+  pageSwitchDelay: 200,
   stagger: 45,
   startScale: 0.72,
   translate: 18,
@@ -272,12 +274,17 @@ function page(id: string, label: string, icon: string, target: string): NeonMenu
 function paginate(id: string, title: string, center: NeonMenuItem, entries: NeonMenuItem[], t?: (key: string, fallback: string) => string): NeonMenuPage[] {
   const pages: NeonMenuPage[] = [];
   const chunks: NeonMenuItem[][] = [];
-  for (let i = 0; i < entries.length; i += 4) chunks.push(entries.slice(i, i + 4));
+  for (let offset = 0; offset < entries.length;) {
+    const remaining = entries.length - offset;
+    const size = remaining > 6 ? 5 : remaining;
+    chunks.push(entries.slice(offset, offset + size));
+    offset += size;
+  }
   chunks.forEach((chunk, i) => {
     const items = [...chunk];
-    if (i > 0) items.push(page(`prev-${i}`, t?.("previous", "Previous") ?? "Previous", "mdi:chevron-left", `${id}-${i}`));
     if (i < chunks.length - 1) items.push(page(`next-${i}`, t?.("next", "Next") ?? "Next", "mdi:chevron-right", `${id}-${i + 2}`));
-    pages.push({ id: `${id}-${i + 1}`, title, center, items });
+    const pageCenter = i === 0 ? center : { ...center, id: `${center.id}-${i}`, action: { type: "page", page: `${id}-${i}` } as const };
+    pages.push({ id: `${id}-${i + 1}`, title, center: pageCenter, items });
   });
   return pages;
 }

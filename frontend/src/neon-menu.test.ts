@@ -44,6 +44,8 @@ test("motion tokens stay inside the roadmap acceptance window", () => {
   assert.ok(HONEYCOMB_MOTION.duration >= 120 && HONEYCOMB_MOTION.duration <= 180);
   assert.ok(HONEYCOMB_MOTION.stagger >= 35 && HONEYCOMB_MOTION.stagger <= 60);
   assert.ok(HONEYCOMB_MOTION.duration + HONEYCOMB_MOTION.stagger * 5 <= 450);
+  assert.ok(HONEYCOMB_MOTION.pageSwitchDelay >= HONEYCOMB_MOTION.closeDuration);
+  assert.ok(HONEYCOMB_MOTION.pageSwitchDelay <= 250);
   assert.ok(HONEYCOMB_MOTION.startScale >= 0.68 && HONEYCOMB_MOTION.startScale <= 0.8);
   assert.ok(HONEYCOMB_MOTION.translate >= 12 && HONEYCOMB_MOTION.translate <= 24);
 });
@@ -119,6 +121,10 @@ test("light keeps all eight colours and adjusts brightness in ten-percent steps"
   assert.deepEqual(brightness.items.map((item) => item.action.type === "service" ? item.action.data?.brightness_pct : undefined), [60, 70]);
   const colours = model.pages.flatMap((p) => p.items).filter((i) => i.id.startsWith("rgb-"));
   assert.equal(colours.length, 8);
+  const palettePages = model.pages.filter((page) => page.id.startsWith("palette-"));
+  assert.deepEqual(palettePages.map((page) => page.items.length), [6, 3]);
+  assert.deepEqual(palettePages[1].center.action, { type: "page", page: "palette-1" });
+  assert.equal(palettePages.flatMap((page) => page.items).some((item) => item.id.startsWith("prev-")), false);
   assert.ok(model.pages.every((p) => p.items.length <= 6));
 });
 

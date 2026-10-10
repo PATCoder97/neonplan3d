@@ -11,6 +11,7 @@ export class NeonHoneycomb extends LitElement {
     sheet: { type: Boolean, reflect: true },
     pausedAt: { type: Number, attribute: "paused-at" },
     _pageId: { state: true },
+    _pageLeaving: { state: true },
     _closing: { state: true },
     _focusIndex: { state: true },
   };
@@ -21,10 +22,12 @@ export class NeonHoneycomb extends LitElement {
   declare sheet: boolean;
   declare pausedAt: number | null;
   private declare _pageId: string;
+  private declare _pageLeaving: boolean;
   private declare _closing: boolean;
   private declare _focusIndex: number;
   private restoreFocus: HTMLElement | null = null;
   private closeTimer: ReturnType<typeof setTimeout> | undefined;
+  private pageTimer: ReturnType<typeof setTimeout> | undefined;
   private openedAt = 0;
 
   constructor() {
@@ -35,6 +38,7 @@ export class NeonHoneycomb extends LitElement {
     this.sheet = false;
     this.pausedAt = null;
     this._pageId = "main";
+    this._pageLeaving = false;
     this._closing = false;
     this._focusIndex = 0;
   }
@@ -47,6 +51,7 @@ export class NeonHoneycomb extends LitElement {
 
   disconnectedCallback(): void {
     clearTimeout(this.closeTimer);
+    clearTimeout(this.pageTimer);
     super.disconnectedCallback();
   }
 
@@ -78,6 +83,8 @@ export class NeonHoneycomb extends LitElement {
 
   requestClose(immediate = false): void {
     if (this._closing) return;
+    clearTimeout(this.pageTimer);
+    this._pageLeaving = false;
     this._closing = true;
     const done = () => {
       this.dispatchEvent(new CustomEvent("close", { bubbles: true, composed: true }));
@@ -88,12 +95,22 @@ export class NeonHoneycomb extends LitElement {
   }
 
   private activate(item: NeonMenuItem): void {
+    if (this._closing || this._pageLeaving) return;
     if (item.action.type === "page") {
       const target = item.action.page;
-      if (this.model.pages.some((p) => p.id === target)) {
-        this._pageId = target;
-        this._focusIndex = 0;
-        this.updateComplete.then(() => this.focusables()[0]?.focus());
+      if (target !== this._pageId && this.model.pages.some((p) => p.id === target)) {
+        this._pageLeaving = true;
+        const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+        this.pageTimer = setTimeout(() => {
+          if (!this.model.pages.some((p) => p.id === target)) {
+            this._pageLeaving = false;
+            return;
+          }
+          this._pageId = target;
+          this._pageLeaving = false;
+          this._focusIndex = 0;
+          this.updateComplete.then(() => this.focusables()[0]?.focus());
+        }, reduced ? 80 : HONEYCOMB_MOTION.pageSwitchDelay);
       }
       return;
     }
@@ -151,7 +168,7 @@ export class NeonHoneycomb extends LitElement {
     const points = honeycombPoints(p.items.length);
     const pause = this.pausedAt === null ? "" : `--pause:${Math.max(0, Math.min(100, this.pausedAt)) / 100};`;
     return html`<section
-      class="dialog ${this._closing ? "closing" : ""} ${this.pausedAt === null ? "" : "paused"}"
+      class="dialog ${this._closing ? "closing" : ""} ${this._pageLeaving ? "page-leaving" : ""} ${this.pausedAt === null ? "" : "paused"}"
       style=${pause}
       role="dialog"
       aria-modal="true"
@@ -202,8 +219,9 @@ export class NeonHoneycomb extends LitElement {
     .hex:disabled { opacity:.38;cursor:not-allowed; }
     .hex.unavailable .hex-shape { filter:saturate(.2); }
     .hex.busy ha-icon { animation:spin .8s linear infinite; }
-    .closing .center-wrap { animation:center-out ${HONEYCOMB_MOTION.closeDuration}ms ease-in both; }
-    .closing .hex.outer { animation:item-out ${HONEYCOMB_MOTION.closeDuration}ms ease-in calc((5 - var(--i)) * 14ms) both; }
+    .page-leaving { pointer-events:none; }
+    .closing .center-wrap,.page-leaving .center-wrap { animation:center-out ${HONEYCOMB_MOTION.closeDuration}ms ease-in both; }
+    .closing .hex.outer,.page-leaving .hex.outer { animation:item-out ${HONEYCOMB_MOTION.closeDuration}ms ease-in calc((5 - var(--i)) * 14ms) both; }
     .paused .center-wrap { animation-delay:calc(var(--pause) * -1 * var(--motion));animation-play-state:paused; }
     .paused .hex.outer { animation-delay:var(--paused-delay);animation-play-state:paused; }
     .sr { position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0; }
@@ -234,7 +252,7 @@ export class NeonHoneycomb extends LitElement {
     @keyframes center-in { from { opacity:0;transform:scale(${HONEYCOMB_MOTION.startScale}); } }
     @keyframes center-out { to { opacity:0;transform:scale(.82); } }
     @keyframes spin { to { transform:rotate(360deg); } }
-    @media (prefers-reduced-motion:reduce) { .center-wrap,.hex.outer,.closing .center-wrap,.closing .hex.outer { animation-duration:80ms;animation-delay:0ms;transform:none; } .hex-shape { transition:none; } }
+    @media (prefers-reduced-motion:reduce) { .center-wrap,.hex.outer,.closing .center-wrap,.closing .hex.outer,.page-leaving .center-wrap,.page-leaving .hex.outer { animation-duration:80ms;animation-delay:0ms;transform:none; } .hex-shape { transition:none; } }
   `];
 }
 
