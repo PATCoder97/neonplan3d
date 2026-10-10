@@ -4,6 +4,7 @@ import { css, html, LitElement, nothing, svg, type PropertyValues } from "lit";
 import { carState, carWatched, type CarState, roomClimateValue,
   appColor,
   areaEntities,
+  deviceTapAction,
   entityName,
   furnitureEntities,
   isActive,
@@ -12,7 +13,6 @@ import { carState, carWatched, type CarState, roomClimateValue,
   lightGlow,
   openingEntities,
   openingState,
-  TOGGLE_KINDS,
   type FurnitureLinks,
   type OpeningEntities, confirmEntities, fridgeDoors, hasScreen, pictureRuleMatches,
   fromCelsius,
@@ -2720,16 +2720,20 @@ export class Fp3dView3d extends LitElement {
       return;
     }
     const kind = kindOf(entityId);
-    // blinds have no single on/off: a tap opens their quick menu (up, positions, stop, down); a camera shows its picture
-    if (kind === "cover" || kind === "camera") {
+    const tapAction = deviceTapAction(kind);
+    // Blinds have no single on/off: a tap opens their quick menu (up, positions, stop, down).
+    if (tapAction === "menu") {
       this._central = false;
       this._menu = { entity: entityId, x, y };
       return;
     }
-    if (kind && TOGGLE_KINDS.has(kind)) {
+    if (tapAction === "toggle") {
       if (this.confirmSet.has(entityId) && !confirm(translate(this.hass, "confirm_switch", { name: entityName(this.hass, entityId) }))) return;
       void toggleEntity(this.hass, entityId);
-    } else openMoreInfo(this, entityId);
+    } else {
+      // Cameras open Home Assistant's live popup here; long press still opens their Honeycomb.
+      openMoreInfo(this, entityId);
+    }
   }
 
   /** The start view: the card's own, else the one remembered in the editor. */

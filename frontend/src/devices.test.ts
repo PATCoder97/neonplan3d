@@ -13,7 +13,7 @@ test("a lamp switched by a relay takes colour and brightness from its colour ent
   // the bulb unavailable: the relay's own (plain) glow
   assert.deepEqual(lightGlow(relay as never, { ...bulb, state: "unavailable" } as never)!.color, [1, 0.71, 0.28]);
 });
-import { appColor, areaEntities, otherAreaEntities, roomClimateSensors, roomClimateValue, unassignedEntities, autoPlace, entityName, fridgeDoors, furnitureEntities, groupByDevice, hasScreen, isActive, isMediaFurniture, kindOf, lightGlow, openingEntities, openingState, powerSensorsOf, primaryEntities, roomPanelEntities, windowPosition, confirmEntities, robotRoom, robotRoomSensor, roomKey, TOGGLE_KINDS } from "./devices.ts";
+import { appColor, areaEntities, otherAreaEntities, roomClimateSensors, roomClimateValue, unassignedEntities, autoPlace, deviceTapAction, entityName, fridgeDoors, furnitureEntities, groupByDevice, hasScreen, isActive, isMediaFurniture, kindOf, lightGlow, openingEntities, openingState, powerSensorsOf, primaryEntities, roomPanelEntities, windowPosition, confirmEntities, robotRoom, robotRoomSensor, roomKey, TOGGLE_KINDS } from "./devices.ts";
 import type { Floor, Opening, Room } from "./model.ts";
 import { centroid, FURNITURE_SIZE, newFloor, pointInPolygon } from "./model.ts";
 import type { HomeAssistant } from "./types.ts";
@@ -29,6 +29,13 @@ test("a fan opens its details on tap instead of toggling immediately", () => {
   assert.equal(TOGGLE_KINDS.has("climate"), false);
   assert.equal(TOGGLE_KINDS.has("light"), true);
   assert.equal(TOGGLE_KINDS.has("switch"), true);
+});
+
+test("camera taps open details while only covers need the quick menu", () => {
+  assert.equal(deviceTapAction("camera"), "details");
+  assert.equal(deviceTapAction("cover"), "menu");
+  assert.equal(deviceTapAction("light"), "toggle");
+  assert.equal(deviceTapAction("fan"), "details");
 });
 
 function hassWith(): HomeAssistant {

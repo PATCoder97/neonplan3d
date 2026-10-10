@@ -6,6 +6,12 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 
 ## Unreleased
 
+## 1.24.10
+
+### Fixed
+
+- Opened a camera's Home Assistant live popup on a normal 3D tap while keeping the Honeycomb camera menu on long press.
+
 ## 1.24.9
 
 ### Changed

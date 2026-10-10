@@ -73,6 +73,14 @@ export const KIND_ORDER: DeviceKind[] = ["light", "cover", "climate", "media", "
 /** Kinds that can be toggled with a tap in 3D. Fans open their Home Assistant details like climate devices, so speed and presets stay one tap away. */
 export const TOGGLE_KINDS = new Set<DeviceKind>(["light", "switch"]);
 
+export type DeviceTapAction = "toggle" | "menu" | "details";
+
+/** Normal 3D taps stay immediate; richer controls remain available on long press. */
+export function deviceTapAction(kind: DeviceKind | null): DeviceTapAction {
+  if (kind === "cover") return "menu";
+  return kind !== null && TOGGLE_KINDS.has(kind) ? "toggle" : "details";
+}
+
 export function domainOf(entityId: string): string {
   return entityId.slice(0, entityId.indexOf("."));
 }
