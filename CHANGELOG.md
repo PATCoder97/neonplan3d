@@ -6,6 +6,12 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 
 ## Unreleased
 
+## 1.24.8
+
+### Fixed
+
+- Prevented quantized fan speeds such as 29% from getting stuck by applying Honeycomb's ten-percent fan steps relative to the reported value instead of repeatedly snapping to an unreachable grid value.
+
 ## 1.24.7
 
 ### Fixed

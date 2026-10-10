@@ -351,13 +351,14 @@ function stepperPage(
   format: (value: number) => string,
   disabled = false,
   confirm = false,
+  relative = false,
 ): NeonMenuPage {
   const current = finiteNumber(value, min, min, max);
   const safeStep = finiteNumber(step, 1, 0.001, Math.max(0.001, max - min));
   const offset = current - min;
   const clean = (candidate: number) => Math.round(Math.max(min, Math.min(max, candidate)) * 1000) / 1000;
-  let down = clean(min + Math.floor(offset / safeStep - 1e-6) * safeStep);
-  let up = clean(min + Math.ceil(offset / safeStep + 1e-6) * safeStep);
+  let down = relative ? clean(current - safeStep) : clean(min + Math.floor(offset / safeStep - 1e-6) * safeStep);
+  let up = relative ? clean(current + safeStep) : clean(min + Math.ceil(offset / safeStep + 1e-6) * safeStep);
   if (max - up < safeStep / 2) up = max;
   if (down - min < safeStep / 2) down = min;
   const center = page(`${id}-back`, title, "mdi:arrow-left", backPage);
@@ -490,7 +491,7 @@ function fanMenu(entity: string, st: HassEntity, commonDetails: NeonMenuItem, pa
   const presets = Array.isArray(st.attributes.preset_modes) ? (st.attributes.preset_modes as string[]) : [];
   const pages: NeonMenuPage[] = [{ id: "main", title: String(st.attributes.friendly_name ?? entity), center: { id: "power", label: String(st.attributes.friendly_name ?? entity), icon: "mdi:fan", value: `${Math.round(pct)} %`, active: on, disabled: unavailable, close: false, action: { type: "toggle", entity } }, items: [...items, ...(f & FAN_PRESET && presets.length ? [page("presets", t("honeycomb_presets", "Presets"), "mdi:fan-chevron-down", "fan-presets-1")] : [])] }];
   if (speed) {
-    pages.push(stepperPage("fan-speed", t("speed", "Speed"), "main", entity, "fan", "set_percentage", "percentage", pct, 0, 100, Math.max(10, percentageStep), (v) => `${Math.round(v)} %`, unavailable));
+    pages.push(stepperPage("fan-speed", t("speed", "Speed"), "main", entity, "fan", "set_percentage", "percentage", pct, 0, 100, Math.max(10, percentageStep), (v) => `${Math.round(v)} %`, unavailable, false, true));
   }
   if (f & FAN_PRESET && presets.length) pages.push(...paginate("fan-presets", t("honeycomb_presets", "Presets"), page("back", t("back", "Back"), "mdi:arrow-left", "main"), presets.map((p) => service(`preset-${p}`, p, "mdi:fan", entity, "fan", "set_preset_mode", { preset_mode: p }, { active: st.attributes.preset_mode === p, disabled: unavailable })), t));
   return model(pages);

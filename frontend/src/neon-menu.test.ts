@@ -173,6 +173,8 @@ test("fan exposes only confirmed capabilities", () => {
   assert.ok(full.pages[0].items.some((i) => i.id === "oscillate"));
   const threeStep = menuForEntity(hass(state("fan.three", "on", { supported_features: 1, percentage: 66, percentage_step: 33 })), "fan.three")!;
   assert.deepEqual(threeStep.pages.find((p) => p.id === "fan-speed")?.items.map((i) => i.action.type === "service" ? i.action.data?.percentage : undefined), [33, 100]);
+  const quantized = menuForEntity(hass(state("fan.quantized", "on", { supported_features: 1, percentage: 29, percentage_step: 1 })), "fan.quantized")!;
+  assert.deepEqual(quantized.pages.find((p) => p.id === "fan-speed")?.items.map((i) => i.action.type === "service" ? i.action.data?.percentage : undefined), [19, 39]);
 });
 
 test("a combined fan and light expose the other entity from either Honeycomb marker", () => {
